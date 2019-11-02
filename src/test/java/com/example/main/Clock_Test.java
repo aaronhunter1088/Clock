@@ -7,6 +7,9 @@ import java.text.ParseException;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
+import com.clockv1.main.Clock;
+import com.clockv1.main.Time;
+
 public class Clock_Test {
 	private Clock clock;
 	

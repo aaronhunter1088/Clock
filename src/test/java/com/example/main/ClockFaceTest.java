@@ -7,7 +7,7 @@ import java.util.List;
 
 import org.junit.Test;
 
-import com.example.main.ClockFace;
+import com.clockv1.main.ClockFace;
 
 public class ClockFaceTest {
 

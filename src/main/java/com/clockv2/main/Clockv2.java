@@ -1,4 +1,4 @@
-package com.example.main;
+package com.clockv2.main;
 
 import java.awt.*;
 import java.text.*;
@@ -14,7 +14,7 @@ import javax.swing.*;
  * @author Michael Ball 
  * @version 2
  */
-public class Clock extends JFrame { // implements Runnable {
+public class Clockv2 extends JFrame { // implements Runnable {
     private static final long serialVersionUID = 1L;
     private final String JANUARY = "January";
     private final String FEBRUARY = "February";
@@ -99,9 +99,9 @@ public class Clock extends JFrame { // implements Runnable {
     private void setClockFace(ClockFace clockFace) { this.clockFace = clockFace; }
     
     /**
-     * Constructor for objects of class Clock
+     * Constructor for objects of class Clockv2
      */
-    public Clock() throws ParseException {
+    public Clockv2() throws ParseException {
         super();
         setResizable(true);
         setLayout(layout);
@@ -113,7 +113,7 @@ public class Clock extends JFrame { // implements Runnable {
         
     }
     
-    public Clock(int hours, int minutes, int seconds, String month, String day, int date, int year, Time time) throws ParseException {
+    public Clockv2(int hours, int minutes, int seconds, String month, String day, int date, int year, Time time) throws ParseException {
         super();
         setResizable(true);
         setLayout(layout);
@@ -125,7 +125,7 @@ public class Clock extends JFrame { // implements Runnable {
         pack();
     }
     
-    public Clock(int hours, int minutes, int seconds, Date today, Time time) throws ParseException {
+    public Clockv2(int hours, int minutes, int seconds, Date today, Time time) throws ParseException {
         super();
         setResizable(true);
         setLayout(layout);
@@ -278,7 +278,7 @@ public class Clock extends JFrame { // implements Runnable {
         fullDateSetting.setForeground(Color.WHITE); // added on mac
         
         // Menu Items for Features
-        JMenuItem clockFeature = new JMenuItem("View Clock");
+        JMenuItem clockFeature = new JMenuItem("View Clockv2");
         clockFeature.addActionListener(action -> {
             if (this.clockFace != ClockFace.StartFace) {
                 this.clockFace = ClockFace.StartFace;
@@ -813,14 +813,14 @@ public class Clock extends JFrame { // implements Runnable {
     
 
     public static void main(String[] args) throws ParseException, InterruptedException {
-        Clock clock = new Clock();
-        clock.setVisible(true);
-        clock.getContentPane().setBackground(Color.BLACK);
-        clock.setSize(700, 300); // 500, 300
-        clock.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        clock.setBounds(200, 200, 700, 300);
+        Clockv2 clockv2 = new Clockv2();
+        clockv2.setVisible(true);
+        clockv2.getContentPane().setBackground(Color.BLACK);
+        clockv2.setSize(700, 300); // 500, 300
+        clockv2.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        clockv2.setBounds(200, 200, 700, 300);
         while (true) {
-            clock.tick();
+            clockv2.tick();
             Thread.sleep(1000); // main thread put to sleep
         }
     }

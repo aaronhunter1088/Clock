@@ -6,6 +6,9 @@ import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
+import com.clockv1.main.InvalidInputException;
+import com.clockv1.main.Time;
+
 public class InvalidInputExceptionTest extends Exception {
 
 	private static final long serialVersionUID = 1L;

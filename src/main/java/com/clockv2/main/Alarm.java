@@ -1,4 +1,4 @@
-package com.example.main;
+package com.clockv2.main;
 
 /**
  * Write a description of class Alarm here.

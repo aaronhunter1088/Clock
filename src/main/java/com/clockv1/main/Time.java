@@ -1,4 +1,4 @@
-package com.example.main;
+package com.clockv1.main;
 /**
  * Enumeration class Time - write a description of the enum class here
  * 
