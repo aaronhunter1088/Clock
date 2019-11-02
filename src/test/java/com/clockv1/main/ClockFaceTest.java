@@ -1,4 +1,4 @@
-package com.example.main;
+package com.clockv1.main;
 
 import static org.junit.Assert.*;
 

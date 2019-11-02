@@ -1,4 +1,4 @@
-package com.example.main;
+package com.clockv1.main;
 
 import static org.junit.Assert.*;
 
@@ -36,8 +36,8 @@ public class Clock_Test {
 		assertEquals("boolean daylightSavingsTime should be true", false, clock.daylightSavingsTime);
 		
 		// validate that we are moving forward now
-		for (int i = 0; i < 1; i++) {
-			clock.tick(60, 60, 1); // 60 seconds and 60 minutes and one hour
+		for (int i = 0; i < 3600; i++) {
+			clock.tick(); // 60 seconds and 60 minutes and one hour
 			Thread.sleep(1000);
 		}
 		
@@ -72,8 +72,8 @@ public class Clock_Test {
 		assertEquals("boolean daylightSavingsTime should be false", false, clock.daylightSavingsTime);
 		
 		// validate that the clock moves forward
-		for (int i = 0; i < 1; i++) {
-			clock.tick(60, 60, 1); // 60 seconds and 60 minutes and one hour
+		for (int i = 0; i < 3600; i++) {
+			clock.tick(); // 60 seconds and 60 minutes and one hour
 			Thread.sleep(1000);
 		}
 		
