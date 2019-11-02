@@ -15,7 +15,7 @@ public class ClockFaceTest {
 	public void testClockFacesAreDifferent() {
 		ClockFace c1 = ClockFace.StartFace;
 		ClockFace c2 = ClockFace.AlarmFace;
-		assertTrue("No differences found", c1 != c2);
+		assertTrue("Differences found", c1 != c2);
 	}
 	
 	@Test
@@ -25,8 +25,8 @@ public class ClockFaceTest {
 			clockFaces.add(cf);
 		}
 		// x should be hard coded for future tests
-		int x = ClockFace.values().length;
-		assertTrue("Expected " + x + " but got something else!", x == clockFaces.size());
+		assertTrue("Expected " + ClockFace.values().length + " but got another size!", 
+			   ClockFace.values().length == clockFaces.size());
 	}
 
 }

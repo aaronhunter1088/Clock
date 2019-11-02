@@ -13,10 +13,6 @@ import com.clockv1.main.Time;
 public class Clock_Test {
 	private Clock clock;
 	
-	
-	
-	
-	
 	@BeforeClass
 	public static void setUpBeforeClass() throws Exception {}
 	
@@ -58,7 +54,7 @@ public class Clock_Test {
 	
 	@Test
 	public void testDaylightSavingsTimeFallBackWorksButContinuesNormallyThenOn() throws InterruptedException, ParseException {
-		clock = new Clock(1, 59, 59, "November", "Sunday", 3, 2019, Time.AM); // throws ParseException
+		clock = new Clock(1, 59, 59, "November", "Sunday", 3, 2019, Time.AM);
 		
 		for (int i = 0; i < 1; i++) {
 			clock.tick();
@@ -94,7 +90,7 @@ public class Clock_Test {
 	
 	@Test
 	public void testUpdateTextArea() throws InterruptedException, ParseException {
-		clock = new Clock(11, 59, 59, "September", "Monday", 30, 2019, Time.PM); // hours, minutes, seconds
+		clock = new Clock(11, 59, 59, "September", "Monday", 30, 2019, Time.PM);
 		for (int i = 0; i < 1; i++) {
 			clock.tick();
 			Thread.sleep(1000);
