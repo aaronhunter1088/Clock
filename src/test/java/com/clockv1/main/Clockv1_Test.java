@@ -10,7 +10,7 @@ import org.junit.Test;
 import com.clockv1.main.Clock;
 import com.clockv1.main.Time;
 
-public class Clock_Test {
+public class Clockv1_Test {
 	private Clock clock;
 	
 	@BeforeClass
