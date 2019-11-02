@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Configuration status="WARN">
+	<Properties>
+		<Property name="basepath">logs</Property>
+		<Property name="masterName">${sys:appName}~Master~Logs</Property>
+		<Property name="instanceName">${sys:appName}~Instance~Logs</Property>
+		<Property name="patternWithColor">%highlight{%-5level}{FATAL=bg_red, ERROR=bg_red, WARN=yellow, INFO=green, DEBUG=cyan} %d{MM-dd-yyyy HH:mm:ss.SSS} [%t] %c:%M:%L - %msg%n</Property>
+		<Property name="patternNoColor">[%-5level] %d{MM-dd-yyyy HH:mm:ss.SSS} [%t] %c:%M:%L - %msg%n</Property>
+		<Property name="rollOverDaily">%d{MM-dd-yyyy}</Property>
+		<Property name="rollOverHourly">%d{MM-dd-yyyy_hh}</Property>
+		<Property name="rollOverMinutely">%d{MM-dd-yyyy_hh-mm}</Property>
+	</Properties>
+	<Appenders>
+		<Console name="ConsoleAppender" target="SYSTEM_OUT">
+			<PatternLayout>
+				<Pattern>${patternWithColor}</Pattern>
+			</PatternLayout>
+		</Console>
+		<File name="MasterFileAppender" fileName="${basepath}/${masterName}.log">
+			<PatternLayout>
+				<Pattern>${patternNoColor}</Pattern>
+			</PatternLayout>
+		</File>
+		<RollingFile name="RollingFileAppender" fileName="${basepath}/${instanceName}.log"
+			filePattern="${basepath}/${instanceName}_${rollOverDaily}_%i.log">
+			<PatternLayout>
+				<Pattern>${patternNoColor}</Pattern>
+			</PatternLayout>
+			<Policies>
+				<OnStartupTriggeringPolicy />
+				<TimeBasedTriggeringPolicy 
+					interval="1"
+					modulate="true">
+				</TimeBasedTriggeringPolicy>
+				<SizeBasedTriggeringPolicy size="50 MB" />
+			</Policies>
+			<DefaultRolloverStrategy max="20" />
+		</RollingFile>
+	</Appenders>
+	<Loggers>
+		<Root level="TRACE">
+			<AppenderRef ref="ConsoleAppender" level="info"/>
+			<AppenderRef ref="MasterFileAppender" />
+			<AppenderRef ref="RollingFileAppender" />
+		</Root>
+	</Loggers>
+</Configuration>
