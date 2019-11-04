@@ -260,6 +260,7 @@ public class Clockv2 extends JFrame { // implements Runnable {
                 militaryTimeSetting.setText("Show standard time");
             }
             updateClockFace(true);
+            pack();
         });
         militaryTimeSetting.setForeground(Color.WHITE); // added on mac
         
@@ -274,6 +275,7 @@ public class Clockv2 extends JFrame { // implements Runnable {
                fullDateSetting.setText("Hide full date");
            }
            updateClockFace(true);
+           pack();
         });
         fullDateSetting.setForeground(Color.WHITE); // added on mac
         
@@ -403,7 +405,6 @@ public class Clockv2 extends JFrame { // implements Runnable {
                 }
             }
             updateClockFace(true);
-            pack(); // Moved here to help facilitate not having to resize GUI for components to show up
         } catch (Exception e) {}
     }
     
