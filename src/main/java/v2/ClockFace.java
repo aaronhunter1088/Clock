@@ -1,4 +1,4 @@
-package com.clockv2.main;
+package v2;
 
 public enum ClockFace {
 	

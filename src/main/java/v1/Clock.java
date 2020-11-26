@@ -1,4 +1,4 @@
-package com.clockv2.main;
+package v1;
 
 import java.awt.*;
 import java.text.*;
@@ -9,12 +9,10 @@ import javax.swing.*;
  * can be view in military time or not, and the date fully expressed
  * or not.
  * 
- * Alarms are the next feature and are a work in progress.
- * 
  * @author Michael Ball 
- * @version 2
+ * @version 1
  */
-public class Clockv2 extends JFrame { // implements Runnable {
+public class Clock extends JFrame implements Runnable {
     private static final long serialVersionUID = 1L;
     private final String JANUARY = "January";
     private final String FEBRUARY = "February";
@@ -99,9 +97,9 @@ public class Clockv2 extends JFrame { // implements Runnable {
     private void setClockFace(ClockFace clockFace) { this.clockFace = clockFace; }
     
     /**
-     * Constructor for objects of class Clockv2
+     * Constructor for objects of class Clock
      */
-    public Clockv2() throws ParseException {
+    public Clock() throws ParseException {
         super();
         setResizable(true);
         setLayout(layout);
@@ -113,7 +111,7 @@ public class Clockv2 extends JFrame { // implements Runnable {
         
     }
     
-    public Clockv2(int hours, int minutes, int seconds, String month, String day, int date, int year, Time time) throws ParseException {
+    public Clock(int hours, int minutes, int seconds, String month, String day, int date, int year, Time time) throws ParseException {
         super();
         setResizable(true);
         setLayout(layout);
@@ -125,7 +123,7 @@ public class Clockv2 extends JFrame { // implements Runnable {
         pack();
     }
     
-    public Clockv2(int hours, int minutes, int seconds, Date today, Time time) throws ParseException {
+    public Clock(int hours, int minutes, int seconds, Date today, Time time) throws ParseException {
         super();
         setResizable(true);
         setLayout(layout);
@@ -245,10 +243,6 @@ public class Clockv2 extends JFrame { // implements Runnable {
         settings.setOpaque(false);
         settings.setForeground(Color.WHITE);
         
-        JMenu features = new JMenu("Features");
-        features.setOpaque(false);
-        features.setForeground(Color.WHITE);
-        
         // Menu Items for Settings
         JMenuItem militaryTimeSetting = new JMenuItem("Show Military Time");
         militaryTimeSetting.addActionListener(action -> {
@@ -260,7 +254,6 @@ public class Clockv2 extends JFrame { // implements Runnable {
                 militaryTimeSetting.setText("Show standard time");
             }
             updateClockFace(true);
-            pack();
         });
         militaryTimeSetting.setForeground(Color.WHITE); // added on mac
         
@@ -275,39 +268,15 @@ public class Clockv2 extends JFrame { // implements Runnable {
                fullDateSetting.setText("Hide full date");
            }
            updateClockFace(true);
-           pack();
         });
         fullDateSetting.setForeground(Color.WHITE); // added on mac
-        
-        // Menu Items for Features
-        JMenuItem clockFeature = new JMenuItem("View Clockv2");
-        clockFeature.addActionListener(action -> {
-            if (this.clockFace != ClockFace.StartFace) {
-                this.clockFace = ClockFace.StartFace;
-            }
-            updateClockFace(true);
-         });
-        clockFeature.setForeground(Color.WHITE);
-        
-        JMenuItem alarmFeature = new JMenuItem("View Alarms");
-        alarmFeature.addActionListener(action -> {
-            if (this.clockFace != ClockFace.AlarmFace) {
-                this.clockFace = ClockFace.AlarmFace;
-            }
-            updateClockFace(true);
-         });
-        alarmFeature.setForeground(Color.WHITE);
         
         // Add menu items to menu
         settings.add(militaryTimeSetting);
         settings.add(fullDateSetting);
         
-        features.add(clockFeature);
-        features.add(alarmFeature);
-        
         // Add menu to menuBar
         menuBar.add(settings);
-        menuBar.add(features);
         
         this.setJMenuBar(menuBar);
     }
@@ -375,40 +344,11 @@ public class Clockv2 extends JFrame { // implements Runnable {
      * the purpose of tick is to start the clock normally.
      */
     public void tick() {
-//        Thread t = new Thread(this);
-//        t.start();
-    	tick(1, 1, 1);
+        Thread t = new Thread(this);
+        t.start();
     }
     
-    /**
-     * the purpose of tick is to start the clock but it should increase
-     * the clocks time given the values of seconds, minutes, and seconds
-     * with each tick.
-     * 
-     * @param seconds, the amount of seconds to tick forward or backwards with each tick
-     * @param minutes, the amount of minutes to tick forward of backwards with each tick
-     * @param hours,   the amount of hours   to tick forward or backwards with each tick
-     */
-    public void tick(int seconds, int minutes, int hours) {
-    	try {
-            updateJLabels(seconds, minutes, hours);
-            //Updates the clock daily to keep time current
-            if (!isShowMilitaryTime()) {
-         	   if (getTimeAsStr().equals("04:20:00 AM")) {
-                    updateAllClockValues();
-                    updateClockFace(false);
-                }
-            } else {
-         	   if (getMilitaryTimeAsStr().equals("0420 hours 00")) {
-                    updateAllClockValues();
-                    updateClockFace(false);
-                }
-            }
-            updateClockFace(true);
-        } catch (Exception e) {}
-    }
-    
-    @Deprecated
+    @Override
     public void run() {
     	try {
             updateJLabels();
@@ -512,35 +452,18 @@ public class Clockv2 extends JFrame { // implements Runnable {
         this.daylightSavingsTime = isTodayDaylightSavingsTime();
     }
     
-    @Deprecated
     public void updateJLabels() {
-    	updateJLabels(1,1,1);
-    }
-    
-    /**
-     * updateJLabels performs the logic to update the time, date, month, 
-     * and many other values. it also updates the values we see on the 
-     * clock face.
-     * 
-     * @param seconds, the amount of time to increase or decrease seconds
-     * @param minutes, the amount of time to increase or decrease seconds
-     * @param hours,   the amount of time to increase or decrease seconds
-     */
-    public void updateJLabels(int seconds, int minutes, int hours) {
-    	this.seconds += seconds;
-//        this.seconds += 1;
+        this.seconds += 1;
         this.secondsAsStr = this.seconds <= 9 ? "0"+Integer.toString(this.seconds) : Integer.toString(this.seconds);
         if (this.seconds == 60) {
             this.seconds = 0;
             this.secondsAsStr = "00";
-            this.minutes += minutes;
-//            this.minutes += 1;
+            this.minutes += 1;
             this.minutesAsStr = this.minutes <= 9 ? "0"+Integer.toString(this.minutes) : Integer.toString(this.minutes);
             if (this.minutes == 60) {
                 this.minutes = 0;
                 this.minutesAsStr = "00";
-                this.hours += hours;
-//                this.hours += 1;
+                this.hours += 1;
                 if (this.hours == 12 && this.minutes == 0 && this.seconds == 0 && !showMilitaryTime) {
                     this.hours = 12;
                     this.hoursAsStr = "12";
@@ -814,14 +737,14 @@ public class Clockv2 extends JFrame { // implements Runnable {
     
 
     public static void main(String[] args) throws ParseException, InterruptedException {
-        Clockv2 clockv2 = new Clockv2();
-        clockv2.setVisible(true);
-        clockv2.getContentPane().setBackground(Color.BLACK);
-        clockv2.setSize(700, 300); // 500, 300
-        clockv2.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        clockv2.setBounds(200, 200, 700, 300);
+        Clock clock = new Clock();
+        clock.setVisible(true);
+        clock.getContentPane().setBackground(Color.BLACK);
+        clock.setSize(700, 300); // 500, 300
+        clock.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        clock.setBounds(200, 200, 700, 300);
         while (true) {
-            clockv2.tick();
+            clock.tick();
             Thread.sleep(1000); // main thread put to sleep
         }
     }

@@ -1,13 +1,10 @@
-package com.clockv1.main;
+package v1;
 
 import static org.junit.Assert.*;
 
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
-
-import com.clockv1.main.InvalidInputException;
-import com.clockv1.main.Time;
 
 public class InvalidInputExceptionTest extends Exception {
 

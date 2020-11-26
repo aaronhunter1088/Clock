@@ -1,4 +1,4 @@
-package com.clockv1.main;
+package v1;
 
 /*  extends Exception says that this exception is a Checked Exception:
 	the compiler forces you to handle these exceptions explicitly. 

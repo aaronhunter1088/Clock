@@ -1,4 +1,4 @@
-package com.clockv2.main;
+package v2;
 
 import static org.junit.Assert.*;
 
@@ -6,13 +6,10 @@ import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-import com.clockv1.main.InvalidInputException;
-import com.clockv1.main.Time;
-
 public class InvalidInputExceptionTest extends Exception {
 
 	private static final long serialVersionUID = 1L;
-	private Time goodMonth, badMonth;
+	private Time.Month goodMonth, badMonth;
 
 	@BeforeClass
 	public static void setUpBeforeClass() throws Exception {
@@ -20,8 +17,8 @@ public class InvalidInputExceptionTest extends Exception {
 
 	@Before
 	public void setUp() throws Exception {
-		goodMonth = Time.AUGUST;
-		badMonth = Time.ERR;
+		goodMonth = Time.Month.AUGUST;
+		badMonth = Time.Month.ERR;
 		
 	}
 

@@ -76,8 +76,8 @@
 	    				<exclude>components</exclude>
 	    				<exclude>future.com.example.serverExample</exclude>
 	    			</excludes>
-		            <source>1.8</source>
-		            <target>1.8</target>
+		            <source>11</source>
+		            <target>11</target>
 		        </configuration>
             </plugin>
             
@@ -134,7 +134,7 @@
             				<Implementation-Version>${project.version}</Implementation-Version>
             				<Creation-Time-Format>MM-dd-YYYY hh:mm:ss</Creation-Time-Format>
             				<Creation-Time>${build.time}</Creation-Time>
-            				<mainClass>com.example.ClockGUI_Main</mainClass>
+            				<mainClass>v2.Clockv2</mainClass>
             			</manifestEntries>
             		</archive>
             		<outputDirectory>${basedir}/dist</outputDirectory>
@@ -196,18 +196,18 @@
                   </executions>
                   <configuration>
                        <!-- ... -->
-                       <finalName>ClockGUI-1.1</finalName>
+                       <finalName>ClockGUI-2.1</finalName>
                        <archive>
                            <index>>true</index>
                            <manifest>
                            		<addClasspath>true</addClasspath>
-                                <mainClass>com.example.ClockGUI_Main</mainClass>
+                                <mainClass>v2.Clockv2</mainClass>
                            </manifest>
                            <manifestEntries>
             				  <Implementation-Version>${project.version}</Implementation-Version>
             				  <Creation-Time-Format>MM-dd-YYYY hh:mm:ss</Creation-Time-Format>
             				  <Creation-Time>${build.time}</Creation-Time>
-            				  <mainClass>com.example.ClockGUI_Main</mainClass>
+            				  <mainClass>v2.Clockv2</mainClass>
             			  </manifestEntries>
                        </archive>
                        <descriptorRefs>

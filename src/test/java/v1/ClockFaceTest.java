@@ -1,4 +1,4 @@
-package com.clockv2.main;
+package v1;
 
 import static org.junit.Assert.*;
 
@@ -6,8 +6,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.junit.Test;
-
-import com.clockv1.main.ClockFace;
 
 public class ClockFaceTest {
 
