@@ -95,7 +95,7 @@
             			</goals>
             			<configuration>
             				<files>
-            					<file>${basedir}/target/filter.properties</file>
+            					<file>${basedir}/dist/build.properties</file>
             				</files>
             				<tasks>
             					<echo>BuildTime : ${build.time}</echo>
@@ -159,7 +159,7 @@
             					<tstamp>
             						<format property="last.updated" pattern="MM-dd-YYYY hh:mm:ss"/>
             					</tstamp>
-            					<echo file="${basedir}/target/filter.properties" message="build.time=${last.updated}"/>
+            					<echo file="${basedir}/dist/build.properties" message="build.time=${last.updated}"/>
             				</tasks>
             			</configuration>
             		</execution>
