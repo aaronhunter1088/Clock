@@ -4,21 +4,19 @@ import java.text.ParseException;
 
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
-import v2.Clockv2;
-import v2.Time.*;
 
 import static org.junit.jupiter.api.Assertions.*;
 
 
-public class Clockv2_Test {
-	private Clockv2 clock;
+public class Clock_Test {
+	private Clock clock;
 	
 	@BeforeAll
 	public static void setUpBeforeClass() throws Exception {}
 	
 	@Test
 	public void testDaylightSavingsTimeSpringForwardWorks() throws InterruptedException, ParseException {
-		clock = new Clockv2(1, 59, 59, v2.Time.Month.MARCH, v2.Time.Day.SUNDAY.strValue, 10, 2019, v2.Time.AMPM.AM); // throws ParseException
+		clock = new Clock(1, 59, 59, Time.Month.MARCH, Time.Day.SUNDAY, 10, 2019, Time.AMPM.AM); // throws ParseException
 		
 		for (int i = 0; i < 1; i++) { // throws InterruptedException
 			clock.tick();
@@ -29,11 +27,11 @@ public class Clockv2_Test {
 		assertEquals(0, clock.getMinutes());
 		assertEquals(0, clock.getSeconds());
 		assertEquals(Time.AMPM.AM, clock.getAmpm());
-		assertSame("March", clock.getMonth());
-		assertSame("Sunday", clock.getDay());
+		assertSame(Time.Month.MARCH, clock.getMonth());
+		assertSame(Time.Day.SUNDAY, clock.getDay());
 		assertEquals(10, clock.getDate());
 		assertEquals(2019, clock.getYear());
-		assertEquals(false, clock.daylightSavingsTime);
+		assertEquals(false, clock.isDaylightSavingsTime());
 		
 		// validate that we are moving forward now
 		for (int i = 0; i < 1; i++) {
@@ -45,16 +43,16 @@ public class Clockv2_Test {
 		assertEquals(0, clock.getMinutes());
 		assertEquals(0, clock.getSeconds());
 		assertEquals(v2.Time.AMPM.AM, clock.getAmpm());
-		assertSame("March", clock.getMonth());
-		assertSame("Sunday", clock.getDay());
+		assertSame(Time.Month.MARCH, clock.getMonth());
+		assertSame(Time.Day.SUNDAY, clock.getDay());
 		assertEquals(10, clock.getDate());
 		assertEquals(2019, clock.getYear());
-		assertEquals(false, clock.daylightSavingsTime);
+		assertEquals(false, clock.isDaylightSavingsTime());
 	}
 	
 	@Test
 	public void testDaylightSavingsTimeFallBackWorksButContinuesNormallyThenOn() throws InterruptedException, ParseException {
-		clock = new Clockv2(1, 59, 59, Time.Month.NOVEMBER, Time.Day.SUNDAY.strValue, 3, 2019, Time.AMPM.AM);
+		clock = new Clock(1, 59, 59, Time.Month.NOVEMBER, Time.Day.SUNDAY, 3, 2019, Time.AMPM.AM);
 		
 		for (int i = 0; i < 1; i++) {
 			clock.tick();
@@ -65,11 +63,11 @@ public class Clockv2_Test {
 		assertEquals(0, clock.getMinutes());
 		assertEquals(0, clock.getSeconds());
 		assertEquals(Time.AMPM.AM, clock.getAmpm());
-		assertSame(Time.Month.NOVEMBER.strValue, clock.getMonth());
-		assertSame(Day.SUNDAY.strValue, clock.getDay());
+		assertSame(Time.Month.NOVEMBER, clock.getMonth());
+		assertSame(Time.Day.SUNDAY, clock.getDay());
 		assertEquals(3, clock.getDate());
 		assertEquals(2019, clock.getYear());
-		assertEquals(false, clock.daylightSavingsTime);
+		assertEquals(false, clock.isDaylightSavingsTime());
 		
 		// validate that the clock moves forward
 		for (int i = 0; i < 1; i++) {
@@ -81,16 +79,16 @@ public class Clockv2_Test {
 		assertEquals(0, clock.getMinutes());
 		assertEquals(0, clock.getSeconds());
 		assertEquals(Time.AMPM.AM, clock.getAmpm());
-		assertSame("November", clock.getMonth());
-		assertSame("Sunday", clock.getDay());
+		assertSame(Time.Month.NOVEMBER, clock.getMonth());
+		assertSame(Time.Day.SUNDAY, clock.getDay());
 		assertEquals(3, clock.getDate());
 		assertEquals(2019, clock.getYear());
-		assertEquals(false, clock.daylightSavingsTime);
+		assertEquals(false, clock.isDaylightSavingsTime());
 	}
 	
 	@Test
 	public void testUpdateTextArea() throws InterruptedException, ParseException {
-		clock = new Clockv2(11, 59, 59, Time.Month.SEPTEMBER, "Monday", 30, 2019, Time.AMPM.PM);
+		clock = new Clock(11, 59, 59, Time.Month.SEPTEMBER, Time.Day.MONDAY, 30, 2019, Time.AMPM.PM);
 		for (int i = 0; i < 1; i++) {
 			clock.tick();
 			Thread.sleep(1000);
@@ -107,8 +105,8 @@ public class Clockv2_Test {
 	
 	@Test
 	public void testIsALeapYear() {
-		assertEquals(true, Clockv2.isALeapYear(2000));
-		assertEquals(false, Clockv2.isALeapYear(2019));
+		assertEquals(true, Clock.isALeapYear(2000));
+		assertEquals(false, Clock.isALeapYear(2019));
 	}
 }
 

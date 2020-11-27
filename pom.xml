@@ -136,7 +136,7 @@
             				<Implementation-Version>${project.version}</Implementation-Version>
             				<Creation-Time-Format>MM-dd-YYYY hh:mm:ss</Creation-Time-Format>
             				<Creation-Time>${build.time}</Creation-Time>
-            				<mainClass>v2.Clockv2</mainClass>
+            				<mainClass>v2.Clock</mainClass>
             			</manifestEntries>
             		</archive>
             		<outputDirectory>${basedir}/dist</outputDirectory>
@@ -203,13 +203,13 @@
                            <index>true</index>
                            <manifest>
                            		<addClasspath>true</addClasspath>
-                                <mainClass>v2.Clockv2</mainClass>
+                                <mainClass>v2.Clock</mainClass>
                            </manifest>
                            <manifestEntries>
             				  <Implementation-Version>${project.version}</Implementation-Version>
             				  <Creation-Time-Format>MM-dd-YYYY hh:mm:ss</Creation-Time-Format>
             				  <Creation-Time>${build.time}</Creation-Time>
-            				  <mainClass>v2.Clockv2</mainClass>
+            				  <mainClass>v2.Clock</mainClass>
             			  </manifestEntries>
                        </archive>
                        <descriptorRefs>

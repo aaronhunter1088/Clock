@@ -6,26 +6,15 @@ package v2;
  * @author (your name here)
  * @version (version number or date here)
  */
-public enum Time implements ITime {
+public enum Time {
 
-    Time() {
-        int value;
-        String strValue;
-        @Override
-        public int getValue() { return value; }
-        @Override
-        public String getStrValue() { return strValue; }
-        @Override
-        public void setValue(int value) { this.value = value; }
-        @Override
-        public void setStrValue(String strValue) { this.strValue = strValue; }
-    };
+    Time() {};
 
     enum Day implements ITime {
 
-        MONDAY(1, "Monday"), TUESDAY(2, "Tuesday"), WEDNESDAY(3, "Wednesday"),
-        THURSDAY(4, "Thursday"), FRIDAY(5, "Saturday"), SATURDAY(6, "Saturday"), SUNDAY(0, "Sunday"),
-        UNKNOWN_DAY(8, "Unknown day");
+        SUNDAY(0, "Sunday"), MONDAY(1, "Monday"), TUESDAY(2, "Tuesday"),
+        WEDNESDAY(3, "Wednesday"), THURSDAY(4, "Thursday"), FRIDAY(5, "Saturday"),
+        SATURDAY(6, "Saturday"), ERROR(7, "Unknown day");
 
         int value;
         String strValue;
@@ -49,9 +38,11 @@ public enum Time implements ITime {
 
     enum Month implements ITime {
 
-        JANUARY(1, "January"), FEBRUARY(2, "February"), MARCH(3, "March"), APRIL(4, "April"), MAY(5, "May"), JUNE(6, "June"),
-        JULY(7, "July"), AUGUST(8, "August"), SEPTEMBER(9, "September"), OCTOBER(10, "October"), NOVEMBER(11, "November"), DECEMBER(12, "December"),
-        ERR(13, "Err");
+        ERR(0, "Unknown month"), JANUARY(1, "January"), FEBRUARY(2, "February"),
+        MARCH(3, "March"), APRIL(4, "April"), MAY(5, "May"), JUNE(6, "June"),
+        JULY(7, "July"), AUGUST(8, "August"), SEPTEMBER(9, "September"),
+        OCTOBER(10, "October"), NOVEMBER(11, "November"), DECEMBER(12, "December");
+
         int value;
         String strValue;
 
@@ -76,7 +67,7 @@ public enum Time implements ITime {
 
     enum AMPM implements ITime {
 
-        AM(0, "AM"), PM(1, "PM");
+        ERROR(0, "Unknown time"), AM(1, "AM"), PM(2, "PM");
 
         int value;
         String strValue;
