@@ -15,7 +15,7 @@ import javax.swing.*;
  * @author Michael Ball 
  * @version 2
  */
-public class Clockv2 extends JFrame { // implements Runnable {
+public class Clockv2 extends JFrame {
     private static final long serialVersionUID = 1L;
     private static Dimension defaultSize = new Dimension(700, 300);
     private static final String INVALID_MONTH_TEXT = "Invalid month: ";
@@ -184,6 +184,7 @@ public class Clockv2 extends JFrame { // implements Runnable {
         calendar = Calendar.getInstance();
         calendar.setTime(definedDate);
         this.monthAsTime = month;
+        this.month = this.monthAsTime.strValue;
         this.day = day;
         this.date = date;
         this.year =year;
@@ -252,6 +253,9 @@ public class Clockv2 extends JFrame { // implements Runnable {
         
         // Menu Items for Settings
         JMenuItem militaryTimeSetting = new JMenuItem("Show Military Time");
+        JMenuItem partialDateSetting = new JMenuItem("Show partial date");
+        JMenuItem fullDateSetting = new JMenuItem("Show full date");
+
         militaryTimeSetting.addActionListener(action -> {
             if (isShowMilitaryTime() == true) {
                 setShowMilitaryTime(false);
@@ -265,7 +269,6 @@ public class Clockv2 extends JFrame { // implements Runnable {
         });
         militaryTimeSetting.setForeground(Color.WHITE); // added on mac
         
-        JMenuItem fullDateSetting = new JMenuItem("Show full date");
         fullDateSetting.addActionListener(action -> {
            if (this.showFullDate) {
                this.showFullDate = false;
@@ -275,6 +278,7 @@ public class Clockv2 extends JFrame { // implements Runnable {
                this.showFullDate = true;
                this.showPartialDate = false;
                fullDateSetting.setText("Hide full date");
+               partialDateSetting.setText("Show partial date");
            }
            updateClockFace(true);
            pack();
@@ -282,7 +286,6 @@ public class Clockv2 extends JFrame { // implements Runnable {
         fullDateSetting.setForeground(Color.WHITE); // added on mac
         
         // new: added on Raspberry PI
-        JMenuItem partialDateSetting = new JMenuItem("Show partial date");
         partialDateSetting.addActionListener(action -> {
            if (this.showPartialDate) {
                this.showPartialDate = false;
@@ -292,6 +295,7 @@ public class Clockv2 extends JFrame { // implements Runnable {
                this.showPartialDate = true;
                this.showFullDate = false;
                partialDateSetting.setText("Hide partial date");
+               fullDateSetting.setText("Show full date");
            }
            updateClockFace(true);
            pack();
@@ -300,6 +304,8 @@ public class Clockv2 extends JFrame { // implements Runnable {
         
         // Menu Items for Features
         JMenuItem clockFeature = new JMenuItem("View Clock");
+        JMenuItem alarmFeature = new JMenuItem("View Alarms");
+
         clockFeature.addActionListener(action -> {
             if (this.clockFace != ClockFace.StartFace) {
                 this.clockFace = ClockFace.StartFace;
@@ -308,7 +314,6 @@ public class Clockv2 extends JFrame { // implements Runnable {
          });
         clockFeature.setForeground(Color.WHITE);
         
-        JMenuItem alarmFeature = new JMenuItem("View Alarms");
         alarmFeature.addActionListener(action -> {
             if (this.clockFace != ClockFace.AlarmFace) {
                 this.clockFace = ClockFace.AlarmFace;
@@ -356,7 +361,6 @@ public class Clockv2 extends JFrame { // implements Runnable {
             jlbl1.setFont(font60);
 		    jlbl2.setFont(font60);
         }
-
         jalarmLbl1.setFont(font60);
         jalarmLbl2.setFont(font60);
         jalarmLbl3.setFont(font60);
@@ -394,7 +398,6 @@ public class Clockv2 extends JFrame { // implements Runnable {
             addComponent(jalarmLbl3, 1,0,7,1, 0,0);
             // TODO: add new alarm and continue to display all alarms created
         }
-        this.resize(this.getSize());
         this.repaint();
     }
 
@@ -818,8 +821,7 @@ public class Clockv2 extends JFrame { // implements Runnable {
         this.layout.setConstraints(cpt, constraints);
         add(cpt);
     }
-    
-    
+
     public void setClockValues(Time.AMPM time, boolean showMilitaryTime) {
         if (time == null && showMilitaryTime == false) {}
         
@@ -844,14 +846,12 @@ public class Clockv2 extends JFrame { // implements Runnable {
             if (this.hours > 12) setHours(this.hours - 12);
         }
     }
-    
-    
 
     public static void main(String[] args) throws ParseException, InterruptedException {
         Clockv2 clockv2 = new Clockv2();
         clockv2.setVisible(true);
         clockv2.getContentPane().setBackground(Color.BLACK);
-        clockv2.setSize(defaultSize); // 500, 300
+        clockv2.setSize(defaultSize);
         clockv2.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         clockv2.setBounds(200, 200, 700, 300);
         while (true) {

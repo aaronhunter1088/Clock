@@ -1,11 +1,12 @@
 package v1;
 
-import static org.junit.Assert.*;
+import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import org.junit.Test;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
 
 public class ClockFaceTest {
 
@@ -13,7 +14,7 @@ public class ClockFaceTest {
 	public void testClockFacesAreDifferent() {
 		ClockFace c1 = ClockFace.StartFace;
 		ClockFace c2 = ClockFace.AlarmFace;
-		assertTrue("Differences found", c1 != c2);
+		assertTrue(c1 != c2);
 	}
 	
 	@Test
@@ -23,8 +24,7 @@ public class ClockFaceTest {
 			clockFaces.add(cf);
 		}
 		// x should be hard coded for future tests
-		assertTrue("Expected " + ClockFace.values().length + " but got another size!", 
-			   ClockFace.values().length == clockFaces.size());
+		assertTrue(ClockFace.values().length == clockFaces.size());
 	}
 
 }

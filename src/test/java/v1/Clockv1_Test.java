@@ -1,16 +1,18 @@
 package v1;
 
-import static org.junit.Assert.*;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
 
 import java.text.ParseException;
 
-import org.junit.BeforeClass;
-import org.junit.Test;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertSame;
+
 
 public class Clockv1_Test {
 	private Clock clock;
 	
-	@BeforeClass
+	@BeforeAll
 	public static void setUpBeforeClass() throws Exception {}
 	
 	@Test
@@ -30,7 +32,7 @@ public class Clockv1_Test {
 		assertSame("Sunday", clock.getDay());
 		assertEquals(10, clock.getDate());
 		assertEquals(2019, clock.getYear());
-		assertEquals("boolean daylightSavingsTime should be true", false, clock.daylightSavingsTime);
+		assertEquals(false, clock.daylightSavingsTime);
 		
 		// validate that we are moving forward now
 		for (int i = 0; i < 3600; i++) {
@@ -46,7 +48,7 @@ public class Clockv1_Test {
 		assertSame("Sunday", clock.getDay());
 		assertEquals(10, clock.getDate());
 		assertEquals(2019, clock.getYear());
-		assertEquals("boolean daylightSavingsTime should be true", false, clock.daylightSavingsTime);
+		assertEquals(false, clock.daylightSavingsTime);
 	}
 	
 	@Test
@@ -66,7 +68,7 @@ public class Clockv1_Test {
 		assertSame("Sunday", clock.getDay());
 		assertEquals(3, clock.getDate());
 		assertEquals(2019, clock.getYear());
-		assertEquals("boolean daylightSavingsTime should be false", false, clock.daylightSavingsTime);
+		assertEquals(false, clock.daylightSavingsTime);
 		
 		// validate that the clock moves forward
 		for (int i = 0; i < 3600; i++) {
@@ -82,7 +84,7 @@ public class Clockv1_Test {
 		assertSame("Sunday", clock.getDay());
 		assertEquals(3, clock.getDate());
 		assertEquals(2019, clock.getYear());
-		assertEquals("boolean daylightSavingsTime should be false", false, clock.daylightSavingsTime);
+		assertEquals(false, clock.daylightSavingsTime);
 	}
 	
 	@Test

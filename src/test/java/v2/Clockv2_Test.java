@@ -1,21 +1,24 @@
 package v2;
 
-import static org.junit.Assert.*;
-
 import java.text.ParseException;
 
-import org.junit.BeforeClass;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
+import v2.Clockv2;
+import v2.Time.*;
+
+import static org.junit.jupiter.api.Assertions.*;
+
 
 public class Clockv2_Test {
 	private Clockv2 clock;
 	
-	@BeforeClass
+	@BeforeAll
 	public static void setUpBeforeClass() throws Exception {}
 	
 	@Test
 	public void testDaylightSavingsTimeSpringForwardWorks() throws InterruptedException, ParseException {
-		clock = new Clockv2(1, 59, 59, Time.Month.MARCH, "Sunday", 10, 2019, Time.AMPM.AM); // throws ParseException
+		clock = new Clockv2(1, 59, 59, v2.Time.Month.MARCH, v2.Time.Day.SUNDAY.strValue, 10, 2019, v2.Time.AMPM.AM); // throws ParseException
 		
 		for (int i = 0; i < 1; i++) { // throws InterruptedException
 			clock.tick();
@@ -30,7 +33,7 @@ public class Clockv2_Test {
 		assertSame("Sunday", clock.getDay());
 		assertEquals(10, clock.getDate());
 		assertEquals(2019, clock.getYear());
-		assertEquals("boolean daylightSavingsTime should be true", false, clock.daylightSavingsTime);
+		assertEquals(false, clock.daylightSavingsTime);
 		
 		// validate that we are moving forward now
 		for (int i = 0; i < 1; i++) {
@@ -41,32 +44,32 @@ public class Clockv2_Test {
 		assertEquals(4, clock.getHours());
 		assertEquals(0, clock.getMinutes());
 		assertEquals(0, clock.getSeconds());
-		assertEquals(Time.AMPM.AM, clock.getAmpm());
+		assertEquals(v2.Time.AMPM.AM, clock.getAmpm());
 		assertSame("March", clock.getMonth());
 		assertSame("Sunday", clock.getDay());
 		assertEquals(10, clock.getDate());
 		assertEquals(2019, clock.getYear());
-		assertEquals("boolean daylightSavingsTime should be true", false, clock.daylightSavingsTime);
+		assertEquals(false, clock.daylightSavingsTime);
 	}
 	
 	@Test
 	public void testDaylightSavingsTimeFallBackWorksButContinuesNormallyThenOn() throws InterruptedException, ParseException {
-		clock = new Clockv2(1, 59, 59, Time.Month.NOVEMBER, "Sunday", 3, 2019, Time.AMPM.AM);
+		clock = new Clockv2(1, 59, 59, Time.Month.NOVEMBER, Time.Day.SUNDAY.strValue, 3, 2019, Time.AMPM.AM);
 		
 		for (int i = 0; i < 1; i++) {
 			clock.tick();
 			Thread.sleep(1000);
 		}
 		
-		assertEquals(1, clock.getHours());
+		assertEquals(1, clock.getHours()); // should be 1, testing daylight savings time
 		assertEquals(0, clock.getMinutes());
 		assertEquals(0, clock.getSeconds());
 		assertEquals(Time.AMPM.AM, clock.getAmpm());
-		assertSame("November", clock.getMonth());
-		assertSame("Sunday", clock.getDay());
+		assertSame(Time.Month.NOVEMBER.strValue, clock.getMonth());
+		assertSame(Day.SUNDAY.strValue, clock.getDay());
 		assertEquals(3, clock.getDate());
 		assertEquals(2019, clock.getYear());
-		assertEquals("boolean daylightSavingsTime should be false", false, clock.daylightSavingsTime);
+		assertEquals(false, clock.daylightSavingsTime);
 		
 		// validate that the clock moves forward
 		for (int i = 0; i < 1; i++) {
@@ -82,7 +85,7 @@ public class Clockv2_Test {
 		assertSame("Sunday", clock.getDay());
 		assertEquals(3, clock.getDate());
 		assertEquals(2019, clock.getYear());
-		assertEquals("boolean daylightSavingsTime should be false", false, clock.daylightSavingsTime);
+		assertEquals(false, clock.daylightSavingsTime);
 	}
 	
 	@Test

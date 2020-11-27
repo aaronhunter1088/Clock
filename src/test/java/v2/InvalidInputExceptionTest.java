@@ -1,21 +1,23 @@
 package v2;
 
-import static org.junit.Assert.*;
 
-import org.junit.Before;
-import org.junit.BeforeClass;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.fail;
 
 public class InvalidInputExceptionTest extends Exception {
 
 	private static final long serialVersionUID = 1L;
 	private Time.Month goodMonth, badMonth;
 
-	@BeforeClass
+	@BeforeAll
 	public static void setUpBeforeClass() throws Exception {
 	}
 
-	@Before
+	@BeforeEach
 	public void setUp() throws Exception {
 		goodMonth = Time.Month.AUGUST;
 		badMonth = Time.Month.ERR;
@@ -44,7 +46,7 @@ public class InvalidInputExceptionTest extends Exception {
         } catch (InvalidInputException iie) {
         	fail("No exception should have been thrown");
         }
-        assertTrue("month should have been 8", month == 8);
+        assertTrue(month == 8);
 	}
 	
 	@SuppressWarnings("unused")
@@ -68,7 +70,7 @@ public class InvalidInputExceptionTest extends Exception {
 	            default: throw new InvalidInputException("Unknown month");
 	        }
         } catch (InvalidInputException iie) {
-        	assertTrue("Wrong exception message", "Unknown month".equals(iie.getMessage()));
+        	assertTrue("Unknown month".equals(iie.getMessage()));
         }
         
 	}
