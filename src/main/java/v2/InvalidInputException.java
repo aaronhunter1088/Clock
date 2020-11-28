@@ -12,23 +12,39 @@ public class InvalidInputException extends Exception {
 	private static final long serialVersionUID = 1L;
 	private String message;
 	private Throwable cause;
-	
+
+	@Override
+	public String getMessage() {
+		return message;
+	}
+
+	public void setMessage(String message) {
+		this.message = message;
+	}
+
+	public Throwable getCause() {
+		return cause;
+	}
+
+	public void setCause(Throwable cause) {
+		this.cause = cause;
+	}
+
 	public InvalidInputException() { super(); }
 	
 	public InvalidInputException(String message) {
 		super(message);
-		this.message = message;
+		setMessage(message);
 	}
 	
-	private InvalidInputException(Throwable cause) {
+	public InvalidInputException(Throwable cause) {
 		super(cause);
-		this.cause = cause;
+		setCause(cause);
 	}
 	
 	public InvalidInputException(String message, Throwable cause) {
 		super(message, cause);
-		this.message = message;
-		this.cause = cause;
+		setMessage(message);
+		setCause(cause);
 	}
-	
 }

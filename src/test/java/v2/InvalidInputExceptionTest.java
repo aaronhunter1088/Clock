@@ -5,23 +5,22 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.junit.jupiter.api.Assertions.fail;
+import static org.junit.jupiter.api.Assertions.*;
 
 public class InvalidInputExceptionTest extends Exception {
 
 	private static final long serialVersionUID = 1L;
 	private Time.Month goodMonth, badMonth;
+	private final String INVALID_MONTH = "Invalid month";
 
 	@BeforeAll
 	public static void setUpBeforeClass() throws Exception {
 	}
 
 	@BeforeEach
-	public void setUp() throws Exception {
+	public void setUp() {
 		goodMonth = Time.Month.AUGUST;
 		badMonth = Time.Month.ERR;
-		
 	}
 
 	@Test
@@ -48,8 +47,7 @@ public class InvalidInputExceptionTest extends Exception {
         }
         assertTrue(month == 8);
 	}
-	
-	@SuppressWarnings("unused")
+
 	@Test
 	public void whenAnInvalidMonthIsGivenReturnAnInvalidInputException() {
 		int month = 0;
@@ -73,6 +71,25 @@ public class InvalidInputExceptionTest extends Exception {
         	assertTrue("Unknown month".equals(iie.getMessage()));
         }
         
+	}
+
+	@Test
+	public void testIIEIsCreated() {
+		InvalidInputException iie = new InvalidInputException();
+		assertNotNull(iie);
+	}
+
+	@Test
+	public void test() {
+		InvalidInputException iie = new InvalidInputException(new IllegalArgumentException(INVALID_MONTH, new IllegalArgumentException().getCause()));
+		assertNotNull(iie.getCause());
+	}
+
+	@Test
+	public void testIIEIsCreatedWithMessageAndCause() {
+		InvalidInputException iie = new InvalidInputException(INVALID_MONTH, new IllegalArgumentException());
+		assertNotNull(iie.getMessage());
+		assertNotNull(iie.getCause());
 	}
 
 }

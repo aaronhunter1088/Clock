@@ -28,19 +28,20 @@ public class Clock extends JFrame {
     private static final String MILITARY_TIME_SETTING = "military time";
     private static final String FULL_TIME_SETTING = "full date";
     private static final String PARTIAL_TIME_SETTING = "partial date";
+    private static final DateFormat sdf = new SimpleDateFormat("MM-dd-yyyy");
     private final int lbl1 = 1;
     private final int lbl2 = 2;
     // For clock
     private JLabel jlbl1 = new JLabel("", SwingConstants.CENTER);
     private JLabel jlbl2 = new JLabel("", SwingConstants.CENTER);
     // For alarm
-    private JLabel jalarmLbl1 = new JLabel("", SwingConstants.CENTER);
-    private JLabel jalarmLbl2 = new JLabel("", SwingConstants.CENTER);
-    private JLabel jalarmLbl3 = new JLabel("", SwingConstants.CENTER);
-    private JLabel jalarmLbl4 = new JLabel("", SwingConstants.CENTER);
-    private JTextField jtextField1 = new JTextField(2); // Hour
-    private JTextField jtextField2 = new JTextField(2); // Min
-    private JTextField jtextField3 = new JTextField(2); // Sec
+    private JLabel jalarmLbl1 = new JLabel("", SwingConstants.CENTER); // H
+    private JLabel jalarmLbl2 = new JLabel("", SwingConstants.CENTER); // M
+    private JLabel jalarmLbl3 = new JLabel("", SwingConstants.CENTER); // S
+    private JLabel jalarmLbl4 = new JLabel("", SwingConstants.CENTER); // All Alarms
+    private JTextField jtextField1 = new JTextField(2); // Hour textfield
+    private JTextField jtextField2 = new JTextField(2); // Min textfield
+    private JTextField jtextField3 = new JTextField(2); // Sec textfield
     private ScrollPane scrollPane = new ScrollPane(ScrollPane.SCROLLBARS_AS_NEEDED);
     private JButton jsetAlarmBtn = new JButton("Set");
     // Main GUI Components
@@ -78,11 +79,11 @@ public class Clock extends JFrame {
     public int getSeconds() { return seconds; }
     public int getMinutes() { return minutes; }
     public int getHours() { return hours; }
-    public Time.AMPM getAmpm() { return ampm; }
+    public Time.AMPM getAMPM() { return ampm; }
     public Time.Day getDay() { return day; }
     public int getDate() { return date; }
     public Time.Month getMonth() { return month; }
-    public int getYear() { return year; }
+    public int getYear() { return this.year; }
     public String getHoursAsStr() { return this.hoursAsStr; }
     public String getMinutesAsStr() { return this.minutesAsStr; }
     public String getSecondsAsStr() { return this.secondsAsStr; }
@@ -159,105 +160,119 @@ public class Clock extends JFrame {
 
         if (time == Time.AMPM.AM && showMilitaryTime) // Daytime and we show Military v2.Time
         {
-            if (this.hours == 12) setHours(0);
-            else setHours(this.hours);
+            if (getHours() == 12) setHours(0);
+            else setHours(getHours());
         }
         else if (time == Time.AMPM.AM && !showMilitaryTime) // DayTime and we do not show Military v2.Time
         {
-            if (this.hours == 0) setHours(12);
-            else setHours(this.hours);
+            if (getHours() == 0) setHours(12);
+            else setHours(getHours());
         }
         else if (time == Time.AMPM.PM && showMilitaryTime) // NightTime and we show Military v2.Time
         {
-            if (this.hours == 24) setHours(0);
-            else if (this.hours < 12) setHours(this.hours + 12);
-            else setHours(this.hours);
+            if (getHours() == 24) setHours(0);
+            else if (getHours() < 12) setHours(getHours() + 12);
+            else setHours(getHours());
         }
         else if (time == Time.AMPM.PM && !showMilitaryTime) // NightTime and we do not show Military v2.Time
         {
-            if (this.hours > 12) setHours(this.hours - 12);
+            if (getHours() > 12) setHours(getHours() - 12);
         }
     }
-    public static boolean isALeapYear(int year) {
+    public boolean isALeapYear(int year)
+    {
         boolean leap = false;
-        if (year % 4 == 0) {
+        if (year % 4 == 0)
+        {
             leap = true;
-            if (Integer.toString(year).substring(2).equals("00")) {
-                if (year % 400 == 0) {
+            if (Integer.toString(year).substring(2).equals("00"))
+            {
+                if (year % 400 == 0)
+                {
                     leap = true;
-                } else {
+                }
+                else
+                {
                     leap = false;
                 }
             }
         }
         return leap;
     }
-    public void setDaylightSavingsTimeDates() throws ParseException {
-        DateFormat sdf = new SimpleDateFormat("MM-dd-yyyy");
-        beginDaylightSavingsTimeDate = sdf.parse("03-01-"+Integer.toString(year));
-        endDaylightSavingsTimeDate = sdf.parse("11-01-"+Integer.toString(year));
+    public void setDaylightSavingsTimeDates() throws ParseException
+    {
+        setBeginDaylightSavingsTimeDate(sdf.parse("03-01-"+year));
+        setEndDaylightSavingsTimeDate(sdf.parse("11-01-"+year));
         Calendar calendar = Calendar.getInstance();
-        calendar.setTime(beginDaylightSavingsTimeDate);
+        calendar.setTime(getBeginDaylightSavingsTimeDate());
         switch (calendar.get(Calendar.DAY_OF_WEEK)) {
-            case 1: beginDaylightSavingsTimeDate = sdf.parse("03-08-"+Integer.toString(year));
+            case 1: setBeginDaylightSavingsTimeDate(sdf.parse("03-08-"+year));
                 // endDaylightSavingsTimeDate already set
                 break;
-            case 2: beginDaylightSavingsTimeDate = sdf.parse("03-14-"+Integer.toString(year));
-                endDaylightSavingsTimeDate = sdf.parse("11-07-"+Integer.toString(year)); break;
-            case 3: beginDaylightSavingsTimeDate = sdf.parse("03-13-"+Integer.toString(year));
-                endDaylightSavingsTimeDate = sdf.parse("11-06-"+Integer.toString(year)); break;
-            case 4: beginDaylightSavingsTimeDate = sdf.parse("03-12-"+Integer.toString(year));
-                endDaylightSavingsTimeDate = sdf.parse("11-05-"+Integer.toString(year)); break;
-            case 5: beginDaylightSavingsTimeDate = sdf.parse("03-11-"+Integer.toString(year));
-                endDaylightSavingsTimeDate = sdf.parse("11-04-"+Integer.toString(year)); break;
-            case 6: beginDaylightSavingsTimeDate = sdf.parse("03-10-"+Integer.toString(year));
-                endDaylightSavingsTimeDate = sdf.parse("11-03-"+Integer.toString(year)); break;
-            case 7: beginDaylightSavingsTimeDate = sdf.parse("03-09-"+Integer.toString(year));
-                endDaylightSavingsTimeDate = sdf.parse("11-02-"+Integer.toString(year)); break;
+            case 2: setBeginDaylightSavingsTimeDate(sdf.parse("03-14-"+(year)));
+                setEndDaylightSavingsTimeDate(sdf.parse("11-07-"+year)); break;
+            case 3: setBeginDaylightSavingsTimeDate(sdf.parse("03-13-"+year));
+                setEndDaylightSavingsTimeDate(sdf.parse("11-06-"+year)); break;
+            case 4: setBeginDaylightSavingsTimeDate(sdf.parse("03-12-"+year));
+                setEndDaylightSavingsTimeDate(sdf.parse("11-05-"+year)); break;
+            case 5: setBeginDaylightSavingsTimeDate(sdf.parse("03-11-"+year));
+                setEndDaylightSavingsTimeDate(sdf.parse("11-04-"+year)); break;
+            case 6: setBeginDaylightSavingsTimeDate(sdf.parse("03-10-"+year));
+                setEndDaylightSavingsTimeDate(sdf.parse("11-03-"+year)); break;
+            case 7: setBeginDaylightSavingsTimeDate(sdf.parse("03-09-"+year));
+                setEndDaylightSavingsTimeDate(sdf.parse("11-02-"+year)); break;
+            default: setBeginDaylightSavingsTimeDate(new Date());
+                setEndDaylightSavingsTimeDate(new Date()); break;
         }
     }
-    public boolean isTodayDaylightSavingsTime() {
+    // TODO: change to compare one date to another
+    public boolean isTodayDaylightSavingsTime()
+    {
         Calendar calendar = Calendar.getInstance();
-        calendar.setTime(beginDaylightSavingsTimeDate);
-        if (getDateAsStr().equals(
-                Integer.toString(calendar.get(Calendar.MONTH) + 1)+"/"+
-                        Integer.toString(calendar.get(Calendar.DATE))+"/"+
-                        Integer.toString(calendar.get(Calendar.YEAR)) ) )  {
-            daylightSavingsTime = true;
-            return true;
-        } else {
-            calendar.setTime(endDaylightSavingsTimeDate);
-            if (getDateAsStr().equals(
-                    Integer.toString(calendar.get(Calendar.MONTH) +1)+"/"+
-                            Integer.toString(calendar.get(Calendar.DATE))+"/"+
-                            Integer.toString(calendar.get(Calendar.YEAR)) )
-                    && !this.daylightSavingsTime) {
-                daylightSavingsTime = true;
-                return true;
+        calendar.setTime(getBeginDaylightSavingsTimeDate());
+        if (getMonth() == Time.Month.MARCH &&
+            getDate() == calendar.get(Calendar.DATE) &&
+            getYear() == calendar.get(Calendar.YEAR))
+        {
+            setDaylightSavingsTime(true);
+            return isDaylightSavingsTime();
+        }
+        else
+        {
+            calendar.setTime(getEndDaylightSavingsTimeDate());
+            if (getMonth() == Time.Month.NOVEMBER &&
+                getDate() == calendar.get(Calendar.DATE) &&
+                getYear() == calendar.get(Calendar.YEAR) &&
+                !isDaylightSavingsTime())
+            {
+                setDaylightSavingsTime(true);
+                return isDaylightSavingsTime();
             }
         }
-        daylightSavingsTime = false;
-        return false;
+        setDaylightSavingsTime(false);
+        return isDaylightSavingsTime();
     }
-    private void setMonthAsTime() throws ParseException {
-        month = convertMonthToStr(calendar.get(Calendar.MONTH)+1);
-        this.day = convertDayFromIntToTimeDay(this.calendar.get(Calendar.DAY_OF_WEEK));
-        this.date = this.calendar.get(Calendar.DAY_OF_MONTH);
-        this.year = this.calendar.get(Calendar.YEAR);
-        setHours(this.calendar.get(Calendar.HOUR));
-        setMinutes(this.calendar.get(Calendar.MINUTE));
-        setSeconds(this.calendar.get(Calendar.SECOND));
-        this.ampm = this.calendar.get(Calendar.AM_PM) == Calendar.PM ? Time.AMPM.PM : Time.AMPM.AM;
+    private void setMonthAsTime() throws ParseException
+    {
+        setMonth(convertMonthFromIntToTimeMonth(getCalendar().get(Calendar.MONTH)+1));
+        setDay(convertIntToTimeDay(getCalendar().get(Calendar.DAY_OF_WEEK)));
+        setDate(getCalendar().get(Calendar.DAY_OF_MONTH));
+        setYear(getCalendar().get(Calendar.YEAR));
+        setHours(getCalendar().get(Calendar.HOUR));
+        setMinutes(getCalendar().get(Calendar.MINUTE));
+        setSeconds(getCalendar().get(Calendar.SECOND));
+        setAMPM(getCalendar().get(Calendar.AM_PM) == Calendar.PM ? Time.AMPM.PM : Time.AMPM.AM);
         setDaylightSavingsTimeDates();
-        this.leapYear = isALeapYear(year);
-        this.daylightSavingsTime = isTodayDaylightSavingsTime();
+        setLeapYear(isALeapYear(getYear()));
+        setDaylightSavingsTime(isTodayDaylightSavingsTime());
     }
     /*
      *
      * Method to update clock because of lost seconds
      */
-    public void updateAllClockValues() throws ParseException {
-        this.calendar.setTime(new Date());
+    public void updateAllClockValues() throws ParseException
+    {
+        getCalendar().setTime(new Date());
         setMonthAsTime();
     }
     /**
@@ -269,199 +284,435 @@ public class Clock extends JFrame {
      * @param minutes, the amount of time to increase or decrease seconds
      * @param hours,   the amount of time to increase or decrease seconds
      */
-    public void updateJLabels(int seconds, int minutes, int hours) {
-        this.seconds += seconds;
-//        this.seconds += 1;
-        this.secondsAsStr = this.seconds <= 9 ? "0"+Integer.toString(this.seconds) : Integer.toString(this.seconds);
-        if (this.seconds == 60) {
-            this.seconds = 0;
-            this.secondsAsStr = "00";
-            this.minutes += minutes;
-//            this.minutes += 1;
-            this.minutesAsStr = this.minutes <= 9 ? "0"+Integer.toString(this.minutes) : Integer.toString(this.minutes);
-            if (this.minutes == 60) {
-                this.minutes = 0;
-                this.minutesAsStr = "00";
-                this.hours += hours;
-//                this.hours += 1;
-                if (this.hours == 12 && this.minutes == 0 && this.seconds == 0 && !showMilitaryTime) {
-                    this.hours = 12;
-                    this.hoursAsStr = "12";
-                    if (ampm == Time.AMPM.PM) {
-                        this.ampm = Time.AMPM.AM;
-                        this.dateChanged = true;
-                    } else {
-                        this.dateChanged = false;
-                        this.ampm = Time.AMPM.PM;
+    public void updateJLabels(int seconds, int minutes, int hours)
+    {
+        setSeconds(getSeconds()+seconds);
+        setSecondsAsStr(getSeconds() <= 9 ? "0"+getSeconds() : Integer.toString(getSeconds()));
+        if (getSeconds() == 60)
+        {
+            setSeconds(0);
+            setSecondsAsStr("00");
+            setMinutes(getMinutes()+minutes);
+            setMinutesAsStr(getMinutes() <= 9 ? "0"+getMinutes() : Integer.toString(getMinutes()));
+            if (getMinutes() == 60)
+            {
+                setMinutes(0);
+                setMinutesAsStr("00");
+                setHours(getHours()+hours);
+                if (getHours() == 12 && getMinutes() == 0 && getSeconds() == 0 && !isShowMilitaryTime())
+                {
+                    setHours(12);
+                    setHoursAsStr("12");
+                    if (getAMPM() == Time.AMPM.PM)
+                    {
+                        setAMPM(Time.AMPM.AM);
+                        setDateChanged(true);
                     }
-                } else if (this.hours == 13 && !showMilitaryTime) {
-                    this.hours = 1;
-                    this.hoursAsStr = "01";
-                    this.dateChanged = false;
-                } else if (this.hours == 24 && this.minutes == 0 && this.seconds == 0 && showMilitaryTime) {
-                    this.hours = 0;
-                    this.hoursAsStr = "00";
-                    this.ampm = Time.AMPM.AM;
-                    this.dateChanged = true;
-                } else if (this.hours >= 13 && showMilitaryTime) {
-                    this.hoursAsStr = Integer.toString(this.hours);
-                    this.dateChanged = false;
-                } else {
-                    setHours(this.hours);
+                    else
+                    {
+                        setDateChanged(false);
+                        setAMPM(Time.AMPM.PM);
+                    }
+                }
+                else if (getHours() == 13 && !isShowMilitaryTime())
+                {
+                    setHours(1);
+                    setHoursAsStr("01");
+                    setDateChanged(false);
+                }
+                else if (getHours() == 24 && getMinutes() == 0 && getSeconds() == 0 && isShowMilitaryTime())
+                {
+                    setHours(0);
+                    setHoursAsStr("00");
+                    setAMPM(Time.AMPM.AM);
+                    setDateChanged(true);
+                }
+                else if (getHours() >= 13 && isShowMilitaryTime())
+                {
+                    setHoursAsStr(Integer.toString(this.hours));
+                    setDateChanged(false);
+                }
+                else
+                {
+                    setHours(getHours());
                 }
             }
         }
-        else { this.dateChanged = false; }
-
-        if (this.dateChanged) {
-            this.date += 1;
-            this.daylightSavingsTime = isTodayDaylightSavingsTime();
+        else
+        {
+            setDateChanged(false);
         }
-        switch (month) {
+
+        if (isDateChanged())
+        {
+            setDate(getDate()+1);
+            setDaylightSavingsTime(isTodayDaylightSavingsTime());
+        }
+        switch (getMonth()) {
             case JANUARY: {
-                if (this.date == 31 && dateChanged) {
-                    this.date = 1;
-                    this.month = Time.Month.FEBRUARY;
+                if (getDate() == 31 && isDateChanged()) {
+                    setDate(1);
+                    setMonth(Time.Month.FEBRUARY);
                 }
                 break;
             }
             case FEBRUARY: {
-                if ((this.date == 28 || this.date == 30) && this.dateChanged) {
-                    this.date = 1;
-                    this.month = Time.Month.MARCH;
-                } else if (this.date == 28 && this.leapYear && this.dateChanged) {
-                    this.date = 29;
-                    this.month = Time.Month.FEBRUARY;
+                if ((getDate() == 28 || getDate() == 30) && isDateChanged())
+                {
+                    setDate(1);
+                    setMonth(Time.Month.MARCH);
+                }
+                else if (getDate() == 28 && isLeapYear() && isDateChanged())
+                {
+                    setDate(29);
+                    setMonth(Time.Month.FEBRUARY);
                 }
                 break;
             }
             case MARCH: {
-                if (this.date == 32 && this.dateChanged) {
-                    this.date = 1;
-                    this.month = Time.Month.APRIL;
+                if (getDate() == 32 && isDateChanged())
+                {
+                    setDate(1);
+                    setMonth(Time.Month.APRIL);
                 }
                 break;
             }
             case APRIL: {
-                if (this.date == 31 && this.dateChanged) {
-                    this.date = 1;
-                    this.month = Time.Month.MAY;
+                if (getDate() == 31 && isDateChanged())
+                {
+                    setDate(1);
+                    setMonth(Time.Month.MAY);
                 }
                 break;
             }
             case MAY: {
-                if (this.date == 32 && this.dateChanged) {
-                    this.date= 1;
-                    this.month = Time.Month.JUNE;
+                if (getDate() == 32 && isDateChanged())
+                {
+                    setDate(1);
+                    setMonth(Time.Month.JUNE);
                 }
                 break;
             }
             case JUNE: {
-                if (this.date == 31 && this.dateChanged) {
-                    this.date = 1;
-                    this.month = Time.Month.JULY;
+                if (getDate() == 31 && isDateChanged())
+                {
+                    setDate(1);
+                    setMonth(Time.Month.JULY);
                 }
                 break;
             }
             case JULY: {
-                if (this.date == 32 && this.dateChanged) {
-                    this.date = 1;
-                    this.month = Time.Month.AUGUST;
+                if (getDate() == 32 && isDateChanged())
+                {
+                    setDate(1);
+                    setMonth(Time.Month.AUGUST);
                 }
                 break;
             }
             case AUGUST: {
-                if (this.date == 32 && this.dateChanged) {
-                    this.date = 1;
-                    this.month = Time.Month.SEPTEMBER;
+                if (getDate() == 32 && isDateChanged())
+                {
+                    setDate(1);
+                    setMonth(Time.Month.SEPTEMBER);
                 }
                 break;
             }
             case SEPTEMBER: {
-                if (this.date == 31 && this.dateChanged) {
-                    this.date = 1;
-                    this.month = Time.Month.OCTOBER;
+                if (getDate() == 31 && isDateChanged())
+                {
+                    setDate(1);
+                    setMonth(Time.Month.OCTOBER);
                 }
                 break;
             }
             case OCTOBER: {
-                if (this.date == 32 && this.dateChanged) {
-                    this.date = 1;
-                    this.month = Time.Month.NOVEMBER;
+                if (getDate() == 32 && isDateChanged())
+                {
+                    setDate(1);
+                    setMonth(Time.Month.NOVEMBER);
                 }
                 break;
             }
             case NOVEMBER: {
-                if (this.date == 31 && this.dateChanged) {
-                    this.date = 1;
-                    this.month = Time.Month.DECEMBER;
+                if (getDate() == 31 && isDateChanged())
+                {
+                    setDate(1);
+                    setMonth(Time.Month.DECEMBER);
                 }
                 break;
             }
             case DECEMBER: {
-                if (this.date == 32 && this.dateChanged) {
-                    this.date = 1;
-                    this.month = Time.Month.JANUARY;
-                    this.year += 1;
+                if (getDate() == 32 && isDateChanged()) {
+                    setDate(1);
+                    setMonth(Time.Month.JANUARY);
+                    setYear(getYear()+1);
                 }
                 break;
             }
-            default : {
-
-            }
+            default : {}
         }
-        setClockValues(this.ampm, this.showMilitaryTime);
-        if (this.dateChanged) {
-            //System.out.println("day was: " + convertDayToStr(this.calendar.get(Calendar.DAY_OF_WEEK)));
-            DateFormat sdf = new SimpleDateFormat("MM-dd-yyyy");
+        setClockValues(getAMPM(), isShowMilitaryTime());
+        if (isDateChanged())
+        {
             int month = 0;
             try {
-                month = convertMonthToInt(this.month);
+                month = convertFromTimeMonthToInt(getMonth());
             } catch (InvalidInputException iie) {
-                System.out.println(iie.getMessage());
+                System.err.println(iie.getMessage());
             }
-            int date = this.date;
-            String monthStr = month <= 9 ? "0"+Integer.toString(month) : Integer.toString(month);
-            String dateStr = date <= 9 ? "0"+Integer.toString(date) : Integer.toString(date);
+            int date = getDate();
+            String monthStr = month <= 9 ? "0"+month : Integer.toString(month);
+            String dateStr = date <= 9 ? "0"+date : Integer.toString(date);
             Date updatedDate = null;
             try {
-                updatedDate = sdf.parse(monthStr+"-"+dateStr+"-"+Integer.toString(this.year));
-            } catch (ParseException e) {}
-            this.calendar.setTime(updatedDate);
-            this.day = convertDayFromIntToTimeDay(this.calendar.get(Calendar.DAY_OF_WEEK));
-            //System.out.println("day is now: " + convertDayToStr(this.calendar.get(Calendar.DAY_OF_WEEK)));
+                updatedDate = sdf.parse(monthStr+"-"+dateStr+"-"+getYear());
+            } catch (ParseException e) { System.err.println(e.getMessage()); }
+            getCalendar().setTime(updatedDate);
+            setDay(convertIntToTimeDay(getCalendar().get(Calendar.DAY_OF_WEEK)));
         }
-        if (this.daylightSavingsTime) {
-            if (calendar.get(Calendar.MONTH) == 2 && this.ampm.getStrValue().equals("AM")) {
+        if (isDaylightSavingsTime())
+        {
+            if (getCalendar().get(Calendar.MONTH) == 2 && getAMPM().getStrValue().equals(Time.AMPM.AM.strValue))
+            {
                 setHours(3);
-                this.daylightSavingsTime = false;
-            } else if (calendar.get(Calendar.MONTH) == 10 && this.ampm.getStrValue().equals("AM")) { // && daylightSavingsTime
+                setDaylightSavingsTime(false);
+            }
+            else if (getCalendar().get(Calendar.MONTH) == 10 && getAMPM().getStrValue().equals(Time.AMPM.AM.strValue))
+            { // && daylightSavingsTime
                 setHours(1);
-                this.daylightSavingsTime = false;
+                setDaylightSavingsTime(false);
             }
         }
-        //System.out.println(defaultText(lbl2, isALeapYear(this.year)));
     } // update jLabels
-    public String defaultText(int labelVersion, boolean isALeapYear) {
+    public void updateJLabels()
+    {
+        setSeconds(getSeconds()+1);
+        setSecondsAsStr(getSeconds() <= 9 ? "0"+getSeconds() : Integer.toString(getSeconds()));
+        if (getSeconds() == 60)
+        {
+            setSeconds(0);
+            setSecondsAsStr("00");
+            setMinutes(getMinutes()+1);
+            setMinutesAsStr(getMinutes() <= 9 ? "0"+getMinutes() : Integer.toString(getMinutes()));
+            if (getMinutes() == 60)
+            {
+                setMinutes(0);
+                setMinutesAsStr("00");
+                setHours(getHours()+1);
+                if (getHours() == 12 && getMinutes() == 0 && getSeconds() == 0 && !isShowMilitaryTime())
+                {
+                    setHours(12);
+                    setHoursAsStr("12");
+                    if (getAMPM() == Time.AMPM.PM)
+                    {
+                        setAMPM(Time.AMPM.AM);
+                        setDateChanged(true);
+                    }
+                    else
+                    {
+                        setDateChanged(false);
+                        setAMPM(Time.AMPM.PM);
+                    }
+                }
+                else if (getHours() == 13 && !isShowMilitaryTime())
+                {
+                    setHours(1);
+                    setHoursAsStr("01");
+                    setDateChanged(false);
+                }
+                else if (getHours() == 24 && getMinutes() == 0 && getSeconds() == 0 && isShowMilitaryTime())
+                {
+                    setHours(0);
+                    setHoursAsStr("00");
+                    setAMPM(Time.AMPM.AM);
+                    setDateChanged(true);
+                }
+                else if (getHours() >= 13 && isShowMilitaryTime())
+                {
+                    setHoursAsStr(Integer.toString(getHours()));
+                    setDateChanged(false);
+                }
+                else
+                {
+                    setHours(getHours());
+                }
+            }
+        }
+        else
+        {
+            setDateChanged(false);
+        }
+
+        if (isDateChanged())
+        {
+            setDate(getDate()+1);
+            setDaylightSavingsTime(isTodayDaylightSavingsTime());
+        }
+        switch (getMonth()) {
+            case JANUARY: {
+                if (getDate() == 31 && isDateChanged()) {
+                    setDate(1);
+                    setMonth(Time.Month.FEBRUARY);
+                }
+                break;
+            }
+            case FEBRUARY: {
+                if ((getDate() == 28 || getDate() == 30) && isDateChanged())
+                {
+                    setDate(1);
+                    setMonth(Time.Month.MARCH);
+                }
+                else if (getDate() == 28 && isLeapYear() && isDateChanged())
+                {
+                    setDate(29);
+                    setMonth(Time.Month.FEBRUARY);
+                }
+                break;
+            }
+            case MARCH: {
+                if (getDate() == 32 && isDateChanged())
+                {
+                    setDate(1);
+                    setMonth(Time.Month.APRIL);
+                }
+                break;
+            }
+            case APRIL: {
+                if (getDate() == 31 && isDateChanged())
+                {
+                    setDate(1);
+                    setMonth(Time.Month.MAY);
+                }
+                break;
+            }
+            case MAY: {
+                if (getDate() == 32 && isDateChanged())
+                {
+                    setDate(1);
+                    setMonth(Time.Month.JUNE);
+                }
+                break;
+            }
+            case JUNE: {
+                if (getDate() == 31 && isDateChanged())
+                {
+                    setDate(1);
+                    setMonth(Time.Month.JULY);
+                }
+                break;
+            }
+            case JULY: {
+                if (getDate() == 32 && isDateChanged())
+                {
+                    setDate(1);
+                    setMonth(Time.Month.AUGUST);
+                }
+                break;
+            }
+            case AUGUST: {
+                if (getDate() == 32 && isDateChanged())
+                {
+                    setDate(1);
+                    setMonth(Time.Month.SEPTEMBER);
+                }
+                break;
+            }
+            case SEPTEMBER: {
+                if (getDate() == 31 && isDateChanged())
+                {
+                    setDate(1);
+                    setMonth(Time.Month.OCTOBER);
+                }
+                break;
+            }
+            case OCTOBER: {
+                if (getDate() == 32 && isDateChanged())
+                {
+                    setDate(1);
+                    setMonth(Time.Month.NOVEMBER);
+                }
+                break;
+            }
+            case NOVEMBER: {
+                if (getDate() == 31 && isDateChanged())
+                {
+                    setDate(1);
+                    setMonth(Time.Month.DECEMBER);
+                }
+                break;
+            }
+            case DECEMBER: {
+                if (getDate() == 32 && isDateChanged()) {
+                    setDate(1);
+                    setMonth(Time.Month.JANUARY);
+                    setYear(getYear()+1);
+                }
+                break;
+            }
+            default : {}
+        }
+        setClockValues(getAMPM(), isShowMilitaryTime());
+        if (isDateChanged())
+        {
+            int month = 0;
+            try {
+                month = convertFromTimeMonthToInt(getMonth());
+            } catch (InvalidInputException iie) {
+                System.err.println(iie.getMessage());
+            }
+            int date = getDate();
+            String monthStr = month <= 9 ? "0"+month : Integer.toString(month);
+            String dateStr = date <= 9 ? "0"+date : Integer.toString(date);
+            Date updatedDate = null;
+            try {
+                updatedDate = sdf.parse(monthStr+"-"+dateStr+"-"+getYear());
+            } catch (ParseException e) { System.err.println(e.getMessage()); }
+            getCalendar().setTime(updatedDate);
+            setDay(convertIntToTimeDay(getCalendar().get(Calendar.DAY_OF_WEEK)));
+        }
+        if (isDaylightSavingsTime())
+        {
+            if (getMonth() == Time.Month.MARCH && getAMPM().getStrValue().equals(Time.AMPM.AM.strValue))
+            {
+                setHours(3);
+                setDaylightSavingsTime(false);
+            }
+            else if (getMonth() == Time.Month.NOVEMBER && getAMPM().getStrValue().equals(Time.AMPM.AM.strValue))
+            { // && daylightSavingsTime
+                setHours(1);
+                setDaylightSavingsTime(false);
+            }
+        }
+    }
+    // TODO: refactor and organize code
+    public String defaultText(int labelVersion, boolean isALeapYear)
+    {
         String defaultText = "";
-        if (labelVersion == 1) {
-            if (showFullDate && !showPartialDate) defaultText += getFullDateAsStr();
-            else if (showPartialDate && !showFullDate) defaultText += getPartialDateAsStr();
+        if (labelVersion == 1)
+        {
+            if (isShowFullDate() && !isShowPartialDate()) defaultText += getFullDateAsStr();
+            else if (isShowPartialDate() && !isShowFullDate()) defaultText += getPartialDateAsStr();
             else defaultText += getDateAsStr();
-        } else if (labelVersion == 2) {
-            if (!showMilitaryTime) defaultText += getTimeAsStr();
-            else if (showMilitaryTime) defaultText += getMilitaryTimeAsStr();
-        } else if (labelVersion == 3 || labelVersion == 5) {
+        }
+        else if (labelVersion == 2) {
+            if (!isShowMilitaryTime()) defaultText += getTimeAsStr();
+            else if (isShowMilitaryTime()) defaultText += getMilitaryTimeAsStr();
+        }
+        else if (labelVersion == 3 || labelVersion == 5) {
             defaultText = labelVersion == 3 ? "H" : "M";
-        } else if (labelVersion == 6) {
+        }
+        else if (labelVersion == 6) {
             defaultText = "T";
-        }   else if (labelVersion == 4) {
+        }
+        else if (labelVersion == 4) {
             defaultText = "All Alarms";
         }
         return defaultText;
     }
-    public Time.Day convertDayFromIntToTimeDay(int thisDay) {
-        switch(thisDay) {
+    public Time.Day convertIntToTimeDay(int thisDay)
+    {
+        switch(thisDay)
+        {
             case 1: return Time.Day.SUNDAY;
             case 2: return Time.Day.MONDAY;
             case 3: return Time.Day.TUESDAY;
@@ -472,7 +723,8 @@ public class Clock extends JFrame {
             default: return Time.Day.ERROR;
         }
     }
-    public int convertMonthToInt(Time.Month month) throws InvalidInputException {
+    public int convertFromTimeMonthToInt(Time.Month month) throws InvalidInputException
+    {
         switch (month) {
             case JANUARY: return 1;
             case FEBRUARY: return 2;
@@ -486,10 +738,11 @@ public class Clock extends JFrame {
             case OCTOBER: return 10;
             case NOVEMBER: return 11;
             case DECEMBER: return 12;
-            default: throw new InvalidInputException("Unknown month");
+            default: throw new InvalidInputException(Time.Month.ERR.strValue);
         }
     }
-    public Time.Month convertMonthToStr(int thisMonth) {
+    public Time.Month convertMonthFromIntToTimeMonth(int thisMonth)
+    {
         switch (thisMonth) {
             case 1: return Time.Month.JANUARY;
             case 2: return Time.Month.FEBRUARY;
@@ -507,44 +760,10 @@ public class Clock extends JFrame {
         }
     }
     /**
-     * The purpose of tick is to start the clock normally.
-     */
-    public void tick() {
-        tick(1, 1, 1);
-    }
-    /**
-     * The purpose of tick is to start the clock but it should increase
-     * the clocks time given the values of seconds, minutes, and seconds
-     * with each tick.
-     *
-     * @param seconds, the amount of seconds to tick forward or backwards with each tick
-     * @param minutes, the amount of minutes to tick forward of backwards with each tick
-     * @param hours,   the amount of hours   to tick forward or backwards with each tick
-     */
-    public void tick(int seconds, int minutes, int hours) {
-        try {
-            updateJLabels(seconds, minutes, hours);
-            //Updates the clock daily to keep time current
-            if (!isShowMilitaryTime()) {
-                if (getTimeAsStr().equals("04:20:00 AM")) {
-                    updateAllClockValues();
-                    updateClockFace(false);
-                }
-            } else {
-                if (getMilitaryTimeAsStr().equals("0420 hours 00")) {
-                    updateAllClockValues();
-                    updateClockFace(false);
-                }
-            }
-            updateClockFace(true);
-        } catch (Exception e) {
-
-        }
-    }
-    /**
      * Constructor for objects of class v2.Clockv2
      */
-    public Clock() throws ParseException {
+    public Clock() throws ParseException
+    {
         super();
         setResizable(true);
         setGridBagLayout(new GridBagLayout());
@@ -555,7 +774,8 @@ public class Clock extends JFrame {
         setClockFace(ClockFace.StartFace);
         updateClockFace(false);
     }
-    public Clock(int hours, int minutes, int seconds, Time.Month month, Time.Day day, int date, int year, Time.AMPM time) throws ParseException {
+    public Clock(int hours, int minutes, int seconds, Time.Month month, Time.Day day, int date, int year, Time.AMPM time) throws ParseException
+    {
         super();
         setResizable(true);
         setGridBagLayout(new GridBagLayout());
@@ -568,56 +788,62 @@ public class Clock extends JFrame {
         pack();
     }
     // Constructor methods
-    public void setGUI(int hours, int minutes, int seconds, Time.Month month, Time.Day day, int  date, int year, Time.AMPM time) throws ParseException {
-        DateFormat sdf = new SimpleDateFormat("MM-dd-yyyy");
+    public void setGUI(int hours, int minutes, int seconds, Time.Month month, Time.Day day, int  date, int year, Time.AMPM ampm) throws ParseException
+    {
         Date definedDate = null;
         try {
             if (date < 10)
-                definedDate = sdf.parse(convertMonthToInt(month)+"-0"+date+"-"+year);
+                definedDate = sdf.parse(convertFromTimeMonthToInt(month)+"-0"+date+"-"+year);
             else
-                definedDate = sdf.parse(convertMonthToInt(month)+"-"+date+"-"+year);
-        } catch (ParseException | InvalidInputException e) {
+                definedDate = sdf.parse(convertFromTimeMonthToInt(month)+"-"+date+"-"+year);
         }
-        calendar = Calendar.getInstance();
-        calendar.setTime(definedDate);
-        this.month = month;
-        this.day = day;
-        this.date = date;
-        this.year =year;
+        catch (ParseException | InvalidInputException e)
+        {
+            String dateStr = date <= 9 ? "0"+date : Integer.toString(date);
+            System.err.println("Error! Couldn't create the date using month=["+month+"], date=["+dateStr+
+                    "], year=["+year+"]");
+        }
+        setCalendar(Calendar.getInstance());
+        getCalendar().setTime(definedDate);
+        setMonth(month);
+        setDay(day);
+        setDate(date);
+        setYear(year);
         setHours(hours);
         setMinutes(minutes);
         setSeconds(seconds);
-        this.ampm = time;
+        setAMPM(ampm);
         setDaylightSavingsTimeDates();
-        this.daylightSavingsTime = isTodayDaylightSavingsTime();
+        setDaylightSavingsTime(isTodayDaylightSavingsTime());
         jlbl1.setFont(new Font("Courier New", Font.BOLD, 50));
         jlbl2.setFont(new Font("Courier New", Font.BOLD, 60));
         jlbl1.setForeground(Color.WHITE);
         jlbl2.setForeground(Color.WHITE);
-        jlbl1.setText(defaultText(lbl1, isALeapYear(year)));
-        jlbl2.setText(defaultText(lbl2, isALeapYear(year)));
+        jlbl1.setText(defaultText(lbl1, isALeapYear(getYear())));
+        jlbl2.setText(defaultText(lbl2, isALeapYear(getYear())));
         //addComponent(jlbl1, 0,0,1,1, 0,0);
         //addComponent(jlbl2, 1,0,1,1, 0,0);
     }
-    public void setGUI() throws ParseException {
-        this.calendar = Calendar.getInstance();
-        this.calendar.setTime(new Date());
+    public void setGUI() throws ParseException
+    {
+        setCalendar(Calendar.getInstance());
+        getCalendar().setTime(new Date());
         setMonthAsTime();
-        this.dateChanged = false;
+        setDateChanged(false);
         setShowFullDate(false);
         setShowPartialDate(false);
         setShowMilitaryTime(false);
     }
-    public void setMenuBar() {
+    public void setMenuBar()
+    {
         UIManager.put("MenuItem.background", Color.BLACK);
         class BackgroundMenuBar extends JMenuBar {
             private static final long serialVersionUID = 1L;
-            Color bgColor=Color.BLACK;
             @Override
             protected void paintComponent(Graphics g) {
                 super.paintComponent(g);
                 Graphics2D g2d = (Graphics2D) g;
-                g2d.setColor(bgColor);
+                g2d.setColor(Color.BLACK);
                 g2d.fillRect(0, 0, getWidth() - 1, getHeight() - 1);
             }
         }
@@ -653,15 +879,15 @@ public class Clock extends JFrame {
         militaryTimeSetting.setForeground(Color.WHITE); // added on mac
 
         fullDateSetting.addActionListener(action -> {
-            if (this.showFullDate) {
-                this.showFullDate = false;
-                this.showPartialDate = false;
+            if (isShowFullDate()) {
+                setShowFullDate(false);
+                setShowPartialDate(false);
                 fullDateSetting.setText(SHOW + SPACE + FULL_TIME_SETTING);
                 partialDateSetting.setText(SHOW + SPACE + PARTIAL_TIME_SETTING);
             }
             else {
-                this.showFullDate = true;
-                this.showPartialDate = false;
+                setShowFullDate(true);
+                setShowPartialDate(false);
                 fullDateSetting.setText(HIDE + SPACE + FULL_TIME_SETTING);
                 partialDateSetting.setText(SHOW + SPACE + PARTIAL_TIME_SETTING);
             }
@@ -672,15 +898,17 @@ public class Clock extends JFrame {
 
         // new: added on Raspberry PI
         partialDateSetting.addActionListener(action -> {
-            if (this.showPartialDate) {
-                this.showPartialDate = false;
-                partialDateSetting.setText("Show partial date");
+            if (isShowPartialDate()) {
+                setShowPartialDate(false);
+                setShowFullDate(false);
+                partialDateSetting.setText(SHOW + SPACE + PARTIAL_TIME_SETTING);
+                fullDateSetting.setText(SHOW + SPACE + FULL_TIME_SETTING);
             }
             else {
-                this.showPartialDate = true;
-                this.showFullDate = false;
-                partialDateSetting.setText("Hide partial date");
-                fullDateSetting.setText("Show full date");
+                setShowPartialDate(true);
+                setShowFullDate(false);
+                partialDateSetting.setText(HIDE + SPACE + PARTIAL_TIME_SETTING);
+                fullDateSetting.setText(SHOW + SPACE + FULL_TIME_SETTING);
             }
             updateClockFace(true);
             pack();
@@ -692,16 +920,16 @@ public class Clock extends JFrame {
         JMenuItem alarmFeature = new JMenuItem("View Alarms");
 
         clockFeature.addActionListener(action -> {
-            if (this.clockFace != ClockFace.StartFace) {
-                this.clockFace = ClockFace.StartFace;
+            if (getClockFace() != ClockFace.StartFace) {
+                setClockFace(ClockFace.StartFace);
             }
             updateClockFace(true);
         });
         clockFeature.setForeground(Color.WHITE);
 
         alarmFeature.addActionListener(action -> {
-            if (this.clockFace != ClockFace.AlarmFace) {
-                this.clockFace = ClockFace.AlarmFace;
+            if (getClockFace() != ClockFace.AlarmFace) {
+                setClockFace(ClockFace.AlarmFace);
             }
             updateClockFace(true);
         });
@@ -721,8 +949,10 @@ public class Clock extends JFrame {
 
         this.setJMenuBar(menuBar);
     }
-    public void updateClockFace(boolean dothis) {
-        if (dothis) {
+    public void updateClockFace(boolean dothis)
+    {
+        if (dothis)
+        {
             this.getContentPane().remove(jlbl1);
             this.getContentPane().remove(jlbl2);
             this.getContentPane().remove(jalarmLbl1);
@@ -735,13 +965,18 @@ public class Clock extends JFrame {
             this.getContentPane().remove(jtextField3);
             this.getContentPane().remove(scrollPane);
         }
-        if (this.showFullDate && !this.showPartialDate) {
+        if (isShowFullDate() && !isShowPartialDate())
+        {
             jlbl1.setFont(font50);
             jlbl2.setFont(font50);
-        } else if (!this.showFullDate && this.showPartialDate) {
+        }
+        else if (!isShowFullDate() && isShowPartialDate())
+        {
             jlbl1.setFont(font60);
             jlbl2.setFont(font60);
-        } else {
+        }
+        else
+        {
             jlbl1.setFont(font60);
             jlbl2.setFont(font60);
         }
@@ -760,31 +995,35 @@ public class Clock extends JFrame {
         jtextField2.setEnabled(false);
         jtextField3.setEnabled(false);
         jtextField1.setFocusable(true);
-        if (this.clockFace == ClockFace.StartFace) {
+        if (getClockFace() == ClockFace.StartFace)
+        {
             jlbl1.setText(defaultText(lbl1, isALeapYear(year)));
             jlbl2.setText(defaultText(lbl2, isALeapYear(year)));
             addComponent(jlbl1, 0,0,1,1, 0,0);
             addComponent(jlbl2, 1,0,1,1, 0,0);
-        } else if (this.clockFace == ClockFace.AlarmFace) {
-            jalarmLbl1.setText(defaultText(3, isALeapYear(year))); // H
+        }
+        else if (getClockFace() == ClockFace.AlarmFace)
+        {
+            jalarmLbl1.setText(defaultText(3, isALeapYear(getYear()))); // H
             addComponent(jalarmLbl1, 0,0,1,1, 0,0);
             addComponent(jtextField1, 0,1,1,1, 0,0); // Textfield
             //do { jtextField1.requestFocusInWindow(); } while (jtextField1.getText().length() <= 2);
-            jalarmLbl2.setText(defaultText(5, isALeapYear(year))); // M
+            jalarmLbl2.setText(defaultText(5, isALeapYear(getYear()))); // M
             addComponent(jalarmLbl2, 0,2,1,1, 0,0);
             addComponent(jtextField2, 0,3,1,1, 0,0); // Textfield
             //do { jtextField2.requestFocusInWindow(); } while (jtextField2.getText().length() <= 2);
-            jalarmLbl4.setText(defaultText(6, isALeapYear(year))); // T
+            jalarmLbl4.setText(defaultText(6, isALeapYear(getYear()))); // T
             addComponent(jalarmLbl4, 0,4,1,1, 0,0);
             addComponent(jtextField3, 0,5,1,1, 0,0); // Textfield
             addComponent(jsetAlarmBtn, 0,6,1,1, 0,0); // Set v2.Alarm button
-            jalarmLbl3.setText(defaultText(4, isALeapYear(year))); // All Alarms ...
+            jalarmLbl3.setText(defaultText(4, isALeapYear(getYear()))); // All Alarms ...
             addComponent(jalarmLbl3, 1,0,7,1, 0,0);
             // TODO: add new alarm and continue to display all alarms created
         }
         this.repaint();
     }
-    public void addComponent(Component cpt, int gridy, int gridx, double gwidth, double gheight, int ipadx, int ipady) {
+    public void addComponent(Component cpt, int gridy, int gridx, double gwidth, double gheight, int ipadx, int ipady)
+    {
         this.constraints.gridx = gridx;
         this.constraints.gridy = gridy;
         this.constraints.gridwidth = (int)Math.ceil(gwidth);
@@ -796,7 +1035,54 @@ public class Clock extends JFrame {
         getGridBagLayout().setConstraints(cpt, getGridBagConstraints());
         add(cpt);
     }
-
+    /**
+     * The purpose of tick is to start the clock normally.
+     */
+    public void tick() {
+        if (getCalendar() != null)
+        {
+            updateJLabels();
+        }
+        else
+        {
+            tick(1, 1, 1);
+        }
+    }
+    /**
+     * The purpose of tick is to start the clock but it should increase
+     * the clocks time given the values of seconds, minutes, and seconds
+     * with each tick.
+     *
+     * @param seconds, the amount of seconds to tick forward or backwards with each tick
+     * @param minutes, the amount of minutes to tick forward of backwards with each tick
+     * @param hours,   the amount of hours   to tick forward or backwards with each tick
+     */
+    public void tick(int seconds, int minutes, int hours)
+    {
+        try {
+            updateJLabels(seconds, minutes, hours);
+            //Updates the clock daily to keep time current
+            if (!isShowMilitaryTime())
+            {
+                if (getTimeAsStr().equals("04:20:00 " + Time.AMPM.AM.strValue))
+                {
+                    updateAllClockValues();
+                    updateClockFace(false);
+                }
+            }
+            else
+            {
+                if (getMilitaryTimeAsStr().equals("0420 hours 00"))
+                {
+                    updateAllClockValues();
+                    updateClockFace(false);
+                }
+            }
+            updateClockFace(true);
+        } catch (Exception e) {
+            System.err.println("Error! Clock had an exception when performing tick: " + e.getMessage());
+        }
+    }
     public static void main(String[] args) throws ParseException, InterruptedException {
         Clock clock = new Clock();
         clock.setVisible(true);
