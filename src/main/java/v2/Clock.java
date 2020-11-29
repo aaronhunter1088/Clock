@@ -965,6 +965,7 @@ public class Clock extends JFrame {
             this.getContentPane().remove(jtextField3);
             this.getContentPane().remove(scrollPane);
         }
+        // logic should be done in menu
         if (isShowFullDate() && !isShowPartialDate())
         {
             jlbl1.setFont(font50);
@@ -980,6 +981,7 @@ public class Clock extends JFrame {
             jlbl1.setFont(font60);
             jlbl2.setFont(font60);
         }
+        // end in menu
         jalarmLbl1.setFont(font60);
         jalarmLbl2.setFont(font60);
         jalarmLbl3.setFont(font60);
@@ -1038,7 +1040,8 @@ public class Clock extends JFrame {
     /**
      * The purpose of tick is to start the clock normally.
      */
-    public void tick() {
+    public void tick()
+    {
         if (getCalendar() != null)
         {
             updateJLabels();

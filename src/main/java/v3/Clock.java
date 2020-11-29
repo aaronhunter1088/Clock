@@ -1,7 +1,5 @@
 package v3;
 
-import org.apache.commons.lang.StringUtils;
-
 import javax.swing.*;
 import java.awt.*;
 import java.text.DateFormat;
@@ -9,7 +7,6 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
-import java.util.TimeZone;
 
 /**
  * A simple application which displays the time and date. The time
@@ -25,8 +22,9 @@ import java.util.TimeZone;
  */
 public class Clock extends JFrame {
     // Class attributes
-    private static final long serialVersionUID = 1L;
+    protected static final long serialVersionUID = 1L;
     protected static final Dimension defaultSize = new Dimension(700, 300);
+    protected static final Dimension alarmSize = new Dimension(701, 301);
     protected static final String HIDE = "Hide";
     protected static final String SHOW = "Show";
     protected static final String SPACE = " ";
@@ -35,25 +33,11 @@ public class Clock extends JFrame {
     protected static final String FULL_TIME_SETTING = "full date";
     protected static final String PARTIAL_TIME_SETTING = "partial date";
     protected static final DateFormat sdf = new SimpleDateFormat("MM-dd-yyyy");
-    // labels
-    // For clock
-    protected JPanel facePanel;
-    // For alarm
-    private JLabel jalarmLbl1 = new JLabel("", SwingConstants.CENTER); // H
-    private JLabel jalarmLbl2 = new JLabel("", SwingConstants.CENTER); // M
-    private JLabel jalarmLbl3 = new JLabel("", SwingConstants.CENTER); // S
-    private JLabel jalarmLbl4 = new JLabel("", SwingConstants.CENTER); // All Alarms
-    private JTextField jtextField1 = new JTextField(2); // Hour textfield
-    private JTextField jtextField2 = new JTextField(2); // Min textfield
-    private JTextField jtextField3 = new JTextField(2); // Sec textfield
-    private ScrollPane scrollPane = new ScrollPane(ScrollPane.SCROLLBARS_AS_NEEDED);
-    private JButton jsetAlarmBtn = new JButton("Set");
-    // Main GUI Components
-    private GridBagLayout layout;
-    private GridBagConstraints constraints;
     protected static final Font font60 = new Font("Courier New", Font.BOLD, 60);
     protected static final Font font50 = new Font("Courier New", Font.BOLD, 50);
-    // Clock object attributes
+    // Main GUI Components
+    // For displaying faces on main display
+    protected Panels facePanel;
     protected Date beginDaylightSavingsTimeDate;
     protected Date endDaylightSavingsTimeDate;
     protected Calendar calendar;
@@ -77,7 +61,7 @@ public class Clock extends JFrame {
     // Getters/Issers
     //public GridBagLayout getGridBagLayout() { return this.layout; }
     //public GridBagConstraints getGridBagConstraints() { return this.constraints; }
-    public JPanel getFacePanel() { return this.facePanel; }
+    public Panels getFacePanel() { return this.facePanel; }
     public Date getBeginDaylightSavingsTimeDate() { return this.beginDaylightSavingsTimeDate; }
     public Date getEndDaylightSavingsTimeDate() { return this.endDaylightSavingsTimeDate; }
     public Calendar getCalendar() { return this.calendar; }
@@ -112,7 +96,7 @@ public class Clock extends JFrame {
     // Setters
     //private void setGridBagLayout(GridBagLayout layout) { this.layout = layout; }
     //private void setGridBagConstraints(GridBagConstraints constraints) { this.constraints = constraints; }
-    protected void setFacePanel(JPanel facePanel) { this.facePanel = facePanel; }
+    protected void setFacePanel(Panels facePanel) { this.facePanel = facePanel; }
     protected void setBeginDaylightSavingsTimeDate(Date beginDaylightSavingsTimeDate) { this.beginDaylightSavingsTimeDate = beginDaylightSavingsTimeDate; }
     protected void setEndDaylightSavingsTimeDate(Date endDaylightSavingsTimeDate) { this.endDaylightSavingsTimeDate = endDaylightSavingsTimeDate; }
     protected void setCalendar(Calendar calendar) { this.calendar = calendar; }
@@ -160,11 +144,12 @@ public class Clock extends JFrame {
     protected void setShowFullDate(boolean showFullDate) { this.showFullDate = showFullDate; }
     protected void setShowPartialDate(boolean showPartialDate) { this.showPartialDate = showPartialDate; }
     protected void setShowMilitaryTime(boolean showMilitaryTime) { this.showMilitaryTime = showMilitaryTime; }
+    protected void setCalendarTime(Date date) { getCalendar().setTime(date); }
     // Helper methods
     public void setDefaultClockValues(int hours, int minutes, int seconds, Time.Month month, Time.Day day, int  date, int year, Time.AMPM ampm) throws ParseException
     {
         setCalendar(Calendar.getInstance());
-        getCalendar().setTime(new Date());
+        setCalendarTime(new Date());
         Date definedDate = null;
         if (hours == 0) { hours = getCalendar().get(Calendar.HOUR); hoursAsStr = Integer.toString(hours); }
         if (minutes == 0) { minutes = getCalendar().get(Calendar.MINUTE); minutesAsStr = Integer.toString(minutes); }
@@ -186,7 +171,7 @@ public class Clock extends JFrame {
             System.err.println("Error! Couldn't create the date using month=["+month+"], date=["+dateStr+
                     "], year=["+year+"]");
         }
-        getCalendar().setTime(definedDate);
+        setCalendarTime(definedDate);
         setMonth(month);
         setDay(day);
         setDate(date);
@@ -198,16 +183,14 @@ public class Clock extends JFrame {
         setDaylightSavingsTimeDates();
         setDaylightSavingsTime(isTodayDaylightSavingsTime());
     }
-    public void setClockValues(Time.AMPM time, boolean showMilitaryTime)
+    public void updateHourValueAndHourString(Time.AMPM time, boolean showMilitaryTime)
     {
-        if (time == null && showMilitaryTime == false) {}
-
         if (time == Time.AMPM.AM && showMilitaryTime) // Daytime and we show Military v2.Time
         {
             if (getHours() == 12) setHours(0);
             else setHours(getHours());
         }
-        else if (time == Time.AMPM.AM && !showMilitaryTime) // DayTime and we do not show Military v2.Time
+        else if (time == Time.AMPM.AM) // DayTime and we do not show Military v2.Time
         {
             if (getHours() == 0) setHours(12);
             else setHours(getHours());
@@ -218,7 +201,7 @@ public class Clock extends JFrame {
             else if (getHours() < 12) setHours(getHours() + 12);
             else setHours(getHours());
         }
-        else if (time == Time.AMPM.PM && !showMilitaryTime) // NightTime and we do not show Military v2.Time
+        else if (time == Time.AMPM.PM) // NightTime and we do not show Military v2.Time
         {
             if (getHours() > 12) setHours(getHours() - 12);
         }
@@ -297,16 +280,6 @@ public class Clock extends JFrame {
         setDaylightSavingsTime(false);
         return isDaylightSavingsTime();
     }
-    /*
-     *
-     * Method to update clock because of lost seconds
-     */
-    @Deprecated
-    public void updateAllClockValues() throws ParseException
-    {
-        getCalendar().setTime(new Date());
-        //setMonthAsTime();
-    }
     /**
      * updateJLabels performs the logic to update the time, date, month,
      * and many other values. it also updates the values we see on the
@@ -316,7 +289,7 @@ public class Clock extends JFrame {
      * @param minutes, the amount of time to increase or decrease seconds
      * @param hours,   the amount of time to increase or decrease seconds
      */
-    public void updateJLabels(int seconds, int minutes, int hours)
+    public void performTick(int seconds, int minutes, int hours)
     {
         setSeconds(getSeconds()+seconds);
         setSecondsAsStr(getSeconds() <= 9 ? "0"+getSeconds() : Integer.toString(getSeconds()));
@@ -381,6 +354,8 @@ public class Clock extends JFrame {
             setDaylightSavingsTime(isTodayDaylightSavingsTime());
         }
         switch (getMonth()) {
+            case ERR:
+                break;
             case JANUARY: {
                 if (getDate() == 31 && isDateChanged()) {
                     setDate(1);
@@ -483,7 +458,7 @@ public class Clock extends JFrame {
             }
             default : {}
         }
-        setClockValues(getAMPM(), isShowMilitaryTime());
+        updateHourValueAndHourString(getAMPM(), isShowMilitaryTime());
         if (isDateChanged())
         {
             int month = 0;
@@ -499,7 +474,7 @@ public class Clock extends JFrame {
             try {
                 updatedDate = sdf.parse(monthStr+"-"+dateStr+"-"+getYear());
             } catch (ParseException e) { System.err.println(e.getMessage()); }
-            getCalendar().setTime(updatedDate);
+            setCalendarTime(updatedDate);
             setDay(convertIntToTimeDay(getCalendar().get(Calendar.DAY_OF_WEEK)));
         }
         if (isDaylightSavingsTime())
@@ -515,9 +490,9 @@ public class Clock extends JFrame {
                 setDaylightSavingsTime(false);
             }
         }
-    } // update jLabels
+    } // performTick
     // TODO: refactor and organize code
-    public String defaultText(int labelVersion, boolean isALeapYear)
+    public String defaultText(int labelVersion)
     {
         String defaultText = "";
         if (labelVersion == 1)
@@ -603,19 +578,20 @@ public class Clock extends JFrame {
         setMenuBar();
         setFacePanel(new ClockPanel(this));
         setClockFace(ClockFace.ClockFace);
-        add(getFacePanel());
+        pack();
+        add((Component) getFacePanel());
     }
     public Clock(int hours, int minutes, int seconds, Time.Month month, Time.Day day, int date, int year, Time.AMPM ampm) throws ParseException
     {
         super();
         setResizable(true);
         setDefaultClockValues(hours, minutes, seconds, month, day, date, year, ampm);
-        setFacePanel(facePanel);
+        setFacePanel(new ClockPanel(this));
         setMenuBar();
         setClockFace(ClockFace.ClockFace);
         pack();
+        add((Component) getFacePanel());
     }
-
     // Constructor methods
     public void setMenuBar()
     {
@@ -708,19 +684,26 @@ public class Clock extends JFrame {
 
         clockFeature.addActionListener(action -> {
             if (getClockFace() != ClockFace.ClockFace) {
+                remove((Component) getFacePanel());
                 setClockFace(ClockFace.ClockFace);
+                setFacePanel(new ClockPanel(this));
+                add((Component) getFacePanel());
+                this.repaint();
+                setMinimumSize(defaultSize);
+                pack();
             }
-            //updateClockFace(true);
-            // updatePanel
         });
         clockFeature.setForeground(Color.WHITE);
 
         alarmFeature.addActionListener(action -> {
             if (getClockFace() != ClockFace.AlarmFace) {
+                remove((Component) getFacePanel());
                 setClockFace(ClockFace.AlarmFace);
+                setFacePanel(new AlarmPanel(this));
+                add((Component) getFacePanel());
+                this.repaint();
+                setMinimumSize(alarmSize);
             }
-            //updateClockFace(true);
-            // updatePanel
         });
         alarmFeature.setForeground(Color.WHITE);
 
@@ -739,6 +722,14 @@ public class Clock extends JFrame {
         this.setJMenuBar(menuBar);
     }
     /**
+     * The purpose of tick is to start the clock normally.
+     */
+    public void tick()
+    {
+        tick(1, 0, 0);
+
+    }
+    /**
      * The purpose of tick is to start the clock but it should increase
      * the clocks time given the values of seconds, minutes, and seconds
      * with each tick.
@@ -749,20 +740,19 @@ public class Clock extends JFrame {
      */
     public void tick(int seconds, int minutes, int hours)
     {
-        try {
-            updateJLabels(seconds, minutes, hours);
+        try
+        {
+            performTick(seconds, minutes, hours);
             //Updates the clock daily to keep time current
-            if (getTimeAsStr().equals("04:20:00 " + Time.AMPM.AM.strValue) ||
+            if (getTimeAsStr().equals("04:20:00" + SPACE + Time.AMPM.AM.strValue) ||
                 getMilitaryTimeAsStr().equals("0420 hours 00"))
             {
-                //updateAllClockValues();
-                // update clock because of lost seconds
-                //updateClockFace(false);
-                // updatePanel
+                setDefaultClockValues(0, 0, 0, null, null, 0, 0, null);
             }
-            //updateClockFace(true);
-            // updatePanel
-        } catch (Exception e) {
+            ((Panels)getFacePanel()).updateLabels();
+        }
+        catch (Exception e)
+        {
             System.err.println("Error! Clock had an exception when performing tick: " + e.getMessage());
         }
     }
@@ -774,8 +764,9 @@ public class Clock extends JFrame {
         clock.setSize(defaultSize);
         clock.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         clock.setBounds(200, 200, 700, 300);
-        while (true) {
-            ((ClockPanel)clock.getFacePanel()).tick();
+        while (true)
+        {
+            clock.tick();
             Thread.sleep(1000);
         }
     }
