@@ -689,8 +689,7 @@ public class Clock extends JFrame {
                 setFacePanel(new ClockPanel(this));
                 add((Component) getFacePanel());
                 this.repaint();
-                setMinimumSize(defaultSize);
-                pack();
+                this.setVisible(true);
             }
         });
         clockFeature.setForeground(Color.WHITE);
@@ -702,7 +701,7 @@ public class Clock extends JFrame {
                 setFacePanel(new AlarmPanel(this));
                 add((Component) getFacePanel());
                 this.repaint();
-                setMinimumSize(alarmSize);
+                this.setVisible(true);
             }
         });
         alarmFeature.setForeground(Color.WHITE);
