@@ -11,16 +11,17 @@ public class AlarmPanel extends JPanel implements Panels {
     private GridBagConstraints constraints;
     private JLabel jalarmLbl1 = new JLabel("", SwingConstants.CENTER); // H
     private JLabel jalarmLbl2 = new JLabel("", SwingConstants.CENTER); // M
-    private JLabel jalarmLbl3 = new JLabel("", SwingConstants.CENTER); // S
+    private JLabel jalarmLbl3 = new JLabel("", SwingConstants.CENTER); // Time (AM/PM)
     private JLabel jalarmLbl4 = new JLabel("", SwingConstants.CENTER); // All Alarms
     private JTextField jtextField1 = new JTextField(2); // Hour textfield
     private JTextField jtextField2 = new JTextField(2); // Min textfield
-    private JTextField jtextField3 = new JTextField(2); // Sec textfield
-    private ScrollPane scrollPane = new ScrollPane(ScrollPane.SCROLLBARS_AS_NEEDED);
+    private JTextField jtextField3 = new JTextField(2); // Time textfield
     private JButton jsetAlarmBtn = new JButton("Set");
+    private ScrollPane scrollPane = new ScrollPane(ScrollPane.SCROLLBARS_AS_NEEDED);
     private Clock clock;
 
-    public AlarmPanel(Clock clock) {
+    public AlarmPanel(Clock clock)
+    {
         setClock(clock);
         setMinimumSize(clock.alarmSize);
         setGridBagLayout(new GridBagLayout());
@@ -30,7 +31,7 @@ public class AlarmPanel extends JPanel implements Panels {
         setBackground(Color.BLACK);
         setForeground(Color.WHITE);
         setupAlarmPanel(getClock());
-        addComponentsToPanel_v3();
+        addComponentsToPanel();
     }
 
     // Getters
@@ -67,14 +68,15 @@ public class AlarmPanel extends JPanel implements Panels {
         clock.setShowPartialDate(false);
         clock.setShowMilitaryTime(false);
     }
-    public void addComponentsToPanel_v3()
+    @Override
+    public void addComponentsToPanel()
     {
         updateLabels();
         addComponent(jalarmLbl1, 0,0,1,1, 0,0); // H
         addComponent(jtextField1, 0,1,1,1, 0,0); // Textfield
         addComponent(jalarmLbl2, 0,2,1,1, 0,0); // M
         addComponent(jtextField2, 0,3,1,1, 0,0); // Textfield
-        addComponent(jalarmLbl3, 1,0,7,1, 0,0); // S
+        addComponent(jalarmLbl3, 1,0,7,1, 0,0); // Time (AM/PM)
         addComponent(jtextField3, 0,5,1,1, 0,0); // Textfield
         addComponent(jsetAlarmBtn, 0,6,1,1, 0,0); // Set Alarm button
         addComponent(jalarmLbl4, 0,4,1,1, 0,0); // All alarms

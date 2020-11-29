@@ -24,7 +24,7 @@ public class ClockPanel extends JPanel implements Panels {
         setBackground(Color.BLACK);
         setForeground(Color.WHITE);
         setupClockPanel(getClock());
-        addComponentsToPanel_v3();
+        addComponentsToPanel();
     }
 
     // Getters
@@ -51,7 +51,8 @@ public class ClockPanel extends JPanel implements Panels {
         clock.setShowPartialDate(false);
         clock.setShowMilitaryTime(false);
     }
-    public void addComponentsToPanel_v3()
+    @Override
+    public void addComponentsToPanel()
     {
         updateLabels();
         addComponent(getJlbl1(), 0,0,1,1, 0,0);
