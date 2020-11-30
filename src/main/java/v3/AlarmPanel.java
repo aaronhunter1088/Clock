@@ -13,6 +13,12 @@ import java.util.concurrent.atomic.AtomicReference;
 
 import static v3.Time.AMPM.*;
 
+/**
+ * TODO: Add feature where we click on Alarm under menu
+ * the AlarmPanel will appear and the alarm will appear
+ * in the text fields. The alarm will be removed from
+ * the list of alarms, the textarea, and from the menu
+ */
 public class AlarmPanel extends JPanel implements Panels {
 
     private GridBagLayout layout;
@@ -147,8 +153,8 @@ public class AlarmPanel extends JPanel implements Panels {
                 if (alarm.getTimeAsStr().equals(getClock().getTimeAsStr()) || getClock().isAlarm())
                 {
                     System.out.println("Alarm " + alarm.getTimeAsStr() + " is going off");
-                    ((ClockPanel)getClock().getFacePanel()).getJlbl1().setText(alarm.getTimeAsStr());
-                    ((ClockPanel)getClock().getFacePanel()).getJlbl2().setText("is going off!");
+                    getClock().getClockPanel().getJlbl1().setText(alarm.getTimeAsStr());
+                    getClock().getClockPanel().getJlbl2().setText("is going off!");
                     getClock().setAlarm(true);
                 }
             }
@@ -186,6 +192,7 @@ public class AlarmPanel extends JPanel implements Panels {
                             {
                                 alarmToRemove.set(alarm);
                                 stringToRemove.set((alarm).getTimeAsStr());
+                                getClock().setAlarm(false);
                             }
                         }
                     );
@@ -202,6 +209,8 @@ public class AlarmPanel extends JPanel implements Panels {
                             getJTextArea().append(stringAlarm);
                         }
                     }
+                    //getClock().setFacePanel((ClockPanel)getClock().getClockPanel());
+                    //getClock().setClockFace(ClockFace.ClockFace);
                     //((ClockPanel)getClock().getFacePanel()).getJlbl1().setText(getClock().defaultText(1));
                     //((ClockPanel)getClock().getFacePanel()).getJlbl2().setText(getClock().defaultText(2));
                 });
@@ -210,7 +219,7 @@ public class AlarmPanel extends JPanel implements Panels {
     }
     public void setupAlarmButton()
     {
-        jalarmButton.addActionListener(action -> {
+        getJalarmButton().addActionListener(action -> {
             // check if h, m, and time are set. exit if not
             try
             {
@@ -271,9 +280,9 @@ public class AlarmPanel extends JPanel implements Panels {
         // display list of alarms below All Alarms
         this.repaint();
         // erase input in textfields
-        jtextField1.setText("");
-        jtextField2.setText("");
-        jtextField3.setText("");
+        getJTextField1().setText("");
+        getJTextField2().setText("");
+        getJTextField3().setText("");
         JMenuItem alarmItem = new JMenuItem(alarm.getTimeAsStr());
         alarmItem.setForeground(Color.WHITE);
         alarmItem.setBackground(Color.BLACK);
