@@ -5,8 +5,6 @@ import org.apache.commons.lang.StringUtils;
 import javax.swing.*;
 import java.awt.*;
 import java.text.ParseException;
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.concurrent.atomic.AtomicReference;
@@ -30,7 +28,7 @@ public class AlarmPanel extends JPanel implements Panels {
     private JTextField jtextField1 = new JTextField(2); // Hour textfield
     private JTextField jtextField2 = new JTextField(2); // Min textfield
     private JTextField jtextField3 = new JTextField(2); // Time textfield
-    private JButton jalarmButton = new JButton("Set");
+    private JButton jSetAlarmButton = new JButton("Set");
     private JTextArea jTextArea = new JTextArea();
     private JScrollPane scrollPane = null;
     private Clock clock;
@@ -47,7 +45,7 @@ public class AlarmPanel extends JPanel implements Panels {
         setForeground(Color.WHITE);
         setupAlarmPanel(getClock());
         setupAlarmButton();
-        setupCreatedAlarmsFunctionality();
+        //setupCreatedAlarmsFunctionality();
         addComponentsToPanel();
     }
 
@@ -62,7 +60,7 @@ public class AlarmPanel extends JPanel implements Panels {
     public JTextField getJTextField1() { return this.jtextField1; }
     public JTextField getJTextField2() { return this.jtextField2; }
     public JTextField getJTextField3() { return this.jtextField3; }
-    public JButton getJalarmButton() { return this.jalarmButton; }
+    public JButton getJSetAlarmButton() { return this.jSetAlarmButton; }
     public JScrollPane getJScrollPane() { return this.scrollPane; }
     public JTextArea getJTextArea() { return this.jTextArea; }
     public boolean isUpdatingAlarm() { return updatingAlarm; }
@@ -78,7 +76,7 @@ public class AlarmPanel extends JPanel implements Panels {
     protected void setJTextField1(JTextField jtextField1) { this.jtextField1 = jtextField1; }
     protected void setJTextField2(JTextField jtextField2) { this.jtextField2 = jtextField2; }
     protected void setJTextField3(JTextField jtextField3) { this.jtextField3 = jtextField3; }
-    protected void setJalarmButton(JButton jalarmButton) { this.jalarmButton = jalarmButton; }
+    protected void setJSetAlarmButton(JButton jSetAlarmButton) { this.jSetAlarmButton = jSetAlarmButton; }
     protected void setJScrollPane(JScrollPane scrollPane) { this.scrollPane = scrollPane; }
     protected void setJTextArea(JTextArea jTextArea) { this.jTextArea = jTextArea; }
     protected void setUpdatingAlarm(boolean updatingAlarm) { this.updatingAlarm = updatingAlarm; }
@@ -127,7 +125,7 @@ public class AlarmPanel extends JPanel implements Panels {
         addComponent(getJTextField2(), 0,3,1,1, 20,0, GridBagConstraints.HORIZONTAL); // Textfield
         addComponent(getJAlarmLbl3(), 0,4,1,1, 0,0, GridBagConstraints.HORIZONTAL); // Time (AM/PM)
         addComponent(getJTextField3(), 0,5,1,1, 20,0, GridBagConstraints.HORIZONTAL); // Textfield
-        addComponent(getJalarmButton(), 0,6,0,1, 0,0, GridBagConstraints.NONE); // Set Alarm button
+        addComponent(getJSetAlarmButton(), 0,6,0,1, 0,0, GridBagConstraints.NONE); // Set Alarm button
         addComponent(getJAlarmLbl4(), 1,0,0,1, 0,0, GridBagConstraints.HORIZONTAL); // All alarms
         addComponent(getJScrollPane(), 2, 0, 0, 2, 0, 0, GridBagConstraints.BOTH);
     }
@@ -176,16 +174,12 @@ public class AlarmPanel extends JPanel implements Panels {
         {
             AtomicReference<Clock> alarmToRemove = new AtomicReference<>();
             AtomicReference<String> stringToRemove = new AtomicReference<>();
-            if (!((JMenuItem) c).getText().equals("Set Alarm"))
+            if (!((JMenuItem) c).getText().equals("Set Alarm") &&
+                !((JMenuItem) c).getText().equals("View all") )
             {
                 //05:06:00 PM
                 JMenuItem menuItem = (JMenuItem) c;
                 menuItem.addActionListener(action -> {
-                    getJTextField1().setText(menuItem.getText().substring(0,2));
-                    getJTextField2().setText(menuItem.getText().substring(3,5));
-                    getJTextField3().setText(menuItem.getText().substring(9));
-                    setUpdatingAlarm(true);
-                    getClock().getClockMenuBar().getViewAlarmsMenu().remove(menuItem);
                     getClock().getListOfAlarms().forEach(
                         (alarm) -> {
                             if ((alarm).getTimeAsStr().equals(menuItem.getText()))
@@ -196,12 +190,19 @@ public class AlarmPanel extends JPanel implements Panels {
                             }
                         }
                     );
+                    getJTextField1().setText(menuItem.getText().substring(0,2));
+                    getJTextField2().setText(menuItem.getText().substring(3,5));
+                    getJTextField3().setText(menuItem.getText().substring(9));
+                    setUpdatingAlarm(true);
+                    // remove time as option from menu
+                    getClock().getClockMenuBar().getViewAlarmsMenu().remove(menuItem);
+                    // remove alarm from list of alarms
                     getClock().getListOfAlarms().remove(alarmToRemove.getAcquire());
                     String[] strings = getJTextArea().getText().split("\n");
                     getJTextArea().setText("");
                     for(String stringAlarm : strings)
                     {
-                        if (alarmToRemove.getAcquire() != null && !stringAlarm.equals(((Clock)alarmToRemove.getAcquire()).getTimeAsStr()))
+                        if (alarmToRemove.getAcquire() != null && !stringAlarm.equals((alarmToRemove.getAcquire()).getTimeAsStr()))
                         {
                             if (!StringUtils.isEmpty(getJTextArea().getText())) {
                                 getJTextArea().append("\n");
@@ -209,17 +210,20 @@ public class AlarmPanel extends JPanel implements Panels {
                             getJTextArea().append(stringAlarm);
                         }
                     }
-                    //getClock().setFacePanel((ClockPanel)getClock().getClockPanel());
-                    //getClock().setClockFace(ClockFace.ClockFace);
-                    //((ClockPanel)getClock().getFacePanel()).getJlbl1().setText(getClock().defaultText(1));
-                    //((ClockPanel)getClock().getFacePanel()).getJlbl2().setText(getClock().defaultText(2));
+                    System.out.println("Clicked on " + alarmToRemove.getAcquire().getTimeAsStr());
+                    getClock().changeToAlarmPanel();
                 });
+            }
+            // TODO: is this necessary. Clicking 'Set Alarm' brings us to the same view
+            else if (((JMenuItem) c).getText().equals("View all"))
+            {
+                getClock().changeToAlarmPanel();
             }
         }
     }
     public void setupAlarmButton()
     {
-        getJalarmButton().addActionListener(action -> {
+        getJSetAlarmButton().addActionListener(action -> {
             // check if h, m, and time are set. exit if not
             try
             {
@@ -245,6 +249,7 @@ public class AlarmPanel extends JPanel implements Panels {
                     // determine how to update alarm (update/delete)
                 }
                 createAlarm();
+                getClock().changeToClockPanel();
             }
             catch (InvalidInputException iie)
             {

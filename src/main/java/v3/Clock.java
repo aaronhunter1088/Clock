@@ -1,7 +1,5 @@
 package v3;
 
-import org.apache.commons.lang3.StringUtils;
-
 import javax.swing.*;
 import java.awt.*;
 import java.text.DateFormat;
@@ -692,37 +690,40 @@ public class Clock extends JFrame {
         });
         getClockMenuBar().getClockFeature().addActionListener(action -> {
             if (getClockFace() != ClockFace.ClockFace) {
-                setAlarmPanel((AlarmPanel)getFacePanel()); // is this correct
-                remove((Component) getFacePanel());
-                setClockFace(ClockFace.ClockFace);
-                setFacePanel(getClockPanel());
-                setClockPanel((ClockPanel)getFacePanel());
-                add((Component) getFacePanel());
-                this.repaint();
-                this.setVisible(true);
+                changeToClockPanel();
             }
         });
-        getClockMenuBar().getAlarms().addActionListener(action -> {
-            if (getClockFace() != ClockFace.AlarmFace ||
-                getClockFace() == ClockFace.ClockFace) {
-                if (getClockFace() == ClockFace.ClockFace)
-                {
-                    System.out.println("looking at clock, clicking on view alarms");
-                }
-                setClockPanel((ClockPanel)getFacePanel());
-                remove((Component) getFacePanel());
-                setClockFace(ClockFace.AlarmFace);
-                setFacePanel(getAlarmPanel());
-                add((Component) getFacePanel());
-                this.repaint();
-                this.setVisible(true);
-            }
+        getClockMenuBar().getViewAllAlarms().addActionListener(action -> {
+            changeToAlarmPanel();
+        });
+        getClockMenuBar().getSetAlarms().addActionListener(action -> {
+            changeToAlarmPanel();
         });
 
         // Add menu to menuBar
         getClockMenuBar().add(getClockMenuBar().getSettingsMenu());
         getClockMenuBar().add(getClockMenuBar().getFeaturesMenu());
         setJMenuBar(getClockMenuBar());
+    }
+    public void changeToClockPanel()
+    {
+        setAlarmPanel((AlarmPanel)getFacePanel()); // is this correct
+        remove((Component) getFacePanel());
+        setClockFace(ClockFace.ClockFace);
+        setFacePanel(getClockPanel());
+        setClockPanel((ClockPanel)getFacePanel());
+        add((Component) getFacePanel());
+        this.repaint();
+        this.setVisible(true);
+    }
+    public void changeToAlarmPanel()
+    {
+        remove((Component) getFacePanel());
+        setClockFace(ClockFace.AlarmFace);
+        setFacePanel(getAlarmPanel());
+        add((Component) getFacePanel());
+        this.repaint();
+        this.setVisible(true);
     }
     /**
      * The purpose of tick is to start the clock normally.
