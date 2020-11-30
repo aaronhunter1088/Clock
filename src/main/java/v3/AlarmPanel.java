@@ -1,9 +1,17 @@
 package v3;
 
+import org.apache.commons.lang.StringUtils;
+
 import javax.swing.*;
 import java.awt.*;
+import java.text.ParseException;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.concurrent.atomic.AtomicReference;
+
+import static v3.Time.AMPM.*;
 
 public class AlarmPanel extends JPanel implements Panels {
 
@@ -16,21 +24,27 @@ public class AlarmPanel extends JPanel implements Panels {
     private JTextField jtextField1 = new JTextField(2); // Hour textfield
     private JTextField jtextField2 = new JTextField(2); // Min textfield
     private JTextField jtextField3 = new JTextField(2); // Time textfield
-    private JButton jsetAlarmBtn = new JButton("Set");
-    private ScrollPane scrollPane = new ScrollPane(ScrollPane.SCROLLBARS_AS_NEEDED);
+    private JButton jalarmButton = new JButton("Set");
+    private JTextArea jTextArea = new JTextArea();
+    private JScrollPane scrollPane = null;
     private Clock clock;
+    private boolean updatingAlarm;
+    // TODO: move this attribute to inside of Clock. Clock should know of its alarms
+    private ArrayList<Clock> listOfAlarms;
 
     public AlarmPanel(Clock clock)
     {
         setClock(clock);
+        setListOfAlarms(new ArrayList<>());
         setMinimumSize(clock.alarmSize);
         setGridBagLayout(new GridBagLayout());
         setLayout(getGridBagLayout());
         setGridBagConstraints(new GridBagConstraints());
-        constraints.fill = GridBagConstraints.HORIZONTAL;
         setBackground(Color.BLACK);
         setForeground(Color.WHITE);
         setupAlarmPanel(getClock());
+        setupAlarmButton();
+        setupCreatedAlarmsFunctionality();
         addComponentsToPanel();
     }
 
@@ -38,13 +52,18 @@ public class AlarmPanel extends JPanel implements Panels {
     public GridBagLayout getGridBagLayout() { return this.layout; }
     public GridBagConstraints getGridBagConstraints() { return this.constraints; }
     public Clock getClock() { return this.clock; }
-    public JLabel getJAlarmLbl1() { return this.jalarmLbl1; }
-    public JLabel getJAlarmLbl2() { return this.jalarmLbl2; }
-    public JLabel getJAlarmLbl3() { return this.jalarmLbl3; }
-    public JLabel getJAlarmLbl4() { return this.jalarmLbl4; }
+    public JLabel getJAlarmLbl1() { return this.jalarmLbl1; } // H
+    public JLabel getJAlarmLbl2() { return this.jalarmLbl2; } // M
+    public JLabel getJAlarmLbl3() { return this.jalarmLbl3; } // T
+    public JLabel getJAlarmLbl4() { return this.jalarmLbl4; } // All alarms
     public JTextField getJTextField1() { return this.jtextField1; }
     public JTextField getJTextField2() { return this.jtextField2; }
     public JTextField getJTextField3() { return this.jtextField3; }
+    public JButton getJalarmButton() { return this.jalarmButton; }
+    public JScrollPane getJScrollPane() { return this.scrollPane; }
+    public JTextArea getJTextArea() { return this.jTextArea; }
+    public ArrayList getListOfAlarms() { return this.listOfAlarms; }
+    public boolean isUpdatingAlarm() { return updatingAlarm; }
 
     // Setters
     private void setGridBagLayout(GridBagLayout layout) { this.layout = layout; }
@@ -57,8 +76,21 @@ public class AlarmPanel extends JPanel implements Panels {
     protected void setJTextField1(JTextField jtextField1) { this.jtextField1 = jtextField1; }
     protected void setJTextField2(JTextField jtextField2) { this.jtextField2 = jtextField2; }
     protected void setJTextField3(JTextField jtextField3) { this.jtextField3 = jtextField3; }
+    protected void setJalarmButton(JButton jalarmButton) { this.jalarmButton = jalarmButton; }
+    protected void setJScrollPane(JScrollPane scrollPane) { this.scrollPane = scrollPane; }
+    protected void setJTextArea(JTextArea jTextArea) { this.jTextArea = jTextArea; }
+    protected void setListOfAlarms(ArrayList<Clock> listOfAlarms) { this.listOfAlarms = listOfAlarms; }
+    protected void setUpdatingAlarm(boolean updatingAlarm) { this.updatingAlarm = updatingAlarm; }
 
     // Helper methods
+    public Time.AMPM convertStringToTimeAMPM(String ampm)
+    {
+        if (StringUtils.equals("AM", ampm.toUpperCase()))
+        { return AM; }
+        else if (StringUtils.equals("PM", ampm.toUpperCase()))
+        { return PM; }
+        else return Time.AMPM.ERROR;
+    }
     public void setupAlarmPanel(Clock clock)
     {
         clock.setCalendar(Calendar.getInstance());
@@ -67,51 +99,182 @@ public class AlarmPanel extends JPanel implements Panels {
         clock.setShowFullDate(false);
         clock.setShowPartialDate(false);
         clock.setShowMilitaryTime(false);
+        getJAlarmLbl1().setFont(getClock().font60); // H
+        getJAlarmLbl2().setFont(getClock().font60); // M
+        getJAlarmLbl3().setFont(getClock().font60); // T
+        getJAlarmLbl4().setFont(getClock().font50); // All Alarms
+        getJTextArea().setFont(getClock().font50); // alarms
+        getJAlarmLbl1().setForeground(Color.WHITE);
+        getJAlarmLbl2().setForeground(Color.WHITE);
+        getJAlarmLbl3().setForeground(Color.WHITE);
+        getJAlarmLbl4().setForeground(Color.WHITE);
+        getJTextArea().setVisible(true);
+        getJTextArea().setEditable(false);
+        getJTextArea().setBackground(Color.BLACK);
+        getJTextArea().setForeground(Color.WHITE);
+        setJScrollPane(new JScrollPane(getJTextArea()));
+        getJScrollPane().setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
+        getJScrollPane().setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
     }
     @Override
     public void addComponentsToPanel()
     {
         updateLabels();
-        addComponent(jalarmLbl1, 0,0,1,1, 0,0); // H
-        addComponent(jtextField1, 0,1,1,1, 0,0); // Textfield
-        addComponent(jalarmLbl2, 0,2,1,1, 0,0); // M
-        addComponent(jtextField2, 0,3,1,1, 0,0); // Textfield
-        addComponent(jalarmLbl3, 1,0,7,1, 0,0); // Time (AM/PM)
-        addComponent(jtextField3, 0,5,1,1, 0,0); // Textfield
-        addComponent(jsetAlarmBtn, 0,6,1,1, 0,0); // Set Alarm button
-        addComponent(jalarmLbl4, 0,4,1,1, 0,0); // All alarms
+        addComponent(getJAlarmLbl1(), 0,0,1,1, 0,0, GridBagConstraints.HORIZONTAL); // H
+        addComponent(getJTextField1(), 0,1,1,1, 20,0, GridBagConstraints.HORIZONTAL); // Textfield
+        addComponent(getJAlarmLbl2(), 0,2,1,1, 0,0, GridBagConstraints.HORIZONTAL); // M
+        addComponent(getJTextField2(), 0,3,1,1, 20,0, GridBagConstraints.HORIZONTAL); // Textfield
+        addComponent(getJAlarmLbl3(), 0,4,1,1, 0,0, GridBagConstraints.HORIZONTAL); // Time (AM/PM)
+        addComponent(getJTextField3(), 0,5,1,1, 20,0, GridBagConstraints.HORIZONTAL); // Textfield
+        addComponent(getJalarmButton(), 0,6,0,1, 0,0, GridBagConstraints.NONE); // Set Alarm button
+        addComponent(getJAlarmLbl4(), 1,0,0,1, 0,0, GridBagConstraints.HORIZONTAL); // All alarms
+        addComponent(getJScrollPane(), 2, 0, 0, 2, 0, 0, GridBagConstraints.BOTH);
     }
     @Override
     public void updateLabels()
     {
-        getJAlarmLbl1().setFont(getClock().font60);
-        getJAlarmLbl2().setFont(getClock().font60);
-        getJAlarmLbl3().setFont(getClock().font60);
-        getJAlarmLbl4().setFont(getClock().font60);
-        getJAlarmLbl1().setForeground(Color.WHITE);
-        getJAlarmLbl2().setForeground(Color.WHITE);
-        getJAlarmLbl3().setForeground(Color.WHITE);
-        getJAlarmLbl4().setForeground(Color.WHITE);
-        getJTextField1().setVisible(true);
-        getJTextField1().setEnabled(true);
-        getJTextField2().setEnabled(false);
-        getJTextField3().setEnabled(false);
-        getJTextField2().setFocusable(true);
         getJAlarmLbl1().setText(getClock().defaultText(3)); // H
-        getJAlarmLbl2().setText(getClock().defaultText(5)); // M
-        getJAlarmLbl4().setText(getClock().defaultText(6)); // T
-        getJAlarmLbl3().setText(getClock().defaultText(4)); // All Alarms ...
+        getJAlarmLbl2().setText(getClock().defaultText(4)); // M
+        getJAlarmLbl3().setText(getClock().defaultText(5)); // T
+        getJAlarmLbl4().setText(getClock().defaultText(6)); // All Alarms ...
         getClock().repaint();
     }
-    public void addComponent(Component cpt, int gridy, int gridx, double gwidth, double gheight, int ipadx, int ipady)
+    public void checkAlarms()
+    {
+
+    }
+    public void setupCreatedAlarmsFunctionality()
+    {
+        // get the view alarms menu
+        // for each except the Set Alarms (option1)
+        // create an action listener which
+        // takes the alarmClock, set the hour, min, and ampm
+        // in the textfields and we will set a boolean to true
+        // which will allow editing the textfields to any value
+        // changing all values to 0 or explicitly Time to 0
+        // will delete the alarm
+        // changing the values and clicking Set will save the alarm
+        Component[] components = getClock().getClockMenuBar().getViewAlarmsMenu().getMenuComponents();
+        for(Component c : components)
+        {
+            AtomicReference<Clock> alarmToRemove = new AtomicReference<>();
+            AtomicReference<String> stringToRemove = new AtomicReference<>();
+            if (!((JMenuItem) c).getText().equals("Set Alarm"))
+            {
+                //05:06:00 PM
+                JMenuItem menuItem = (JMenuItem) c;
+                menuItem.addActionListener(action -> {
+                    getJTextField1().setText(menuItem.getText().substring(0,2));
+                    getJTextField2().setText(menuItem.getText().substring(3,5));
+                    getJTextField3().setText(menuItem.getText().substring(9));
+                    setUpdatingAlarm(true);
+                    getClock().getClockMenuBar().getViewAlarmsMenu().remove(menuItem);
+                    getListOfAlarms().forEach(
+                        (alarm) -> {
+                            if (((Clock)alarm).getTimeAsStr().equals(menuItem.getText()))
+                            {
+                                alarmToRemove.set((Clock)alarm);
+                                stringToRemove.set(((Clock)alarm).getTimeAsStr());
+                            }
+                        }
+                    );
+                    listOfAlarms.remove(alarmToRemove.getAcquire());
+                    String[] strings = getJTextArea().getText().split("\n");
+                    getJTextArea().setText("");
+                    for(String stringAlarm : strings)
+                    {
+                        if (!stringAlarm.equals(((Clock)alarmToRemove.getAcquire()).getTimeAsStr()))
+                        {
+                            if (!StringUtils.isEmpty(getJTextArea().getText())) {
+                                getJTextArea().append("\n");
+                            }
+                            getJTextArea().append(stringAlarm);
+                        }
+                    }
+                });
+            }
+        }
+    }
+    public void setupAlarmButton()
+    {
+        jalarmButton.addActionListener(action -> {
+            // check if h, m, and time are set. exit if not
+            try
+            {
+                if (StringUtils.isBlank(getJTextField1().getText()))
+                {
+                    throw new InvalidInputException("Hour cannot be blank");
+                }
+                if (StringUtils.isBlank(getJTextField2().getText()))
+                {
+                    throw new InvalidInputException("Minutes cannot be blank");
+                }
+                if (StringUtils.isEmpty(getJTextField3().getText()))
+                {
+                    throw new InvalidInputException("Time cannot be blank");
+                }
+                if (isUpdatingAlarm())
+                {
+                    // update list of alarms
+                    Clock alarm = null;
+                    alarm = new Clock(Integer.parseInt(getJTextField1().getText()), Integer.parseInt(getJTextField2().getText()), 0, Time.Month.NOVEMBER, Time.Day.SUNDAY, 29, 2020, convertStringToTimeAMPM(getJTextField3().getText()));
+                    listOfAlarms.add(alarm);
+                    setUpdatingAlarm(false);
+                    // determine how to update alarm (update/delete)
+                }
+                createAlarm();
+            }
+            catch (InvalidInputException iie)
+            {
+                System.err.println(iie.getMessage() + "; no alarm set!");
+                for(StackTraceElement ste : iie.getStackTrace())
+                {
+                    System.err.println(ste);
+                }
+            }
+            catch (ParseException pe)
+            {
+                System.err.println(pe.getMessage() + "; no alarm set!");
+                for(StackTraceElement ste : pe.getStackTrace())
+                {
+                    System.err.println(ste);
+                }
+            }
+        });
+    }
+    public void createAlarm() throws ParseException {
+        int hour = Integer.parseInt(getJTextField1().getText());
+        int minutes = Integer.parseInt(getJTextField2().getText());
+        Time.AMPM ampm = convertStringToTimeAMPM(getJTextField3().getText());
+        Clock alarm = null;
+        alarm = new Clock(hour, minutes, 0, Time.Month.NOVEMBER, Time.Day.SUNDAY, 29, 2020, ampm);
+        // add clock to list of alarms
+        listOfAlarms.add(alarm);
+        if (!StringUtils.isEmpty(getJTextArea().getText())) {
+            getJTextArea().append("\n");
+        }
+        getJTextArea().append(alarm.getTimeAsStr());
+        // display list of alarms below All Alarms
+        this.repaint();
+        // erase input in textfields
+        jtextField1.setText("");
+        jtextField2.setText("");
+        jtextField3.setText("");
+        JMenuItem alarmItem = new JMenuItem(alarm.getTimeAsStr());
+        alarmItem.setForeground(Color.WHITE);
+        alarmItem.setBackground(Color.BLACK);
+        getClock().getClockMenuBar().getViewAlarmsMenu().add(alarmItem);
+        setupCreatedAlarmsFunctionality();
+    }
+    public void addComponent(Component cpt, int gridy, int gridx, double gwidth, double gheight, int ipadx, int ipady, int fill)
     {
         getGridBagConstraints().gridx = gridx;
         getGridBagConstraints().gridy = gridy;
         getGridBagConstraints().gridwidth = (int)Math.ceil(gwidth);
         getGridBagConstraints().gridheight = (int)Math.ceil(gheight);
+        getGridBagConstraints().fill = fill;
         getGridBagConstraints().ipadx = ipadx;
         getGridBagConstraints().ipady = ipady;
-        getGridBagConstraints().fill = GridBagConstraints.NONE;
         getGridBagConstraints().insets = new Insets(0,0,0,0);
         getGridBagLayout().setConstraints(cpt, getGridBagConstraints());
         add(cpt);

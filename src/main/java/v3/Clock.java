@@ -1,5 +1,7 @@
 package v3;
 
+import org.apache.commons.lang3.StringUtils;
+
 import javax.swing.*;
 import java.awt.*;
 import java.text.DateFormat;
@@ -38,6 +40,7 @@ public class Clock extends JFrame {
     // Main GUI Components
     // For displaying faces on main display
     protected Panels facePanel;
+    protected ClockMenuBar menuBar;
     protected Date beginDaylightSavingsTimeDate;
     protected Date endDaylightSavingsTimeDate;
     protected Calendar calendar;
@@ -62,6 +65,7 @@ public class Clock extends JFrame {
     //public GridBagLayout getGridBagLayout() { return this.layout; }
     //public GridBagConstraints getGridBagConstraints() { return this.constraints; }
     public Panels getFacePanel() { return this.facePanel; }
+    public ClockMenuBar getClockMenuBar() { return this.menuBar; }
     public Date getBeginDaylightSavingsTimeDate() { return this.beginDaylightSavingsTimeDate; }
     public Date getEndDaylightSavingsTimeDate() { return this.endDaylightSavingsTimeDate; }
     public Calendar getCalendar() { return this.calendar; }
@@ -97,6 +101,7 @@ public class Clock extends JFrame {
     //private void setGridBagLayout(GridBagLayout layout) { this.layout = layout; }
     //private void setGridBagConstraints(GridBagConstraints constraints) { this.constraints = constraints; }
     protected void setFacePanel(Panels facePanel) { this.facePanel = facePanel; }
+    protected void setClockMenuBar(ClockMenuBar menuBar) { this.menuBar = menuBar; }
     protected void setBeginDaylightSavingsTimeDate(Date beginDaylightSavingsTimeDate) { this.beginDaylightSavingsTimeDate = beginDaylightSavingsTimeDate; }
     protected void setEndDaylightSavingsTimeDate(Date endDaylightSavingsTimeDate) { this.endDaylightSavingsTimeDate = endDaylightSavingsTimeDate; }
     protected void setCalendar(Calendar calendar) { this.calendar = calendar; }
@@ -151,9 +156,9 @@ public class Clock extends JFrame {
         setCalendar(Calendar.getInstance());
         setCalendarTime(new Date());
         Date definedDate = null;
-        if (hours == 0) { hours = getCalendar().get(Calendar.HOUR); hoursAsStr = Integer.toString(hours); }
-        if (minutes == 0) { minutes = getCalendar().get(Calendar.MINUTE); minutesAsStr = Integer.toString(minutes); }
-        if (seconds == 0) { seconds = getCalendar().get(Calendar.SECOND); secondsAsStr = Integer.toString(seconds); }
+        if (hours == 0 && hoursAsStr.equals("")) { hours = getCalendar().get(Calendar.HOUR); hoursAsStr = Integer.toString(hours); }
+        if (minutes == 0 && minutesAsStr.equals("")) { minutes = getCalendar().get(Calendar.MINUTE); minutesAsStr = Integer.toString(minutes); }
+        if (seconds == 0 && secondsAsStr.equals("")) { seconds = getCalendar().get(Calendar.SECOND); secondsAsStr = Integer.toString(seconds); }
         if (month == null) { month = convertIntToTimeMonth(getCalendar().get(Calendar.MONTH)+1); }
         if (day == null) { day = convertIntToTimeDay(getCalendar().get(Calendar.DAY_OF_WEEK)); }
         if (date == 0) { date = getCalendar().get(Calendar.DAY_OF_MONTH); }
@@ -501,17 +506,25 @@ public class Clock extends JFrame {
             else if (isShowPartialDate() && !isShowFullDate()) defaultText += getPartialDateAsStr();
             else defaultText += getDateAsStr();
         }
-        else if (labelVersion == 2) {
+        else if (labelVersion == 2)
+        {
             if (!isShowMilitaryTime()) defaultText += getTimeAsStr();
             else if (isShowMilitaryTime()) defaultText += getMilitaryTimeAsStr();
         }
-        else if (labelVersion == 3 || labelVersion == 5) {
-            defaultText = labelVersion == 3 ? "H" : "M";
+        else if (labelVersion == 3)
+        {
+            defaultText = "H";
         }
-        else if (labelVersion == 6) {
+        else if (labelVersion == 4)
+        {
+            defaultText = "M";
+        }
+        else if (labelVersion == 5)
+        {
             defaultText = "T";
         }
-        else if (labelVersion == 4) {
+        else if (labelVersion == 6)
+        {
             defaultText = "All Alarms";
         }
         return defaultText;
@@ -574,6 +587,13 @@ public class Clock extends JFrame {
     {
         super();
         setResizable(true);
+        setSeconds(0);
+        setMinutes(0);
+        setShowMilitaryTime(true);
+        setHours(0);
+        setSecondsAsStr("");
+        setMinutesAsStr("");
+        setHoursAsStr("");
         setDefaultClockValues(getHours(), getMinutes(), getSeconds(), getMonth(), getDay(), getDate(), getYear(), getAMPM());
         setMenuBar();
         setFacePanel(new ClockPanel(this));
@@ -585,6 +605,9 @@ public class Clock extends JFrame {
     {
         super();
         setResizable(true);
+        setSeconds(seconds);
+        setMinutes(minutes);
+        setHours(hours);
         setDefaultClockValues(hours, minutes, seconds, month, day, date, year, ampm);
         setFacePanel(new ClockPanel(this));
         setMenuBar();
@@ -596,93 +619,62 @@ public class Clock extends JFrame {
     public void setMenuBar()
     {
         UIManager.put("MenuItem.background", Color.BLACK);
-        class BackgroundMenuBar extends JMenuBar {
-            private static final long serialVersionUID = 1L;
-            @Override
-            protected void paintComponent(Graphics g) {
-                super.paintComponent(g);
-                Graphics2D g2d = (Graphics2D) g;
-                g2d.setColor(Color.BLACK);
-                g2d.fillRect(0, 0, getWidth() - 1, getHeight() - 1);
-            }
-        }
-        BackgroundMenuBar menuBar = new BackgroundMenuBar();
-        menuBar.setForeground(Color.WHITE);
-        menuBar.setBackground(Color.BLACK); // added on mac
-
+        setClockMenuBar(new ClockMenuBar());
         // Menu Options
-        JMenu settings = new JMenu("Settings");
-        settings.setOpaque(false);
-        settings.setForeground(Color.WHITE);
-
-        JMenu features = new JMenu("Features");
-        features.setOpaque(false);
-        features.setForeground(Color.WHITE);
-
-        // Menu Items for Settings
-        JMenuItem militaryTimeSetting = new JMenuItem(SHOW + SPACE + MILITARY_TIME_SETTING);
-        JMenuItem partialDateSetting = new JMenuItem(SHOW + SPACE + PARTIAL_TIME_SETTING);
-        JMenuItem fullDateSetting = new JMenuItem(SHOW + SPACE + FULL_TIME_SETTING);
-
-        militaryTimeSetting.addActionListener(action -> {
-            if (isShowMilitaryTime() == true) {
+        getClockMenuBar().getMilitaryTimeSetting().addActionListener(action -> {
+            if (isShowMilitaryTime() == true)
+            {
                 setShowMilitaryTime(false);
-                militaryTimeSetting.setText(HIDE + SPACE + MILITARY_TIME_SETTING);
+                menuBar.getMilitaryTimeSetting().setText(HIDE + SPACE + MILITARY_TIME_SETTING);
             }
-            else {
+            else
+            {
                 setShowMilitaryTime(true);
-                militaryTimeSetting.setText(SHOW + SPACE + STANDARD_TIME_SETTING);
+                menuBar.getMilitaryTimeSetting().setText(SHOW + SPACE + STANDARD_TIME_SETTING);
             }
             //updateClockFace(true);
             // updatePanel
             pack();
         });
-        militaryTimeSetting.setForeground(Color.WHITE); // added on mac
-
-        fullDateSetting.addActionListener(action -> {
-            if (isShowFullDate()) {
+        getClockMenuBar().getFullTimeSetting().addActionListener(action -> {
+            if (isShowFullDate())
+            {
                 setShowFullDate(false);
                 setShowPartialDate(false);
-                fullDateSetting.setText(SHOW + SPACE + FULL_TIME_SETTING);
-                partialDateSetting.setText(SHOW + SPACE + PARTIAL_TIME_SETTING);
+                menuBar.getFullTimeSetting().setText(SHOW + SPACE + FULL_TIME_SETTING);
+                menuBar.getPartialTimeSetting().setText(SHOW + SPACE + PARTIAL_TIME_SETTING);
             }
-            else {
+            else
+            {
                 setShowFullDate(true);
                 setShowPartialDate(false);
-                fullDateSetting.setText(HIDE + SPACE + FULL_TIME_SETTING);
-                partialDateSetting.setText(SHOW + SPACE + PARTIAL_TIME_SETTING);
+                menuBar.getFullTimeSetting().setText(HIDE + SPACE + FULL_TIME_SETTING);
+                menuBar.getPartialTimeSetting().setText(SHOW + SPACE + PARTIAL_TIME_SETTING);
             }
             //updateClockFace(true);
             // updatePanel
             pack();
         });
-        fullDateSetting.setForeground(Color.WHITE); // added on mac
-
-        // new: added on Raspberry PI
-        partialDateSetting.addActionListener(action -> {
-            if (isShowPartialDate()) {
+        getClockMenuBar().getPartialTimeSetting().addActionListener(action -> {
+            if (isShowPartialDate())
+            {
                 setShowPartialDate(false);
                 setShowFullDate(false);
-                partialDateSetting.setText(SHOW + SPACE + PARTIAL_TIME_SETTING);
-                fullDateSetting.setText(SHOW + SPACE + FULL_TIME_SETTING);
+                menuBar.getPartialTimeSetting().setText(SHOW + SPACE + PARTIAL_TIME_SETTING);
+                menuBar.getFullTimeSetting().setText(SHOW + SPACE + FULL_TIME_SETTING);
             }
-            else {
+            else
+            {
                 setShowPartialDate(true);
                 setShowFullDate(false);
-                partialDateSetting.setText(HIDE + SPACE + PARTIAL_TIME_SETTING);
-                fullDateSetting.setText(SHOW + SPACE + FULL_TIME_SETTING);
+                menuBar.getPartialTimeSetting().setText(HIDE + SPACE + PARTIAL_TIME_SETTING);
+                menuBar.getFullTimeSetting().setText(SHOW + SPACE + FULL_TIME_SETTING);
             }
             //updateClockFace(true);
             // updatePanel
             pack();
         });
-        partialDateSetting.setForeground(Color.WHITE); // added on Raspberry PI
-
-        // Menu Items for Features
-        JMenuItem clockFeature = new JMenuItem("View Clock");
-        JMenuItem alarmFeature = new JMenuItem("View Alarms");
-
-        clockFeature.addActionListener(action -> {
+        getClockMenuBar().getClockFeature().addActionListener(action -> {
             if (getClockFace() != ClockFace.ClockFace) {
                 remove((Component) getFacePanel());
                 setClockFace(ClockFace.ClockFace);
@@ -692,9 +684,7 @@ public class Clock extends JFrame {
                 this.setVisible(true);
             }
         });
-        clockFeature.setForeground(Color.WHITE);
-
-        alarmFeature.addActionListener(action -> {
+        getClockMenuBar().getAlarms().addActionListener(action -> {
             if (getClockFace() != ClockFace.AlarmFace) {
                 remove((Component) getFacePanel());
                 setClockFace(ClockFace.AlarmFace);
@@ -704,21 +694,10 @@ public class Clock extends JFrame {
                 this.setVisible(true);
             }
         });
-        alarmFeature.setForeground(Color.WHITE);
-
-        // Add menu items to menu
-        settings.add(militaryTimeSetting);
-        settings.add(fullDateSetting);
-        settings.add(partialDateSetting);
-
-        features.add(clockFeature);
-        features.add(alarmFeature);
-
         // Add menu to menuBar
-        menuBar.add(settings);
-        menuBar.add(features);
-
-        this.setJMenuBar(menuBar);
+        getClockMenuBar().add(getClockMenuBar().getSettingsMenu());
+        getClockMenuBar().add(getClockMenuBar().getFeaturesMenu());
+        setJMenuBar(getClockMenuBar());
     }
     /**
      * The purpose of tick is to start the clock normally.
@@ -746,6 +725,9 @@ public class Clock extends JFrame {
             if (getTimeAsStr().equals("04:20:00" + SPACE + Time.AMPM.AM.strValue) ||
                 getMilitaryTimeAsStr().equals("0420 hours 00"))
             {
+                setSecondsAsStr("00");
+                setMinutesAsStr("00");
+                setHoursAsStr("00");
                 setDefaultClockValues(0, 0, 0, null, null, 0, 0, null);
             }
             ((Panels)getFacePanel()).updateLabels();
@@ -766,6 +748,11 @@ public class Clock extends JFrame {
         while (true)
         {
             clock.tick();
+            // check alarms
+            if (StringUtils.equalsIgnoreCase(AlarmPanel.class.getName(), clock.getFacePanel().getClass().getName()))
+            {
+                ((AlarmPanel)clock.getFacePanel()).checkAlarms();
+            }
             Thread.sleep(1000);
         }
     }
