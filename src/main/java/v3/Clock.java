@@ -7,6 +7,7 @@ import java.awt.*;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 
@@ -41,6 +42,7 @@ public class Clock extends JFrame {
     // For displaying faces on main display
     protected Panels facePanel;
     protected ClockMenuBar menuBar;
+    protected AlarmPanel alarmPanel;
     protected Date beginDaylightSavingsTimeDate;
     protected Date endDaylightSavingsTimeDate;
     protected Calendar calendar;
@@ -61,11 +63,13 @@ public class Clock extends JFrame {
     protected boolean showFullDate = false;
     protected boolean showPartialDate = false;
     protected boolean showMilitaryTime = false;
+    private ArrayList<Clock> listOfAlarms;
     // Getters/Issers
     //public GridBagLayout getGridBagLayout() { return this.layout; }
     //public GridBagConstraints getGridBagConstraints() { return this.constraints; }
     public Panels getFacePanel() { return this.facePanel; }
     public ClockMenuBar getClockMenuBar() { return this.menuBar; }
+    public AlarmPanel getAlarmPanel() { return this.alarmPanel; }
     public Date getBeginDaylightSavingsTimeDate() { return this.beginDaylightSavingsTimeDate; }
     public Date getEndDaylightSavingsTimeDate() { return this.endDaylightSavingsTimeDate; }
     public Calendar getCalendar() { return this.calendar; }
@@ -97,11 +101,13 @@ public class Clock extends JFrame {
     public boolean isShowFullDate() { return this.showFullDate; }
     public boolean isShowPartialDate() { return this.showPartialDate; }
     public boolean isShowMilitaryTime() { return this.showMilitaryTime; }
+    public ArrayList<Clock> getListOfAlarms() { return this.listOfAlarms; }
     // Setters
     //private void setGridBagLayout(GridBagLayout layout) { this.layout = layout; }
     //private void setGridBagConstraints(GridBagConstraints constraints) { this.constraints = constraints; }
     protected void setFacePanel(Panels facePanel) { this.facePanel = facePanel; }
     protected void setClockMenuBar(ClockMenuBar menuBar) { this.menuBar = menuBar; }
+    protected void setAlarmPanel(AlarmPanel alarmPanel) { this.alarmPanel = alarmPanel; }
     protected void setBeginDaylightSavingsTimeDate(Date beginDaylightSavingsTimeDate) { this.beginDaylightSavingsTimeDate = beginDaylightSavingsTimeDate; }
     protected void setEndDaylightSavingsTimeDate(Date endDaylightSavingsTimeDate) { this.endDaylightSavingsTimeDate = endDaylightSavingsTimeDate; }
     protected void setCalendar(Calendar calendar) { this.calendar = calendar; }
@@ -135,6 +141,7 @@ public class Clock extends JFrame {
     protected void setHoursAsStr(String hoursAsStr) { this.hoursAsStr = hoursAsStr; }
     protected void setMinutesAsStr(String minutesAsStr) { this.minutesAsStr = minutesAsStr; }
     protected void setSecondsAsStr(String secondsAsStr) { this.secondsAsStr = secondsAsStr; }
+    protected void setListOfAlarms(ArrayList<Clock> listOfAlarms) { this.listOfAlarms = listOfAlarms; }
     // setDateAsStr()
     // setFullDateAsStr()
     // setMilitaryTimeAsStr()
@@ -587,15 +594,17 @@ public class Clock extends JFrame {
     {
         super();
         setResizable(true);
+        setListOfAlarms(new ArrayList<>());
+        setMenuBar();
+        setAlarmPanel(new AlarmPanel(this));
+        setShowMilitaryTime(true);
         setSeconds(0);
         setMinutes(0);
-        setShowMilitaryTime(true);
         setHours(0);
         setSecondsAsStr("");
         setMinutesAsStr("");
         setHoursAsStr("");
         setDefaultClockValues(getHours(), getMinutes(), getSeconds(), getMonth(), getDay(), getDate(), getYear(), getAMPM());
-        setMenuBar();
         setFacePanel(new ClockPanel(this));
         setClockFace(ClockFace.ClockFace);
         pack();
@@ -605,12 +614,14 @@ public class Clock extends JFrame {
     {
         super();
         setResizable(true);
+        setListOfAlarms(new ArrayList<>());
+        setMenuBar();
+        setAlarmPanel(new AlarmPanel(this));
         setSeconds(seconds);
         setMinutes(minutes);
         setHours(hours);
         setDefaultClockValues(hours, minutes, seconds, month, day, date, year, ampm);
         setFacePanel(new ClockPanel(this));
-        setMenuBar();
         setClockFace(ClockFace.ClockFace);
         pack();
         add((Component) getFacePanel());
@@ -676,6 +687,7 @@ public class Clock extends JFrame {
         });
         getClockMenuBar().getClockFeature().addActionListener(action -> {
             if (getClockFace() != ClockFace.ClockFace) {
+                setAlarmPanel((AlarmPanel)getFacePanel());
                 remove((Component) getFacePanel());
                 setClockFace(ClockFace.ClockFace);
                 setFacePanel(new ClockPanel(this));
@@ -704,8 +716,7 @@ public class Clock extends JFrame {
      */
     public void tick()
     {
-        tick(1, 0, 0);
-
+        tick(1, 1, 1);
     }
     /**
      * The purpose of tick is to start the clock but it should increase
@@ -749,11 +760,9 @@ public class Clock extends JFrame {
         {
             clock.tick();
             // check alarms
-            if (StringUtils.equalsIgnoreCase(AlarmPanel.class.getName(), clock.getFacePanel().getClass().getName()))
-            {
-                ((AlarmPanel)clock.getFacePanel()).checkAlarms();
-            }
-            Thread.sleep(1000);
+            Thread.sleep(500);
+            clock.getAlarmPanel().checkAlarms();
+            Thread.sleep(500);
         }
     }
 }
