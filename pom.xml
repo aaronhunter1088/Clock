@@ -15,6 +15,20 @@
     
     <dependencies>
 
+		<!-- https://mvnrepository.com/artifact/javazoom/jlayer -->
+		<dependency>
+			<groupId>javazoom</groupId>
+			<artifactId>jlayer</artifactId>
+			<version>1.0.1</version>
+		</dependency>
+
+		<!-- https://mvnrepository.com/artifact/org.springframework/spring-core -->
+		<dependency>
+			<groupId>org.springframework</groupId>
+			<artifactId>spring-core</artifactId>
+			<version>5.3.1</version>
+		</dependency>
+
 		<!-- https://mvnrepository.com/artifact/org.jacoco/jacoco-maven-plugin -->
 		<dependency>
 			<groupId>org.jacoco</groupId>
@@ -64,6 +78,11 @@
 			<groupId>org.apache.maven.plugins</groupId>
 			<artifactId>maven-surefire-plugin</artifactId>
 			<version>2.22.2</version>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.velocity</groupId>
+			<artifactId>velocity</artifactId>
+			<version>1.5</version>
 		</dependency>
 
 
@@ -138,7 +157,7 @@
             			<manifestEntries>
             				<Implementation-Version>${project.version}</Implementation-Version>
             				<Creation-Time-Format>MM-dd-YYYY hh:mm:ss</Creation-Time-Format>
-            				<Creation-Time>${build.time}</Creation-Time>
+            				<!--<Creation-Time>${build.time}</Creation-Time>-->
             				<mainClass>v2.Clock</mainClass>
             			</manifestEntries>
             		</archive>
@@ -162,7 +181,7 @@
             					<tstamp>
             						<format property="last.updated" pattern="MM-dd-YYYY hh:mm:ss"/>
             					</tstamp>
-            					<echo file="${basedir}/dist/build.properties" message="build.time=${last.updated}"/>
+            					<echo file="${basedir}/dist/filter.properties" message="build.time=${last.updated}"/>
             				</tasks>
             			</configuration>
             		</execution>

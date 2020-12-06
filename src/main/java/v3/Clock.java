@@ -62,7 +62,7 @@ public class Clock extends JFrame {
     protected boolean showFullDate = false;
     protected boolean showPartialDate = false;
     protected boolean showMilitaryTime = false;
-    private ArrayList<Clock> listOfAlarms;
+    protected ArrayList<Clock> listOfAlarms;
     // Getters/Issers
     //public GridBagLayout getGridBagLayout() { return this.layout; }
     //public GridBagConstraints getGridBagConstraints() { return this.constraints; }
@@ -96,8 +96,8 @@ public class Clock extends JFrame {
     public boolean isDaylightSavingsTime() { return this.daylightSavingsTime; }
     public boolean isDateChanged() { return this.dateChanged; }
     public boolean isHome() { return this.home; }
-    public boolean isAlarm() { return this.alarm; }
-    public boolean isTimer() { return this.timer; }
+    public boolean isAlarmGoingOff() { return this.alarm; }
+    public boolean isTimerGoingOff() { return this.timer; }
     public boolean isShowFullDate() { return this.showFullDate; }
     public boolean isShowPartialDate() { return this.showPartialDate; }
     public boolean isShowMilitaryTime() { return this.showMilitaryTime; }
@@ -105,6 +105,7 @@ public class Clock extends JFrame {
     // Setters
     //private void setGridBagLayout(GridBagLayout layout) { this.layout = layout; }
     //private void setGridBagConstraints(GridBagConstraints constraints) { this.constraints = constraints; }
+    /* TODO: setFacePanel appears to be irrelevant now. remove*/
     protected void setFacePanel(Panels facePanel) { this.facePanel = facePanel; }
     protected void setClockMenuBar(ClockMenuBar menuBar) { this.menuBar = menuBar; }
     protected void setAlarmPanel(AlarmPanel alarmPanel) { this.alarmPanel = alarmPanel; }
@@ -152,19 +153,30 @@ public class Clock extends JFrame {
     protected void setDaylightSavingsTime(boolean daylightSavingsTime) { this.daylightSavingsTime = daylightSavingsTime; }
     protected void setDateChanged(boolean dateChanged) { this.dateChanged = dateChanged; }
     protected void setHome(boolean home) { this.home = home; }
-    protected void setAlarm(boolean alarm) { this.alarm = alarm; }
-    protected void setTimer(boolean timer) { this.timer = timer; }
+    protected void setAlarmGoingOff(boolean alarm) { this.alarm = alarm; }
+    protected void setTimerGoingOff(boolean timer) { this.timer = timer; }
     protected void setShowFullDate(boolean showFullDate) { this.showFullDate = showFullDate; }
     protected void setShowPartialDate(boolean showPartialDate) { this.showPartialDate = showPartialDate; }
     protected void setShowMilitaryTime(boolean showMilitaryTime) { this.showMilitaryTime = showMilitaryTime; }
     protected void setCalendarTime(Date date) { getCalendar().setTime(date); }
     // Helper methods
+    public void setRemainingDefaultValues()
+    {
+        setLeapYear(false);
+        setDateChanged(false);
+        setHome(false);
+        //setAlarm(false); method exists as below
+        setAlarmGoingOff(false);
+        //setTimer(false); functionality doesn't exist
+        setListOfAlarms(new ArrayList<Clock>());
+    }
     public void setDefaultClockValues(int hours, int minutes, int seconds, Time.Month month, Time.Day day, int  date, int year, Time.AMPM ampm) throws ParseException
     {
         setCalendar(Calendar.getInstance());
         setCalendarTime(new Date());
         Date definedDate = null;
-        if (hours == 0 && hoursAsStr.equals("")) { hours = getCalendar().get(Calendar.HOUR); hoursAsStr = Integer.toString(hours); }
+        if (hours == 0 && hoursAsStr.equals("") ||
+            hours == 12 && hoursAsStr.equals("12")) { hours = getCalendar().get(Calendar.HOUR); hoursAsStr = Integer.toString(hours); }
         if (minutes == 0 && minutesAsStr.equals("")) { minutes = getCalendar().get(Calendar.MINUTE); minutesAsStr = Integer.toString(minutes); }
         if (seconds == 0 && secondsAsStr.equals("")) { seconds = getCalendar().get(Calendar.SECOND); secondsAsStr = Integer.toString(seconds); }
         if (month == null) { month = convertIntToTimeMonth(getCalendar().get(Calendar.MONTH)+1); }
@@ -597,18 +609,18 @@ public class Clock extends JFrame {
         setResizable(true);
         setListOfAlarms(new ArrayList<>());
         setMenuBar();
-        setAlarmPanel(new AlarmPanel(this));
-        setShowMilitaryTime(true);
+        setShowMilitaryTime(false);
         setSeconds(0);
         setMinutes(0);
         setHours(0);
         setSecondsAsStr("");
         setMinutesAsStr("");
-        setHoursAsStr("");
         setDefaultClockValues(getHours(), getMinutes(), getSeconds(), getMonth(), getDay(), getDate(), getYear(), getAMPM());
         setFacePanel(new ClockPanel(this));
         setClockPanel((ClockPanel)getFacePanel());
+        setAlarmPanel(new AlarmPanel(this));
         setClockFace(ClockFace.ClockFace);
+        setRemainingDefaultValues();
         pack();
         add((Component) getFacePanel());
     }
@@ -630,6 +642,7 @@ public class Clock extends JFrame {
         add((Component) getFacePanel());
     }
     // Constructor methods
+    /* TODO: change method to setupMenuBar*/
     public void setMenuBar()
     {
         UIManager.put("MenuItem.background", Color.BLACK);
@@ -689,17 +702,29 @@ public class Clock extends JFrame {
             pack();
         });
         getClockMenuBar().getClockFeature().addActionListener(action -> {
-            if (getClockFace() != ClockFace.ClockFace) {
+            if (getClockFace() != ClockFace.ClockFace)
+            {
                 changeToClockPanel();
             }
+            else
+            {
+                System.err.println("Trying to change to clock panel but already showing ClockFace");
+            }
         });
+        // TODO: Not sure if needed. Set Alarm changes to Panel as well
         getClockMenuBar().getViewAllAlarms().addActionListener(action -> {
             changeToAlarmPanel();
+            getAlarmPanel().getJTextField1().setText("");
+            getAlarmPanel().getJTextField2().setText("");
+            getAlarmPanel().getJTextField3().setText("");
         });
         getClockMenuBar().getSetAlarms().addActionListener(action -> {
             changeToAlarmPanel();
+            getAlarmPanel().getJTextField1().setText("");
+            getAlarmPanel().getJTextField2().setText("");
+            getAlarmPanel().getJTextField3().setText("");
         });
-
+        // actionListeners for alarm values built in AlarmPanel
         // Add menu to menuBar
         getClockMenuBar().add(getClockMenuBar().getSettingsMenu());
         getClockMenuBar().add(getClockMenuBar().getFeaturesMenu());
@@ -721,6 +746,7 @@ public class Clock extends JFrame {
         remove((Component) getFacePanel());
         setClockFace(ClockFace.AlarmFace);
         setFacePanel(getAlarmPanel());
+        if (getAlarmPanel().getMusicPlayer() != null) { getAlarmPanel().setMusicPlayer(null); }
         add((Component) getFacePanel());
         this.repaint();
         this.setVisible(true);

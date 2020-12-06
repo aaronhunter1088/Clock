@@ -1,12 +1,26 @@
 package v3;
 
+import javazoom.jl.decoder.JavaLayerException;
+import javazoom.jl.player.Player;
+import javazoom.jl.player.advanced.AdvancedPlayer;
+import javazoom.jl.player.advanced.PlaybackEvent;
 import org.apache.commons.lang.StringUtils;
+import org.springframework.core.io.Resource;
+import org.springframework.core.io.ClassPathResource;
 
+import javax.sound.sampled.*;
 import javax.swing.*;
 import java.awt.*;
+import java.io.*;
+import java.net.URISyntaxException;
+import java.net.URL;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.text.ParseException;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import java.util.concurrent.atomic.AtomicReference;
 
 import static v3.Time.AMPM.*;
@@ -16,6 +30,18 @@ import static v3.Time.AMPM.*;
  * the AlarmPanel will appear and the alarm will appear
  * in the text fields. The alarm will be removed from
  * the list of alarms, the textarea, and from the menu
+ *
+ * 11/30/2020 Bug:
+ * When we have two alarms set, and then one goes off,
+ * both alarms are displaying as going off. Only the
+ * appropriate alarm(s) should be going off.
+ * -Possible cause-
+ * When we trigger an alarm, we are possibly displaying
+ * all alarms in the list, and not a specific one
+ * OR
+ * We are looping through the list to determine which
+ * alarm to trigger. We may just be triggering them
+ * all while looping and not doing for just one.
  */
 public class AlarmPanel extends JPanel implements Panels {
 
@@ -32,10 +58,11 @@ public class AlarmPanel extends JPanel implements Panels {
     private JTextArea jTextArea = new JTextArea();
     private JScrollPane scrollPane = null;
     private Clock clock;
+    private Clock alarm;
     private boolean updatingAlarm;
+    private AdvancedPlayer musicPlayer;
 
-    public AlarmPanel(Clock clock)
-    {
+    public AlarmPanel(Clock clock) {
         setClock(clock);
         setMinimumSize(clock.alarmSize);
         setGridBagLayout(new GridBagLayout());
@@ -45,7 +72,7 @@ public class AlarmPanel extends JPanel implements Panels {
         setForeground(Color.WHITE);
         setupAlarmPanel(getClock());
         setupAlarmButton();
-        //setupCreatedAlarmsFunctionality();
+        setupMusicPlayer();
         addComponentsToPanel();
     }
 
@@ -53,6 +80,7 @@ public class AlarmPanel extends JPanel implements Panels {
     public GridBagLayout getGridBagLayout() { return this.layout; }
     public GridBagConstraints getGridBagConstraints() { return this.constraints; }
     public Clock getClock() { return this.clock; }
+    public Clock getAlarm() { return this.alarm; }
     public JLabel getJAlarmLbl1() { return this.jalarmLbl1; } // H
     public JLabel getJAlarmLbl2() { return this.jalarmLbl2; } // M
     public JLabel getJAlarmLbl3() { return this.jalarmLbl3; } // T
@@ -64,11 +92,13 @@ public class AlarmPanel extends JPanel implements Panels {
     public JScrollPane getJScrollPane() { return this.scrollPane; }
     public JTextArea getJTextArea() { return this.jTextArea; }
     public boolean isUpdatingAlarm() { return updatingAlarm; }
+    public AdvancedPlayer getMusicPlayer() { return musicPlayer; }
 
     // Setters
-    private void setGridBagLayout(GridBagLayout layout) { this.layout = layout; }
-    private void setGridBagConstraints(GridBagConstraints constraints) { this.constraints = constraints; }
-    private void setClock(Clock clock) { this.clock = clock; }
+    protected void setGridBagLayout(GridBagLayout layout) { this.layout = layout; }
+    protected void setGridBagConstraints(GridBagConstraints constraints) { this.constraints = constraints; }
+    protected void setClock(Clock clock) { this.clock = clock; }
+    protected void setAlarm(Clock alarm) { this.alarm = alarm; }
     protected void setJAlarmLbl1(JLabel jalarmLbl1) { this.jalarmLbl1 = jalarmLbl1; }
     protected void setJAlarmLbl2(JLabel jalarmLbl2) { this.jalarmLbl2 = jalarmLbl2; }
     protected void setJAlarmLbl3(JLabel jalarmLbl3) { this.jalarmLbl3 = jalarmLbl3; }
@@ -80,8 +110,18 @@ public class AlarmPanel extends JPanel implements Panels {
     protected void setJScrollPane(JScrollPane scrollPane) { this.scrollPane = scrollPane; }
     protected void setJTextArea(JTextArea jTextArea) { this.jTextArea = jTextArea; }
     protected void setUpdatingAlarm(boolean updatingAlarm) { this.updatingAlarm = updatingAlarm; }
+    protected void setMusicPlayer(AdvancedPlayer musicPlayer) { this.musicPlayer = musicPlayer; }
 
     // Helper methods
+    public void setupMusicPlayer()
+    {
+        try {
+            setMusicPlayer(new AdvancedPlayer(new FileInputStream(Paths.get("src/main/resources/alarmSound1.mp3").toUri().getPath())));
+        }
+        catch (FileNotFoundException | JavaLayerException e) {
+            e.printStackTrace();
+        }
+    }
     public Time.AMPM convertStringToTimeAMPM(String ampm)
     {
         if (StringUtils.equals("AM", ampm.toUpperCase()))
@@ -98,6 +138,10 @@ public class AlarmPanel extends JPanel implements Panels {
         clock.setShowFullDate(false);
         clock.setShowPartialDate(false);
         clock.setShowMilitaryTime(false);
+        getJTextField1().requestFocusInWindow();
+        getJTextField1().setText("");
+        getJTextField1().setText("");
+        getJTextField1().setText("");
         getJAlarmLbl1().setFont(getClock().font60); // H
         getJAlarmLbl2().setFont(getClock().font60); // M
         getJAlarmLbl3().setFont(getClock().font60); // T
@@ -145,19 +189,44 @@ public class AlarmPanel extends JPanel implements Panels {
         // if any alarm matches clock's time
         // update lbl1 and lbl2 to display alarm
         // user must view that alarm to set it off
+//        AtomicReference<ArrayList<Clock>> newListOfAlarms = new AtomicReference<>();
         getClock().getListOfAlarms().forEach(
             (alarm) ->
             {
-                if (alarm.getTimeAsStr().equals(getClock().getTimeAsStr()) || getClock().isAlarm())
+                setAlarm(alarm);
+                ExecutorService executor = Executors.newCachedThreadPool();
+                if (getAlarm().getTimeAsStr().equals(getClock().getTimeAsStr()))
                 {
-                    System.out.println("Alarm " + alarm.getTimeAsStr() + " is going off");
+                    // time for alarm to be triggered on
+                    getAlarm().setAlarmGoingOff(true);
+                    System.out.print("Alarm " + getAlarm().getTimeAsStr() + " is going off. ");
+                    System.out.println("Sounding alarm");
+                    //System.out.println("Clock's time is " + getClock().getTimeAsStr());
+                }
+                if (getAlarm().isAlarmGoingOff())
+                {
                     getClock().getClockPanel().getJlbl1().setText(alarm.getTimeAsStr());
                     getClock().getClockPanel().getJlbl2().setText("is going off!");
-                    getClock().setAlarm(true);
+                    // play sound
+                    Runnable r = () -> {
+                        try {
+                            getClock().getAlarmPanel().setupMusicPlayer();
+                            getClock().getAlarmPanel().getMusicPlayer().play(50);
+                            getClock().getAlarmPanel().setMusicPlayer(null);
+                        } catch (Exception e) {
+                            System.err.println("An exception occurred while playing music: " + e.getMessage());
+                        }
+                    };
+                    executor.submit(r);
+                }
+                else
+                {
+                    executor.shutdown();
                 }
             }
         );
     }
+    // TODO: add implementation that takes a component and adds this logic to it.
     public void setupCreatedAlarmsFunctionality()
     {
         // get the view alarms menu
@@ -182,36 +251,75 @@ public class AlarmPanel extends JPanel implements Panels {
                 menuItem.addActionListener(action -> {
                     getClock().getListOfAlarms().forEach(
                         (alarm) -> {
-                            if ((alarm).getTimeAsStr().equals(menuItem.getText()))
+                            setAlarm(alarm);
+                            if (getMusicPlayer() == null)
                             {
-                                alarmToRemove.set(alarm);
-                                stringToRemove.set((alarm).getTimeAsStr());
-                                getClock().setAlarm(false);
+                                setupMusicPlayer();
                             }
+                            if (getAlarm().getTimeAsStr().equals(menuItem.getText()) && getAlarm().isAlarmGoingOff())
+                            {
+                                alarmToRemove.set(getAlarm());
+                                stringToRemove.set(getAlarm().getTimeAsStr());
+                                if (getMusicPlayer() != null)
+                                {
+                                    setMusicPlayer(null);
+                                    System.out.print("Stopping music. ");
+                                    setupMusicPlayer();
+                                    System.out.println("New music player setup and ready for new alarm");
+                                }
+                                else
+                                {
+                                    System.err.println("Music player is null!");
+                                }
+                                System.out.println(getAlarm().getTimeAsStr()+" alarm turned off.\n");
+                                alarm.setAlarmGoingOff(false);
+                                setAlarm(null);
+                                getClock().getListOfAlarms().remove(alarmToRemove.getAcquire());
+                                getClock().getClockMenuBar().getViewAlarmsMenu().remove(menuItem);
+                                String[] strings = getJTextArea().getText().split("\n");
+                                getJTextArea().setText("");
+                                // reset text area with appropriate alarms
+                                for(String stringAlarm : strings)
+                                {
+                                    if (alarmToRemove.getAcquire() != null && !stringAlarm.equals((alarmToRemove.getAcquire()).getTimeAsStr()))
+                                    {
+                                        if (!StringUtils.isEmpty(getJTextArea().getText())) {
+                                            getJTextArea().append("\n");
+                                        }
+                                        getJTextArea().append(stringAlarm);
+                                    }
+                                }
+                            }
+                            // updating alarm
+                            else
+                            {
+                                getJTextField1().setText(menuItem.getText().substring(0,2));
+                                getJTextField2().setText(menuItem.getText().substring(3,5));
+                                getJTextField3().setText(menuItem.getText().substring(9));
+                                setUpdatingAlarm(true);
+                                // remove time as option from menu
+                                getClock().getClockMenuBar().getViewAlarmsMenu().remove(menuItem);
+                                // remove alarm from list of alarms
+                                System.err.println("Size of listOfAlarms before removing " + getClock().getListOfAlarms().size());
+                                getClock().getListOfAlarms().remove(alarmToRemove.getAcquire());
+                                System.err.println("Size of listOfAlarms after removing " + getClock().getListOfAlarms().size());
+                                String[] strings = getJTextArea().getText().split("\n");
+                                getJTextArea().setText("");
+                                // reset text area with appropriate alarms
+                                for(String stringAlarm : strings)
+                                {
+                                    if (alarmToRemove.getAcquire() != null && !stringAlarm.equals((alarmToRemove.getAcquire()).getTimeAsStr()))
+                                    {
+                                        if (!StringUtils.isEmpty(getJTextArea().getText())) {
+                                            getJTextArea().append("\n");
+                                        }
+                                        getJTextArea().append(stringAlarm);
+                                    }
+                                }
+                            }
+                            getClock().changeToAlarmPanel();
                         }
                     );
-                    getJTextField1().setText(menuItem.getText().substring(0,2));
-                    getJTextField2().setText(menuItem.getText().substring(3,5));
-                    getJTextField3().setText(menuItem.getText().substring(9));
-                    setUpdatingAlarm(true);
-                    // remove time as option from menu
-                    getClock().getClockMenuBar().getViewAlarmsMenu().remove(menuItem);
-                    // remove alarm from list of alarms
-                    getClock().getListOfAlarms().remove(alarmToRemove.getAcquire());
-                    String[] strings = getJTextArea().getText().split("\n");
-                    getJTextArea().setText("");
-                    for(String stringAlarm : strings)
-                    {
-                        if (alarmToRemove.getAcquire() != null && !stringAlarm.equals((alarmToRemove.getAcquire()).getTimeAsStr()))
-                        {
-                            if (!StringUtils.isEmpty(getJTextArea().getText())) {
-                                getJTextArea().append("\n");
-                            }
-                            getJTextArea().append(stringAlarm);
-                        }
-                    }
-                    System.out.println("Clicked on " + alarmToRemove.getAcquire().getTimeAsStr());
-                    getClock().changeToAlarmPanel();
                 });
             }
             // TODO: is this necessary. Clicking 'Set Alarm' brings us to the same view
@@ -225,6 +333,7 @@ public class AlarmPanel extends JPanel implements Panels {
     {
         getJSetAlarmButton().addActionListener(action -> {
             // check if h, m, and time are set. exit if not
+            Clock alarm = null;
             try
             {
                 if (StringUtils.isBlank(getJTextField1().getText()))
@@ -242,14 +351,50 @@ public class AlarmPanel extends JPanel implements Panels {
                 if (isUpdatingAlarm())
                 {
                     // update list of alarms
-                    Clock alarm = null;
                     alarm = new Clock(Integer.parseInt(getJTextField1().getText()), Integer.parseInt(getJTextField2().getText()), 0, Time.Month.NOVEMBER, Time.Day.SUNDAY, 29, 2020, convertStringToTimeAMPM(getJTextField3().getText()));
-                    getClock().getListOfAlarms().add(alarm);
+                    alarm.setAlarmGoingOff(false);
                     setUpdatingAlarm(false);
+                    // add clock to list of alarms
+                    getClock().getListOfAlarms().remove(getAlarm());
+                    System.err.println("Size of listOfAlarms before adding " + getClock().getListOfAlarms().size());
+                    // TODO: fix logic to where if listOfAlarms contains same time alarm, don't add it
+//                    if (!getClock().getListOfAlarms().contains(alarm))
+//                    {
+//                        getClock().getListOfAlarms().add(alarm);
+//                    }
+                    getClock().getListOfAlarms().add(alarm);
+                    System.err.println("Size of listOfAlarms after adding " + getClock().getListOfAlarms().size());
+                    JMenuItem alarmItem = new JMenuItem(alarm.getTimeAsStr());
+                    alarmItem.setForeground(Color.WHITE);
+                    alarmItem.setBackground(Color.BLACK);
+                    getClock().getClockMenuBar().getViewAlarmsMenu().add(alarmItem);
+                    setupCreatedAlarmsFunctionality();
+                    getClock().changeToClockPanel();
                     // determine how to update alarm (update/delete)
                 }
-                createAlarm();
-                getClock().changeToClockPanel();
+                else
+                {
+                    alarm = createAlarm();
+                    setUpdatingAlarm(false);
+                    JMenuItem alarmItem = new JMenuItem(alarm.getTimeAsStr());
+                    alarmItem.setForeground(Color.WHITE);
+                    alarmItem.setBackground(Color.BLACK);
+                    getClock().getClockMenuBar().getViewAlarmsMenu().add(alarmItem);
+                    getClock().getListOfAlarms().add(alarm);
+                    if (!StringUtils.isEmpty(getJTextArea().getText())) {
+                        getJTextArea().append("\n");
+                    }
+                    getJTextArea().append(alarm.getTimeAsStr());
+                    setupCreatedAlarmsFunctionality();
+                    // display list of alarms below All Alarms
+                    // erase input in textfields
+                    getJTextField1().setText("");
+                    getJTextField2().setText("");
+                    getJTextField3().setText("");
+                    // set alarm to newly created alarm
+                    setAlarm(alarm);
+                    getClock().changeToClockPanel();
+                }
             }
             catch (InvalidInputException iie)
             {
@@ -269,19 +414,26 @@ public class AlarmPanel extends JPanel implements Panels {
             }
         });
     }
-    public void createAlarm() throws ParseException
+    public Clock createAlarm() throws ParseException
     {
         int hour = Integer.parseInt(getJTextField1().getText());
         int minutes = Integer.parseInt(getJTextField2().getText());
         Time.AMPM ampm = convertStringToTimeAMPM(getJTextField3().getText());
-        Clock alarm = null;
-        alarm = new Clock(hour, minutes, 0, Time.Month.NOVEMBER, Time.Day.SUNDAY, 29, 2020, ampm);
+        Clock alarm = new Clock(hour, minutes, 0, Time.Month.NOVEMBER, Time.Day.SUNDAY, 29, 2020, ampm);
+        alarm.setAlarmGoingOff(false);
+        return alarm;
+    }
+    public void createAlarm(Clock alarm)
+    {
+        setAlarm(alarm);
+        getAlarm().setAlarmGoingOff(false);
         // add clock to list of alarms
-        getClock().getListOfAlarms().add(alarm);
+        getClock().getListOfAlarms().add(getAlarm());
         if (!StringUtils.isEmpty(getJTextArea().getText())) {
             getJTextArea().append("\n");
         }
-        getJTextArea().append(alarm.getTimeAsStr());
+        getJTextArea().append(getAlarm().getTimeAsStr());
+        setupMusicPlayer();
         // display list of alarms below All Alarms
         this.repaint();
         // erase input in textfields
