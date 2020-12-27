@@ -3,29 +3,24 @@ package v3;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.mockito.Mockito;
 import org.mockito.junit.MockitoJUnit;
 import org.mockito.junit.MockitoJUnitRunner;
 import org.mockito.junit.MockitoRule;
 import org.mockito.quality.Strictness;
 
-import java.text.ParseException;
 import java.util.Calendar;
 
-import static org.junit.Assert.*;
 import static org.mockito.Mockito.*;
 import static v3.Time.AMPM.AM;
 import static v3.Time.Month.NOVEMBER;
 
 @RunWith(MockitoJUnitRunner.class)
-public class ClockTest extends Object {
+public class ClockTest {
 
     Clock clock = spy(Clock.class);
     @Rule public MockitoRule mockito = MockitoJUnit.rule().strictness(Strictness.LENIENT);
     @Test
-    public void tickUpdatesClockValuesWhenTimeIs420() throws ParseException, InterruptedException, InvalidInputException {
+    public void tickUpdatesClockValuesWhenTimeIs420() throws InvalidInputException {
         //clock = new Clock(4, 20, 0, Time.Month.NOVEMBER, Time.Day.SUNDAY, 29, 2020, Time.AMPM.AM);
         doReturn(0).when(clock).getSeconds();
         doReturn(false).when(clock).isDateChanged(); // called 3 times
@@ -43,8 +38,5 @@ public class ClockTest extends Object {
         {
             clock.tick();
         }
-
-        //Mockito.verify(clock, times(1))
-        //    .setDefaultClockValues(0, 0, 0, null, null, 0, 0, null);
     }
 }

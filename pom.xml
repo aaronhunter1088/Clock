@@ -3,15 +3,19 @@
 		 xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
     
-    <groupId>gui</groupId>
+    <groupId>com.example</groupId>
   	<artifactId>clock</artifactId>
   	<version>2.3</version>
   	<name>Clock</name>
-    <description>This is maven container of GUI projects.</description>
+    <description>This is Clock GUI.</description>
     
     <properties>
     	<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
+
+	<!-- NOTES -->
+	<!-- Assembly:single creates Clock-v#.jar -->
+	<!-- Mvn:package creates Clock-v3-jar-with-dependencies.jar -->
     
     <dependencies>
 
@@ -43,8 +47,16 @@
 			<version>5.6.2</version>
 			<scope>test</scope>
 		</dependency>
-	    
-	    <!-- https://mvnrepository.com/artifact/org.apache.commons/commons-lang3 -->
+
+		<!-- https://mvnrepository.com/artifact/junit/junit -->
+		<dependency>
+			<groupId>junit</groupId>
+			<artifactId>junit</artifactId>
+			<version>4.13.1</version>
+			<scope>test</scope>
+		</dependency>
+
+		<!-- https://mvnrepository.com/artifact/org.apache.commons/commons-lang3 -->
 		<dependency>
 		    <groupId>org.apache.commons</groupId>
 		    <artifactId>commons-lang3</artifactId>
@@ -80,11 +92,17 @@
 			<version>1.5</version>
 		</dependency>
 
+		<!-- https://mvnrepository.com/artifact/org.apache.maven.shared/maven-dependency-analyzer -->
+		<dependency>
+			<groupId>org.apache.maven.shared</groupId>
+			<artifactId>maven-dependency-analyzer</artifactId>
+			<version>1.11.3</version>
+		</dependency>
+
 	</dependencies>
     
     <build>
 		<sourceDirectory>src/main/java</sourceDirectory>
-    	
     	<testSourceDirectory>src/test/java</testSourceDirectory>
     	
     	<plugins>
@@ -125,7 +143,7 @@
             			</goals>
             			<configuration>
             				<files>
-            					<file>${basedir}/dist/filter.properties</file>
+            					<file>${basedir}/dist/build.properties</file>
             				</files>
             				<tasks>
             					<echo>BuildTime : ${build.time}</echo>
@@ -154,7 +172,6 @@
             			<include>**/*.class</include>
             		</includes>
             		<excludes>
-						<exclude>*Test.class</exclude>
             			<exclude>components/*</exclude>
             			<exclude>future.com.example.serverExample/*</exclude>
             		</excludes>
@@ -167,7 +184,7 @@
             				<Implementation-Version>${project.version}</Implementation-Version>
             				<Creation-Time-Format>MM-dd-YYYY hh:mm:ss</Creation-Time-Format>
             				<!--<Creation-Time>${build.time}</Creation-Time>-->
-            				<mainClass>v${project.version}.Clock</mainClass>
+            				<mainClass>v3.Clock</mainClass>
             			</manifestEntries>
             		</archive>
             		<outputDirectory>${basedir}/dist</outputDirectory>
@@ -190,7 +207,7 @@
             					<tstamp>
             						<format property="last.updated" pattern="MM-dd-YYYY hh:mm:ss"/>
             					</tstamp>
-            					<echo file="${basedir}/dist/filter.properties" message="build.time=${last.updated}"/>
+            					<echo file="${basedir}/dist/build.properties" message="build.time=${last.updated}"/>
             				</tasks>
             			</configuration>
             		</execution>
