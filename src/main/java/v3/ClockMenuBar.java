@@ -14,7 +14,7 @@ public class ClockMenuBar extends JMenuBar {
     protected JMenuItem fullTimeSetting;
     protected JMenuItem partialTimeSetting;
     protected JMenuItem clockFeature;
-    protected JMenuItem viewAllAlarms;
+    //protected JMenuItem viewAllAlarms;
     protected JMenuItem setAlarms;
 
     public ClockMenuBar()
@@ -25,8 +25,12 @@ public class ClockMenuBar extends JMenuBar {
         setFeaturesMenu(new JMenu("Features"));
         setViewAlarmsMenu(new JMenu("View Alarms"));
         setClockFeature(new JMenuItem("View Clock"));
-        setViewAllAlarms(new JMenuItem("View all"));
-        setSetAlarms(new JMenuItem("Set Alarm"));
+        getClockFeature().setAccelerator(KeyStroke.getKeyStroke(
+                java.awt.event.KeyEvent.VK_C, java.awt.Event.CTRL_MASK));
+        //setViewAllAlarms(new JMenuItem("View all"));
+        setSetAlarms(new JMenuItem("Set Alarms"));
+        getSetAlarms().setAccelerator(KeyStroke.getKeyStroke(
+            java.awt.event.KeyEvent.VK_A, java.awt.Event.CTRL_MASK));
 
         setMilitaryTimeSetting(new JMenuItem(SHOW + SPACE + MILITARY_TIME_SETTING));
         getMilitaryTimeSetting().setForeground(Color.WHITE);
@@ -42,7 +46,7 @@ public class ClockMenuBar extends JMenuBar {
         // Features Menu
         getFeaturesMenu().add(getClockFeature());
         getFeaturesMenu().add(getViewAlarmsMenu());
-        getViewAlarmsMenu().add(getViewAllAlarms());
+        //getViewAlarmsMenu().add(getViewAllAlarms());
         getViewAlarmsMenu().add(getSetAlarms());
 
         getSettingsMenu().setOpaque(false);
@@ -57,8 +61,8 @@ public class ClockMenuBar extends JMenuBar {
         getViewAlarmsMenu().setForeground(Color.WHITE);
         getViewAlarmsMenu().setBackground(Color.BLACK);
         getClockFeature().setForeground(Color.WHITE);
-        getViewAllAlarms().setForeground(Color.WHITE);
-        getViewAllAlarms().setBackground(Color.BLACK);
+        //getViewAllAlarms().setForeground(Color.WHITE);
+        //getViewAllAlarms().setBackground(Color.BLACK);
         getSetAlarms().setForeground(Color.WHITE);
         getSetAlarms().setBackground(Color.BLACK);
     }
@@ -70,7 +74,7 @@ public class ClockMenuBar extends JMenuBar {
     public JMenuItem getFullTimeSetting() { return this.fullTimeSetting; }
     public JMenuItem getPartialTimeSetting() { return this.partialTimeSetting; }
     public JMenuItem getClockFeature() { return this.clockFeature; }
-    public JMenuItem getViewAllAlarms() { return this.viewAllAlarms; }
+    //public JMenuItem getViewAllAlarms() { return this.viewAllAlarms; }
     public JMenuItem getSetAlarms() { return this.setAlarms; }
 
     protected void setSettingsMenu(JMenu settingsMenu) { this.settingsMenu = settingsMenu; }
@@ -80,7 +84,7 @@ public class ClockMenuBar extends JMenuBar {
     protected void setFullTimeSetting(JMenuItem fullTimeSetting) { this.fullTimeSetting = fullTimeSetting; }
     protected void setPartialTimeSetting(JMenuItem partialTimeSetting) { this.partialTimeSetting = partialTimeSetting; }
     protected void setClockFeature(JMenuItem clockFeature) { this.clockFeature = clockFeature; }
-    protected void setViewAllAlarms(JMenuItem viewAllAlarms) { this.viewAllAlarms = viewAllAlarms; }
+    //protected void setViewAllAlarms(JMenuItem viewAllAlarms) { this.viewAllAlarms = viewAllAlarms; }
     protected void setSetAlarms(JMenuItem setAlarms) { this.setAlarms = setAlarms; }
 
     @Override

@@ -2,21 +2,18 @@ package v3;
 
 import org.junit.BeforeClass;
 import org.junit.Test;
-import org.mockito.Mock;
-import org.mockito.Mockito;
 
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.ActionEvent;
 import java.text.ParseException;
 import java.util.ArrayList;
 
 import static org.junit.Assert.*;
-import static org.mockito.Mockito.*;
 
 public class AlarmPanelTest extends Object {
 
     private static Clock clock;
+    private static Clock.Alarm alarm;
 
     @BeforeClass
     public static void setupBeforeClass() throws InterruptedException, ParseException {
@@ -27,6 +24,8 @@ public class AlarmPanelTest extends Object {
         clock.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         clock.setBounds(200, 200, 700, 300);
         clock.tick();
+
+        alarm = new Clock.Alarm(clock, clock.getHours(), true);
     }
     @Test
     public void setUpdatingAlarm() {
@@ -46,8 +45,8 @@ public class AlarmPanelTest extends Object {
 
     @Test
     public void alarmWorksAsExpected() throws ParseException {
-        clock.setListOfAlarms(new ArrayList<>(){{add(clock);}});
-        clock.getAlarmPanel().checkAlarms();
+        clock.setListOfAlarms(new ArrayList<>(){{add(alarm);}});
+        clock.getAlarmPanel().checkIfAnyAlarmsAreGoingOff();
 //        assertTrue("Alarm doesn't match time of clock",
 //                spyClock.getAlarmPanel().getAlarm().getTimeAsStr()
 //                .equals(clock.getTimeAsStr()));

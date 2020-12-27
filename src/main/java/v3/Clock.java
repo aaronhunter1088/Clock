@@ -36,6 +36,8 @@ public class Clock extends JFrame {
     protected static final DateFormat sdf = new SimpleDateFormat("MM-dd-yyyy");
     protected static final Font font60 = new Font("Courier New", Font.BOLD, 60);
     protected static final Font font50 = new Font("Courier New", Font.BOLD, 50);
+    protected static final Font font40 = new Font("Courier New", Font.PLAIN, 20);
+    protected static final Font font20 = new Font("Courier New", Font.PLAIN, 20);
     // Main GUI Components
     // For displaying faces on main display
     protected Panels facePanel;
@@ -58,11 +60,11 @@ public class Clock extends JFrame {
     protected boolean leapYear;
     protected boolean daylightSavingsTime;
     protected boolean dateChanged;
-    protected boolean home = true, alarm= false, timer = false;
+    protected boolean home = true, alarm = false, timer = false, updateAlarm = false;
     protected boolean showFullDate = false;
     protected boolean showPartialDate = false;
     protected boolean showMilitaryTime = false;
-    protected ArrayList<Clock> listOfAlarms;
+    protected ArrayList<Clock.Alarm> listOfAlarms;
     // Getters/Issers
     //public GridBagLayout getGridBagLayout() { return this.layout; }
     //public GridBagConstraints getGridBagConstraints() { return this.constraints; }
@@ -84,6 +86,12 @@ public class Clock extends JFrame {
     public String getHoursAsStr() { return this.hoursAsStr; }
     public String getMinutesAsStr() { return this.minutesAsStr; }
     public String getSecondsAsStr() { return this.secondsAsStr; }
+
+    /**
+     * This method returns the clock's current hour, minute, second, and time.
+     * It can also be used to get the alarm's time set value
+     * @return
+     */
     public String getTimeAsStr() { return this.hoursAsStr+":"+this.minutesAsStr+":"+this.secondsAsStr+" "+this.ampm.getStrValue(); }
     public String getDateAsStr() { return this.month.strValue+" "+this.date+", "+this.year; }
     public String getFullDateAsStr() { return this.day.strValue+" "+this.month.strValue+" "+this.date+", "+this.year; }
@@ -97,11 +105,12 @@ public class Clock extends JFrame {
     public boolean isDateChanged() { return this.dateChanged; }
     public boolean isHome() { return this.home; }
     public boolean isAlarmGoingOff() { return this.alarm; }
+    public boolean isUpdateAlarm() { return this.updateAlarm; }
     public boolean isTimerGoingOff() { return this.timer; }
     public boolean isShowFullDate() { return this.showFullDate; }
     public boolean isShowPartialDate() { return this.showPartialDate; }
     public boolean isShowMilitaryTime() { return this.showMilitaryTime; }
-    public ArrayList<Clock> getListOfAlarms() { return this.listOfAlarms; }
+    public ArrayList<Clock.Alarm> getListOfAlarms() { return this.listOfAlarms; }
     // Setters
     //private void setGridBagLayout(GridBagLayout layout) { this.layout = layout; }
     //private void setGridBagConstraints(GridBagConstraints constraints) { this.constraints = constraints; }
@@ -143,7 +152,8 @@ public class Clock extends JFrame {
     protected void setHoursAsStr(String hoursAsStr) { this.hoursAsStr = hoursAsStr; }
     protected void setMinutesAsStr(String minutesAsStr) { this.minutesAsStr = minutesAsStr; }
     protected void setSecondsAsStr(String secondsAsStr) { this.secondsAsStr = secondsAsStr; }
-    protected void setListOfAlarms(ArrayList<Clock> listOfAlarms) { this.listOfAlarms = listOfAlarms; }
+    protected void setListOfAlarms(ArrayList<Clock.Alarm> listOfAlarms) { this.listOfAlarms = listOfAlarms; }
+    protected void setUpdateAlarm(boolean updateAlarm) { this.updateAlarm = updateAlarm;}
     // setDateAsStr()
     // setFullDateAsStr()
     // setMilitaryTimeAsStr()
@@ -168,7 +178,7 @@ public class Clock extends JFrame {
         //setAlarm(false); method exists as below
         setAlarmGoingOff(false);
         //setTimer(false); functionality doesn't exist
-        setListOfAlarms(new ArrayList<Clock>());
+        setListOfAlarms(new ArrayList<Clock.Alarm>());
     }
     public void setDefaultClockValues(int hours, int minutes, int seconds, Time.Month month, Time.Day day, int  date, int year, Time.AMPM ampm) throws ParseException
     {
@@ -600,9 +610,26 @@ public class Clock extends JFrame {
             default: return Time.Month.ERR;
         }
     }
-    /**
-     * Constructor for objects of class v2.Clockv2
-     */
+    public Clock(Clock clock) throws ParseException
+    {
+        super();
+        setResizable(true);
+        setListOfAlarms(clock.getListOfAlarms());
+        setMenuBar(clock.getMenuBar());
+        setAlarmPanel(new AlarmPanel(this));
+        setSeconds(clock.getSeconds());
+        setMinutes(clock.getMinutes());
+        setHours(clock.getHours());
+        setAMPM(clock.getAMPM());
+        setMonth(clock.getMonth());
+        setDate(clock.getDate());
+        setYear(clock.getYear());
+        setFacePanel(new ClockPanel(this));
+        setClockPanel((ClockPanel)getFacePanel());
+        setClockFace(ClockFace.ClockFace);
+        pack();
+        add((Component) getFacePanel());
+    }
     public Clock() throws ParseException
     {
         super();
@@ -640,6 +667,15 @@ public class Clock extends JFrame {
         setClockFace(ClockFace.ClockFace);
         pack();
         add((Component) getFacePanel());
+    }
+    static class Alarm extends Clock
+    {
+        public Alarm(Clock clock, int hours, boolean isUpdateAlarm) throws ParseException
+        {
+            super(clock);
+            setHours(hours);
+            setUpdateAlarm(isUpdateAlarm);
+        }
     }
     // Constructor methods
     /* TODO: change method to setupMenuBar*/
@@ -711,13 +747,12 @@ public class Clock extends JFrame {
                 System.err.println("Trying to change to clock panel but already showing ClockFace");
             }
         });
-        // TODO: Not sure if needed. Set Alarm changes to Panel as well
-        getClockMenuBar().getViewAllAlarms().addActionListener(action -> {
-            changeToAlarmPanel();
-            getAlarmPanel().getJTextField1().setText("");
-            getAlarmPanel().getJTextField2().setText("");
-            getAlarmPanel().getJTextField3().setText("");
-        });
+//        getClockMenuBar().getViewAllAlarms().addActionListener(action -> {
+//            changeToAlarmPanel();
+//            getAlarmPanel().getJTextField1().setText("");
+//            getAlarmPanel().getJTextField2().setText("");
+//            getAlarmPanel().getJTextField3().setText("");
+//        });
         getClockMenuBar().getSetAlarms().addActionListener(action -> {
             changeToAlarmPanel();
             getAlarmPanel().getJTextField1().setText("");
@@ -788,6 +823,44 @@ public class Clock extends JFrame {
             System.err.println("Error! Clock had an exception when performing tick: " + e.getMessage());
         }
     }
+    public void printClockStatus()
+    {
+        System.out.println("Clock Status:");
+        //System.out.println("facePanel: " + getFacePanel());
+        //System.out.println("menuBar: " + getClockMenuBar());
+        System.out.println("clockPanel: " + getClockPanel().getName());
+        System.out.println("alarmPanel: " + getAlarmPanel().getName());
+        System.out.println("beginDST Date: " + getBeginDaylightSavingsTimeDate());
+        System.out.println("endDST Date: " + getEndDaylightSavingsTimeDate());
+        //System.out.println("calendar: " + getCalendar());
+        System.out.println("seconds: " + getSeconds());
+        System.out.println("secondsAtStr: " + getSecondsAsStr());
+        System.out.println("minutes: " + getMinutes());
+        System.out.println("minutesAsStr: " + getMinutesAsStr());
+        System.out.println("hours: " + getHours());
+        System.out.println("hoursAsStr: " + getHoursAsStr());
+        System.out.println("AMPM: " + getAMPM());
+        System.out.println("day: " + getDay());
+        System.out.println("date: " + getDate());
+        System.out.println("month: " + getMonth());
+        System.out.println("year: " + getYear());
+        System.out.println("clockFace: " + getClockFace());
+        System.out.println("leapYear: " + isLeapYear());
+        System.out.println("DST: " + isDaylightSavingsTime());
+        System.out.println("dateChanged: " + isDateChanged());
+        //System.out.println("home: " + isHome());
+        System.out.println("alarm: " + isAlarmGoingOff());
+        System.out.println("timer: " + isTimerGoingOff());
+        System.out.println("updateAlarm: " + isUpdateAlarm());
+        System.out.println("showFullDate: " + isShowFullDate());
+        System.out.println("showPartialDate: " + isShowPartialDate());
+        System.out.println("showMilitaryTime: " + isShowMilitaryTime());
+        System.out.println("listOfAlarms size: " + this.getListOfAlarms().size());
+        for(int i = 0; i < getListOfAlarms().size(); i++)
+        {
+            System.out.println("\talarm: " + getListOfAlarms().get(i).getTimeAsStr());
+        }
+    }
     public static void main(String[] args) throws ParseException, InterruptedException
     {
         Clock clock = new Clock();
@@ -801,7 +874,7 @@ public class Clock extends JFrame {
             clock.tick();
             // check alarms
             Thread.sleep(250);
-            clock.getAlarmPanel().checkAlarms();
+            clock.getAlarmPanel().checkIfAnyAlarmsAreGoingOff();
             Thread.sleep(750);
         }
     }
