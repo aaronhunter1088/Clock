@@ -71,7 +71,7 @@
 		<dependency>
 			<groupId>org.apache.maven.plugins</groupId>
 			<artifactId>maven-surefire-plugin</artifactId>
-			<version>2.22.2</version>
+			<version>3.0.0-M5</version>
 		</dependency>
 
 		<dependency>
@@ -98,6 +98,20 @@
 					<target>11</target>
 				</configuration>
 			</plugin>
+
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-surefire-plugin</artifactId>
+				<version>3.0.0-M5</version>
+				<configuration>
+					<excludes>
+						<exclude>v1.*.java</exclude>
+						<exclude>v1.*Test.java</exclude>
+						<exclude>v2.*.java</exclude>
+						<exclude>v2.*Test.java</exclude>
+					</excludes>
+				</configuration>
+			</plugin>
             
             <plugin>
             	<groupId>org.codehaus.mojo</groupId>
@@ -111,7 +125,7 @@
             			</goals>
             			<configuration>
             				<files>
-            					<file>${basedir}/dist/build.properties</file>
+            					<file>${basedir}/dist/filter.properties</file>
             				</files>
             				<tasks>
             					<echo>BuildTime : ${build.time}</echo>
@@ -140,6 +154,7 @@
             			<include>**/*.class</include>
             		</includes>
             		<excludes>
+						<exclude>*Test.class</exclude>
             			<exclude>components/*</exclude>
             			<exclude>future.com.example.serverExample/*</exclude>
             		</excludes>
@@ -152,11 +167,11 @@
             				<Implementation-Version>${project.version}</Implementation-Version>
             				<Creation-Time-Format>MM-dd-YYYY hh:mm:ss</Creation-Time-Format>
             				<!--<Creation-Time>${build.time}</Creation-Time>-->
-            				<mainClass>v2.Clock</mainClass>
+            				<mainClass>v${project.version}.Clock</mainClass>
             			</manifestEntries>
             		</archive>
             		<outputDirectory>${basedir}/dist</outputDirectory>
-            		<finalName>ClockGUI-${project.version}</finalName> <!-- ${project.artifactId}.${project.version} -->
+            		<finalName>Clock-v${project.version}</finalName> <!-- ${project.artifactId}.${project.version} -->
             	</configuration>
             </plugin>
             
@@ -214,18 +229,18 @@
                   </executions>
                   <configuration>
                        <!-- ... -->
-                       <finalName>ClockGUI-2.1</finalName>
+                       <finalName>Clock-v${project.version}</finalName>
                        <archive>
                            <index>true</index>
                            <manifest>
                            		<addClasspath>true</addClasspath>
-                                <mainClass>v2.Clock</mainClass>
+                                <mainClass>v3.Clock</mainClass>
                            </manifest>
                            <manifestEntries>
             				  <Implementation-Version>${project.version}</Implementation-Version>
             				  <Creation-Time-Format>MM-dd-YYYY hh:mm:ss</Creation-Time-Format>
             				  <Creation-Time>${build.time}</Creation-Time>
-            				  <mainClass>v2.Clock</mainClass>
+            				  <mainClass>v3.Clock</mainClass>
             			  </manifestEntries>
                        </archive>
                        <descriptorRefs>
