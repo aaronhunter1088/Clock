@@ -309,21 +309,6 @@ public class AlarmPanel extends JPanel implements Panels {
             }
         };
     }
-    protected void resetViewAlarmsMenu(ArrayList alarms)
-    {
-        getClock().getClockMenuBar().setViewAlarmsMenu(new JMenu("View Alarms"));
-        getClock().getClockMenuBar().setSetAlarms(new JMenuItem("Set Alarms"));
-        getClock().getClockMenuBar().getViewAlarmsMenu().add(getClock().getClockMenuBar().getSetAlarms());
-        getClock().getClockMenuBar().getSetAlarms().setAccelerator(KeyStroke.getKeyStroke(
-                java.awt.event.KeyEvent.VK_A, java.awt.Event.CTRL_MASK));
-        System.err.println("Size of viewAlarms before adding " + getClock().getClockMenuBar().getViewAlarmsMenu().getItemCount());
-        for(int i = 0; i < alarms.size(); i++)
-        {
-            JMenuItem alarmItem = new JMenuItem(((Clock)alarms.get(i)).getTimeAsStr());
-            getClock().getClockMenuBar().getViewAlarmsMenu().add(alarmItem);
-        }
-        System.err.println("Size of viewAlarms after adding " + getClock().getClockMenuBar().getViewAlarmsMenu().getItemCount());
-    }
     public void setupAlarmButton()
     {
         getJSetAlarmButton().addActionListener(action ->
@@ -498,16 +483,13 @@ public class AlarmPanel extends JPanel implements Panels {
         System.err.println("\ncreated an alarm: " + alarm.getTimeAsStr());
         return alarm;
     }
-    public void createAlarm(Clock alarm)
+    public void createAlarm(Clock.Alarm alarm)
     {
-        setAlarm((Clock.Alarm)alarm);
+        setAlarm(alarm);
         getAlarm().setAlarmGoingOff(false);
         // add clock to list of alarms
         getClock().getListOfAlarms().add(getAlarm());
-        if (!StringUtils.isEmpty(getJTextArea().getText())) {
-            getJTextArea().append("\n");
-        }
-        getJTextArea().append(getAlarm().getTimeAsStr());
+        resetJTextArea();
         setupMusicPlayer();
         // display list of alarms below All Alarms
         this.repaint();

@@ -13,7 +13,7 @@ public enum Time {
     enum Day implements ITime {
 
         SUNDAY(0, "Sunday"), MONDAY(1, "Monday"), TUESDAY(2, "Tuesday"),
-        WEDNESDAY(3, "Wednesday"), THURSDAY(4, "Thursday"), FRIDAY(5, "Saturday"),
+        WEDNESDAY(3, "Wednesday"), THURSDAY(4, "Thursday"), FRIDAY(5, "Friday"),
         SATURDAY(6, "Saturday"), ERROR(7, "Unknown day");
 
         int value;
@@ -38,7 +38,7 @@ public enum Time {
 
     enum Month implements ITime {
 
-        ERR(0, "Unknown month"), JANUARY(1, "January"), FEBRUARY(2, "February"),
+        ERROR(0, "Unknown month"), JANUARY(1, "January"), FEBRUARY(2, "February"),
         MARCH(3, "March"), APRIL(4, "April"), MAY(5, "May"), JUNE(6, "June"),
         JULY(7, "July"), AUGUST(8, "August"), SEPTEMBER(9, "September"),
         OCTOBER(10, "October"), NOVEMBER(11, "November"), DECEMBER(12, "December");

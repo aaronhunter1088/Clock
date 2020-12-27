@@ -20,7 +20,7 @@ public class InvalidInputExceptionTest extends Exception {
 	@BeforeEach
 	public void setUp() {
 		goodMonth = Time.Month.AUGUST;
-		badMonth = Time.Month.ERR;
+		badMonth = Time.Month.ERROR;
 	}
 
 	@Test
