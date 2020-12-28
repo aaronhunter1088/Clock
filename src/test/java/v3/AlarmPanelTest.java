@@ -2,6 +2,8 @@ package v3;
 
 import org.junit.BeforeClass;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.mockito.junit.MockitoJUnitRunner;
 
 import javax.swing.*;
 import java.awt.*;
@@ -10,6 +12,7 @@ import java.util.ArrayList;
 
 import static org.junit.Assert.*;
 
+@RunWith(MockitoJUnitRunner.class)
 public class AlarmPanelTest extends Object {
 
     private static Clock clock;
@@ -43,17 +46,13 @@ public class AlarmPanelTest extends Object {
     public void createAlarm() {
     }
 
-    //TODO: refactor
-//    @Test
-//    public void alarmWorksAsExpected() throws ParseException {
-//        clock.setListOfAlarms(new ArrayList<>(){{add(alarm);}});
-//        clock.getAlarmPanel().checkIfAnyAlarmsAreGoingOff();
-////        assertTrue("Alarm doesn't match time of clock",
-////                spyClock.getAlarmPanel().getAlarm().getTimeAsStr()
-////                .equals(clock.getTimeAsStr()));
-//        assertTrue("Alarm should be going off!", clock.getAlarmPanel().getAlarm().isAlarmGoingOff());
-//        clock.tick();
-//        assertTrue("Alarm should not be triggered to go off!", clock.getAlarmPanel().getAlarm().getTimeAsStr().equals(clock.getTimeAsStr()));
-//    }
+    @Test
+    public void alarmWorksAsExpected() {
+        clock.setListOfAlarms(new ArrayList<>(){{add(alarm);}});
+        clock.getAlarmPanel().checkIfAnyAlarmsAreGoingOff();
+        assertTrue("Alarm should be going off!", alarm.isAlarmGoingOff());
+        assertEquals("This 'alarm' is set as the current alarm going off", alarm, clock.getAlarmPanel().getCurrentAlarmGoingOff());
+        assertTrue("Alarm should not be triggered to go off!", alarm.isAlarmGoingOff());
+    }
 
 }

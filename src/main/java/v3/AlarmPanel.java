@@ -4,6 +4,10 @@ import javazoom.jl.decoder.JavaLayerException;
 import javazoom.jl.player.advanced.AdvancedPlayer;
 import org.apache.commons.lang.StringUtils;
 
+import javax.sound.sampled.AudioInputStream;
+import javax.sound.sampled.AudioSystem;
+import javax.sound.sampled.TargetDataLine;
+import javax.sound.sampled.UnsupportedAudioFileException;
 import javax.swing.*;
 import java.awt.*;
 import java.io.*;
@@ -112,9 +116,11 @@ public class AlarmPanel extends JPanel implements Panels {
     {
         try
         {
-            setMusicPlayer(new AdvancedPlayer(new FileInputStream(Paths.get("src/main/resources/alarmSound1.mp3").toUri().getPath())));
+            InputStream inputStream = getClass().getClassLoader().getSystemResourceAsStream("sounds/alarmSound1.mp3");
+            setMusicPlayer(new AdvancedPlayer(inputStream));
+            //setMusicPlayer(new AdvancedPlayer(new FileInputStream(Paths.get("src/main/resources/sounds/alarmSound1.mp3").toUri().getPath())));
         }
-        catch (FileNotFoundException | JavaLayerException e)
+        catch (JavaLayerException e)
         {
             e.printStackTrace();
         }
@@ -193,7 +199,7 @@ public class AlarmPanel extends JPanel implements Panels {
                 if (alarm.getTimeAsStr().equals(getClock().getTimeAsStr()))
                 {
                     // time for alarm to be triggered on
-                    setCurrentAlarmGoingOff((Clock.Alarm)alarm);
+                    setCurrentAlarmGoingOff(alarm);
                     alarm.setAlarmGoingOff(true);
                     System.out.print("Alarm " + getCurrentAlarmGoingOff().getTimeAsStr() + " matches clock's time. ");
                     System.out.println("Sounding alarm...");

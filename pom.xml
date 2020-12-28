@@ -11,6 +11,9 @@
     
     <properties>
     	<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+		<maven.compiler.version>3.8.1</maven.compiler.version>
+		<maven.properties.version>1.0-alpha-2</maven.properties.version>
+		<maven.jar.version>2.6</maven.jar.version>
     </properties>
 
 	<!-- NOTES -->
@@ -104,37 +107,33 @@
     <build>
 		<sourceDirectory>src/main/java</sourceDirectory>
     	<testSourceDirectory>src/test/java</testSourceDirectory>
-    	
-    	<plugins>
+		<resources>
+			<resource>
+				<directory>${basedir}/src/main/resources</directory>
+				<includes>
+					<include>**/*.mp3</include>
+				</includes>
+			</resource>
+		</resources>
 
+		<plugins>
+
+			<!-- Compile -->
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-compiler-plugin</artifactId>
-				<version>3.8.1</version>
+				<version>${maven.compiler.version}</version>
 				<configuration>
 					<source>11</source>
 					<target>11</target>
 				</configuration>
 			</plugin>
 
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-surefire-plugin</artifactId>
-				<version>3.0.0-M5</version>
-				<configuration>
-					<excludes>
-						<exclude>v1.*.java</exclude>
-						<exclude>v1.*Test.java</exclude>
-						<exclude>v2.*.java</exclude>
-						<exclude>v2.*Test.java</exclude>
-					</excludes>
-				</configuration>
-			</plugin>
-            
+			<!-- Generate build.properties file -->
             <plugin>
             	<groupId>org.codehaus.mojo</groupId>
             	<artifactId>properties-maven-plugin</artifactId>
-            	<version>1.0-alpha-2</version>
+            	<version>${maven.properties.version}</version>
             	<executions>
             		<execution>
             			<phase>generate-resources</phase>
@@ -157,7 +156,7 @@
             <plugin>
             	<groupId>org.apache.maven.plugins</groupId>
             	<artifactId>maven-jar-plugin</artifactId>
-            	<version>2.6</version>
+            	<version>${maven.jar.version}</version>
             	<executions>
             		<execution>
             			<id>make-a-jar</id>
@@ -168,8 +167,24 @@
             		</execution>
             	</executions>
             	<configuration>
+					<!-- ... -->
+					<archive>
+						<index>true</index>
+						<manifest>
+							<addClasspath>true</addClasspath>
+							<mainClass>v3.Clock</mainClass>
+						</manifest>
+						<manifestEntries>
+							<Implementation-Version>${project.version}</Implementation-Version>
+							<Creation-Time-Format>MM-dd-YYYY hh:mm:ss</Creation-Time-Format>
+							<Creation-Time>${build.time}</Creation-Time>
+							<mainClass>v3.Clock</mainClass>
+						</manifestEntries>
+					</archive>
+					<outputDirectory>${basedir}/dist</outputDirectory>
             		<includes>
             			<include>**/*.class</include>
+						<include>**/*.mp3</include>
             		</includes>
             		<excludes>
             			<exclude>components/*</exclude>
@@ -233,39 +248,39 @@
             		</execution>
             	</executions>
             </plugin>-->
-            
+
+			<!-- Package -->
             <plugin>
                  <artifactId>maven-assembly-plugin</artifactId>
                  <executions>
                      <execution>
-                          <phase>package</phase>
-                          <goals>
-                              <goal>single</goal>
-                          </goals>
-                      </execution>
-                  </executions>
-                  <configuration>
-                       <!-- ... -->
-                       <finalName>Clock-v${project.version}</finalName>
-                       <archive>
-                           <index>true</index>
-                           <manifest>
-                           		<addClasspath>true</addClasspath>
-                                <mainClass>v3.Clock</mainClass>
-                           </manifest>
-                           <manifestEntries>
-            				  <Implementation-Version>${project.version}</Implementation-Version>
-            				  <Creation-Time-Format>MM-dd-YYYY hh:mm:ss</Creation-Time-Format>
-            				  <Creation-Time>${build.time}</Creation-Time>
-            				  <mainClass>v3.Clock</mainClass>
-            			  </manifestEntries>
-                       </archive>
-                       <descriptorRefs>
-                           <descriptorRef>jar-with-dependencies</descriptorRef>
-                      </descriptorRefs>
-                      <outputDirectory>${basedir}/dist</outputDirectory>
-                 </configuration>
-             </plugin>
+						 <phase>package</phase>
+						 <goals>
+							 <goal>single</goal>
+						 </goals>
+					 </execution>
+				 </executions>
+				 <configuration>
+					 <finalName>Clock-v${project.version}</finalName>
+					 <archive>
+						   <index>true</index>
+						   <manifest>
+								<addClasspath>true</addClasspath>
+								<mainClass>v3.Clock</mainClass>
+						   </manifest>
+						   <manifestEntries>
+							  <Implementation-Version>${project.version}</Implementation-Version>
+							  <Creation-Time-Format>MM-dd-YYYY hh:mm:ss</Creation-Time-Format>
+							  <Creation-Time>${build.time}</Creation-Time>
+							  <mainClass>v3.Clock</mainClass>
+						  </manifestEntries>
+					 </archive>
+					 <descriptorRefs>
+						 <descriptorRef>jar-with-dependencies</descriptorRef>
+					 </descriptorRefs>
+					 <outputDirectory>${basedir}/dist</outputDirectory>
+				 </configuration>
+			</plugin>
 		    
         </plugins>
         
