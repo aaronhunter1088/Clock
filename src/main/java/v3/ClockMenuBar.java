@@ -1,7 +1,10 @@
 package v3;
 
 import javax.swing.*;
-import java.awt.*;
+import java.awt.Graphics;
+import java.awt.Graphics2D;
+import java.awt.Color;
+import java.awt.event.InputEvent;
 
 import static v3.Clock.*;
 
@@ -26,11 +29,10 @@ public class ClockMenuBar extends JMenuBar {
         setViewAlarmsMenu(new JMenu("View Alarms"));
         setClockFeature(new JMenuItem("View Clock"));
         getClockFeature().setAccelerator(KeyStroke.getKeyStroke(
-                java.awt.event.KeyEvent.VK_C, java.awt.Event.CTRL_MASK));
-        //setViewAllAlarms(new JMenuItem("View all"));
+                java.awt.event.KeyEvent.VK_C, InputEvent.CTRL_DOWN_MASK));
         setSetAlarms(new JMenuItem("Set Alarms"));
         getSetAlarms().setAccelerator(KeyStroke.getKeyStroke(
-            java.awt.event.KeyEvent.VK_A, java.awt.Event.CTRL_MASK));
+            java.awt.event.KeyEvent.VK_A, InputEvent.CTRL_DOWN_MASK));
 
         setMilitaryTimeSetting(new JMenuItem(SHOW + SPACE + MILITARY_TIME_SETTING));
         getMilitaryTimeSetting().setForeground(Color.WHITE);
@@ -61,8 +63,6 @@ public class ClockMenuBar extends JMenuBar {
         getViewAlarmsMenu().setForeground(Color.WHITE);
         getViewAlarmsMenu().setBackground(Color.BLACK);
         getClockFeature().setForeground(Color.WHITE);
-        //getViewAllAlarms().setForeground(Color.WHITE);
-        //getViewAllAlarms().setBackground(Color.BLACK);
         getSetAlarms().setForeground(Color.WHITE);
         getSetAlarms().setBackground(Color.BLACK);
     }

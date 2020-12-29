@@ -2,10 +2,10 @@ package v3;
 
 import javax.swing.*;
 import java.awt.*;
-import java.text.ParseException;
 import java.util.Calendar;
 import java.util.Date;
 
+@SuppressWarnings("unused")
 public class ClockPanel extends JPanel implements Panels {
 
     private GridBagLayout layout;
@@ -16,7 +16,7 @@ public class ClockPanel extends JPanel implements Panels {
 
     public ClockPanel(Clock clock) {
         setClock(clock);
-        setMinimumSize(clock.defaultSize);
+        setMinimumSize(Clock.defaultSize);
         setGridBagLayout(new GridBagLayout());
         setLayout(getGridBagLayout());
         setGridBagConstraints(new GridBagConstraints());
@@ -63,8 +63,8 @@ public class ClockPanel extends JPanel implements Panels {
     {
         getJlbl1().setText(getClock().defaultText(1));
         getJlbl2().setText(getClock().defaultText(2));
-        getJlbl1().setFont(getClock().font60);
-        getJlbl2().setFont(getClock().font50);
+        getJlbl1().setFont(Clock.font60);
+        getJlbl2().setFont(Clock.font50);
         getJlbl1().setForeground(Color.WHITE);
         getJlbl2().setForeground(Color.WHITE);
         getClock().repaint();

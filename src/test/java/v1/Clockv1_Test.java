@@ -1,18 +1,20 @@
 package v1;
 
-import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.Test;
+import org.junit.BeforeClass;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.mockito.junit.MockitoJUnitRunner;
 
 import java.text.ParseException;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertSame;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertSame;
 
-
+@RunWith(MockitoJUnitRunner.class)
 public class Clockv1_Test {
 	private Clock clock;
 	
-	@BeforeAll
+	@BeforeClass
 	public static void setUpBeforeClass() throws Exception {}
 	
 	@Test

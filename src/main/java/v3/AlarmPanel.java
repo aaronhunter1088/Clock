@@ -4,26 +4,20 @@ import javazoom.jl.decoder.JavaLayerException;
 import javazoom.jl.player.advanced.AdvancedPlayer;
 import org.apache.commons.lang.StringUtils;
 
-import javax.sound.sampled.AudioInputStream;
-import javax.sound.sampled.AudioSystem;
-import javax.sound.sampled.TargetDataLine;
-import javax.sound.sampled.UnsupportedAudioFileException;
 import javax.swing.*;
 import java.awt.*;
 import java.io.*;
-import java.nio.file.Paths;
 import java.text.ParseException;
-import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.Objects;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 import static v3.Time.AMPM.*;
 
-/**
- * TODO: Add feature where we click on Alarm under menu
- * the AlarmPanel will appear and the alarm will appear
+@SuppressWarnings("unused")
+/* the AlarmPanel will appear and the alarm will appear
  * in the text fields. The alarm will be removed from
  * the list of alarms, the textarea, and from the menu
  *
@@ -47,9 +41,9 @@ public class AlarmPanel extends JPanel implements Panels {
     private JLabel jalarmLbl2 = new JLabel("", SwingConstants.CENTER); // M
     private JLabel jalarmLbl3 = new JLabel("", SwingConstants.CENTER); // Time (AM/PM)
     private JLabel jalarmLbl4 = new JLabel("", SwingConstants.CENTER); // All Alarms
-    private JTextField jtextField1 = new JTextField(2); // Hour textfield
-    private JTextField jtextField2 = new JTextField(2); // Min textfield
-    private JTextField jtextField3 = new JTextField(2); // Time textfield
+    private JTextField jtextField1 = new JTextField(2); // Hour textField
+    private JTextField jtextField2 = new JTextField(2); // Min textField
+    private JTextField jtextField3 = new JTextField(2); // Time textField
     private JButton jSetAlarmButton = new JButton("Set");
     private JTextArea jTextArea = new JTextArea(4, 20);
     private JScrollPane scrollPane = null;
@@ -61,7 +55,7 @@ public class AlarmPanel extends JPanel implements Panels {
 
     public AlarmPanel(Clock clock) {
         setClock(clock);
-        setMinimumSize(clock.alarmSize);
+        setMinimumSize(Clock.alarmSize);
         setGridBagLayout(new GridBagLayout());
         setLayout(getGridBagLayout());
         setGridBagConstraints(new GridBagConstraints());
@@ -116,11 +110,10 @@ public class AlarmPanel extends JPanel implements Panels {
     {
         try
         {
-            InputStream inputStream = getClass().getClassLoader().getSystemResourceAsStream("sounds/alarmSound1.mp3");
-            setMusicPlayer(new AdvancedPlayer(inputStream));
-            //setMusicPlayer(new AdvancedPlayer(new FileInputStream(Paths.get("src/main/resources/sounds/alarmSound1.mp3").toUri().getPath())));
+            InputStream inputStream = ClassLoader.getSystemResourceAsStream("sounds/alarmSound1.mp3");
+            if (null != inputStream) { setMusicPlayer(new AdvancedPlayer(inputStream)); }
         }
-        catch (JavaLayerException e)
+        catch (NullPointerException | JavaLayerException e)
         {
             e.printStackTrace();
         }
@@ -145,15 +138,15 @@ public class AlarmPanel extends JPanel implements Panels {
         getJTextField1().setText("");
         getJTextField1().setText("");
         getJTextField1().setText("");
-        getJAlarmLbl1().setFont(getClock().font60); // H
-        getJAlarmLbl2().setFont(getClock().font60); // M
-        getJAlarmLbl3().setFont(getClock().font60); // T
-        getJAlarmLbl4().setFont(getClock().font20); // All Alarms
+        getJAlarmLbl1().setFont(Clock.font60); // H
+        getJAlarmLbl2().setFont(Clock.font60); // M
+        getJAlarmLbl3().setFont(Clock.font60); // T
+        getJAlarmLbl4().setFont(Clock.font20); // All Alarms
         getJAlarmLbl1().setForeground(Color.WHITE);
         getJAlarmLbl2().setForeground(Color.WHITE);
         getJAlarmLbl3().setForeground(Color.WHITE);
         getJAlarmLbl4().setForeground(Color.WHITE);
-        getJTextArea().setFont(getClock().font40); // alarms
+        getJTextArea().setFont(Clock.font40); // alarms
         getJTextArea().setVisible(true);
         getJTextArea().setEditable(false);
         getJTextArea().setWrapStyleWord(true);
@@ -170,11 +163,11 @@ public class AlarmPanel extends JPanel implements Panels {
     {
         updateLabels();
         addComponent(getJAlarmLbl1(), 0,0,1,1, 0,0, GridBagConstraints.HORIZONTAL); // H
-        addComponent(getJTextField1(), 0,1,1,1, 20,0, GridBagConstraints.HORIZONTAL); // Textfield
+        addComponent(getJTextField1(), 0,1,1,1, 20,0, GridBagConstraints.HORIZONTAL); // textField
         addComponent(getJAlarmLbl2(), 0,2,1,1, 0,0, GridBagConstraints.HORIZONTAL); // M
-        addComponent(getJTextField2(), 0,3,1,1, 20,0, GridBagConstraints.HORIZONTAL); // Textfield
+        addComponent(getJTextField2(), 0,3,1,1, 20,0, GridBagConstraints.HORIZONTAL); // textField
         addComponent(getJAlarmLbl3(), 0,4,1,1, 0,0, GridBagConstraints.HORIZONTAL); // Time (AM/PM)
-        addComponent(getJTextField3(), 0,5,1,1, 20,0, GridBagConstraints.HORIZONTAL); // Textfield
+        addComponent(getJTextField3(), 0,5,1,1, 20,0, GridBagConstraints.HORIZONTAL); // textField
         addComponent(getJSetAlarmButton(), 0,6,0,1, 0,0, GridBagConstraints.NONE); // Set Alarm button
         addComponent(getJAlarmLbl4(), 1,0,0,1, 0,0, GridBagConstraints.HORIZONTAL); // All alarms
         addComponent(getJScrollPane(), 2, 0, 0, 2, 0, 0, GridBagConstraints.BOTH);
@@ -239,8 +232,8 @@ public class AlarmPanel extends JPanel implements Panels {
         // for each except the Set Alarms (option1)
         // create an action listener which
         // takes the alarmClock, set the hour, min, and ampm
-        // in the textfields and we will set a boolean to true
-        // which will allow editing the textfields to any value
+        // in the textFields and we will set a boolean to true
+        // which will allow editing the textFields to any value
         // changing all values to 0 or explicitly Time to 0
         // will delete the alarm
         // changing the values and clicking Set will save the alarm
@@ -313,7 +306,7 @@ public class AlarmPanel extends JPanel implements Panels {
                     getClock().changeToAlarmPanel();
                 });
             }
-        };
+        }
     }
     public void setupAlarmButton()
     {
@@ -412,31 +405,21 @@ public class AlarmPanel extends JPanel implements Panels {
                     // display list of alarms below All Alarms
                     resetJTextArea();
                     setupCreatedAlarmsFunctionality();
-                    // erase input in textfields
+                    // erase input in textFields
                     getJTextField1().setText("");
                     getJTextField2().setText("");
                     getJTextField3().setText("");
                 }
             }
-            catch (InvalidInputException iie)
+            catch (InvalidInputException | ParseException e)
             {
-                System.err.println(iie.getMessage() + "; no alarm set!");
-                for(StackTraceElement ste : iie.getStackTrace())
-                {
-                    System.err.println(ste);
-                }
-            }
-            catch (ParseException pe)
-            {
-                System.err.println(pe.getMessage() + "; no alarm set!");
-                for(StackTraceElement ste : pe.getStackTrace())
-                {
-                    System.err.println(ste);
-                }
+                System.err.println(e.getMessage() + "; no alarm set!");
+                for(StackTraceElement ste : e.getStackTrace())
+                { System.err.println(ste); }
             }
             getClock().changeToClockPanel();
             getClock().printClockStatus();
-            System.err.println("Finished updating alarm: " + alarm.getTimeAsStr());
+            System.err.println("Finished updating alarm: " + Objects.requireNonNull(alarm).getTimeAsStr());
         });
     }
     protected void addAlarmMenuItemFromAlarm(Clock alarm)
@@ -475,8 +458,8 @@ public class AlarmPanel extends JPanel implements Panels {
     /**
      * Creates an alarm and sets the latest one created as the currentAlarm
      * defined in setAlarm
-     * @return
-     * @throws ParseException
+     * @return Clock.Alarm
+     * @throws ParseException will be thrown if hour, minutes, or time is inappropriate.
      */
     public Clock.Alarm createAlarm() throws ParseException
     {
@@ -499,7 +482,7 @@ public class AlarmPanel extends JPanel implements Panels {
         setupMusicPlayer();
         // display list of alarms below All Alarms
         this.repaint();
-        // erase input in textfields
+        // erase input in textFields
         getJTextField1().setText("");
         getJTextField2().setText("");
         getJTextField3().setText("");

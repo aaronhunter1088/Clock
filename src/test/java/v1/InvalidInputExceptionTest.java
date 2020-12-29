@@ -1,23 +1,25 @@
 package v1;
 
+import org.junit.Before;
+import org.junit.BeforeClass;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.mockito.junit.MockitoJUnitRunner;
 
-import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
-import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.junit.jupiter.api.Assertions.fail;
-
+@RunWith(MockitoJUnitRunner.class)
 public class InvalidInputExceptionTest extends Exception {
 
 	private static final long serialVersionUID = 1L;
 	private Time goodMonth, badMonth;
 
-	@BeforeAll
+	@BeforeClass
 	public static void setUpBeforeClass() throws Exception {
 	}
 
-	@BeforeEach
+	@Before
 	public void setUp() throws Exception {
 		goodMonth = Time.AUGUST;
 		badMonth = Time.ERR;

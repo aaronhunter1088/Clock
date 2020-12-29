@@ -5,6 +5,7 @@ import java.awt.*;
 import java.util.Calendar;
 import java.util.Date;
 
+@SuppressWarnings("unused")
 public class TimerPanel extends JPanel implements Panels {
 
     private GridBagLayout layout;
@@ -12,10 +13,10 @@ public class TimerPanel extends JPanel implements Panels {
     private JLabel jtimerLbl1 = new JLabel("", SwingConstants.CENTER); // H
     private JLabel jtimerLbl2 = new JLabel("", SwingConstants.CENTER); // M
     private JLabel jtimerLbl3 = new JLabel("", SwingConstants.CENTER); // S
-    private JTextField jtextField1 = new JTextField(2); // Hour textfield
-    private JTextField jtextField2 = new JTextField(2); // Min textfield
-    private JTextField jtextField3 = new JTextField(2); // Second textfield
-    private JButton jsetAlarmBtn = new JButton("Set");
+    private JTextField jtextField1 = new JTextField(2); // Hour textField
+    private JTextField jtextField2 = new JTextField(2); // Min textField
+    private JTextField jtextField3 = new JTextField(2); // Second textField
+    private final JButton jsetAlarmBtn = new JButton("Set");
     private Clock clock;
 
     public TimerPanel(Clock clock) {

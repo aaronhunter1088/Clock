@@ -9,8 +9,10 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 
-/**
- * A simple application which displays the time and date. The time
+import static java.lang.Thread.sleep;
+
+@SuppressWarnings({"unused", "ConstantConditions"})
+/* A simple application which displays the time and date. The time
  * can be view in military time or not, and the date fully expressed,
  * partially expressed or standard expression.
  * 
@@ -66,8 +68,6 @@ public class Clock extends JFrame {
     protected boolean showMilitaryTime = false;
     protected ArrayList<Clock.Alarm> listOfAlarms;
     // Getters/Issers
-    //public GridBagLayout getGridBagLayout() { return this.layout; }
-    //public GridBagConstraints getGridBagConstraints() { return this.constraints; }
     public Panels getFacePanel() { return this.facePanel; }
     public ClockMenuBar getClockMenuBar() { return this.menuBar; }
     public ClockPanel getClockPanel() { return this.clockPanel; }
@@ -90,9 +90,9 @@ public class Clock extends JFrame {
     /**
      * This method returns the clock's current hour, minute, second, and time.
      * It can also be used to get the alarm's time set value
-     * @return
+     * @return 'HH:MM:SS TIME' ex: 05:15:24 PM
      */
-    public String getTimeAsStr() { return this.hoursAsStr+":"+this.minutesAsStr+":"+this.secondsAsStr+" "+this.ampm.getStrValue(); }
+    public String getTimeAsStr() { return this.hoursAsStr+":"+this.minutesAsStr+":"+this.secondsAsStr+" "+this.ampm.strValue; }
     public String getDateAsStr() { return this.month.strValue+" "+this.date+", "+this.year; }
     public String getFullDateAsStr() { return this.day.strValue+" "+this.month.strValue+" "+this.date+", "+this.year; }
     public String getMilitaryTimeAsStr() {
@@ -112,9 +112,6 @@ public class Clock extends JFrame {
     public boolean isShowMilitaryTime() { return this.showMilitaryTime; }
     public ArrayList<Clock.Alarm> getListOfAlarms() { return this.listOfAlarms; }
     // Setters
-    //private void setGridBagLayout(GridBagLayout layout) { this.layout = layout; }
-    //private void setGridBagConstraints(GridBagConstraints constraints) { this.constraints = constraints; }
-    /* TODO: setFacePanel appears to be irrelevant now. remove*/
     protected void setFacePanel(Panels facePanel) { this.facePanel = facePanel; }
     protected void setClockMenuBar(ClockMenuBar menuBar) { this.menuBar = menuBar; }
     protected void setAlarmPanel(AlarmPanel alarmPanel) { this.alarmPanel = alarmPanel; }
@@ -247,7 +244,7 @@ public class Clock extends JFrame {
         //setAlarm(false); method exists as below
         setAlarmGoingOff(false);
         //setTimer(false); functionality doesn't exist
-        setListOfAlarms(new ArrayList<Clock.Alarm>());
+        setListOfAlarms(new ArrayList<>());
     }
     public void setDefaultClockValues(int hours, int minutes, int seconds, Time.Month month, Time.Day day, int  date, int year, Time.AMPM ampm) throws ParseException
     {
@@ -318,14 +315,7 @@ public class Clock extends JFrame {
             leap = true;
             if (Integer.toString(year).substring(2).equals("00"))
             {
-                if (year % 400 == 0)
-                {
-                    leap = true;
-                }
-                else
-                {
-                    leap = false;
-                }
+                leap = year % 400 == 0;
             }
         }
         return leap;
@@ -583,12 +573,12 @@ public class Clock extends JFrame {
         }
         if (isDaylightSavingsTime())
         {
-            if (getCalendar().get(Calendar.MONTH) == 2 && getAMPM().getStrValue().equals(Time.AMPM.AM.strValue))
+            if (getCalendar().get(Calendar.MONTH) == Calendar.MARCH && getAMPM().getStrValue().equals(Time.AMPM.AM.strValue))
             {
                 setHours(3);
                 setDaylightSavingsTime(false);
             }
-            else if (getCalendar().get(Calendar.MONTH) == 10 && getAMPM().getStrValue().equals(Time.AMPM.AM.strValue))
+            else if (getCalendar().get(Calendar.MONTH) == Calendar.NOVEMBER && getAMPM().getStrValue().equals(Time.AMPM.AM.strValue))
             { // && daylightSavingsTime
                 setHours(1);
                 setDaylightSavingsTime(false);
@@ -684,7 +674,7 @@ public class Clock extends JFrame {
         setClockMenuBar(new ClockMenuBar());
         // Menu Options
         getClockMenuBar().getMilitaryTimeSetting().addActionListener(action -> {
-            if (isShowMilitaryTime() == true)
+            if (isShowMilitaryTime())
             {
                 setShowMilitaryTime(false);
                 menuBar.getMilitaryTimeSetting().setText(HIDE + SPACE + MILITARY_TIME_SETTING);
@@ -819,8 +809,6 @@ public class Clock extends JFrame {
     public void printClockStatus()
     {
         System.out.println("Clock Status:");
-        //System.out.println("facePanel: " + getFacePanel());
-        //System.out.println("menuBar: " + getClockMenuBar());
         System.out.println("clockPanel: " + getClockPanel().getName());
         System.out.println("alarmPanel: " + getAlarmPanel().getName());
         System.out.println("beginDST Date: " + getBeginDaylightSavingsTimeDate());
@@ -862,13 +850,21 @@ public class Clock extends JFrame {
         clock.setSize(defaultSize);
         clock.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         clock.setBounds(200, 200, 700, 300);
-        while (true)
+        try
         {
-            clock.tick();
-            // check alarms
-            Thread.sleep(250);
-            clock.getAlarmPanel().checkIfAnyAlarmsAreGoingOff();
-            Thread.sleep(750);
+            while (true)
+            {
+                clock.tick();
+                // check alarms
+                sleep(250);
+                clock.getAlarmPanel().checkIfAnyAlarmsAreGoingOff();
+                sleep(750);
+            }
+        }
+        catch (Exception e)
+        {
+            for(StackTraceElement ste : e.getStackTrace())
+            { System.err.println(ste); }
         }
     }
 }

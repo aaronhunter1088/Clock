@@ -1,12 +1,15 @@
 package v2;
 
-import org.junit.jupiter.api.Test;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.mockito.junit.MockitoJUnitRunner;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.Assert.assertTrue;
 
+@RunWith(MockitoJUnitRunner.class)
 public class ClockFaceTest {
 
 	@Test

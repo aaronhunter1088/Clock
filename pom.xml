@@ -10,10 +10,12 @@
     <description>This is Clock GUI.</description>
     
     <properties>
+		<java.version>11</java.version>
     	<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<maven.compiler.version>3.8.1</maven.compiler.version>
 		<maven.properties.version>1.0-alpha-2</maven.properties.version>
-		<maven.jar.version>2.6</maven.jar.version>
+		<maven.jar.version>3.2.0</maven.jar.version>
+		<maven.surefire.version>3.0.0-M5</maven.surefire.version>
     </properties>
 
 	<!-- NOTES -->
@@ -41,14 +43,6 @@
 			<groupId>org.jacoco</groupId>
 			<artifactId>jacoco-maven-plugin</artifactId>
 			<version>0.8.5</version>
-		</dependency>
-
-		<!-- https://mvnrepository.com/artifact/org.junit.jupiter/junit-jupiter-api -->
-		<dependency>
-			<groupId>org.junit.jupiter</groupId>
-			<artifactId>junit-jupiter-api</artifactId>
-			<version>5.6.2</version>
-			<scope>test</scope>
 		</dependency>
 
 		<!-- https://mvnrepository.com/artifact/junit/junit -->
@@ -82,24 +76,24 @@
 		    <scope>test</scope>
 		</dependency>
 
+<!--		<dependency>-->
+<!--			<groupId>org.apache.velocity</groupId>-->
+<!--			<artifactId>velocity</artifactId>-->
+<!--			<version>1.5</version>-->
+<!--		</dependency>-->
+
+		<!-- https://mvnrepository.com/artifact/org.apache.maven.plugins/maven-jar-plugin -->
+		<dependency>
+			<groupId>org.apache.maven.plugins</groupId>
+			<artifactId>maven-jar-plugin</artifactId>
+			<version>${maven.jar.version}</version>
+		</dependency>
+
 		<!-- https://mvnrepository.com/artifact/org.apache.maven.plugins/maven-surefire-plugin -->
 		<dependency>
 			<groupId>org.apache.maven.plugins</groupId>
 			<artifactId>maven-surefire-plugin</artifactId>
-			<version>3.0.0-M5</version>
-		</dependency>
-
-		<dependency>
-			<groupId>org.apache.velocity</groupId>
-			<artifactId>velocity</artifactId>
-			<version>1.5</version>
-		</dependency>
-
-		<!-- https://mvnrepository.com/artifact/org.apache.maven.shared/maven-dependency-analyzer -->
-		<dependency>
-			<groupId>org.apache.maven.shared</groupId>
-			<artifactId>maven-dependency-analyzer</artifactId>
-			<version>1.11.3</version>
+			<version>${maven.surefire.version}</version>
 		</dependency>
 
 	</dependencies>
@@ -109,9 +103,9 @@
     	<testSourceDirectory>src/test/java</testSourceDirectory>
 		<resources>
 			<resource>
-				<directory>${basedir}/src/main/resources</directory>
+				<directory>src/main/resources</directory>
 				<includes>
-					<include>**/*.mp3</include>
+					<include>**/sounds/*.mp3</include>
 				</includes>
 			</resource>
 		</resources>
@@ -124,8 +118,43 @@
 				<artifactId>maven-compiler-plugin</artifactId>
 				<version>${maven.compiler.version}</version>
 				<configuration>
-					<source>11</source>
-					<target>11</target>
+					<release>11</release>
+					<compilerArgs>
+						<!--<arg>#doubledash#enable-preview</arg>-->
+						<arg>-verbose</arg>
+						<arg>-Xlint:all,-options,-path</arg>
+					</compilerArgs>
+					<!-- for surefire plugin -->
+				</configuration>
+				<executions>
+					<execution>
+						<id>default-testCompile</id>
+						<phase>test-compile</phase>
+						<configuration>
+							<testExcludes>
+								<exclude>**/v1/*Test.java</exclude>
+								<exclude>**/v2/*Test.java</exclude>
+							</testExcludes>
+						</configuration>
+						<goals>
+							<goal>testCompile</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
+
+			<!-- Test-compile -->
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-surefire-plugin</artifactId>
+				<version>${maven.surefire.version}</version>
+				<configuration>
+					<excludes>
+						<exclude>**/v1/*.java</exclude>
+						<exclude>**/v2/*.java</exclude>
+						<exclude>**/v1/*Test.java</exclude>
+						<exclude>**/v2/*Test.java</exclude>
+					</excludes>
 				</configuration>
 			</plugin>
 
@@ -151,7 +180,8 @@
             		</execution>
             	</executions>
             </plugin>
-            
+
+			<!-- Binds to Package phase -->
             <!-- When creating a jar, update MANIFEST.MF file and place JAR in specified outputDirectory -->
             <plugin>
             	<groupId>org.apache.maven.plugins</groupId>
@@ -159,7 +189,7 @@
             	<version>${maven.jar.version}</version>
             	<executions>
             		<execution>
-            			<id>make-a-jar</id>
+            			<id>default-jar</id>
             			<phase>compile</phase>
             			<goals>
             				<goal>jar</goal>
@@ -167,7 +197,8 @@
             		</execution>
             	</executions>
             	<configuration>
-					<!-- ... -->
+					<finalName>Clock-v${project.version}</finalName>
+					<outputDirectory>${basedir}/dist</outputDirectory>
 					<archive>
 						<index>true</index>
 						<manifest>
@@ -177,33 +208,21 @@
 						<manifestEntries>
 							<Implementation-Version>${project.version}</Implementation-Version>
 							<Creation-Time-Format>MM-dd-YYYY hh:mm:ss</Creation-Time-Format>
+							<!--suppress UnresolvedMavenProperty -->
 							<Creation-Time>${build.time}</Creation-Time>
 							<mainClass>v3.Clock</mainClass>
 						</manifestEntries>
 					</archive>
-					<outputDirectory>${basedir}/dist</outputDirectory>
-            		<includes>
-            			<include>**/*.class</include>
-						<include>**/*.mp3</include>
-            		</includes>
-            		<excludes>
-            			<exclude>components/*</exclude>
-            			<exclude>future.com.example.serverExample/*</exclude>
-            		</excludes>
-            		<archive>
-            			<index>true</index>
-            			<manifest>
-            				<addClasspath>true</addClasspath>
-            			</manifest>
-            			<manifestEntries>
-            				<Implementation-Version>${project.version}</Implementation-Version>
-            				<Creation-Time-Format>MM-dd-YYYY hh:mm:ss</Creation-Time-Format>
-            				<!--<Creation-Time>${build.time}</Creation-Time>-->
-            				<mainClass>v3.Clock</mainClass>
-            			</manifestEntries>
-            		</archive>
-            		<outputDirectory>${basedir}/dist</outputDirectory>
-            		<finalName>Clock-v${project.version}</finalName> <!-- ${project.artifactId}.${project.version} -->
+					<includes>
+						<include>**/v3/*</include>
+						<include>**/sounds/*</include>
+					</includes>
+					<excludes>
+						<exclude>**/*</exclude>
+<!--						<exclude>**/v2/*</exclude>-->
+<!--						<exclude>**/v1/*Test</exclude>-->
+<!--						<exclude>**/v2/*Test</exclude>-->
+					</excludes>
             	</configuration>
             </plugin>
             
@@ -222,7 +241,8 @@
             					<tstamp>
             						<format property="last.updated" pattern="MM-dd-YYYY hh:mm:ss"/>
             					</tstamp>
-            					<echo file="${basedir}/dist/build.properties" message="build.time=${last.updated}"/>
+            					<!--suppress UnresolvedMavenProperty -->
+								<echo file="${basedir}/dist/build.properties" message="build.time=${last.updated}"/>
             				</tasks>
             			</configuration>
             		</execution>
@@ -271,6 +291,7 @@
 						   <manifestEntries>
 							  <Implementation-Version>${project.version}</Implementation-Version>
 							  <Creation-Time-Format>MM-dd-YYYY hh:mm:ss</Creation-Time-Format>
+							  <!--suppress UnresolvedMavenProperty -->
 							  <Creation-Time>${build.time}</Creation-Time>
 							  <mainClass>v3.Clock</mainClass>
 						  </manifestEntries>

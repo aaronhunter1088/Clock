@@ -2,11 +2,14 @@ package v3;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.mockito.junit.MockitoJUnitRunner;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertSame;
 import static v3.Time.Day.MONDAY;
 
+@RunWith(MockitoJUnitRunner.class)
 public class ITimeTest extends Object {
 
     @Before
