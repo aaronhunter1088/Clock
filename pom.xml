@@ -5,7 +5,7 @@
     
     <groupId>com.example</groupId>
   	<artifactId>clock</artifactId>
-  	<version>2.3</version>
+  	<version>2.4</version>
   	<name>Clock</name>
     <description>This is Clock GUI.</description>
     
@@ -221,10 +221,12 @@
 						<include>**/sounds/*</include>
 					</includes>
 					<excludes>
-						<exclude>**/*</exclude>
-						<exclude>**/v2/*</exclude>
-						<exclude>**/v1/*Test</exclude>
-						<exclude>**/v2/*Test</exclude>
+						<exclude>**/v1/*.java</exclude>
+						<exclude>**/v2/*.java</exclude>
+						<exclude>**/v3/*.java</exclude>
+						<exclude>**/v1/*Test.java</exclude>
+						<exclude>**/v2/*Test.java</exclude>
+						<exclude>**/v3/*Test.java</exclude>
 					</excludes>
             	</configuration>
             </plugin>

@@ -6,6 +6,21 @@ import java.util.Calendar;
 import java.util.Date;
 
 @SuppressWarnings("unused")
+/** This is the newest panel, the Timer panel.
+ * It is part of version 2.4
+ *
+ * The timer panel is used to set a timer.
+ * Giving the panel some Hours, some Minutes,
+ * and some Seconds, it will sound an alarm
+ * when the timer reaches '00:00:00'.
+ *
+ * Timers are a new "Feature".
+ * They are visible under the View Timers menu
+ * which is under the Features menu
+ *
+ * @author michael ball
+ * @version 2.4
+ */
 public class TimerPanel extends JPanel implements Panels {
 
     private GridBagLayout layout;

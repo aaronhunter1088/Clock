@@ -12,7 +12,7 @@ import java.util.Date;
 import static java.lang.Thread.sleep;
 
 @SuppressWarnings({"unused", "ConstantConditions"})
-/* A simple application which displays the time and date. The time
+/** A simple application which displays the time and date. The time
  * can be view in military time or not, and the date fully expressed,
  * partially expressed or standard expression.
  * 
@@ -41,6 +41,8 @@ public class Clock extends JFrame {
     protected static final Font font40 = new Font("Courier New", Font.PLAIN, 40);
     protected static final Font font30 = new Font("Courier New", Font.PLAIN, 30);
     protected static final Font font20 = new Font("Courier New", Font.PLAIN, 20);
+    protected static final Font font15 = new Font("Courier New", Font.BOLD, 15);
+    protected static final Font font10 = new Font("Courier New", Font.BOLD, 10);
     // Main GUI Components
     // For displaying faces on main display
     protected Panels facePanel;
@@ -673,7 +675,7 @@ public class Clock extends JFrame {
     {
         UIManager.put("MenuItem.background", Color.BLACK);
         setClockMenuBar(new ClockMenuBar());
-        // Menu Options
+        // Settings Actions for Settings menu
         getClockMenuBar().getMilitaryTimeSetting().addActionListener(action -> {
             if (isShowMilitaryTime())
             {
@@ -727,7 +729,7 @@ public class Clock extends JFrame {
             // updatePanel
             pack();
         });
-
+        // Features Actions for Features menu
         getClockMenuBar().getClockFeature().addActionListener(action -> {
             if (getClockFace() != ClockFace.ClockFace)
             {
@@ -739,14 +741,20 @@ public class Clock extends JFrame {
             }
         });
         getClockMenuBar().getSetAlarms().addActionListener(action -> {
-            changeToAlarmPanel();
             getAlarmPanel().getJTextField1().setText("");
             getAlarmPanel().getJTextField2().setText("");
             getAlarmPanel().getJTextField3().setText("");
-        });
-
+            getAlarmPanel().resetJTextArea();
+            try
+                { getAlarmPanel().setCheckBoxesBasedOnDays(null); }
+                catch (InvalidInputException iie)
+                { /**/ }
+                changeToAlarmPanel();
+            });
+        // Add both menus to main menu
         getClockMenuBar().add(getClockMenuBar().getSettingsMenu());
         getClockMenuBar().add(getClockMenuBar().getFeaturesMenu());
+        // Set the Clock's menu to ClockMenuBar
         setJMenuBar(getClockMenuBar());
     }
     public void changeToClockPanel()
@@ -808,10 +816,17 @@ public class Clock extends JFrame {
         }
     }
     public void printClockStatus()
-    { printClockStatus(""); }
-    public void printClockStatus(String status)
+    { printClockStatus(this.getClass(), ""); }
+    public void printClockStatus(Class clazz, String status)
     {
-        System.out.println("Clock Status: " + status);
+        if (clazz == Alarm.class)
+        {
+            System.out.println("Alarm Status: " + status);
+        }
+        else
+        {
+            System.out.println("Clock Status: " + status);
+        }
         System.out.println("clockPanel: " + getClockPanel().getName());
         System.out.println("alarmPanel: " + getAlarmPanel().getName());
         System.out.println("beginDST Date: " + getBeginDaylightSavingsTimeDate());

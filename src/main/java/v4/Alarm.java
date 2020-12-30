@@ -7,9 +7,15 @@ import java.text.ParseException;
 import java.util.ArrayList;
 
 @SuppressWarnings("unused")
-/* an Alarm is similar to a Clock except
- * it has a list of days that is should
- * use to trigger on or off.
+/** An Alarm is similar to a Clock by many.
+ * The differences may continue to grow but
+ * as for now, an Alarm knows all the days
+ * it should go off, the time at which to
+ * go off, and can set the current day based
+ * on Clocks time if alarm is going off.
+ *
+ * @author michael ball
+ * @version 2.4
  */
 public class Alarm extends Clock
 {
@@ -26,6 +32,9 @@ public class Alarm extends Clock
     protected void setCurrentDay(Day currentDay) { this.currentDay = currentDay; }
 
     // Constructors
+    public Alarm() throws ParseException {
+        super();
+    }
     public Alarm(Clock clock, int hours, boolean isUpdateAlarm) throws ParseException
     {
         super(clock);
@@ -34,9 +43,9 @@ public class Alarm extends Clock
     }
     public Alarm(Clock clock, int hours, int minutes, AMPM time, boolean isUpdateAlarm, ArrayList<Day> days) throws ParseException
     {
-        super(clock);
         setHours(hours);
         setMinutes(minutes);
+        setSeconds(0);
         setAMPM(time);
         setDays(days);
         setUpdateAlarm(isUpdateAlarm);
@@ -44,13 +53,22 @@ public class Alarm extends Clock
 
     // Helper methods
     public void printAlarmStatus()
-    { printClockStatus(""); }
-    public void printAlarmStatus(String status)
+    { this.printAlarmStatus(this.getClass(), ""); }
+    public void printAlarmStatus(String message)
+    { this.printAlarmStatus(this.getClass(), message); }
+    public void printAlarmStatus(Class clazz, String status)
     {
-        super.printClockStatus(status);
+        this.printClockStatus(clazz, status);
         System.out.println("days:");
-        for(Day day: days)
-        { System.out.println("\t"+day); }
+        if (null != days)
+        {
+            for(Day day: days)
+            { System.out.println("\t"+day); }
+        }
+        else
+        {
+            System.out.println("\t'No days'");
+        }
     }
     protected void setCurrentDay()
     {

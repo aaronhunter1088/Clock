@@ -6,6 +6,16 @@ import java.util.Calendar;
 import java.util.Date;
 
 @SuppressWarnings("unused")
+/** The ClockPanel is the main panel and is
+ * visible first to the user. Here you can
+ * see the time and date.
+ * Clicking on the menu options under
+ * Settings can change how the time and date
+ * look.
+ *
+ * @author michael ball
+ * @version 2.4
+ */
 public class ClockPanel extends JPanel implements Panels {
 
     private GridBagLayout layout;

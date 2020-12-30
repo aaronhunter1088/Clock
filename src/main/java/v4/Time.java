@@ -1,7 +1,6 @@
 package v4;
 
-/**
- * Enumeration class v4.Time - The values used by the clock to distinguish time.
+/** Enumeration class v4.Time - The values used by the clock to distinguish time.
  * 
  * @author michael ball
  * @version 2.4
