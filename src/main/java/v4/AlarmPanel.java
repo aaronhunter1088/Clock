@@ -4,6 +4,7 @@ import javazoom.jl.decoder.JavaLayerException;
 import javazoom.jl.player.advanced.AdvancedPlayer;
 import org.apache.commons.lang.StringUtils;
 
+import javax.sound.sampled.AudioInputStream;
 import javax.swing.*;
 import java.awt.*;
 import java.io.InputStream;
@@ -36,7 +37,7 @@ import static v4.Time.Day.*;
  * @author michael ball
  * @version 2.4
  */
-public class AlarmPanel extends JPanel implements Panels {
+public class AlarmPanel extends JPanel implements IClockFace {
 
     private GridBagLayout layout;
     private GridBagConstraints constraints;
@@ -64,6 +65,7 @@ public class AlarmPanel extends JPanel implements Panels {
     private Alarm alarm;
     private Alarm currentAlarmGoingOff;
     private boolean updatingAlarm;
+    private boolean alarmIsGoingOff;
     private AdvancedPlayer musicPlayer;
 
     public AlarmPanel(Clock clock) throws ParseException
@@ -109,6 +111,7 @@ public class AlarmPanel extends JPanel implements Panels {
     public JCheckBox getSundayCheckBox() { return sundayCheckBox; }
     public JCheckBox getWeekCheckBox() { return weekCheckBox; }
     public JCheckBox getWkendCheckBox() { return wkendCheckBox; }
+    public boolean isAlarmIsGoingOff() { return alarmIsGoingOff; }
 
     // Setters
     protected void setGridBagLayout(GridBagLayout layout) { this.layout = layout; }
@@ -137,18 +140,22 @@ public class AlarmPanel extends JPanel implements Panels {
     protected void setSundayCheckBox(JCheckBox sundayCheckBox) { this.sundayCheckBox = sundayCheckBox; }
     protected void setWeekCheckBox(JCheckBox weekCheckBox) { this.weekCheckBox = weekCheckBox; }
     protected void setWkendCheckBox(JCheckBox wkendCheckBox) { this.wkendCheckBox = wkendCheckBox; }
+    protected void setAlarmIsGoingOff(boolean alarmIsGoingOff) { this.alarmIsGoingOff = alarmIsGoingOff; }
 
     // Helper methods
     public void setupMusicPlayer()
     {
+        InputStream inputStream = null;
         try
         {
-            InputStream inputStream = ClassLoader.getSystemResourceAsStream("sounds/alarmSound1.mp3");
+            inputStream = ClassLoader.getSystemResourceAsStream("sounds/alarmSound1.mp3");
             if (null != inputStream) { setMusicPlayer(new AdvancedPlayer(inputStream)); }
         }
         catch (NullPointerException | JavaLayerException e)
         {
-            printStackTrace(e);
+            if (null == inputStream)
+                printStackTrace(e, "An issue occurred while reading the alarm file.");
+            printStackTrace(e, "A JavaLayerException occurred: " + e.getMessage());
         }
     }
     public Time.AMPM convertStringToTimeAMPM(String ampm)
@@ -206,7 +213,7 @@ public class AlarmPanel extends JPanel implements Panels {
         getJSetAlarmButton().setBackground(Color.BLACK);
         getJSetAlarmButton().setForeground(Color.BLACK);
         // setup checkboxes
-        createAndSetupCheckBoxes(null);
+        setupCheckboxBasedOnDay(null);
     }
     @Override
     public void addComponentsToPanel()
@@ -261,6 +268,7 @@ public class AlarmPanel extends JPanel implements Panels {
                         // time for alarm to be triggered on
                         setCurrentAlarmGoingOff(alarm);
                         alarm.setAlarmGoingOff(true);
+                        setAlarmIsGoingOff(true);
                         System.out.print("Alarm " + getCurrentAlarmGoingOff().getTimeAsStr() + " matches clock's time. ");
                         System.out.println("Sounding alarm...");
                         //System.out.println("Clock's time is " + getClock().getTimeAsStr());
@@ -287,9 +295,11 @@ public class AlarmPanel extends JPanel implements Panels {
                 catch (Exception e)
                 {
                     System.err.println("An exception occurred while playing music: " + e.getMessage());
+                    printStackTrace(e);
                 }
             };
             executor.submit(r);
+            //r.run();
         }
         else
         { executor.shutdown(); }
@@ -346,24 +356,16 @@ public class AlarmPanel extends JPanel implements Panels {
                         getClock().getAlarmPanel().getJTextField1().setText(getAlarm().getHoursAsStr());
                         getClock().getAlarmPanel().getJTextField2().setText(getAlarm().getMinutesAsStr());
                         getClock().getAlarmPanel().getJTextField3().setText(getAlarm().getAMPM().getStrValue());
-                        try
-                        {
-                            setCheckBoxesBasedOnDays(getAlarm().getDays());
-                        }
-                        catch (InvalidInputException iie)
-                        { printStackTrace(iie); }
+                        getJAlarmLbl4().setText("Turning alarm off");
+                        resetJCheckboxes(getAlarm().getDays(), true);
                     }
-                    // if we are updating an alarm, by clicking on it in the menuBar
-                    if (null != getAlarm() && getAlarm().isUpdateAlarm())
+                    // we are updating an alarm by clicking on it in the menuBar
+                    else if (null != getAlarm() && getAlarm().isUpdateAlarm())
                     {
                         System.out.println("Updating an alarm: " + menuItem.getText());
                         getJTextField1().setText(menuItem.getText().substring(0,2));
                         getJTextField2().setText(menuItem.getText().substring(3,5));
                         getJTextField3().setText(menuItem.getText().substring(9));
-                        try
-                        { setCheckBoxesBasedOnDays(getAlarm().getDays()); }
-                        catch (InvalidInputException iie)
-                        { printStackTrace(iie); }
                         setUpdatingAlarm(true);
                         // remove alarm from list of alarms
                         deleteAlarmMenuItemFromViewAlarms(getAlarm());
@@ -371,6 +373,8 @@ public class AlarmPanel extends JPanel implements Panels {
                         getClock().getListOfAlarms().remove(getAlarm());
                         System.err.println("Size of listOfAlarms after removing " + getClock().getListOfAlarms().size());
                         resetJTextArea();
+                        resetJCheckboxes(getAlarm().getDays(), true);
+                        getJAlarmLbl4().setText("Updating alarm");
                     }
                     else // when is this reachable
                     {
@@ -392,7 +396,7 @@ public class AlarmPanel extends JPanel implements Panels {
             }
         }
     }
-    public void setupAlarmButton() throws ParseException
+    public void setupAlarmButton()
     {
         getJSetAlarmButton().addActionListener(action ->
         {
@@ -417,15 +421,11 @@ public class AlarmPanel extends JPanel implements Panels {
                 }
                 else // validated is true
                 {
-                    ArrayList<Day> days = checkWhichCheckBoxesWereChecked();
                     // Passed validation
                     if (isUpdatingAlarm())
                     {
-                        // update list of alarms
-                        Clock clock = new Clock(Integer.parseInt(getJTextField1().getText()), Integer.parseInt(getJTextField2().getText()), 0, Time.Month.NOVEMBER, Time.Day.SUNDAY, 29, 2020, convertStringToTimeAMPM(getJTextField3().getText()));
-                        alarm = new Alarm(clock, clock.getHours(), clock.getMinutes(), clock.getAMPM(), isUpdatingAlarm(), days);
-                        alarm.setAlarmGoingOff(false);
-                        alarm.setUpdateAlarm(true);
+                        alarm = createAlarm();
+                        alarm.setUpdateAlarm(false); // at this point, we are doing updating
                         setAlarm(alarm);
                         // add clock to list of alarms
                         if (getClock().getListOfAlarms().size() == 0)
@@ -459,12 +459,13 @@ public class AlarmPanel extends JPanel implements Panels {
                         setupCreatedAlarmsFunctionality();
                         setUpdatingAlarm(false);
                         resetJTextArea();
-                        setCheckBoxesBasedOnDays(getAlarm().getDays());
+                        resetJCheckboxes(getAlarm().getDays(), false);
+                        resetJAlarmLabel4();
                         // determine how to update alarm (update/delete)
                     }
                     else // creating a new alarm
                     {
-                        alarm = new Alarm(getClock(), getClock().getHours(), getClock().getMinutes(), getClock().getAMPM(), true, days);
+                        alarm = createAlarm();
                         setAlarm(alarm);
                         setUpdatingAlarm(false);
                         if (getClock().getListOfAlarms().size() == 0)
@@ -495,18 +496,14 @@ public class AlarmPanel extends JPanel implements Panels {
                         System.err.println("Size of listOfAlarms after adding " + getClock().getListOfAlarms().size());
                         // display list of alarms below All Alarms
                         resetJTextArea();
+                        resetJCheckboxes(null, false);
                         setupCreatedAlarmsFunctionality();
                         // erase input in textFields
                         getJTextField1().setText("");
                         getJTextField2().setText("");
                         getJTextField3().setText("");
-                        setCheckBoxesBasedOnDays(null);
-                        getJAlarmLbl4().setText
-                        (
-                            getClock().getListOfAlarms().size() == 1 ?
-                            getClock().getListOfAlarms().size() + " Alarm Added" :
-                            getClock().getListOfAlarms().size() + " Alarms Added"
-                        );
+                        resetJCheckboxes(null, false);
+                        resetJAlarmLabel4();
                     }
                     getClock().changeToClockPanel();
                     getAlarm().printAlarmStatus("Finished setting alarm.");
@@ -532,13 +529,36 @@ public class AlarmPanel extends JPanel implements Panels {
             }
         });
     }
-    protected void printStackTrace(Exception e)
+    protected void resetJAlarmLabel4()
     {
-        System.err.println(e.getMessage());
+        if (getClock().getListOfAlarms().size() == 0)
+        {
+            getJAlarmLbl4().setText(getClock().defaultText(6)); // All Alarms label...
+        }
+        else
+        {
+            getJAlarmLbl4().setText
+                    (
+                            getClock().getListOfAlarms().size() == 1 ?
+                                    getClock().getListOfAlarms().size() + " Alarm Added" :
+                                    getClock().getListOfAlarms().size() + " Alarms Added"
+                    );
+        }
+    }
+    protected void printStackTrace(Exception e, String message)
+    {
+        if (null != message)
+            System.err.println(message);
+        else
+            System.err.println(e.getMessage());
         for(StackTraceElement ste : e.getStackTrace())
         {
             System.out.println(ste.toString());
         }
+    }
+    protected void printStackTrace(Exception e)
+    {
+        printStackTrace(e, "");
     }
     protected boolean validateFirstTextField() throws InvalidInputException
     {
@@ -608,413 +628,226 @@ public class AlarmPanel extends JPanel implements Panels {
         { throw new InvalidInputException("At least one checkbox must be selected."); }
         return true;
     }
-    protected void createAndSetupCheckBoxes(ArrayList<Day> days)
+    protected void setupCheckboxBasedOnDay(ArrayList<Day> days)
     {
         try
         {
             if (days == null) // default values
             {
+                days = new ArrayList<>();
                 for(Day day : Day.values() )
-                {
-                    switch(day)
-                    {
-                        case SUNDAY:
-                        {
-                            setSundayCheckBox(new JCheckBox(SUNDAY.strValue.substring(0,2), false));
-                            getSundayCheckBox().setFont(Clock.font20);
-                            getSundayCheckBox().setBackground(Color.BLACK);
-                            getSundayCheckBox().setForeground(Color.WHITE);
-                            getSundayCheckBox().addActionListener(action -> {
-                                if (!getSundayCheckBox().isSelected())
-                                {
-                                    System.err.println("Sunday checkbox selected!");
-                                    getSundayCheckBox().setSelected(true);
-                                }
-                                else
-                                {
-                                    System.err.println("Sunday checkbox not selected!");
-                                    getSundayCheckBox().setSelected(false);
-                                }
-                            });
-                            break;
-                        }
-                        case MONDAY:
-                        {
-                            setMondayCheckBox(new JCheckBox(MONDAY.strValue.substring(0,1), false));
-                            getMondayCheckBox().setFont(Clock.font20);
-                            getMondayCheckBox().setBackground(Color.BLACK);
-                            getMondayCheckBox().setForeground(Color.WHITE);
-                            getMondayCheckBox().addActionListener(action -> {
-                                if (!getMondayCheckBox().isSelected())
-                                {
-                                    System.err.println("Monday checkbox selected!");
-                                    getMondayCheckBox().setSelected(true);
-                                }
-                                else
-                                {
-                                    System.err.println("Monday checkbox not selected!");
-                                    getMondayCheckBox().setSelected(false);
-                                }
-                            });
-                            break;
-                        }
-                        case TUESDAY:
-                        {
-                            setTuesdayCheckBox(new JCheckBox(TUESDAY.strValue.substring(0,1), false));
-                            getTuesdayCheckBox().setFont(Clock.font20);
-                            getTuesdayCheckBox().setBackground(Color.BLACK);
-                            getTuesdayCheckBox().setForeground(Color.WHITE);
-                            getTuesdayCheckBox().addActionListener(action -> {
-                                if (!getTuesdayCheckBox().isSelected())
-                                {
-                                    System.err.println("Tuesday checkbox selected!");
-                                    getTuesdayCheckBox().setSelected(true);
-                                }
-                                else
-                                {
-                                    System.err.println("Tuesday checkbox not selected!");
-                                    getTuesdayCheckBox().setSelected(false);
-                                }
-                            });
-                            break;
-                        }
-                        case WEDNESDAY:
-                        {
-                            setWednesdayCheckBox(new JCheckBox(WEDNESDAY.strValue.substring(0,1), false));
-                            getWednesdayCheckBox().setFont(Clock.font20);
-                            getWednesdayCheckBox().setBackground(Color.BLACK);
-                            getWednesdayCheckBox().setForeground(Color.WHITE);
-                            getWednesdayCheckBox().addActionListener(action -> {
-                                if (!getTuesdayCheckBox().isSelected())
-                                {
-                                    System.err.println("Wednesday checkbox selected!");
-                                    getWednesdayCheckBox().setSelected(true);
-                                }
-                                else
-                                {
-                                    System.err.println("Wednesday checkbox not selected!");
-                                    getWednesdayCheckBox().setSelected(false);
-                                }
-                            });
-                            break;
-                        }
-                        case THURSDAY:
-                        {
-                            setThursdayCheckBox(new JCheckBox(THURSDAY.strValue.substring(0,1), false));
-                            getThursdayCheckBox().setFont(Clock.font20);
-                            getThursdayCheckBox().setBackground(Color.BLACK);
-                            getThursdayCheckBox().setForeground(Color.WHITE);
-                            getThursdayCheckBox().addActionListener(action -> {
-                                if (!getThursdayCheckBox().isSelected())
-                                {
-                                    System.err.println("Thursday checkbox selected!");
-                                    getThursdayCheckBox().setSelected(true);
-                                }
-                                else
-                                {
-                                    System.err.println("Thursday checkbox not selected!");
-                                    getThursdayCheckBox().setSelected(false);
-                                }
-                            });
-                            break;
-                        }
-                        case FRIDAY:
-                        {
-                            setFridayCheckBox(new JCheckBox(FRIDAY.strValue.substring(0,1), false));
-                            getFridayCheckBox().setFont(Clock.font20);
-                            getFridayCheckBox().setBackground(Color.BLACK);
-                            getFridayCheckBox().setForeground(Color.WHITE);
-                            getFridayCheckBox().addActionListener(action -> {
-                                if (!getFridayCheckBox().isSelected())
-                                {
-                                    System.err.println("Friday checkbox selected!");
-                                    getFridayCheckBox().setSelected(true);
-                                }
-                                else
-                                {
-                                    System.err.println("Friday checkbox not selected!");
-                                    getFridayCheckBox().setSelected(false);
-                                }
-                            });
-                            break;
-                        }
-                        case SATURDAY:
-                        {
-                            setSaturdayCheckBox(new JCheckBox(SATURDAY.strValue.substring(0,1), false));
-                            getSaturdayCheckBox().setFont(Clock.font20);
-                            getSaturdayCheckBox().setBackground(Color.BLACK);
-                            getSaturdayCheckBox().setForeground(Color.WHITE);
-                            getSaturdayCheckBox().addActionListener(action -> {
-                                if (!getSaturdayCheckBox().isSelected())
-                                {
-                                    System.err.println("Saturday checkbox selected!");
-                                    getSaturdayCheckBox().setSelected(true);
-                                }
-                                else
-                                {
-                                    System.err.println("Saturday checkbox not selected!");
-                                    getSaturdayCheckBox().setSelected(false);
-                                }
-                            });
-                            break;
-                        }
-                        case WEEK:
-                        {
-                            setWeekCheckBox(new JCheckBox(WEEK.strValue.substring(0,1) + WEEK.strValue.substring(3), false));
-                            getWeekCheckBox().setFont(Clock.font20);
-                            getWeekCheckBox().setBackground(Color.BLACK);
-                            getWeekCheckBox().setForeground(Color.WHITE);
-                            getWeekCheckBox().addActionListener(action -> {
-                                if (!getWeekCheckBox().isSelected())
-                                {
-                                    System.err.println("Week checkbox selected!");
-                                    getWeekCheckBox().setSelected(true);
-                                }
-                                else
-                                {
-                                    System.err.println("Week checkbox not selected!");
-                                    getWeekCheckBox().setSelected(false);
-                                }
-                            });
-                            break;
-                        }
-                        case WEEKEND:
-                        {
-                            setWkendCheckBox(new JCheckBox(WEEKEND.strValue.substring(0,1) + WEEKEND.strValue.substring(6), false));
-                            getWkendCheckBox().setFont(Clock.font20);
-                            getWkendCheckBox().setBackground(Color.BLACK);
-                            getWkendCheckBox().setForeground(Color.WHITE);
-                            getWkendCheckBox().addActionListener(action -> {
-                                if (!getWkendCheckBox().isSelected())
-                                {
-                                    System.err.println("Weekend checkbox selected!");
-                                    getWkendCheckBox().setSelected(true);
-                                }
-                                else
-                                {
-                                    System.err.println("Weekend checkbox not selected!");
-                                    getWkendCheckBox().setSelected(false);
-                                }
-                            });
-                            break;
-                        }
-                        case ERROR:
-                        { break; }
-                        default: throw new InvalidInputException(Day.ERROR.strValue + ": " + day);
-                    }
-                }
+                    days.add(day); // defaulting days
             }
-            else // list of days
+            for(Day day : days )
             {
-                for(Day day : days )
-                {
-                    switch(day)
-                    {
-                        case SUNDAY:
-                        {
-                            setSundayCheckBox(new JCheckBox(SUNDAY.strValue.substring(0,2), false));
-                            getSundayCheckBox().setFont(Clock.font20);
-                            getSundayCheckBox().setBackground(Color.BLACK);
-                            getSundayCheckBox().setForeground(Color.WHITE);
-                            getSundayCheckBox().addActionListener(action -> {
-                                if (!getSundayCheckBox().isSelected())
-                                {
-                                    System.err.println("Sunday checkbox selected!");
-                                    getSundayCheckBox().setSelected(true);
-                                }
-                                else
-                                {
-                                    System.err.println("Sunday checkbox not selected!");
-                                    getSundayCheckBox().setSelected(false);
-                                }
-                            });
-                            break;
-                        }
-                        case MONDAY:
-                        {
-                            setMondayCheckBox(new JCheckBox(MONDAY.strValue.substring(0,1), false));
-                            getMondayCheckBox().setFont(Clock.font20);
-                            getMondayCheckBox().setBackground(Color.BLACK);
-                            getMondayCheckBox().setForeground(Color.WHITE);
-                            getMondayCheckBox().addActionListener(action -> {
-                                if (!getMondayCheckBox().isSelected())
-                                {
-                                    System.err.println("Monday checkbox selected!");
-                                    getMondayCheckBox().setSelected(true);
-                                }
-                                else
-                                {
-                                    System.err.println("Monday checkbox not selected!");
-                                    getMondayCheckBox().setSelected(false);
-                                }
-                            });
-                            break;
-                        }
-                        case TUESDAY:
-                        {
-                            setTuesdayCheckBox(new JCheckBox(TUESDAY.strValue.substring(0,1), false));
-                            getTuesdayCheckBox().setFont(Clock.font20);
-                            getTuesdayCheckBox().setBackground(Color.BLACK);
-                            getTuesdayCheckBox().setForeground(Color.WHITE);
-                            getTuesdayCheckBox().addActionListener(action -> {
-                                if (!getTuesdayCheckBox().isSelected())
-                                {
-                                    System.err.println("Tuesday checkbox selected!");
-                                    getTuesdayCheckBox().setSelected(true);
-                                }
-                                else
-                                {
-                                    System.err.println("Tuesday checkbox not selected!");
-                                    getTuesdayCheckBox().setSelected(false);
-                                }
-                            });
-                            break;
-                        }
-                        case WEDNESDAY:
-                        {
-                            setWednesdayCheckBox(new JCheckBox(WEDNESDAY.strValue.substring(0,1), false));
-                            getWednesdayCheckBox().setFont(Clock.font20);
-                            getWednesdayCheckBox().setBackground(Color.BLACK);
-                            getWednesdayCheckBox().setForeground(Color.WHITE);
-                            getWednesdayCheckBox().addActionListener(action -> {
-                                if (!getTuesdayCheckBox().isSelected())
-                                {
-                                    System.err.println("Wednesday checkbox selected!");
-                                    getWednesdayCheckBox().setSelected(true);
-                                }
-                                else
-                                {
-                                    System.err.println("Wednesday checkbox not selected!");
-                                    getWednesdayCheckBox().setSelected(false);
-                                }
-                            });
-                            break;
-                        }
-                        case THURSDAY:
-                        {
-                            setThursdayCheckBox(new JCheckBox(THURSDAY.strValue.substring(0,1), false));
-                            getThursdayCheckBox().setFont(Clock.font20);
-                            getThursdayCheckBox().setBackground(Color.BLACK);
-                            getThursdayCheckBox().setForeground(Color.WHITE);
-                            getThursdayCheckBox().addActionListener(action -> {
-                                if (!getThursdayCheckBox().isSelected())
-                                {
-                                    System.err.println("Thursday checkbox selected!");
-                                    getThursdayCheckBox().setSelected(true);
-                                }
-                                else
-                                {
-                                    System.err.println("Thursday checkbox not selected!");
-                                    getThursdayCheckBox().setSelected(false);
-                                }
-                            });
-                            break;
-                        }
-                        case FRIDAY:
-                        {
-                            setFridayCheckBox(new JCheckBox(FRIDAY.strValue.substring(0,1), false));
-                            getFridayCheckBox().setFont(Clock.font20);
-                            getFridayCheckBox().setBackground(Color.BLACK);
-                            getFridayCheckBox().setForeground(Color.WHITE);
-                            getFridayCheckBox().addActionListener(action -> {
-                                if (!getFridayCheckBox().isSelected())
-                                {
-                                    System.err.println("Friday checkbox selected!");
-                                    getFridayCheckBox().setSelected(true);
-                                }
-                                else
-                                {
-                                    System.err.println("Friday checkbox not selected!");
-                                    getFridayCheckBox().setSelected(false);
-                                }
-                            });
-                            break;
-                        }
-                        case SATURDAY:
-                        {
-                            setSaturdayCheckBox(new JCheckBox(SATURDAY.strValue.substring(0,1), false));
-                            getSaturdayCheckBox().setFont(Clock.font20);
-                            getSaturdayCheckBox().setBackground(Color.BLACK);
-                            getSaturdayCheckBox().setForeground(Color.WHITE);
-                            getSaturdayCheckBox().addActionListener(action -> {
-                                if (!getSaturdayCheckBox().isSelected())
-                                {
-                                    System.err.println("Saturday checkbox selected!");
-                                    getSaturdayCheckBox().setSelected(true);
-                                }
-                                else
-                                {
-                                    System.err.println("Saturday checkbox not selected!");
-                                    getSaturdayCheckBox().setSelected(false);
-                                }
-                            });
-                            break;
-                        }
-                        case WEEK:
-                        {
-                            setWeekCheckBox(new JCheckBox(WEEK.strValue.substring(0,1) + WEEK.strValue.substring(3), false));
-                            getWeekCheckBox().setFont(Clock.font20);
-                            getWeekCheckBox().setBackground(Color.BLACK);
-                            getWeekCheckBox().setForeground(Color.WHITE);
-                            getWeekCheckBox().addActionListener(action -> {
-                                if (!getWeekCheckBox().isSelected())
-                                {
-                                    System.err.println("Week checkbox selected!");
-                                    getWeekCheckBox().setSelected(true);
-                                }
-                                else
-                                {
-                                    System.err.println("Week checkbox not selected!");
-                                    getWeekCheckBox().setSelected(false);
-                                }
-                            });
-                            break;
-                        }
-                        case WEEKEND:
-                        {
-                            setWkendCheckBox(new JCheckBox(WEEKEND.strValue.substring(0,1) + WEEKEND.strValue.substring(6), false));
-                            getWkendCheckBox().setFont(Clock.font20);
-                            getWkendCheckBox().setBackground(Color.BLACK);
-                            getWkendCheckBox().setForeground(Color.WHITE);
-                            getWkendCheckBox().addActionListener(action -> {
-                                if (!getWkendCheckBox().isSelected())
-                                {
-                                    System.err.println("Weekend checkbox selected!");
-                                    getWkendCheckBox().setSelected(true);
-                                }
-                                else
-                                {
-                                    System.err.println("Weekend checkbox not selected!");
-                                    getWkendCheckBox().setSelected(false);
-                                }
-                            });
-                            break;
-                        }
-                        case ERROR:
-                        { break; }
-                        default: throw new InvalidInputException(Day.ERROR.strValue + ": " + day);
-                    }
-                }
+                createAndSetupCheckBoxes(day);
             }
         }
         catch (InvalidInputException iie)
         { printStackTrace(iie); }
-        finally
-        {
-            if (days == null)
-            {
-                System.err.println("Setting the default values");
-            }
-            else
-            {
-                System.err.println("Setting up based on provided list of days");
-            }
-        }
     }
-    @Deprecated
-    protected void createAndSetupCheckBoxes()
+    private void createAndSetupCheckBoxes(Day day) throws InvalidInputException
     {
-        createAndSetupCheckBoxes(null);
+        switch(day)
+        {
+            case SUNDAY:
+            {
+                setSundayCheckBox(new JCheckBox(SUNDAY.strValue.substring(0,2), false));
+                getSundayCheckBox().setFont(Clock.font20);
+                getSundayCheckBox().setBackground(Color.BLACK);
+                getSundayCheckBox().setForeground(Color.WHITE);
+                getSundayCheckBox().addActionListener(action -> {
+                    if (!getSundayCheckBox().isSelected())
+                    {
+                        System.err.println("Sunday checkbox not selected!");
+                        getSundayCheckBox().setSelected(false);
+                    }
+                    else
+                    {
+                        System.err.println("Sunday checkbox selected!");
+                        getSundayCheckBox().setSelected(true);
+                    }
+                });
+                break;
+            }
+            case MONDAY:
+            {
+                setMondayCheckBox(new JCheckBox(MONDAY.strValue.substring(0,1), false));
+                getMondayCheckBox().setFont(Clock.font20);
+                getMondayCheckBox().setBackground(Color.BLACK);
+                getMondayCheckBox().setForeground(Color.WHITE);
+                getMondayCheckBox().addActionListener(action -> {
+                    if (!getMondayCheckBox().isSelected())
+                    {
+                        System.err.println("Monday checkbox not selected!");
+                        getMondayCheckBox().setSelected(false);
+                    }
+                    else
+                    {
+                        System.err.println("Monday checkbox selected!");
+                        getMondayCheckBox().setSelected(true);
+                    }
+                });
+                break;
+            }
+            case TUESDAY:
+            {
+                setTuesdayCheckBox(new JCheckBox(TUESDAY.strValue.substring(0,1), false));
+                getTuesdayCheckBox().setFont(Clock.font20);
+                getTuesdayCheckBox().setBackground(Color.BLACK);
+                getTuesdayCheckBox().setForeground(Color.WHITE);
+                getTuesdayCheckBox().addActionListener(action -> {
+                    if (!getTuesdayCheckBox().isSelected())
+                    {
+                        System.err.println("Tuesday checkbox not selected!");
+                        getTuesdayCheckBox().setSelected(false);
+                    }
+                    else
+                    {
+                        System.err.println("Tuesday checkbox selected!");
+                        getTuesdayCheckBox().setSelected(true);
+                    }
+                });
+                break;
+            }
+            case WEDNESDAY:
+            {
+                setWednesdayCheckBox(new JCheckBox(WEDNESDAY.strValue.substring(0,1), false));
+                getWednesdayCheckBox().setFont(Clock.font20);
+                getWednesdayCheckBox().setBackground(Color.BLACK);
+                getWednesdayCheckBox().setForeground(Color.WHITE);
+                getWednesdayCheckBox().addActionListener(action -> {
+                    if (!getWednesdayCheckBox().isSelected())
+                    {
+                        System.err.println("Wednesday checkbox not selected!");
+                        getWednesdayCheckBox().setSelected(false);
+                    }
+                    else
+                    {
+                        System.err.println("Wednesday checkbox selected!");
+                        getWednesdayCheckBox().setSelected(true);
+                    }
+                });
+                break;
+            }
+            case THURSDAY:
+            {
+                setThursdayCheckBox(new JCheckBox(THURSDAY.strValue.substring(0,1), false));
+                getThursdayCheckBox().setFont(Clock.font20);
+                getThursdayCheckBox().setBackground(Color.BLACK);
+                getThursdayCheckBox().setForeground(Color.WHITE);
+                getThursdayCheckBox().addActionListener(action -> {
+                    if (!getThursdayCheckBox().isSelected())
+                    {
+                        System.err.println("Thursday checkbox not selected!");
+                        getThursdayCheckBox().setSelected(false);
+                    }
+                    else
+                    {
+                        System.err.println("Thursday checkbox selected!");
+                        getThursdayCheckBox().setSelected(true);
+                    }
+                });
+                break;
+            }
+            case FRIDAY:
+            {
+                setFridayCheckBox(new JCheckBox(FRIDAY.strValue.substring(0,1), false));
+                getFridayCheckBox().setFont(Clock.font20);
+                getFridayCheckBox().setBackground(Color.BLACK);
+                getFridayCheckBox().setForeground(Color.WHITE);
+                getFridayCheckBox().addActionListener(action -> {
+                    if (!getFridayCheckBox().isSelected())
+                    {
+                        System.err.println("Friday checkbox not selected!");
+                        getFridayCheckBox().setSelected(false);
+                    }
+                    else
+                    {
+                        System.err.println("Friday checkbox selected!");
+                        getFridayCheckBox().setSelected(true);
+                    }
+                });
+                break;
+            }
+            case SATURDAY:
+            {
+                setSaturdayCheckBox(new JCheckBox(SATURDAY.strValue.substring(0,1), false));
+                getSaturdayCheckBox().setFont(Clock.font20);
+                getSaturdayCheckBox().setBackground(Color.BLACK);
+                getSaturdayCheckBox().setForeground(Color.WHITE);
+                getSaturdayCheckBox().addActionListener(action -> {
+                    if (!getSaturdayCheckBox().isSelected())
+                    {
+                        System.err.println("Saturday checkbox not selected!");
+                        getSaturdayCheckBox().setSelected(false);
+                    }
+                    else
+                    {
+                        System.err.println("Saturday checkbox selected!");
+                        getSaturdayCheckBox().setSelected(true);
+                    }
+                });
+                break;
+            }
+            case WEEK:
+            {
+                setWeekCheckBox(new JCheckBox(WEEK.strValue.substring(0,1) + WEEK.strValue.substring(3), false));
+                getWeekCheckBox().setFont(Clock.font20);
+                getWeekCheckBox().setBackground(Color.BLACK);
+                getWeekCheckBox().setForeground(Color.WHITE);
+                getWeekCheckBox().addActionListener(action -> {
+                    if (!getWeekCheckBox().isSelected())
+                    {
+                        System.err.println("Week checkbox not selected!");
+                        getWeekCheckBox().setSelected(false);
+                        getMondayCheckBox().setSelected(false);
+                        getTuesdayCheckBox().setSelected(false);
+                        getWednesdayCheckBox().setSelected(false);
+                        getThursdayCheckBox().setSelected(false);
+                        getFridayCheckBox().setSelected(false);
+                    }
+                    else
+                    {
+                        System.err.println("Week checkbox selected!");
+                        getWeekCheckBox().setSelected(true);
+                        getMondayCheckBox().setSelected(true);
+                        getTuesdayCheckBox().setSelected(true);
+                        getWednesdayCheckBox().setSelected(true);
+                        getThursdayCheckBox().setSelected(true);
+                        getFridayCheckBox().setSelected(true);
+                    }
+                });
+                break;
+            }
+            case WEEKEND:
+            {
+                setWkendCheckBox(new JCheckBox(WEEKEND.strValue.substring(0,1) + WEEKEND.strValue.substring(6), false));
+                getWkendCheckBox().setFont(Clock.font20);
+                getWkendCheckBox().setBackground(Color.BLACK);
+                getWkendCheckBox().setForeground(Color.WHITE);
+                getWkendCheckBox().addActionListener(action -> {
+                    if (!getWkendCheckBox().isSelected())
+                    {
+                        System.err.println("Weekend checkbox not selected!");
+                        getWkendCheckBox().setSelected(false);
+                        getSaturdayCheckBox().setSelected(false);
+                        getSundayCheckBox().setSelected(false);
+                    }
+                    else
+                    {
+                        System.err.println("Weekend checkbox selected!");
+                        getWkendCheckBox().setSelected(true);
+                        getSaturdayCheckBox().setSelected(true);
+                        getSundayCheckBox().setSelected(true);
+                    }
+                });
+                break;
+            }
+            case ERROR:
+            { break; }
+            default: throw new InvalidInputException(Day.ERROR.strValue + ": " + day);
+        }
     }
     protected void addAlarmMenuItemFromAlarm(Clock alarm)
     {
@@ -1049,6 +882,79 @@ public class AlarmPanel extends JPanel implements Panels {
             getJTextArea().append(alarm.getTimeAsStr());
         }
     }
+    protected void resetJCheckboxes(ArrayList<Day> days, boolean set)
+    {
+        if (null == days)
+        {
+            for(Day day : Day.values())
+            {
+                resetJCheckbox(day, false);
+            }
+        }
+        else
+        {
+            for(Day day : days)
+            {
+                resetJCheckbox(day, set);
+            }
+        }
+    }
+    protected void resetJCheckbox(Day day, boolean set)
+    {
+        switch(day)
+        {
+            case SUNDAY:
+            {
+                getSundayCheckBox().setSelected(set);
+                break;
+            }
+            case MONDAY:
+            {
+                getMondayCheckBox().setSelected(set);
+                break;
+            }
+            case TUESDAY:
+            {
+                getTuesdayCheckBox().setSelected(set);
+                break;
+            }
+            case WEDNESDAY:
+            {
+                getWednesdayCheckBox().setSelected(set);
+                break;
+            }
+            case THURSDAY:
+            {
+                getThursdayCheckBox().setSelected(set);
+                break;
+            }
+            case FRIDAY:
+            {
+                getFridayCheckBox().setSelected(set);
+                break;
+            }
+            case SATURDAY:
+            {
+                getSaturdayCheckBox().setSelected(set);
+                break;
+            }
+            case WEEK:
+            {
+                getWeekCheckBox().setSelected(set);
+                break;
+            }
+            case WEEKEND:
+            {
+                getWkendCheckBox().setSelected(set);
+                break;
+            }
+            case ERROR: break;
+            default:
+            {
+                System.err.println(Day.ERROR.strValue + " : " + day);
+            }
+        }
+    }
     /**
      * Creates an alarm and sets the latest one created as the currentAlarm
      * defined in setAlarm
@@ -1075,26 +981,26 @@ public class AlarmPanel extends JPanel implements Panels {
         { daysSelected.add(TUESDAY); }
         if (getWednesdayCheckBox().isSelected())
         { daysSelected.add(WEDNESDAY); }
-        if (getThursdayCheckBox().isEnabled())
+        if (getThursdayCheckBox().isSelected())
         { daysSelected.add(THURSDAY); }
-        if (getFridayCheckBox().isEnabled())
+        if (getFridayCheckBox().isSelected())
         { daysSelected.add(FRIDAY); }
-        if (getSaturdayCheckBox().isEnabled())
+        if (getSaturdayCheckBox().isSelected())
         { daysSelected.add(SATURDAY); }
-        if (getSundayCheckBox().isEnabled())
+        if (getSundayCheckBox().isSelected())
         { daysSelected.add(SUNDAY); }
-        if (getWeekCheckBox().isEnabled())
+        if (getWeekCheckBox().isSelected())
         {
-            daysSelected.add(MONDAY);
-            daysSelected.add(TUESDAY);
-            daysSelected.add(WEDNESDAY);
-            daysSelected.add(THURSDAY);
-            daysSelected.add(FRIDAY);
+            if (!daysSelected.contains(MONDAY)) daysSelected.add(MONDAY);
+            if (!daysSelected.contains(TUESDAY)) daysSelected.add(TUESDAY);
+            if (!daysSelected.contains(WEDNESDAY)) daysSelected.add(WEDNESDAY);
+            if (!daysSelected.contains(THURSDAY)) daysSelected.add(THURSDAY);
+            if (!daysSelected.contains(FRIDAY)) daysSelected.add(FRIDAY);
         }
-        if (getWkendCheckBox().isEnabled())
+        if (getWkendCheckBox().isSelected())
         {
-            daysSelected.add(SATURDAY);
-            daysSelected.add(SUNDAY);
+            if (!daysSelected.contains(SATURDAY)) daysSelected.add(SATURDAY);
+            if (!daysSelected.contains(SUNDAY)) daysSelected.add(SUNDAY);
         }
         return daysSelected;
     }
@@ -1102,9 +1008,9 @@ public class AlarmPanel extends JPanel implements Panels {
     {
         // reset to default
         if (null == days)
-            createAndSetupCheckBoxes(null);
+            setupCheckboxBasedOnDay(null);
         else
-            createAndSetupCheckBoxes(days);
+            setupCheckboxBasedOnDay(days);
     }
     public void createAlarm(Alarm alarm)
     {
@@ -1125,6 +1031,23 @@ public class AlarmPanel extends JPanel implements Panels {
         alarmItem.setBackground(Color.BLACK);
         getClock().getClockMenuBar().getAlarmFeature_Menu().add(alarmItem);
         setupCreatedAlarmsFunctionality();
+    }
+    public void triggerAlarm()
+    {
+        setAlarmIsGoingOff(true);
+        Runnable r = () -> {
+            try
+            {
+                getClock().getAlarmPanel().setupMusicPlayer();
+                getClock().getAlarmPanel().getMusicPlayer().play(50);
+            }
+            catch (Exception e)
+            {
+                System.err.println("An exception occurred while playing music: " + e.getMessage());
+                printStackTrace(e);
+            }
+        };
+        r.run();
     }
     public void addComponent(Component cpt, int gridy, int gridx, double gwidth, double gheight, int ipadx, int ipady, int fill)
     {

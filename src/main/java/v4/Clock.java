@@ -45,7 +45,7 @@ public class Clock extends JFrame {
     protected static final Font font10 = new Font("Courier New", Font.BOLD, 10);
     // Main GUI Components
     // For displaying faces on main display
-    protected Panels facePanel;
+    protected ClockFace facePanel;
     protected ClockMenuBar menuBar;
     protected ClockPanel clockPanel;
     protected AlarmPanel alarmPanel;
@@ -71,7 +71,7 @@ public class Clock extends JFrame {
     protected boolean showMilitaryTime = false;
     protected ArrayList<Alarm> listOfAlarms;
     // Getters/Issers
-    public Panels getFacePanel() { return this.facePanel; }
+    public ClockFace getFacePanel() { return this.facePanel; }
     public ClockMenuBar getClockMenuBar() { return this.menuBar; }
     public ClockPanel getClockPanel() { return this.clockPanel; }
     public AlarmPanel getAlarmPanel() { return this.alarmPanel; }
@@ -115,7 +115,7 @@ public class Clock extends JFrame {
     public boolean isShowMilitaryTime() { return this.showMilitaryTime; }
     public ArrayList<Alarm> getListOfAlarms() { return this.listOfAlarms; }
     // Setters
-    protected void setFacePanel(Panels facePanel) { this.facePanel = facePanel; }
+    protected void setFacePanel(ClockFace facePanel) { this.facePanel = facePanel; }
     protected void setClockMenuBar(ClockMenuBar menuBar) { this.menuBar = menuBar; }
     protected void setAlarmPanel(AlarmPanel alarmPanel) { this.alarmPanel = alarmPanel; }
     protected void setClockPanel(ClockPanel clockPanel) { this.clockPanel = clockPanel; }
@@ -184,12 +184,13 @@ public class Clock extends JFrame {
         setMonth(clock.getMonth());
         setDate(clock.getDate());
         setYear(clock.getYear());
-        setFacePanel(new ClockPanel(this));
-        setClockPanel((ClockPanel)getFacePanel());
+        setFacePanel(ClockFace.ClockFace);
+        setClockPanel(new ClockPanel(this));
         setClockFace(ClockFace.ClockFace);
         pack();
-        add((Component) getFacePanel());
+        add(getClockPanel());
     }
+    // main constructor
     public Clock() throws ParseException
     {
         super();
@@ -203,13 +204,13 @@ public class Clock extends JFrame {
         setSecondsAsStr("");
         setMinutesAsStr("");
         setDefaultClockValues(getHours(), getMinutes(), getSeconds(), getMonth(), getDay(), getDate(), getYear(), getAMPM());
-        setFacePanel(new ClockPanel(this));
-        setClockPanel((ClockPanel)getFacePanel());
+        setFacePanel(ClockFace.ClockFace);
+        setClockPanel(new ClockPanel(this));
         setAlarmPanel(new AlarmPanel(this));
         setClockFace(ClockFace.ClockFace);
         setRemainingDefaultValues();
         pack();
-        add((Component) getFacePanel());
+        add(getClockPanel());
     }
     public Clock(int hours, int minutes, int seconds, Time.Month month, Time.Day day, int date, int year, Time.AMPM ampm) throws ParseException
     {
@@ -222,11 +223,11 @@ public class Clock extends JFrame {
         setMinutes(minutes);
         setHours(hours);
         setDefaultClockValues(hours, minutes, seconds, month, day, date, year, ampm);
-        setFacePanel(new ClockPanel(this));
-        setClockPanel((ClockPanel)getFacePanel());
+        setFacePanel(ClockFace.ClockFace);
+        setClockPanel(new ClockPanel(this));
         setClockFace(ClockFace.ClockFace);
         pack();
-        add((Component) getFacePanel());
+        add(getClockPanel());
     }
 //    static class Alarm extends Clock
 //    {
@@ -731,25 +732,16 @@ public class Clock extends JFrame {
         });
         // Features Actions for Features menu
         getClockMenuBar().getClockFeature().addActionListener(action -> {
-            if (getClockFace() != ClockFace.ClockFace)
-            {
-                changeToClockPanel();
-            }
-            else
-            {
-                System.err.println("Trying to change to clock panel but already showing ClockFace");
-            }
+            changeToClockPanel();
         });
         getClockMenuBar().getSetAlarms().addActionListener(action -> {
+
             getAlarmPanel().getJTextField1().setText("");
             getAlarmPanel().getJTextField2().setText("");
             getAlarmPanel().getJTextField3().setText("");
             getAlarmPanel().resetJTextArea();
-            try
-                { getAlarmPanel().setCheckBoxesBasedOnDays(null); }
-                catch (InvalidInputException iie)
-                { /**/ }
-                changeToAlarmPanel();
+            getAlarmPanel().resetJCheckboxes(null, false);
+            changeToAlarmPanel();
             });
         // Add both menus to main menu
         getClockMenuBar().add(getClockMenuBar().getSettingsMenu());
@@ -759,22 +751,18 @@ public class Clock extends JFrame {
     }
     public void changeToClockPanel()
     {
-        setAlarmPanel((AlarmPanel)getFacePanel()); // is this correct
-        remove((Component) getFacePanel());
-        setClockFace(ClockFace.ClockFace);
-        setFacePanel(getClockPanel());
-        setClockPanel((ClockPanel)getFacePanel());
-        add((Component) getFacePanel());
+        remove(getAlarmPanel());
+        setFacePanel(ClockFace.ClockFace);
+        add(getClockPanel());
         this.repaint();
         this.setVisible(true);
     }
     public void changeToAlarmPanel()
     {
-        remove((Component) getFacePanel());
-        setClockFace(ClockFace.AlarmFace);
-        setFacePanel(getAlarmPanel());
+        remove(getClockPanel());
+        setFacePanel(ClockFace.AlarmFace);
         if (getAlarmPanel().getMusicPlayer() != null) { getAlarmPanel().setMusicPlayer(null); }
-        add((Component) getFacePanel());
+        add(getAlarmPanel());
         this.repaint();
         this.setVisible(true);
     }
@@ -860,29 +848,12 @@ public class Clock extends JFrame {
             System.out.println("\talarm: " + getListOfAlarms().get(i).getTimeAsStr());
         }
     }
-    public static void main(String[] args) throws ParseException, InterruptedException
+    protected void printStackTrace(Exception e)
     {
-        Clock clock = new Clock();
-        clock.setVisible(true);
-        clock.getContentPane().setBackground(Color.BLACK);
-        clock.setSize(defaultSize);
-        clock.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        clock.setBounds(200, 200, 700, 300);
-        try
+        System.err.println(e.getMessage());
+        for(StackTraceElement ste : e.getStackTrace())
         {
-            while (true)
-            {
-                clock.tick();
-                // check alarms
-                sleep(250);
-                clock.getAlarmPanel().checkIfAnyAlarmsAreGoingOff();
-                sleep(750);
-            }
-        }
-        catch (Exception e)
-        {
-            for(StackTraceElement ste : e.getStackTrace())
-            { System.err.println(ste); }
+            System.out.println(ste.toString());
         }
     }
 }

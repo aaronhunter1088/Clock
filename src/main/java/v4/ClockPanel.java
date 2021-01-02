@@ -16,7 +16,7 @@ import java.util.Date;
  * @author michael ball
  * @version 2.4
  */
-public class ClockPanel extends JPanel implements Panels {
+public class ClockPanel extends JPanel implements IClockFace {
 
     private GridBagLayout layout;
     private GridBagConstraints constraints;

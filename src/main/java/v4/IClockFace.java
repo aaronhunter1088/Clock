@@ -8,7 +8,7 @@ package v4;
  * @author Michael Ball
  * @version 4
  */
-public interface Panels {
+public interface IClockFace {
 
     void updateLabels();
     void addComponentsToPanel();
