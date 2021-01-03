@@ -3,10 +3,12 @@ package v4;
 import javazoom.jl.decoder.JavaLayerException;
 import javazoom.jl.player.advanced.AdvancedPlayer;
 import org.apache.commons.lang.StringUtils;
+import org.springframework.lang.Nullable;
 
 import javax.sound.sampled.AudioInputStream;
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.*;
 import java.io.InputStream;
 import java.text.ParseException;
 import java.util.*;
@@ -45,16 +47,15 @@ public class AlarmPanel extends JPanel implements IClockFace {
     private JLabel jalarmLbl2 = new JLabel("M", SwingConstants.CENTER); // M
     private JLabel jalarmLbl3 = new JLabel("T", SwingConstants.CENTER); // Time (AM/PM)
     private JLabel jalarmLbl4 = new JLabel("Current Alarms", SwingConstants.CENTER); // Current Alarms;
-    private JCheckBox mondayCheckBox = null; //new JCheckBox("M");
-    private JCheckBox tuesdayCheckBox = null; //new JCheckBox("T");
-    private JCheckBox wednesdayCheckBox = null; //new JCheckBox("W");
-    private JCheckBox thursdayCheckBox = null; //new JCheckBox("Th");
-    private JCheckBox fridayCheckBox = null; //new JCheckBox("F");
-    private JCheckBox saturdayCheckBox = null; //new JCheckBox("Sa");
-    private JCheckBox sundayCheckBox = null; //new JCheckBox("Su");
-    private JCheckBox weekCheckBox = null; //new JCheckBox("Wk");
-    private JCheckBox wkendCheckBox = null; //new JCheckBox("Wd");
-    //private ButtonGroup checkBoxes =  new ButtonGroup();
+    private JCheckBox mondayCheckBox = null;
+    private JCheckBox tuesdayCheckBox = null;
+    private JCheckBox wednesdayCheckBox = null;
+    private JCheckBox thursdayCheckBox = null;
+    private JCheckBox fridayCheckBox = null;
+    private JCheckBox saturdayCheckBox = null;
+    private JCheckBox sundayCheckBox = null;
+    private JCheckBox weekCheckBox = null;
+    private JCheckBox wkendCheckBox = null;
     private JTextField jtextField1 = new JTextField(2); // Hour textField
     private JTextField jtextField2 = new JTextField(2); // Min textField
     private JTextField jtextField3 = new JTextField(2); // Time textField
@@ -68,7 +69,7 @@ public class AlarmPanel extends JPanel implements IClockFace {
     private boolean alarmIsGoingOff;
     private AdvancedPlayer musicPlayer;
 
-    public AlarmPanel(Clock clock) throws ParseException
+    public AlarmPanel(Clock clock)
     {
         super();
         setClock(clock);
@@ -82,7 +83,6 @@ public class AlarmPanel extends JPanel implements IClockFace {
         setupAlarmButton();
         setupMusicPlayer();
         addComponentsToPanel();
-        //setBorder(BorderFactory.createLineBorder(Color.BLACK));
     }
 
     // Getters
@@ -189,13 +189,13 @@ public class AlarmPanel extends JPanel implements IClockFace {
         getJAlarmLbl2().setForeground(Color.WHITE);
         getJAlarmLbl3().setForeground(Color.WHITE);
         getJAlarmLbl4().setForeground(Color.WHITE);
+        // setup textarea
         setJTextArea(new JTextArea(2, 4));
         getJTextArea().setFont(Clock.font10); // message
         getJTextArea().setVisible(true);
         getJTextArea().setEditable(false);
         getJTextArea().setLineWrap(false);
         getJTextArea().setWrapStyleWord(false);
-        getJTextArea().setText("message");
         getJTextArea().setBackground(Color.BLACK);
         getJTextArea().setForeground(Color.WHITE);
         // setup scrollPane
@@ -207,8 +207,6 @@ public class AlarmPanel extends JPanel implements IClockFace {
         // setup Set button
         setJSetAlarmButton(new JButton("Set"));
         getJSetAlarmButton().setFont(Clock.font20);
-        //getJSetAlarmButton().setBorder(BorderFactory.createLineBorder(Color.WHITE));
-        //getJSetAlarmButton().setBorderPainted(true);
         getJSetAlarmButton().setOpaque(true);
         getJSetAlarmButton().setBackground(Color.BLACK);
         getJSetAlarmButton().setForeground(Color.BLACK);
@@ -362,19 +360,7 @@ public class AlarmPanel extends JPanel implements IClockFace {
                     // we are updating an alarm by clicking on it in the menuBar
                     else if (null != getAlarm() && getAlarm().isUpdateAlarm())
                     {
-                        System.out.println("Updating an alarm: " + menuItem.getText());
-                        getJTextField1().setText(menuItem.getText().substring(0,2));
-                        getJTextField2().setText(menuItem.getText().substring(3,5));
-                        getJTextField3().setText(menuItem.getText().substring(9));
-                        setUpdatingAlarm(true);
-                        // remove alarm from list of alarms
-                        deleteAlarmMenuItemFromViewAlarms(getAlarm());
-                        System.err.println("Size of listOfAlarms before removing " + getClock().getListOfAlarms().size());
-                        getClock().getListOfAlarms().remove(getAlarm());
-                        System.err.println("Size of listOfAlarms after removing " + getClock().getListOfAlarms().size());
-                        resetJTextArea();
-                        resetJCheckboxes(getAlarm().getDays(), true);
-                        getJAlarmLbl4().setText("Updating alarm");
+                        updateTheAlarm(menuItem);
                     }
                     else // when is this reachable
                     {
@@ -396,7 +382,26 @@ public class AlarmPanel extends JPanel implements IClockFace {
             }
         }
     }
-    public void setupAlarmButton()
+    protected void updateTheAlarm(@Nullable JMenuItem menuItem)
+    {
+        if (null != menuItem)
+        {
+            System.out.println("Updating an alarm: " + menuItem.getText());
+            getJTextField1().setText(menuItem.getText().substring(0,2));
+            getJTextField2().setText(menuItem.getText().substring(3,5));
+            getJTextField3().setText(menuItem.getText().substring(9));
+        }
+        setUpdatingAlarm(true);
+        // remove alarm from list of alarms
+        deleteAlarmMenuItemFromViewAlarms(getAlarm());
+        System.err.println("Size of listOfAlarms before removing " + getClock().getListOfAlarms().size());
+        getClock().getListOfAlarms().remove(getAlarm());
+        System.err.println("Size of listOfAlarms after removing " + getClock().getListOfAlarms().size());
+        resetJTextArea();
+        resetJCheckboxes(getAlarm().getDays(), true);
+        getJAlarmLbl4().setText("Updating alarm");
+    }
+    protected void setupAlarmButton()
     {
         getJSetAlarmButton().addActionListener(action ->
         {

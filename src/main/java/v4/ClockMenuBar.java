@@ -3,6 +3,7 @@ package v4;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.InputEvent;
+import java.awt.event.KeyEvent;
 
 import static v4.Clock.*;
 
@@ -50,11 +51,11 @@ public class ClockMenuBar extends JMenuBar {
         setAlarmFeature_Menu(new JMenu("View Alarms"));
         setClockFeature(new JMenuItem("View Clock"));
         getClockFeature().setAccelerator(KeyStroke.getKeyStroke(
-                java.awt.event.KeyEvent.VK_C, InputEvent.CTRL_DOWN_MASK));
+                KeyEvent.VK_C, InputEvent.CTRL_DOWN_MASK));
 
         setSetAlarms(new JMenuItem("Set Alarms"));
         getSetAlarms().setAccelerator(KeyStroke.getKeyStroke(
-            java.awt.event.KeyEvent.VK_A, InputEvent.CTRL_DOWN_MASK));
+                KeyEvent.VK_A, InputEvent.CTRL_DOWN_MASK));
         // Add options to Settings Menu
         getSettingsMenu().add(getMilitaryTimeSetting());
         getSettingsMenu().add(getFullTimeSetting());

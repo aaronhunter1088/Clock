@@ -692,6 +692,7 @@ public class Clock extends JFrame {
             // updatePanel
             pack();
         });
+        getClockMenuBar().getMilitaryTimeSetting().setMnemonic('M');
         getClockMenuBar().getFullTimeSetting().addActionListener(action -> {
             if (isShowFullDate())
             {
@@ -711,6 +712,7 @@ public class Clock extends JFrame {
             // updatePanel
             pack();
         });
+        getClockMenuBar().getFullTimeSetting().setMnemonic('T');
         getClockMenuBar().getPartialTimeSetting().addActionListener(action -> {
             if (isShowPartialDate())
             {
@@ -730,6 +732,7 @@ public class Clock extends JFrame {
             // updatePanel
             pack();
         });
+        getClockMenuBar().getPartialTimeSetting().setMnemonic('P');
         // Features Actions for Features menu
         getClockMenuBar().getClockFeature().addActionListener(action -> {
             changeToClockPanel();
