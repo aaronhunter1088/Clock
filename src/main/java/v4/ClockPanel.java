@@ -23,8 +23,9 @@ public class ClockPanel extends JPanel implements IClockFace {
     private JLabel jlbl1 = new JLabel("", SwingConstants.CENTER);
     private JLabel jlbl2 = new JLabel("", SwingConstants.CENTER);
     private Clock clock;
-
-    public ClockPanel(Clock clock) {
+    // Constructor
+    public ClockPanel(Clock clock)
+    {
         setClock(clock);
         setMinimumSize(Clock.defaultSize);
         setGridBagLayout(new GridBagLayout());
@@ -36,21 +37,18 @@ public class ClockPanel extends JPanel implements IClockFace {
         setupClockPanel(getClock());
         addComponentsToPanel();
     }
-
     // Getters
     public GridBagLayout getGridBagLayout() { return this.layout; }
     public GridBagConstraints getGridBagConstraints() { return this.constraints; }
     public Clock getClock() { return this.clock; }
     public JLabel getJlbl1() { return this.jlbl1; }
     public JLabel getJlbl2() { return this.jlbl2; }
-
     // Setters
     private void setGridBagLayout(GridBagLayout layout) { this.layout = layout; }
     private void setGridBagConstraints(GridBagConstraints constraints) { this.constraints = constraints; }
     private void setClock(Clock clock) { this.clock = clock; }
     public void setJlbl1(JLabel jlbl1) { this.jlbl1 = jlbl1; }
     public void setJlbl2(JLabel jlbl2) { this.jlbl2 = jlbl2; }
-
     // Helper methods
     public void setupClockPanel(Clock clock)
     {
@@ -79,6 +77,19 @@ public class ClockPanel extends JPanel implements IClockFace {
         getJlbl2().setForeground(Color.WHITE);
         getClock().repaint();
     }
+    public void printStackTrace(Exception e, String message)
+    {
+        if (null != message)
+            System.err.println(message);
+        else
+            System.err.println(e.getMessage());
+        for(StackTraceElement ste : e.getStackTrace())
+        {
+            System.out.println(ste.toString());
+        }
+    }
+    protected void printStackTrace(Exception e)
+    { printStackTrace(e, ""); }
     public void addComponent(Component cpt, int gridy, int gridx, double gwidth, double gheight, int ipadx, int ipady)
     {
         getGridBagConstraints().gridx = gridx;

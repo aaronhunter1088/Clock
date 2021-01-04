@@ -49,6 +49,7 @@ public class Clock extends JFrame {
     protected ClockMenuBar menuBar;
     protected ClockPanel clockPanel;
     protected AlarmPanel alarmPanel;
+    protected TimerPanel timerPanel;
     protected Date beginDaylightSavingsTimeDate;
     protected Date endDaylightSavingsTimeDate;
     protected Calendar calendar;
@@ -75,6 +76,7 @@ public class Clock extends JFrame {
     public ClockMenuBar getClockMenuBar() { return this.menuBar; }
     public ClockPanel getClockPanel() { return this.clockPanel; }
     public AlarmPanel getAlarmPanel() { return this.alarmPanel; }
+    public TimerPanel getTimerPanel() { return this.timerPanel; }
     public Date getBeginDaylightSavingsTimeDate() { return this.beginDaylightSavingsTimeDate; }
     public Date getEndDaylightSavingsTimeDate() { return this.endDaylightSavingsTimeDate; }
     public Calendar getCalendar() { return this.calendar; }
@@ -89,7 +91,6 @@ public class Clock extends JFrame {
     public String getHoursAsStr() { return this.hoursAsStr; }
     public String getMinutesAsStr() { return this.minutesAsStr; }
     public String getSecondsAsStr() { return this.secondsAsStr; }
-
     /**
      * This method returns the clock's current hour, minute, second, and time.
      * It can also be used to get the alarm's time set value
@@ -117,8 +118,9 @@ public class Clock extends JFrame {
     // Setters
     protected void setFacePanel(ClockFace facePanel) { this.facePanel = facePanel; }
     protected void setClockMenuBar(ClockMenuBar menuBar) { this.menuBar = menuBar; }
-    protected void setAlarmPanel(AlarmPanel alarmPanel) { this.alarmPanel = alarmPanel; }
     protected void setClockPanel(ClockPanel clockPanel) { this.clockPanel = clockPanel; }
+    protected void setAlarmPanel(AlarmPanel alarmPanel) { this.alarmPanel = alarmPanel; }
+    protected void setTimerPanel(TimerPanel timerPanel) { this.timerPanel = timerPanel; }
     protected void setBeginDaylightSavingsTimeDate(Date beginDaylightSavingsTimeDate) { this.beginDaylightSavingsTimeDate = beginDaylightSavingsTimeDate; }
     protected void setEndDaylightSavingsTimeDate(Date endDaylightSavingsTimeDate) { this.endDaylightSavingsTimeDate = endDaylightSavingsTimeDate; }
     protected void setCalendar(Calendar calendar) { this.calendar = calendar; }
@@ -207,6 +209,7 @@ public class Clock extends JFrame {
         setFacePanel(ClockFace.ClockFace);
         setClockPanel(new ClockPanel(this));
         setAlarmPanel(new AlarmPanel(this));
+        setTimerPanel(new TimerPanel(this));
         setClockFace(ClockFace.ClockFace);
         setRemainingDefaultValues();
         pack();
@@ -229,16 +232,6 @@ public class Clock extends JFrame {
         pack();
         add(getClockPanel());
     }
-//    static class Alarm extends Clock
-//    {
-//        public Alarm(Clock clock, int hours, boolean isUpdateAlarm) throws ParseException
-//        {
-//            super(clock);
-//            setHours(hours);
-//            setUpdateAlarm(isUpdateAlarm);
-//        }
-//    }
-
     // Helper methods
     public void setRemainingDefaultValues()
     {
@@ -619,6 +612,10 @@ public class Clock extends JFrame {
         {
             defaultText = "No Alarms";
         }
+        else if (labelVersion == 7)
+        {
+            defaultText = "S";
+        }
         return defaultText;
     }
     public Time.Day convertIntToTimeDay(int thisDay)
@@ -746,6 +743,9 @@ public class Clock extends JFrame {
             getAlarmPanel().resetJCheckboxes(null, false);
             changeToAlarmPanel();
             });
+        getClockMenuBar().getTimerFeature().addActionListener(action -> {
+            changeToTimerPanel();
+        });
         // Add both menus to main menu
         getClockMenuBar().add(getClockMenuBar().getSettingsMenu());
         getClockMenuBar().add(getClockMenuBar().getFeaturesMenu());
@@ -754,7 +754,10 @@ public class Clock extends JFrame {
     }
     public void changeToClockPanel()
     {
-        remove(getAlarmPanel());
+        if (getFacePanel() == ClockFace.TimerFace)
+            remove(getTimerPanel());
+        else if (getFacePanel() == ClockFace.AlarmFace)
+            remove(getAlarmPanel());
         setFacePanel(ClockFace.ClockFace);
         add(getClockPanel());
         this.repaint();
@@ -762,10 +765,24 @@ public class Clock extends JFrame {
     }
     public void changeToAlarmPanel()
     {
-        remove(getClockPanel());
+        if (getFacePanel() == ClockFace.ClockFace)
+            remove(getClockPanel());
+        else if (getFacePanel() == ClockFace.TimerFace)
+            remove(getTimerPanel());
         setFacePanel(ClockFace.AlarmFace);
         if (getAlarmPanel().getMusicPlayer() != null) { getAlarmPanel().setMusicPlayer(null); }
         add(getAlarmPanel());
+        this.repaint();
+        this.setVisible(true);
+    }
+    public void changeToTimerPanel()
+    {
+        if (getFacePanel() == ClockFace.ClockFace)
+            remove(getClockPanel());
+        else if (getFacePanel() == ClockFace.AlarmFace)
+            remove(getAlarmPanel());
+        setFacePanel(ClockFace.TimerFace);
+        add(getTimerPanel());
         this.repaint();
         this.setVisible(true);
     }

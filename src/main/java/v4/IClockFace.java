@@ -12,4 +12,5 @@ public interface IClockFace {
 
     void updateLabels();
     void addComponentsToPanel();
+    void printStackTrace(Exception e, String message);
 }

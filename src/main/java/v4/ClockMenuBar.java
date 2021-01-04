@@ -28,6 +28,7 @@ public class ClockMenuBar extends JMenuBar {
     // Options for Features
     protected JMenuItem clockFeature;
     protected JMenu alarmFeature_Menu;
+    protected JMenuItem timerFeature;
     // Options for alarmFeature_Menu
     protected JMenuItem setAlarms;
     // Constructor
@@ -41,21 +42,21 @@ public class ClockMenuBar extends JMenuBar {
         // Settings menu choices
         setMilitaryTimeSetting(new JMenuItem(SHOW + SPACE + MILITARY_TIME_SETTING));
         getMilitaryTimeSetting().setForeground(Color.WHITE);
-
         setFullTimeSetting(new JMenuItem(SHOW + SPACE + FULL_TIME_SETTING));
         getFullTimeSetting().setForeground(Color.WHITE);
-
         setPartialTimeSetting(new JMenuItem(SHOW + SPACE + PARTIAL_TIME_SETTING));
         getPartialTimeSetting().setForeground(Color.WHITE);
         // Features menu choices
-        setAlarmFeature_Menu(new JMenu("View Alarms"));
         setClockFeature(new JMenuItem("View Clock"));
         getClockFeature().setAccelerator(KeyStroke.getKeyStroke(
                 KeyEvent.VK_C, InputEvent.CTRL_DOWN_MASK));
-
+        setAlarmFeature_Menu(new JMenu("View Alarms"));
         setSetAlarms(new JMenuItem("Set Alarms"));
         getSetAlarms().setAccelerator(KeyStroke.getKeyStroke(
                 KeyEvent.VK_A, InputEvent.CTRL_DOWN_MASK));
+        setTimerFeature(new JMenuItem("View Timer"));
+        getTimerFeature().setAccelerator(KeyStroke.getKeyStroke(
+                KeyEvent.VK_T, InputEvent.CTRL_DOWN_MASK));
         // Add options to Settings Menu
         getSettingsMenu().add(getMilitaryTimeSetting());
         getSettingsMenu().add(getFullTimeSetting());
@@ -64,6 +65,7 @@ public class ClockMenuBar extends JMenuBar {
         getFeaturesMenu().add(getClockFeature());
         getFeaturesMenu().add(getAlarmFeature_Menu());
         getAlarmFeature_Menu().add(getSetAlarms());
+        getFeaturesMenu().add(getTimerFeature());
 
         getSettingsMenu().setOpaque(false);
         getSettingsMenu().setForeground(Color.WHITE);
@@ -77,6 +79,7 @@ public class ClockMenuBar extends JMenuBar {
         getAlarmFeature_Menu().setForeground(Color.WHITE);
         getAlarmFeature_Menu().setBackground(Color.BLACK);
         getClockFeature().setForeground(Color.WHITE);
+        getTimerFeature().setForeground(Color.WHITE);
         getSetAlarms().setForeground(Color.WHITE);
         getSetAlarms().setBackground(Color.BLACK);
     }
@@ -89,6 +92,7 @@ public class ClockMenuBar extends JMenuBar {
     public JMenuItem getPartialTimeSetting() { return this.partialTimeSetting; }
     public JMenuItem getClockFeature() { return this.clockFeature; }
     public JMenuItem getSetAlarms() { return this.setAlarms; }
+    public JMenuItem getTimerFeature() { return this.timerFeature; }
     // Setters
     protected void setSettingsMenu(JMenu settingsMenu) { this.settingsMenu = settingsMenu; }
     protected void setFeaturesMenu(JMenu featuresMenu) { this.featuresMenu = featuresMenu; }
@@ -98,6 +102,7 @@ public class ClockMenuBar extends JMenuBar {
     protected void setPartialTimeSetting(JMenuItem partialTimeSetting) { this.partialTimeSetting = partialTimeSetting; }
     protected void setClockFeature(JMenuItem clockFeature) { this.clockFeature = clockFeature; }
     protected void setSetAlarms(JMenuItem setAlarms) { this.setAlarms = setAlarms; }
+    protected void setTimerFeature(JMenuItem timerFeature) { this.timerFeature = timerFeature; }
     // class methods
     @Override
     protected void paintComponent(Graphics g) {

@@ -5,10 +5,8 @@ import javazoom.jl.player.advanced.AdvancedPlayer;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.lang.Nullable;
 
-import javax.sound.sampled.AudioInputStream;
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.*;
 import java.io.InputStream;
 import java.text.ParseException;
 import java.util.*;
@@ -39,36 +37,36 @@ import static v4.Time.Day.*;
  * @author michael ball
  * @version 2.4
  */
-public class AlarmPanel extends JPanel implements IClockFace {
-
+public class AlarmPanel extends JPanel implements IClockFace
+{
     private GridBagLayout layout;
     private GridBagConstraints constraints;
-    private JLabel jalarmLbl1 = new JLabel("H", SwingConstants.CENTER); // H
-    private JLabel jalarmLbl2 = new JLabel("M", SwingConstants.CENTER); // M
-    private JLabel jalarmLbl3 = new JLabel("T", SwingConstants.CENTER); // Time (AM/PM)
-    private JLabel jalarmLbl4 = new JLabel("Current Alarms", SwingConstants.CENTER); // Current Alarms;
-    private JCheckBox mondayCheckBox = null;
-    private JCheckBox tuesdayCheckBox = null;
-    private JCheckBox wednesdayCheckBox = null;
-    private JCheckBox thursdayCheckBox = null;
-    private JCheckBox fridayCheckBox = null;
-    private JCheckBox saturdayCheckBox = null;
-    private JCheckBox sundayCheckBox = null;
-    private JCheckBox weekCheckBox = null;
-    private JCheckBox wkendCheckBox = null;
-    private JTextField jtextField1 = new JTextField(2); // Hour textField
-    private JTextField jtextField2 = new JTextField(2); // Min textField
-    private JTextField jtextField3 = new JTextField(2); // Time textField
-    private JButton jSetAlarmButton = null;
-    private JTextArea jTextArea = null;
-    private JScrollPane scrollPane = null;
+    private JLabel jalarmLbl1;
+    private JLabel jalarmLbl2;
+    private JLabel jalarmLbl3;
+    private JLabel jalarmLbl4;
+    private JCheckBox mondayCheckBox;
+    private JCheckBox tuesdayCheckBox;
+    private JCheckBox wednesdayCheckBox;
+    private JCheckBox thursdayCheckBox;
+    private JCheckBox fridayCheckBox;
+    private JCheckBox saturdayCheckBox;
+    private JCheckBox sundayCheckBox;
+    private JCheckBox weekCheckBox;
+    private JCheckBox wkendCheckBox;
+    private JTextField jtextField1;
+    private JTextField jtextField2;
+    private JTextField jtextField3;
+    private JButton jSetAlarmButton;
+    private JTextArea jTextArea;
+    private JScrollPane scrollPane;
     private Clock clock;
     private Alarm alarm;
     private Alarm currentAlarmGoingOff;
     private boolean updatingAlarm;
     private boolean alarmIsGoingOff;
     private AdvancedPlayer musicPlayer;
-
+    // Constructor
     public AlarmPanel(Clock clock)
     {
         super();
@@ -84,7 +82,6 @@ public class AlarmPanel extends JPanel implements IClockFace {
         setupMusicPlayer();
         addComponentsToPanel();
     }
-
     // Getters
     public GridBagLayout getGridBagLayout() { return this.layout; }
     public GridBagConstraints getGridBagConstraints() { return this.constraints; }
@@ -107,7 +104,8 @@ public class AlarmPanel extends JPanel implements IClockFace {
     public JCheckBox getTuesdayCheckBox() { return tuesdayCheckBox; }
     public JCheckBox getWednesdayCheckBox() { return wednesdayCheckBox; }
     public JCheckBox getThursdayCheckBox() { return thursdayCheckBox; }
-    public JCheckBox getFridayCheckBox() { return fridayCheckBox; }public JCheckBox getSaturdayCheckBox() { return saturdayCheckBox; }
+    public JCheckBox getFridayCheckBox() { return fridayCheckBox; }
+    public JCheckBox getSaturdayCheckBox() { return saturdayCheckBox; }
     public JCheckBox getSundayCheckBox() { return sundayCheckBox; }
     public JCheckBox getWeekCheckBox() { return weekCheckBox; }
     public JCheckBox getWkendCheckBox() { return wkendCheckBox; }
@@ -141,7 +139,6 @@ public class AlarmPanel extends JPanel implements IClockFace {
     protected void setWeekCheckBox(JCheckBox weekCheckBox) { this.weekCheckBox = weekCheckBox; }
     protected void setWkendCheckBox(JCheckBox wkendCheckBox) { this.wkendCheckBox = wkendCheckBox; }
     protected void setAlarmIsGoingOff(boolean alarmIsGoingOff) { this.alarmIsGoingOff = alarmIsGoingOff; }
-
     // Helper methods
     public void setupMusicPlayer()
     {
@@ -174,6 +171,13 @@ public class AlarmPanel extends JPanel implements IClockFace {
         clock.setShowFullDate(false);
         clock.setShowPartialDate(false);
         clock.setShowMilitaryTime(false);
+        setJAlarmLbl1(new JLabel("H", SwingConstants.CENTER)); // H
+        setJAlarmLbl2(new JLabel("M", SwingConstants.CENTER)); // M
+        setJAlarmLbl3(new JLabel("T", SwingConstants.CENTER)); // Time (AM/PM)
+        setJTextField1(new JTextField(2)); // Hour textField
+        setJTextField2(new JTextField(2)); // Min textField
+        setJTextField3(new JTextField(2)); // Time textField
+        setJAlarmLbl4(new JLabel("Current Alarms", SwingConstants.CENTER)); // Current Alarms
         getJTextField1().requestFocusInWindow();
         getJTextField1().setText("");
         getJTextField1().setBorder(BorderFactory.createLineBorder(Color.BLACK));
@@ -550,7 +554,8 @@ public class AlarmPanel extends JPanel implements IClockFace {
                     );
         }
     }
-    protected void printStackTrace(Exception e, String message)
+    @Override
+    public void printStackTrace(Exception e, String message)
     {
         if (null != message)
             System.err.println(message);
@@ -562,9 +567,7 @@ public class AlarmPanel extends JPanel implements IClockFace {
         }
     }
     protected void printStackTrace(Exception e)
-    {
-        printStackTrace(e, "");
-    }
+    { printStackTrace(e, ""); }
     protected boolean validateFirstTextField() throws InvalidInputException
     {
         if (StringUtils.isBlank(getJTextField1().getText()))
