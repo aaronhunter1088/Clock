@@ -212,8 +212,8 @@ public class Clock extends JFrame {
         setTimerPanel(new TimerPanel(this));
         setClockFace(ClockFace.ClockFace);
         setRemainingDefaultValues();
-        pack();
         add(getClockPanel());
+        pack();
     }
     public Clock(int hours, int minutes, int seconds, Time.Month month, Time.Day day, int date, int year, Time.AMPM ampm) throws ParseException
     {
@@ -222,6 +222,7 @@ public class Clock extends JFrame {
         setListOfAlarms(new ArrayList<>());
         setupMenuBar();
         setAlarmPanel(new AlarmPanel(this));
+        setTimerPanel(new TimerPanel(this));
         setSeconds(seconds);
         setMinutes(minutes);
         setHours(hours);
@@ -687,9 +688,8 @@ public class Clock extends JFrame {
             }
             //updateClockFace(true);
             // updatePanel
-            pack();
+            //pack();
         });
-        getClockMenuBar().getMilitaryTimeSetting().setMnemonic('M');
         getClockMenuBar().getFullTimeSetting().addActionListener(action -> {
             if (isShowFullDate())
             {
@@ -707,9 +707,8 @@ public class Clock extends JFrame {
             }
             //updateClockFace(true);
             // updatePanel
-            pack();
+            //pack();
         });
-        getClockMenuBar().getFullTimeSetting().setMnemonic('T');
         getClockMenuBar().getPartialTimeSetting().addActionListener(action -> {
             if (isShowPartialDate())
             {
@@ -727,22 +726,15 @@ public class Clock extends JFrame {
             }
             //updateClockFace(true);
             // updatePanel
-            pack();
+            //pack();
         });
-        getClockMenuBar().getPartialTimeSetting().setMnemonic('P');
         // Features Actions for Features menu
         getClockMenuBar().getClockFeature().addActionListener(action -> {
             changeToClockPanel();
         });
         getClockMenuBar().getSetAlarms().addActionListener(action -> {
-
-            getAlarmPanel().getJTextField1().setText("");
-            getAlarmPanel().getJTextField2().setText("");
-            getAlarmPanel().getJTextField3().setText("");
-            getAlarmPanel().resetJTextArea();
-            getAlarmPanel().resetJCheckboxes(null, false);
             changeToAlarmPanel();
-            });
+        });
         getClockMenuBar().getTimerFeature().addActionListener(action -> {
             changeToTimerPanel();
         });

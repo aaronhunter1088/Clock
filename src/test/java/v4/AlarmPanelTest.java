@@ -9,11 +9,13 @@ import javax.swing.*;
 import java.awt.*;
 import java.text.ParseException;
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicLongArray;
 import java.util.function.Predicate;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 @RunWith(MockitoJUnitRunner.class)
 public class AlarmPanelTest extends Object {
@@ -46,13 +48,14 @@ public class AlarmPanelTest extends Object {
     @Test
     public void testMusicPlayerCanSoundAlarm() throws InterruptedException {
         AlarmPanel testAlarmPanel = createAndSetupAlarmPanel();
-        testAlarmPanel.triggerAlarm();
-
+        ExecutorService executor = Executors.newCachedThreadPool();
+        testAlarmPanel.setCurrentAlarmGoingOff(alarm);
+        testAlarmPanel.triggerAlarm(executor);
         assertTrue("Alarm is going off", testAlarmPanel.isAlarmIsGoingOff());
         Thread.sleep(1000);
-        testAlarmPanel.setMusicPlayer(null);
-        testAlarmPanel.setAlarmIsGoingOff(false);
-        assertTrue("Alarm is off", !testAlarmPanel.isAlarmIsGoingOff());
+        testAlarmPanel.stopAlarm();
+        assertFalse("Alarm is off", testAlarmPanel.isAlarmIsGoingOff());
+        assertNull("Music Player is null", testAlarmPanel.getMusicPlayer());
     }
 
     @Test

@@ -41,10 +41,13 @@ public class ClockMenuBar extends JMenuBar {
         setFeaturesMenu(new JMenu("Features"));
         // Settings menu choices
         setMilitaryTimeSetting(new JMenuItem(SHOW + SPACE + MILITARY_TIME_SETTING));
+        getMilitaryTimeSetting().setMnemonic('M');
         getMilitaryTimeSetting().setForeground(Color.WHITE);
         setFullTimeSetting(new JMenuItem(SHOW + SPACE + FULL_TIME_SETTING));
+        getFullTimeSetting().setMnemonic('F');
         getFullTimeSetting().setForeground(Color.WHITE);
         setPartialTimeSetting(new JMenuItem(SHOW + SPACE + PARTIAL_TIME_SETTING));
+        getPartialTimeSetting().setMnemonic('P');
         getPartialTimeSetting().setForeground(Color.WHITE);
         // Features menu choices
         setClockFeature(new JMenuItem("View Clock"));

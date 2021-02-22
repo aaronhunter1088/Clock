@@ -32,8 +32,9 @@ public class Alarm extends Clock
     protected void setCurrentDay(Day currentDay) { this.currentDay = currentDay; }
 
     // Constructors
-    public Alarm() throws ParseException {
-        super();
+    public Alarm() throws ParseException
+    {
+        super(new Clock());
     }
     public Alarm(Clock clock, int hours, boolean isUpdateAlarm) throws ParseException
     {

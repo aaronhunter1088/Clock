@@ -10,6 +10,7 @@ import java.awt.*;
 import java.io.InputStream;
 import java.text.ParseException;
 import java.util.*;
+import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -80,6 +81,7 @@ public class AlarmPanel extends JPanel implements IClockFace
         setupAlarmPanel(getClock());
         setupAlarmButton();
         setupMusicPlayer();
+        updateLabels();
         addComponentsToPanel();
     }
     // Getters
@@ -175,8 +177,12 @@ public class AlarmPanel extends JPanel implements IClockFace
         setJAlarmLbl2(new JLabel("M", SwingConstants.CENTER)); // M
         setJAlarmLbl3(new JLabel("T", SwingConstants.CENTER)); // Time (AM/PM)
         setJTextField1(new JTextField(2)); // Hour textField
+        getJTextField1().setSize(new Dimension(50,50));
         setJTextField2(new JTextField(2)); // Min textField
+        getJTextField2().setSize(new Dimension(50,50));
+        getJTextField2().setMaximumSize(getJTextField2().getSize());
         setJTextField3(new JTextField(2)); // Time textField
+        getJTextField3().setSize(new Dimension(50,50));
         setJAlarmLbl4(new JLabel("Current Alarms", SwingConstants.CENTER)); // Current Alarms
         getJTextField1().requestFocusInWindow();
         getJTextField1().setText("");
@@ -220,14 +226,14 @@ public class AlarmPanel extends JPanel implements IClockFace
     @Override
     public void addComponentsToPanel()
     {
-        updateLabels();
-        addComponent(getJAlarmLbl1(), 0,0,1,1, 15,7, GridBagConstraints.VERTICAL); // H
-        addComponent(getJTextField1(), 0,1,1,1, 7,7, GridBagConstraints.BOTH); // textField
-        addComponent(getJAlarmLbl2(), 0,2,1,1, 15,7, GridBagConstraints.VERTICAL); // M
-        addComponent(getJTextField2(), 0,3,1,1, 7,7, GridBagConstraints.BOTH); // textField
-        addComponent(getJAlarmLbl3(), 0,4,1,1, 15,7, GridBagConstraints.VERTICAL); // Time (AM/PM)
-        addComponent(getJTextField3(), 0,5,1,1, 7,7, GridBagConstraints.BOTH); // textField
-        addComponent(getJScrollPane(), 0,6,4,3, 1,7, GridBagConstraints.BOTH); // textArea
+        //addComponent(getJAlarmLbl1(), 0,0,1,1, 15,7, GridBagConstraints.VERTICAL); // H
+        addComponent(getJAlarmLbl1(),0,0,1,1,0,0,   GridBagConstraints.CENTER, GridBagConstraints.NONE, new Insets(0,0,0,0)); // H
+        addComponent(getJTextField1(),0,1,1,1, 0,0, GridBagConstraints.CENTER, GridBagConstraints.NONE, new Insets(0,0,0,0)); // textField
+        addComponent(getJAlarmLbl2(),0,2,1,1, 0,0, GridBagConstraints.CENTER, GridBagConstraints.NONE, new Insets(0,0,0,0)); // M
+        addComponent(getJTextField2(),0,3,1,1, 0,0, GridBagConstraints.CENTER, GridBagConstraints.NONE, new Insets(0,0,0,0)); // textField
+        addComponent(getJAlarmLbl3(),0,4,1,1, 0,0, GridBagConstraints.CENTER, GridBagConstraints.NONE, new Insets(0,0,0,0)); // Time (AM/PM)
+        addComponent(getJTextField3(),0,5,1,1, 0,0, GridBagConstraints.CENTER, GridBagConstraints.NONE, new Insets(0,0,0,0)); // textField
+        addComponent(getJScrollPane(),0,6,4,3, 0,0, GridBagConstraints.BOTH, GridBagConstraints.NONE, new Insets(1,1,1,1)); // textArea
         // new column, first column
         addComponent(getMondayCheckBox(), 1,0,2,1, 0,0, GridBagConstraints.NONE); // Sqr Monday
         addComponent(getTuesdayCheckBox(), 2, 0, 2, 1, 1, 0, GridBagConstraints.NONE); // Sqr Tuesday
@@ -245,6 +251,7 @@ public class AlarmPanel extends JPanel implements IClockFace
         // header and alarms
         addComponent(getJAlarmLbl4(), 5, 0, 4, 1, 2, 2, GridBagConstraints.BOTH);
     }
+
     @Override
     public void updateLabels()
     {
@@ -280,33 +287,14 @@ public class AlarmPanel extends JPanel implements IClockFace
         );
         // update lbl1 and lbl2 to display alarm
         // user must "view that alarm" to turn it off
-        Clock currentAlarm = getCurrentAlarmGoingOff();
+        Alarm currentAlarm = getCurrentAlarmGoingOff();
         ExecutorService executor = Executors.newCachedThreadPool();
         if (null != currentAlarm && currentAlarm.isAlarmGoingOff())
         {
-            getClock().getClockPanel().getJlbl1().setText(currentAlarm.getTimeAsStr());
-            getClock().getClockPanel().getJlbl2().setText("is going off!");
-            // play sound
-            Runnable r = () -> {
-                try
-                {
-                    getClock().getAlarmPanel().setupMusicPlayer();
-                    getClock().getAlarmPanel().getMusicPlayer().play(50);
-                    getClock().getAlarmPanel().setMusicPlayer(null);
-                }
-                catch (Exception e)
-                {
-                    System.err.println("An exception occurred while playing music: " + e.getMessage());
-                    printStackTrace(e);
-                }
-            };
-            executor.submit(r);
-            //r.run();
+            triggerAlarm(executor);
         }
-        else
-        { executor.shutdown(); }
     }
-    public void setupCreatedAlarmsFunctionality()
+    public void setupAlarmsInMenuFunctionality()
     {
         // get the view alarms menu
         // for each except the Set Alarms (option1)
@@ -339,12 +327,9 @@ public class AlarmPanel extends JPanel implements IClockFace
                         setAlarm(getCurrentAlarmGoingOff());
                         if (null != getMusicPlayer())
                         {
-                            setMusicPlayer(null);
-                            System.out.println("Stopping music. New music player setup and ready for new alarm");
-                            System.out.println(getAlarm().getTimeAsStr()+" alarm turned off.\n");
+                            stopAlarm();
                         }
                         else { System.err.println("Music player is null!"); }
-
                         getAlarm().setAlarmGoingOff(false);
                         getAlarm().setUpdateAlarm(true); // this and the boolean below we want true
                         setUpdatingAlarm(true); // we want to continue with the logic that's done in the next if
@@ -465,7 +450,7 @@ public class AlarmPanel extends JPanel implements IClockFace
                         System.err.println("Size of listOfAlarms after adding " + getClock().getListOfAlarms().size());
                         // restart viewAlarms menu
                         //resetViewAlarmsMenu(getClock().getListOfAlarms());
-                        setupCreatedAlarmsFunctionality();
+                        setupAlarmsInMenuFunctionality();
                         setUpdatingAlarm(false);
                         resetJTextArea();
                         resetJCheckboxes(getAlarm().getDays(), false);
@@ -506,7 +491,7 @@ public class AlarmPanel extends JPanel implements IClockFace
                         // display list of alarms below All Alarms
                         resetJTextArea();
                         resetJCheckboxes(null, false);
-                        setupCreatedAlarmsFunctionality();
+                        setupAlarmsInMenuFunctionality();
                         // erase input in textFields
                         getJTextField1().setText("");
                         getJTextField2().setText("");
@@ -969,16 +954,33 @@ public class AlarmPanel extends JPanel implements IClockFace
      * @return Alarm
      * @throws ParseException will be thrown if hour, minutes, or time is inappropriate.
      */
-    public Alarm createAlarm() throws ParseException
-    {
+    public Alarm createAlarm() throws ParseException, InvalidInputException {
         int hour = Integer.parseInt(getJTextField1().getText());
         int minutes = Integer.parseInt(getJTextField2().getText());
         Time.AMPM ampm = convertStringToTimeAMPM(getJTextField3().getText());
-        ArrayList<Day> days = checkWhichCheckBoxesWereChecked();
-        Alarm alarm = new Alarm(getClock(), hour, minutes, ampm, true, days);
-        alarm.setAlarmGoingOff(false);
-        System.err.println("\ncreated an alarm: " + alarm.getTimeAsStr());
-        return alarm;
+        boolean valid = false;
+        try
+        {
+            valid = validateFirstTextField();
+            valid = validateSecondTextField();
+            valid = validateThirdTextField();
+        }
+        catch (InvalidInputException iie)
+        {
+            throw iie;
+        }
+        if (valid)
+        {
+            ArrayList<Day> days = checkWhichCheckBoxesWereChecked();
+            Alarm alarm = new Alarm(getClock(), hour, minutes, ampm, true, days);
+            alarm.setAlarmGoingOff(false);
+            System.err.println("\ncreated an alarm: " + alarm.getTimeAsStr());
+            return alarm;
+        }
+        else
+        {
+            return null;
+        }
     }
     protected ArrayList<Day> checkWhichCheckBoxesWereChecked()
     {
@@ -1038,24 +1040,36 @@ public class AlarmPanel extends JPanel implements IClockFace
         alarmItem.setForeground(Color.WHITE);
         alarmItem.setBackground(Color.BLACK);
         getClock().getClockMenuBar().getAlarmFeature_Menu().add(alarmItem);
-        setupCreatedAlarmsFunctionality();
+        setupAlarmsInMenuFunctionality();
     }
-    public void triggerAlarm()
+    public void triggerAlarm(ExecutorService executor)
     {
         setAlarmIsGoingOff(true);
-        Runnable r = () -> {
+        getClock().getClockPanel().getJlbl1().setText(getCurrentAlarmGoingOff().getTimeAsStr());
+        getClock().getClockPanel().getJlbl2().setText("is going off!");
+        // play sound
+        Callable<String> c = () -> {
             try
             {
                 getClock().getAlarmPanel().setupMusicPlayer();
                 getClock().getAlarmPanel().getMusicPlayer().play(50);
+                System.err.println("Alarm is going off.");
+                return "Alarm triggered";
             }
             catch (Exception e)
             {
-                System.err.println("An exception occurred while playing music: " + e.getMessage());
                 printStackTrace(e);
+                return "An exception occurred while playing music: " + e.getMessage();
             }
         };
-        r.run();
+        executor.submit(c);
+    }
+    public void stopAlarm()
+    {
+        setMusicPlayer(null);
+        setAlarmIsGoingOff(false);
+        System.err.println("Stopping music. New music player setup and ready for new alarm");
+        System.err.println(getAlarm().getTimeAsStr()+" alarm turned off.\n");
     }
     public void addComponent(Component cpt, int gridy, int gridx, double gwidth, double gheight, int ipadx, int ipady, int fill)
     {
@@ -1067,6 +1081,18 @@ public class AlarmPanel extends JPanel implements IClockFace
         getGridBagConstraints().ipadx = ipadx;
         getGridBagConstraints().ipady = ipady;
         getGridBagConstraints().insets = new Insets(0,0,0,0);
+        getGridBagLayout().setConstraints(cpt, getGridBagConstraints());
+        add(cpt);
+    }
+    public void addComponent(Component cpt, int gridy, int gridx, double gwidth, double gheight, int ipadx, int ipady, int fill, int none, Insets insets) {
+        getGridBagConstraints().gridx = gridx;
+        getGridBagConstraints().gridy = gridy;
+        getGridBagConstraints().gridwidth = (int)Math.ceil(gwidth);
+        getGridBagConstraints().gridheight = (int)Math.ceil(gheight);
+        getGridBagConstraints().fill = fill;
+        getGridBagConstraints().ipadx = ipadx;
+        getGridBagConstraints().ipady = ipady;
+        getGridBagConstraints().insets = insets;
         getGridBagLayout().setConstraints(cpt, getGridBagConstraints());
         add(cpt);
     }

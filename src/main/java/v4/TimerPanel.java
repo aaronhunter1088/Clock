@@ -4,7 +4,11 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.math.NumberUtils;
 
 import javax.swing.*;
+import javax.swing.border.LineBorder;
 import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.FocusEvent;
+import java.awt.event.FocusListener;
 
 @SuppressWarnings("unused")
 /** This is the newest panel, the Timer panel.
@@ -26,26 +30,27 @@ public class TimerPanel extends JPanel implements IClockFace {
 
     private GridBagLayout layout;
     private GridBagConstraints constraints;
-    private JLabel jtimerLbl1 = new JLabel("", SwingConstants.CENTER); // H
-    private JLabel jtimerLbl2 = new JLabel("", SwingConstants.CENTER); // M
-    private JLabel jtimerLbl3 = new JLabel("", SwingConstants.CENTER); // S
-    private JTextField jtextField1 = new JTextField(2); // Hour textField
-    private JTextField jtextField2 = new JTextField(2); // Min textField
-    private JTextField jtextField3 = new JTextField(2); // Second textField
+    private JTextField jtextField1 = new JTextField("Hour", 4); // Hour textField
+    private JTextField jtextField2 = new JTextField("Min", 4); // Min textField
+    private JTextField jtextField3 = new JTextField("Sec", 4); // Second textField
     private JButton timerButton = null;
+    private JButton resetButton = null;
     private Clock clock;
     private Clock timer;
     // Constructor
-    public TimerPanel(Clock clock) {
+    public TimerPanel(Clock clock)
+    {
         setClock(clock);
         setSize(Clock.defaultSize);
         setGridBagLayout(new GridBagLayout());
         setLayout(getGridBagLayout());
         setGridBagConstraints(new GridBagConstraints());
-        setBackground(Color.BLACK);
+        setBackground(Color.WHITE); // Color.BLACK
         setForeground(Color.WHITE);
+        setBorder(new LineBorder(Color.BLACK));
         setupTimerPanel(clock);
         setupTimerButton();
+        setupResetButton();
         updateLabels();
         addComponentsToPanel();
     }
@@ -53,165 +58,317 @@ public class TimerPanel extends JPanel implements IClockFace {
     public GridBagLayout getGridBagLayout() { return this.layout; }
     public GridBagConstraints getGridBagConstraints() { return this.constraints; }
     public Clock getClock() { return this.clock; }
-    public JLabel getJTimerlbl1() { return this.jtimerLbl1; }
-    public JLabel getJTimerlbl2() { return this.jtimerLbl2; }
-    public JLabel getJTimerlbl3() { return this.jtimerLbl3; }
     public JTextField getJTextField1() { return this.jtextField1; }
     public JTextField getJTextField2() { return this.jtextField2; }
     public JTextField getJTextField3() { return this.jtextField3; }
     public JButton getTimerButton() { return this.timerButton; }
+    public JButton getResetButton() { return this.resetButton; }
 
     // Setters
     protected void setGridBagLayout(GridBagLayout layout) { this.layout = layout; }
     protected void setGridBagConstraints(GridBagConstraints constraints) { this.constraints = constraints; }
     protected void setClock(Clock clock) { this.clock = clock; }
-    protected void setJTimerLbl1(JLabel jtimerLbl1) { this.jtimerLbl1 = jtimerLbl1; }
-    protected void setJTimerLbl2(JLabel jtimerLbl2) { this.jtimerLbl2 = jtimerLbl2; }
-    protected void setJTimerLbl3(JLabel jtimerLbl3) { this.jtimerLbl3 = jtimerLbl3; }
     protected void setJTextField1(JTextField jtextField1) { this.jtextField1 = jtextField1; }
     protected void setJTextField2(JTextField jtextField2) { this.jtextField2 = jtextField2; }
     protected void setJTextField3(JTextField jtextField3) { this.jtextField3 = jtextField3; }
     protected void setTimerButton(JButton timerButton) { this.timerButton = timerButton; }
+    protected void setResetButton(JButton resetButton) { this.resetButton = resetButton; }
 
     // Helper methods
     public void setupTimerPanel(Clock clock)
     {
-        getJTimerlbl1().setFont(Clock.font30);
-        getJTimerlbl1().setForeground(Color.WHITE);
-        getJTimerlbl1().setSize(new Dimension(50, 50));
-        getJTimerlbl2().setFont(Clock.font30);
-        getJTimerlbl2().setForeground(Color.WHITE);
-        getJTimerlbl2().setSize(new Dimension(50, 50));
-        getJTimerlbl3().setFont(Clock.font30);
-        getJTimerlbl3().setForeground(Color.WHITE);
-        getJTimerlbl3().setSize(new Dimension(50, 50));
         getJTextField1().setSize(new Dimension(50, 50));
         getJTextField2().setSize(new Dimension(50, 50));
         getJTextField3().setSize(new Dimension(50, 50));
+        getJTextField1().addFocusListener(new FocusListener(){
+            @Override
+            public void focusGained(FocusEvent e)
+            {
+                if (!validateFirstTextField())
+                {
+                    getJTextField1().setText("");
+                }
+            }
+
+            @Override
+            public void focusLost(FocusEvent e)
+            {
+                if (StringUtils.isBlank(getJTextField1().getText()) ||
+                    StringUtils.isEmpty(getJTextField1().getText()))
+                {
+                    getJTextField1().setText("Hour");
+                }
+                if (NumberUtils.isNumber(getJTextField1().getText()))
+                {
+                    if (Integer.parseInt(getJTextField1().getText()) < 24 &&
+                        Integer.parseInt(getJTextField1().getText()) >= 0)
+                    {
+                        getTimerButton().setText("Set");
+                        getTimerButton().repaint();
+                        getTimerButton().updateUI();
+                    }
+                    if (Integer.parseInt(getJTextField1().getText()) >= 24 ||
+                        Integer.parseInt(getJTextField1().getText()) < 0)
+                    {
+                        getTimerButton().setText("Hour between 0 and 24");
+                        getTimerButton().repaint();
+                        getTimerButton().updateUI();
+                        getJTextField1().grabFocus();
+                    }
+                }
+                if (validateFirstTextField() && validateSecondTextField() && validateThirdTextField())
+                {
+                    getTimerButton().setEnabled(true);
+                }
+                else if (validateFirstTextField() && !validateSecondTextField())
+                {
+                    getJTextField2().grabFocus();
+                    getTimerButton().setEnabled(false);
+                }
+                else if (validateFirstTextField() && validateSecondTextField() && !validateThirdTextField())
+                {
+                    getJTextField3().grabFocus();
+                    getTimerButton().setEnabled(false);
+                }
+        }
+        });
+        getJTextField2().addFocusListener(new FocusListener(){
+            @Override
+            public void focusGained(FocusEvent e)
+            {
+                if (!validateSecondTextField())
+                {
+                    getJTextField2().setText("");
+                }
+            }
+
+            @Override
+            public void focusLost(FocusEvent e)
+            {
+                if (StringUtils.isBlank(getJTextField2().getText()) ||
+                    StringUtils.isEmpty(getJTextField2().getText()))
+                {
+                    getJTextField2().setText("Min");
+                }
+                if (NumberUtils.isNumber(getJTextField2().getText()))
+                {
+                    if (Integer.parseInt(getJTextField2().getText()) < 60 &&
+                        Integer.parseInt(getJTextField2().getText()) >= 0)
+                    {
+                        getTimerButton().setText("Set");
+                        getTimerButton().repaint();
+                        getTimerButton().updateUI();
+                    }
+                    if (Integer.parseInt(getJTextField2().getText()) >= 60 ||
+                        Integer.parseInt(getJTextField2().getText()) < 0)
+                    {
+                        getTimerButton().setText("Min between 0 and 60");
+                        getTimerButton().repaint();
+                        getTimerButton().updateUI();
+                        getJTextField2().grabFocus();
+                    }
+                }
+                if (validateFirstTextField() && validateSecondTextField() && validateThirdTextField())
+                {
+                    getTimerButton().setEnabled(true);
+                }
+                else if (!validateFirstTextField())
+                {
+                    getJTextField1().grabFocus();
+                    getTimerButton().setEnabled(false);
+                }
+            }
+        });
+        getJTextField3().addFocusListener(new FocusListener(){
+            @Override
+            public void focusGained(FocusEvent e)
+            {
+                if (!validateThirdTextField())
+                {
+                    getJTextField3().setText("");
+                }
+            }
+
+            @Override
+            public void focusLost(FocusEvent e)
+            {
+                if (StringUtils.isBlank(getJTextField3().getText()) ||
+                    StringUtils.isEmpty(getJTextField3().getText()))
+                {
+                    getJTextField3().setText("Sec");
+                }
+                if (NumberUtils.isNumber(getJTextField3().getText()))
+                {
+                    if (Integer.parseInt(getJTextField3().getText()) < 60 &&
+                        Integer.parseInt(getJTextField3().getText()) >= 0)
+                    {
+                        getTimerButton().setText("Set");
+                        getTimerButton().repaint();
+                        getTimerButton().updateUI();
+                    }
+                    if (Integer.parseInt(getJTextField3().getText()) >= 60 ||
+                        Integer.parseInt(getJTextField3().getText()) < 0)
+                    {
+                        getTimerButton().setText("Sec between 0 and 60");
+                        getTimerButton().repaint();
+                        getTimerButton().updateUI();
+                        getJTextField3().grabFocus();
+                    }
+                }
+                if (validateFirstTextField() && validateSecondTextField() && validateThirdTextField())
+                {
+                    getTimerButton().setEnabled(true);
+                }
+                else if (!validateFirstTextField())
+                {
+                    getJTextField1().grabFocus();
+                    getTimerButton().setEnabled(false);
+                }
+                else if (!validateSecondTextField())
+                {
+                    getJTextField2().grabFocus();
+                    getTimerButton().setEnabled(false);
+                }
+            }
+
+        });
+        getJTextField1().setBorder(new LineBorder(Color.BLACK));
+        getJTextField2().setBorder(new LineBorder(Color.BLACK));
+        getJTextField3().setBorder(new LineBorder(Color.BLACK));
+        getJTextField1().setHorizontalAlignment(JTextField.CENTER);
+        getJTextField2().setHorizontalAlignment(JTextField.CENTER);
+        getJTextField3().setHorizontalAlignment(JTextField.CENTER);
         setTimerButton(new JButton("Set"));
         getTimerButton().setFont(Clock.font20);
         getTimerButton().setOpaque(true);
-        getTimerButton().setBackground(Color.BLACK);
+        getTimerButton().setBackground(Color.WHITE); // Color.BLACK
         getTimerButton().setForeground(Color.BLACK);
+        getTimerButton().setBorder(new LineBorder(Color.BLACK));
+        getTimerButton().setEnabled(false);
+        setResetButton(new JButton("Reset"));
+        getResetButton().setFont(Clock.font20);
+        getResetButton().setOpaque(true);
+        getResetButton().setBackground(Color.WHITE);
+        getResetButton().setForeground(Color.BLACK);
+        getResetButton().setBorder(new LineBorder(Color.BLACK));
     }
     @Override
     public void addComponentsToPanel()
     {
         setComponentOrientation(ComponentOrientation.LEFT_TO_RIGHT);
-        addComponent(getJTimerlbl1(),0,0,1,1,0,0, GridBagConstraints.RELATIVE); // Timer Label 1
-        addComponent(getJTextField1(), 0,1,1,1,0,0, GridBagConstraints.RELATIVE); // TextField 1
-        addComponent(getJTimerlbl2(), 0,2,1,1,0,0, GridBagConstraints.RELATIVE); // Timer Label 2
-        addComponent(getJTextField2(), 0,3,1,1,0,0, GridBagConstraints.RELATIVE); // TextField 2
-        addComponent(getJTimerlbl3(), 0,4,1,1,0,0, GridBagConstraints.RELATIVE); // Timer Label 3
-        addComponent(getJTextField3(), 0,5,1,1,0,0, GridBagConstraints.RELATIVE); // TextField 3
-        addComponent(getTimerButton(), 2,2,2,1,0,0, GridBagConstraints.NONE); // Set Timer
+        addComponent(getJTextField1(), 0,0,1,1,0,0, GridBagConstraints.HORIZONTAL); // TextField 1
+        addComponent(getJTextField2(), 0,1,1,1,0,0, GridBagConstraints.HORIZONTAL); // TextField 2
+        addComponent(getJTextField3(), 0,2,1,1,0,0, GridBagConstraints.HORIZONTAL); // TextField 3
+        addComponent(getResetButton(), 1, 0, 3, 1, 0, 0, GridBagConstraints.HORIZONTAL); // Reset Button
+        addComponent(getTimerButton(), 2,0,3,1,0,0, GridBagConstraints.HORIZONTAL); // Set Timer Button
     }
     @Override
     public void updateLabels()
     {
-        getJTextField1().setFocusable(true);
-        getJTimerlbl1().setText(getClock().defaultText(3)); // H
-        getJTimerlbl2().setText(getClock().defaultText(4)); // M
-        getJTimerlbl3().setText(getClock().defaultText(7)); // S
+        getJTextField1().grabFocus();
         getClock().repaint();
     }
     protected void setupTimerButton()
     {
-        getTimerButton().addActionListener(action ->
-        {
-            // check if h, m, and s are set. do nothing if not
-            boolean validated = false;
-            try
-            {
-                validated = validateThirdTextField(); // Seconds
-                validated = validateSecondTextField(); // Minutes
-                validated = validateFirstTextField(); // Hours
-
-                if (!validated)
-                {
-
-                }
-                else // validated is true
-                {
-
-                }
-            }
-            catch (InvalidInputException iie)
-            { printStackTrace(iie); }
-        });
+        getTimerButton().addActionListener(this::validateAndSetTimer);
     }
-    protected boolean validateFirstTextField() throws InvalidInputException
+    protected void setupResetButton()
     {
-        if (StringUtils.isBlank(getJTextField1().getText()))
+        getResetButton().addActionListener(this::resetTimerFields);
+    }
+    protected boolean validateFirstTextField()
+    {
+        if (StringUtils.equals(getJTextField1().getText(), "Hour"))
         {
-            getJTextField1().grabFocus();
-            throw new InvalidInputException("Hour cannot be blank");
+            return false;
         }
-        else if (!NumberUtils.isNumber(getJTextField1().getText()))
+        if (!NumberUtils.isNumber(getJTextField1().getText()))
         {
-            getJTextField1().grabFocus();
-            throw new InvalidInputException("Given value is invalid");
+            return false;
+        }
+        if (Integer.parseInt(getJTextField1().getText()) >= 24 ||
+            Integer.parseInt(getJTextField1().getText()) < 0) // cannot be more than 23 hours or less than 0
+        {
+            return false;
         }
         return true;
     }
-    protected boolean validateSecondTextField() throws InvalidInputException
+    protected boolean validateSecondTextField()
     {
-        if (StringUtils.isBlank(getJTextField2().getText()))
+        if (StringUtils.equals(getJTextField2().getText(), "Min"))
         {
-            getJTextField2().grabFocus();
-            throw new InvalidInputException("Minutes cannot be blank");
+            return false;
         }
-        else if (!NumberUtils.isNumber(getJTextField2().getText()))
+        if (!NumberUtils.isNumber(getJTextField2().getText()))
         {
-            getJTextField2().grabFocus();
-            throw new InvalidInputException("Given value is invalid");
+            return false;
         }
-        else if (Integer.parseInt(getJTextField2().getText()) >= 60) // 70 minutes given
+        if (Integer.parseInt(getJTextField2().getText()) >= 60) // 70 minutes given
         {
-            System.err.println("minutes: " + getJTextField2().getText());
-            int hours = Integer.parseInt(getJTextField2().getText());
-            while (hours >= 60)
-            {
-                hours -= 60; // 70 - 60 = 1R10
-                getJTextField1().setText(Integer.toString(Integer.parseInt(getJTextField1().getText()) + 1)); // extra hours added, minutes shows remaining
-                getJTextField2().setText(Integer.toString(hours));
-            }
-            System.err.println("minutes: " + getJTextField2().getText());
-            System.err.println("hours: " + getJTextField1().getText());
+            return false;
         }
         return true;
     }
-    protected boolean validateThirdTextField() throws InvalidInputException
+    protected boolean validateThirdTextField()
     {
-        if (StringUtils.isEmpty(getJTextField3().getText()))
+        if (StringUtils.equals(getJTextField3().getText(), "Sec"))
         {
-            getJTextField3().grabFocus();
-            throw new InvalidInputException("Seconds cannot be blank");
+            return false;
         }
-        else if (getJTextField3().getText().length() > 3)
+        if (!NumberUtils.isNumber(getJTextField3().getText()))
         {
-            getJTextField3().grabFocus();
-            throw new InvalidInputException("Cannot enter more than 3 digits");
+            return false;
         }
-        else if (!NumberUtils.isNumber(getJTextField3().getText()))
+        if (Integer.parseInt(getJTextField3().getText()) >= 60) // 70 seconds given
         {
-            getJTextField3().grabFocus();
-            throw new InvalidInputException("Given value is invalid");
-        }
-        else if (Integer.parseInt(getJTextField3().getText()) >= 60) // 70 seconds given
-        {
-            System.err.println("seconds: " + getJTextField3().getText());
-            int seconds = Integer.parseInt(getJTextField3().getText());
-            while (seconds >= 60)
-            {
-                seconds -= 60; // 70 - 60 = 1R10
-                getJTextField2().setText(Integer.toString(Integer.parseInt(getJTextField2().getText()) + 1));
-                getJTextField3().setText(Integer.toString(seconds));
-            }
-            System.err.println("seconds: " + getJTextField3().getText());
-            System.err.println("minutes: " + getJTextField2().getText());
+            return false;
         }
         return true;
+    }
+    public void validateAndSetTimer(ActionEvent action)
+    {
+        // check if h, m, and s are set. timer won't start if not validated
+        boolean validated = false;
+        validated = validateFirstTextField(); // Hours
+        if (!validated)
+        {
+            return;
+        }
+        validated = validateSecondTextField(); // Minutes
+        if (!validated)
+        {
+            return;
+        }
+        validated = validateThirdTextField(); // Seconds
+        if (!validated)
+        {
+            return;
+        }
+        // validated is true
+        // start the Timer
+        if (!StringUtils.equals(getTimerButton().getText(), "Pause Timer"))
+        {
+            getTimerButton().setText("Pause Timer");
+            getTimerButton().repaint();
+            getTimerButton().updateUI();
+        }
+        else // button says Pause Timer, so Pausing timer
+        {
+
+        }
+        System.out.println("Starting timer. Validated: true");
+        // change button text to Stop
+
+        // timer will count down and sound alarm when timer is at 0, 0, 0
+
+    }
+    public void resetTimerFields(ActionEvent action)
+    {
+        getJTextField1().setText("Hour");
+        getJTextField2().setText("Min");
+        getJTextField3().setText("Sec");
+        getTimerButton().setText("Set");
+        getTimerButton().setEnabled(false);
     }
     public void printStackTrace(Exception e, String message)
     {
