@@ -3,6 +3,7 @@
 This is a simple GUI project which displays the time and allows the user to set alarms. 
 
 In v2, You can show the time in military time or not and expand to see the full date or not.
+
 In v2.1, you can now show the partial date.
 
 In v3, you can now set alarms. Click Features --> View Alarms --> Set Alarms (or click Ctrl + A).
