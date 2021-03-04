@@ -208,18 +208,18 @@
 						<manifest>
 							<addDefaultImplementationEntries>true</addDefaultImplementationEntries>
 							<addClasspath>true</addClasspath>
-							<mainClass>v3.Clock</mainClass>
+							<mainClass>v4.Main</mainClass>
 						</manifest>
 						<manifestEntries>
 							<Implementation-Version>${project.version}</Implementation-Version>
 							<Creation-Time-Format>yyyy-MM-dd HH:mm:ss</Creation-Time-Format>
 							<!--suppress UnresolvedMavenProperty -->
 							<Creation-Time>${build.time}</Creation-Time>
-							<mainClass>v3.Clock</mainClass>
+							<mainClass>v4.Main</mainClass>
 						</manifestEntries>
 					</archive>
 					<includes>
-						<include>**/v3/*</include>
+						<include>**/v4/*</include>
 						<include>**/sounds/*</include>
 					</includes>
 					<excludes>
@@ -300,14 +300,14 @@
 						 <manifest>
 							 <addDefaultImplementationEntries>true</addDefaultImplementationEntries>
 							 <addClasspath>true</addClasspath>
-							 <mainClass>v3.Clock</mainClass>
+							 <mainClass>v4.Main</mainClass>
 						 </manifest>
 						 <manifestEntries>
 							 <Implementation-Version>${project.version}</Implementation-Version>
 							 <Creation-Time-Format>yyyy-MM-dd HH:mm:ss</Creation-Time-Format>
 							 <!--suppress UnresolvedMavenProperty -->
 							 <Creation-Time>${build.time}</Creation-Time>
-							 <mainClass>v3.Clock</mainClass>
+							 <mainClass>v4.Main</mainClass>
 						 </manifestEntries>
 					 </archive>
 				 </configuration>
