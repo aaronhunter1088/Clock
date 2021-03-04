@@ -5,7 +5,7 @@
     
     <groupId>com.example</groupId>
   	<artifactId>clock</artifactId>
-  	<version>2.4</version>
+  	<version>2.5</version>
   	<name>Clock</name>
     <description>This is Clock GUI.</description>
     
@@ -155,9 +155,11 @@
 						<exclude>**/v1/*.java</exclude>
 						<exclude>**/v2/*.java</exclude>
 						<exclude>**/v3/*.java</exclude>
+						<exclude>**/v4/*.java</exclude>
 						<exclude>**/v1/*Test.java</exclude>
 						<exclude>**/v2/*Test.java</exclude>
 						<exclude>**/v3/*Test.java</exclude>
+						<exclude>**/v4/*Test.java</exclude>
 					</excludes>
 				</configuration>
 			</plugin>
@@ -208,27 +210,29 @@
 						<manifest>
 							<addDefaultImplementationEntries>true</addDefaultImplementationEntries>
 							<addClasspath>true</addClasspath>
-							<mainClass>v4.Main</mainClass>
+							<mainClass>v5.Main</mainClass>
 						</manifest>
 						<manifestEntries>
 							<Implementation-Version>${project.version}</Implementation-Version>
 							<Creation-Time-Format>yyyy-MM-dd HH:mm:ss</Creation-Time-Format>
 							<!--suppress UnresolvedMavenProperty -->
 							<Creation-Time>${build.time}</Creation-Time>
-							<mainClass>v4.Main</mainClass>
+							<mainClass>v5.Main</mainClass>
 						</manifestEntries>
 					</archive>
 					<includes>
-						<include>**/v4/*</include>
+						<include>**/v5/*</include>
 						<include>**/sounds/*</include>
 					</includes>
 					<excludes>
 						<exclude>**/v1/*.java</exclude>
 						<exclude>**/v2/*.java</exclude>
 						<exclude>**/v3/*.java</exclude>
+						<exclude>**/v4/*.java</exclude>
 						<exclude>**/v1/*Test.java</exclude>
 						<exclude>**/v2/*Test.java</exclude>
 						<exclude>**/v3/*Test.java</exclude>
+						<exclude>**/v4/*Test.java</exclude>
 					</excludes>
             	</configuration>
             </plugin>
@@ -300,14 +304,14 @@
 						 <manifest>
 							 <addDefaultImplementationEntries>true</addDefaultImplementationEntries>
 							 <addClasspath>true</addClasspath>
-							 <mainClass>v4.Main</mainClass>
+							 <mainClass>v5.Main</mainClass>
 						 </manifest>
 						 <manifestEntries>
 							 <Implementation-Version>${project.version}</Implementation-Version>
 							 <Creation-Time-Format>yyyy-MM-dd HH:mm:ss</Creation-Time-Format>
 							 <!--suppress UnresolvedMavenProperty -->
 							 <Creation-Time>${build.time}</Creation-Time>
-							 <mainClass>v4.Main</mainClass>
+							 <mainClass>v5.Main</mainClass>
 						 </manifestEntries>
 					 </archive>
 				 </configuration>
