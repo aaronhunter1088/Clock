@@ -25,6 +25,10 @@ public class Main
                 // check alarms
                 sleep(250);
                 clock.getAlarmPanel().checkIfAnyAlarmsAreGoingOff();
+                clock.getTimerPanel().checkIfTimerHasConcluded();
+                if (clock.getTimerPanel().isTimerHasConcluded()) {
+                    clock.getTimerPanel().setTimerHasConcluded(false);
+                }
                 sleep(750);
             }
         }

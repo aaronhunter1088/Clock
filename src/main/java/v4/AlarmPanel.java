@@ -167,8 +167,8 @@ public class AlarmPanel extends JPanel implements IClockFace
     }
     public void setupAlarmPanel(Clock clock)
     {
-        clock.setCalendar(Calendar.getInstance());
-        clock.setCalendarTime(new Date());
+        //clock.setCalendar(Calendar.getInstance());
+        //clock.setCalendarTime(new Date());
         clock.setDateChanged(false);
         clock.setShowFullDate(false);
         clock.setShowPartialDate(false);

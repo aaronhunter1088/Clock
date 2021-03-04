@@ -1,5 +1,7 @@
 package v4;
 
+import org.apache.commons.lang.StringUtils;
+
 import javax.swing.*;
 import java.awt.*;
 import java.text.DateFormat;
@@ -8,8 +10,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
-
-import static java.lang.Thread.sleep;
+import v4.ClockConstants;
 
 @SuppressWarnings({"unused", "ConstantConditions"})
 /** A simple application which displays the time and date. The time
@@ -28,13 +29,7 @@ public class Clock extends JFrame {
     protected static final long serialVersionUID = 1L;
     protected static final Dimension defaultSize = new Dimension(700, 300);
     protected static final Dimension alarmSize = new Dimension(701, 301);
-    protected static final String HIDE = "Hide";
-    protected static final String SHOW = "Show";
-    protected static final String SPACE = " ";
-    protected static final String STANDARD_TIME_SETTING = "standard time";
-    protected static final String MILITARY_TIME_SETTING = "military time";
-    protected static final String FULL_TIME_SETTING = "full date";
-    protected static final String PARTIAL_TIME_SETTING = "partial date";
+
     protected static final DateFormat sdf = new SimpleDateFormat("MM-dd-yyyy");
     protected static final Font font60 = new Font("Courier New", Font.BOLD, 60);
     protected static final Font font50 = new Font("Courier New", Font.BOLD, 50);
@@ -135,14 +130,33 @@ public class Clock extends JFrame {
         else this.minutesAsStr = Integer.toString(this.minutes);
     }
     protected void setHours(int hours) {
-        if (hours == 0 && !showMilitaryTime) {
+        if (hours == 0 && !isShowMilitaryTime()) {
             this.hours = 12;
         }
-        else if (hours == 0 && showMilitaryTime) {
+        else if (hours == 0 && isShowMilitaryTime()) {
             this.hours = 0;
         }
         else
             this.hours = hours;
+        if (this.hours <= 9) this.hoursAsStr = "0"+hours;
+        else this.hoursAsStr = Integer.toString(this.hours);
+    }
+    protected void setHours(int hours, boolean hardSetHour) {
+        if (hardSetHour)
+        {
+            this.hours = hours;
+        }
+        else
+        {
+            if (hours == 0 && !isShowMilitaryTime()) {
+                this.hours = 12;
+            }
+            else if (hours == 0 && isShowMilitaryTime()) {
+                this.hours = 0;
+            }
+            else
+                this.hours = hours;
+        }
         if (this.hours <= 9) this.hoursAsStr = "0"+hours;
         else this.hoursAsStr = Integer.toString(this.hours);
     }
@@ -202,9 +216,10 @@ public class Clock extends JFrame {
         setShowMilitaryTime(false);
         setSeconds(0);
         setMinutes(0);
-        setHours(0);
+        setHours(0, true);
         setSecondsAsStr("");
         setMinutesAsStr("");
+        setHoursAsStr("");
         setDefaultClockValues(getHours(), getMinutes(), getSeconds(), getMonth(), getDay(), getDate(), getYear(), getAMPM());
         setFacePanel(ClockFace.ClockFace);
         setClockPanel(new ClockPanel(this));
@@ -215,24 +230,39 @@ public class Clock extends JFrame {
         add(getClockPanel());
         pack();
     }
-    public Clock(int hours, int minutes, int seconds, Time.Month month, Time.Day day, int date, int year, Time.AMPM ampm) throws ParseException
-    {
+    public Clock(int hours, int minutes, int seconds, Time.Month month, Time.Day day, int date, int year, Time.AMPM ampm) throws ParseException, InvalidInputException {
         super();
         setResizable(true);
         setListOfAlarms(new ArrayList<>());
         setupMenuBar();
+        setShowMilitaryTime(false);
         setAlarmPanel(new AlarmPanel(this));
         setTimerPanel(new TimerPanel(this));
         setSeconds(seconds);
         setMinutes(minutes);
-        setHours(hours);
-        setDefaultClockValues(hours, minutes, seconds, month, day, date, year, ampm);
+        setHours(hours, true);
+        setMonth(month);
+        setDay(day);
+        setDate(date);
+        setYear(year);
+        setAMPM(ampm);
+        setCalendar(Calendar.getInstance());
+        getCalendar().set(Calendar.MONTH, convertTimeMonthToInt(getMonth())-1);
+        getCalendar().set(Calendar.DATE, getDate());
+        getCalendar().set(Calendar.YEAR, getYear());
+        getCalendar().set(Calendar.HOUR, getHours());
+        getCalendar().set(Calendar.MINUTE, getMinutes());
+        getCalendar().set(Calendar.SECOND, getSeconds());
+        getCalendar().set(Calendar.AM_PM, convertTimeAMPMToInt(getAMPM()));
+        getCalendar().set(Calendar.MILLISECOND,0);
+        System.out.println("Calendar date: " + getCalendar().getTime());
         setFacePanel(ClockFace.ClockFace);
         setClockPanel(new ClockPanel(this));
         setClockFace(ClockFace.ClockFace);
         pack();
         add(getClockPanel());
     }
+
     // Helper methods
     public void setRemainingDefaultValues()
     {
@@ -250,7 +280,11 @@ public class Clock extends JFrame {
         setCalendarTime(new Date());
         Date definedDate = null;
         if (hours == 0 && hoursAsStr.equals("") ||
-                hours == 12 && hoursAsStr.equals("12")) { hours = getCalendar().get(Calendar.HOUR); hoursAsStr = Integer.toString(hours); }
+            hours == 12 && hoursAsStr.equals("12"))
+        {
+            hours = getCalendar().get(Calendar.HOUR);
+            hoursAsStr = Integer.toString(hours);
+        }
         if (minutes == 0 && minutesAsStr.equals("")) { minutes = getCalendar().get(Calendar.MINUTE); minutesAsStr = Integer.toString(minutes); }
         if (seconds == 0 && secondsAsStr.equals("")) { seconds = getCalendar().get(Calendar.SECOND); secondsAsStr = Integer.toString(seconds); }
         if (month == null) { month = convertIntToTimeMonth(getCalendar().get(Calendar.MONTH)+1); }
@@ -275,9 +309,9 @@ public class Clock extends JFrame {
         setDay(day);
         setDate(date);
         setYear(year);
-        setHours(hours);
-        setMinutes(minutes);
-        setSeconds(seconds);
+        //setHours(hours);
+        //setMinutes(minutes);
+        //setSeconds(seconds);
         setAMPM(ampm);
         setDaylightSavingsTimeDates();
         setDaylightSavingsTime(isTodayDaylightSavingsTime());
@@ -670,6 +704,11 @@ public class Clock extends JFrame {
             default: return Time.Month.ERROR;
         }
     }
+    public int convertTimeAMPMToInt(Time.AMPM ampm)
+    {
+        if (ampm == Time.AMPM.AM) return 0;
+        else return 1;
+    }
     public void setupMenuBar()
     {
         UIManager.put("MenuItem.background", Color.BLACK);
@@ -679,12 +718,12 @@ public class Clock extends JFrame {
             if (isShowMilitaryTime())
             {
                 setShowMilitaryTime(false);
-                menuBar.getMilitaryTimeSetting().setText(HIDE + SPACE + MILITARY_TIME_SETTING);
+                menuBar.getMilitaryTimeSetting().setText(ClockConstants.HIDE + ClockConstants.SPACE + ClockConstants.MILITARY_TIME_SETTING);
             }
             else
             {
                 setShowMilitaryTime(true);
-                menuBar.getMilitaryTimeSetting().setText(SHOW + SPACE + STANDARD_TIME_SETTING);
+                menuBar.getMilitaryTimeSetting().setText(ClockConstants.SHOW + ClockConstants.SPACE + ClockConstants.STANDARD_TIME_SETTING);
             }
             //updateClockFace(true);
             // updatePanel
@@ -695,15 +734,15 @@ public class Clock extends JFrame {
             {
                 setShowFullDate(false);
                 setShowPartialDate(false);
-                menuBar.getFullTimeSetting().setText(SHOW + SPACE + FULL_TIME_SETTING);
-                menuBar.getPartialTimeSetting().setText(SHOW + SPACE + PARTIAL_TIME_SETTING);
+                menuBar.getFullTimeSetting().setText(ClockConstants.SHOW + ClockConstants.SPACE + ClockConstants.FULL_TIME_SETTING);
+                menuBar.getPartialTimeSetting().setText(ClockConstants.SHOW + ClockConstants.SPACE + ClockConstants.PARTIAL_TIME_SETTING);
             }
             else
             {
                 setShowFullDate(true);
                 setShowPartialDate(false);
-                menuBar.getFullTimeSetting().setText(HIDE + SPACE + FULL_TIME_SETTING);
-                menuBar.getPartialTimeSetting().setText(SHOW + SPACE + PARTIAL_TIME_SETTING);
+                menuBar.getFullTimeSetting().setText(ClockConstants.HIDE + ClockConstants.SPACE + ClockConstants.FULL_TIME_SETTING);
+                menuBar.getPartialTimeSetting().setText(ClockConstants.SHOW + ClockConstants.SPACE + ClockConstants.PARTIAL_TIME_SETTING);
             }
             //updateClockFace(true);
             // updatePanel
@@ -714,15 +753,15 @@ public class Clock extends JFrame {
             {
                 setShowPartialDate(false);
                 setShowFullDate(false);
-                menuBar.getPartialTimeSetting().setText(SHOW + SPACE + PARTIAL_TIME_SETTING);
-                menuBar.getFullTimeSetting().setText(SHOW + SPACE + FULL_TIME_SETTING);
+                menuBar.getPartialTimeSetting().setText(ClockConstants.SHOW + ClockConstants.SPACE + ClockConstants.PARTIAL_TIME_SETTING);
+                menuBar.getFullTimeSetting().setText(ClockConstants.SHOW + ClockConstants.SPACE + ClockConstants.FULL_TIME_SETTING);
             }
             else
             {
                 setShowPartialDate(true);
                 setShowFullDate(false);
-                menuBar.getPartialTimeSetting().setText(HIDE + SPACE + PARTIAL_TIME_SETTING);
-                menuBar.getFullTimeSetting().setText(SHOW + SPACE + FULL_TIME_SETTING);
+                menuBar.getPartialTimeSetting().setText(ClockConstants.HIDE + ClockConstants.SPACE + ClockConstants.PARTIAL_TIME_SETTING);
+                menuBar.getFullTimeSetting().setText(ClockConstants.SHOW + ClockConstants.SPACE + ClockConstants.FULL_TIME_SETTING);
             }
             //updateClockFace(true);
             // updatePanel
@@ -778,12 +817,9 @@ public class Clock extends JFrame {
         this.repaint();
         this.setVisible(true);
     }
-    /**
-     * The purpose of tick is to start the clock normally.
-     */
     public void tick()
     {
-        tick(1, 1, 1);
+        tick(1,0,0); // default
     }
     /**
      * The purpose of tick is to start the clock but it should increase
@@ -801,7 +837,7 @@ public class Clock extends JFrame {
             performTick(seconds, minutes, hours);
             //Updates the clock daily to keep time current
             getClockPanel().updateLabels();
-            if (getTimeAsStr().equals("04:20:00" + SPACE + Time.AMPM.AM.strValue) ||
+            if (getTimeAsStr().equals("04:20:00" + ClockConstants.SPACE + Time.AMPM.AM.strValue) ||
                 getMilitaryTimeAsStr().equals("0420 hours 00"))
             {
                 setSecondsAsStr("00");
