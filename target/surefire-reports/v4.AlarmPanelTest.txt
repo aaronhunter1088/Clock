@@ -1,0 +1,12 @@
+-------------------------------------------------------------------------------
+Test set: v4.AlarmPanelTest
+-------------------------------------------------------------------------------
+Tests run: 8, Failures: 0, Errors: 2, Skipped: 0, Time elapsed: 3.071 s <<< FAILURE! - in v4.AlarmPanelTest
+v4.AlarmPanelTest.alarmWorksAsExpected  Time elapsed: 0.005 s  <<< ERROR!
+java.lang.NullPointerException
+	at v4.AlarmPanelTest.alarmWorksAsExpected(AlarmPanelTest.java:92)
+
+v4.AlarmPanelTest.testMusicPlayerCanSoundAlarm  Time elapsed: 1.04 s  <<< ERROR!
+java.lang.NullPointerException
+	at v4.AlarmPanelTest.testMusicPlayerCanSoundAlarm(AlarmPanelTest.java:56)
+
