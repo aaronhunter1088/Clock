@@ -5,7 +5,7 @@
     
     <groupId>com.example</groupId>
   	<artifactId>clock</artifactId>
-  	<version>2.3</version>
+  	<version>2.4</version>
   	<name>Clock</name>
     <description>This is Clock GUI.</description>
     
@@ -16,6 +16,7 @@
 		<maven.properties.version>1.0-alpha-2</maven.properties.version>
 		<maven.jar.version>3.2.0</maven.jar.version>
 		<maven.surefire.version>3.0.0-M5</maven.surefire.version>
+		<maven.assembly.version>3.3.0</maven.assembly.version>
     </properties>
 
 	<!-- NOTES -->
@@ -76,11 +77,12 @@
 		    <scope>test</scope>
 		</dependency>
 
-<!--		<dependency>-->
-<!--			<groupId>org.apache.velocity</groupId>-->
-<!--			<artifactId>velocity</artifactId>-->
-<!--			<version>1.5</version>-->
-<!--		</dependency>-->
+		<!-- https://mvnrepository.com/artifact/org.apache.maven.plugins/maven-assembly-plugin -->
+		<dependency>
+			<groupId>org.apache.maven.plugins</groupId>
+			<artifactId>maven-assembly-plugin</artifactId>
+			<version>${maven.assembly.version}</version>
+		</dependency>
 
 		<!-- https://mvnrepository.com/artifact/org.apache.maven.plugins/maven-jar-plugin -->
 		<dependency>
@@ -152,8 +154,10 @@
 					<excludes>
 						<exclude>**/v1/*.java</exclude>
 						<exclude>**/v2/*.java</exclude>
+						<exclude>**/v3/*.java</exclude>
 						<exclude>**/v1/*Test.java</exclude>
 						<exclude>**/v2/*Test.java</exclude>
+						<exclude>**/v3/*Test.java</exclude>
 					</excludes>
 				</configuration>
 			</plugin>
@@ -181,7 +185,7 @@
             	</executions>
             </plugin>
 
-			<!-- Binds to Package phase -->
+			<!-- Binds to Package phase, but will not run... -->
             <!-- When creating a jar, update MANIFEST.MF file and place JAR in specified outputDirectory -->
             <plugin>
             	<groupId>org.apache.maven.plugins</groupId>
@@ -202,26 +206,29 @@
 					<archive>
 						<index>true</index>
 						<manifest>
+							<addDefaultImplementationEntries>true</addDefaultImplementationEntries>
 							<addClasspath>true</addClasspath>
-							<mainClass>v3.Clock</mainClass>
+							<mainClass>v4.Main</mainClass>
 						</manifest>
 						<manifestEntries>
 							<Implementation-Version>${project.version}</Implementation-Version>
-							<Creation-Time-Format>MM-dd-YYYY hh:mm:ss</Creation-Time-Format>
+							<Creation-Time-Format>yyyy-MM-dd HH:mm:ss</Creation-Time-Format>
 							<!--suppress UnresolvedMavenProperty -->
 							<Creation-Time>${build.time}</Creation-Time>
-							<mainClass>v3.Clock</mainClass>
+							<mainClass>v4.Main</mainClass>
 						</manifestEntries>
 					</archive>
 					<includes>
-						<include>**/v3/*</include>
+						<include>**/v4/*</include>
 						<include>**/sounds/*</include>
 					</includes>
 					<excludes>
-						<exclude>**/*</exclude>
-<!--						<exclude>**/v2/*</exclude>-->
-<!--						<exclude>**/v1/*Test</exclude>-->
-<!--						<exclude>**/v2/*Test</exclude>-->
+						<exclude>**/v1/*.java</exclude>
+						<exclude>**/v2/*.java</exclude>
+						<exclude>**/v3/*.java</exclude>
+						<exclude>**/v1/*Test.java</exclude>
+						<exclude>**/v2/*Test.java</exclude>
+						<exclude>**/v3/*Test.java</exclude>
 					</excludes>
             	</configuration>
             </plugin>
@@ -239,7 +246,7 @@
             				<tasks>
             					<mkdir dir="${project.build.directory}"/>
             					<tstamp>
-            						<format property="last.updated" pattern="MM-dd-YYYY hh:mm:ss"/>
+									<format property="last.updated" pattern="yyyy-MM-dd HH:mm:ss"/>
             					</tstamp>
             					<!--suppress UnresolvedMavenProperty -->
 								<echo file="${basedir}/dist/build.properties" message="build.time=${last.updated}"/>
@@ -269,9 +276,11 @@
             	</executions>
             </plugin>-->
 
-			<!-- Package -->
+			<!-- Package: creates runnable jar with dependencies -->
             <plugin>
-                 <artifactId>maven-assembly-plugin</artifactId>
+				 <groupId>org.apache.maven.plugins</groupId>
+				 <artifactId>maven-assembly-plugin</artifactId>
+				 <version>${maven.assembly.version}</version>
                  <executions>
                      <execution>
 						 <phase>package</phase>
@@ -282,24 +291,25 @@
 				 </executions>
 				 <configuration>
 					 <finalName>Clock-v${project.version}</finalName>
-					 <archive>
-						   <index>true</index>
-						   <manifest>
-								<addClasspath>true</addClasspath>
-								<mainClass>v3.Clock</mainClass>
-						   </manifest>
-						   <manifestEntries>
-							  <Implementation-Version>${project.version}</Implementation-Version>
-							  <Creation-Time-Format>MM-dd-YYYY hh:mm:ss</Creation-Time-Format>
-							  <!--suppress UnresolvedMavenProperty -->
-							  <Creation-Time>${build.time}</Creation-Time>
-							  <mainClass>v3.Clock</mainClass>
-						  </manifestEntries>
-					 </archive>
+					 <outputDirectory>${basedir}/dist</outputDirectory>
 					 <descriptorRefs>
 						 <descriptorRef>jar-with-dependencies</descriptorRef>
 					 </descriptorRefs>
-					 <outputDirectory>${basedir}/dist</outputDirectory>
+					 <archive>
+						 <index>true</index>
+						 <manifest>
+							 <addDefaultImplementationEntries>true</addDefaultImplementationEntries>
+							 <addClasspath>true</addClasspath>
+							 <mainClass>v4.Main</mainClass>
+						 </manifest>
+						 <manifestEntries>
+							 <Implementation-Version>${project.version}</Implementation-Version>
+							 <Creation-Time-Format>yyyy-MM-dd HH:mm:ss</Creation-Time-Format>
+							 <!--suppress UnresolvedMavenProperty -->
+							 <Creation-Time>${build.time}</Creation-Time>
+							 <mainClass>v4.Main</mainClass>
+						 </manifestEntries>
+					 </archive>
 				 </configuration>
 			</plugin>
 		    
