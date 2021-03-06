@@ -2,16 +2,13 @@ package v5;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.math.NumberUtils;
-
 import javax.swing.*;
 import javax.swing.border.LineBorder;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.FocusEvent;
 import java.awt.event.FocusListener;
-import java.text.ParseException;
 
-@SuppressWarnings("unused")
 /** This is the newest panel, the Timer panel.
  * It is part of version 2.4
  *
@@ -25,22 +22,20 @@ import java.text.ParseException;
  * which is under the Features menu
  *
  * @author michael ball
- * @version 2.4
+ * @version 2.5
  */
-public class TimerPanel extends JPanel implements IClockFace {
-
+public class TimerPanel extends JPanel implements IClockPanel
+{
     private GridBagLayout layout;
     private GridBagConstraints constraints;
-    private JTextField jtextField1 = new JTextField("Hour", 4); // Hour textField
-    private JTextField jtextField2 = new JTextField("Min", 4); // Min textField
-    private JTextField jtextField3 = new JTextField("Sec", 4); // Second textField
-    private JButton timerButton = null;
-    private JButton resetButton = null;
+    private JTextField jtextField1; // Hour textField
+    private JTextField jtextField2; // Min textField
+    private JTextField jtextField3; // Second textField
+    private JButton timerButton;
+    private JButton resetButton;
     private Clock clock;
-    private Clock timer;
     private Thread countdownThread = new Thread(this::performCountDown);
-    private boolean timerHasConcluded = false;
-    // Constructor
+
     public TimerPanel(Clock clock)
     {
         setClock(clock);
@@ -58,22 +53,6 @@ public class TimerPanel extends JPanel implements IClockFace {
         addComponentsToPanel();
     }
 
-    public TimerPanel() throws ParseException {
-        setClock(new Clock());
-        setSize(Clock.defaultSize);
-        setGridBagLayout(new GridBagLayout());
-        setLayout(getGridBagLayout());
-        setGridBagConstraints(new GridBagConstraints());
-        setBackground(Color.WHITE); // Color.BLACK
-        setForeground(Color.WHITE);
-        setBorder(new LineBorder(Color.BLACK));
-        setupTimerPanel();
-        setupTimerButton();
-        setupResetButton();
-        updateLabels();
-        addComponentsToPanel();
-    }
-    // Getters
     public GridBagLayout getGridBagLayout() { return this.layout; }
     public GridBagConstraints getGridBagConstraints() { return this.constraints; }
     public Clock getClock() { return this.clock; }
@@ -82,9 +61,7 @@ public class TimerPanel extends JPanel implements IClockFace {
     public JTextField getJTextField3() { return this.jtextField3; }
     public JButton getTimerButton() { return this.timerButton; }
     public JButton getResetButton() { return this.resetButton; }
-    public boolean isTimerHasConcluded() { return this.timerHasConcluded; }
 
-    // Setters
     protected void setGridBagLayout(GridBagLayout layout) { this.layout = layout; }
     protected void setGridBagConstraints(GridBagConstraints constraints) { this.constraints = constraints; }
     protected void setClock(Clock clock) { this.clock = clock; }
@@ -93,11 +70,12 @@ public class TimerPanel extends JPanel implements IClockFace {
     protected void setJTextField3(JTextField jtextField3) { this.jtextField3 = jtextField3; }
     protected void setTimerButton(JButton timerButton) { this.timerButton = timerButton; }
     protected void setResetButton(JButton resetButton) { this.resetButton = resetButton; }
-    protected void setTimerHasConcluded(boolean timerHasConcluded) { this.timerHasConcluded = timerHasConcluded; }
 
-    // Helper methods
     public void setupTimerPanel()
     {
+        setJTextField1(new JTextField("Hour", 4));
+        setJTextField2(new JTextField("Min", 4));
+        setJTextField3(new JTextField("Sec", 4));
         getJTextField1().setSize(new Dimension(50, 50));
         getJTextField2().setSize(new Dimension(50, 50));
         getJTextField3().setSize(new Dimension(50, 50));
@@ -295,7 +273,7 @@ public class TimerPanel extends JPanel implements IClockFace {
         getTimerButton().addActionListener(action -> {
             try
             {
-                startOrPauseTimer(action);
+                startOrPauseTimer();
             }
             catch (InterruptedException e)
             {
@@ -318,12 +296,9 @@ public class TimerPanel extends JPanel implements IClockFace {
         {
             return false;
         }
-        if (Integer.parseInt(getJTextField1().getText()) >= 24 ||
-            Integer.parseInt(getJTextField1().getText()) < 0) // cannot be more than 23 hours or less than 0
-        {
-            return false;
-        }
-        return true;
+        // cannot be more than 23 hours or less than 0
+        return Integer.parseInt(getJTextField1().getText()) < 24 &&
+                Integer.parseInt(getJTextField1().getText()) >= 0;
     }
     protected boolean validateSecondTextField()
     {
@@ -335,11 +310,8 @@ public class TimerPanel extends JPanel implements IClockFace {
         {
             return false;
         }
-        if (Integer.parseInt(getJTextField2().getText()) >= 60) // 70 minutes given
-        {
-            return false;
-        }
-        return true;
+        // 70 minutes given
+        return Integer.parseInt(getJTextField2().getText()) < 60;
     }
     protected boolean validateThirdTextField()
     {
@@ -351,14 +323,11 @@ public class TimerPanel extends JPanel implements IClockFace {
         {
             return false;
         }
-        if (Integer.parseInt(getJTextField3().getText()) >= 60) // 70 seconds given
-        {
-            return false;
-        }
-        return true;
+        // 70 seconds given
+        return Integer.parseInt(getJTextField3().getText()) < 60;
     }
     //TODO: Using deprecated Thread.resume(). Fix
-    public void startOrPauseTimer(ActionEvent action) throws InterruptedException
+    public void startOrPauseTimer() throws InterruptedException
     {
         if (StringUtils.equals(getTimerButton().getText(), "Set") ||
             StringUtils.equals(getTimerButton().getText(), "Resume Timer"))
@@ -370,7 +339,8 @@ public class TimerPanel extends JPanel implements IClockFace {
             if (countdownThread.getState() == Thread.State.NEW)
             {
                 countdownThread.start();
-                setTimerHasConcluded(false);
+                //setTimerHasConcluded(false);
+                getClock().setTimerGoingOff(false);
             }
             else
             {
@@ -404,7 +374,7 @@ public class TimerPanel extends JPanel implements IClockFace {
             //int totalSeconds = Integer.parseInt(getJTextField3().getText());
             //totalSeconds += (Integer.parseInt(getJTextField2().getText()) * 60);
             //totalSeconds += (Integer.parseInt(getJTextField1().getText()) * (60*60));
-            // reduce the total, keeping hours, mins, and seconds current
+            // reduce the total, keeping hours, minutes, and seconds current
             //for(int i = totalSeconds; i > 0; i--)
             while (Integer.parseInt(getJTextField3().getText()) > 0 ||
                    Integer.parseInt(getJTextField2().getText()) > 0 ||
@@ -433,7 +403,8 @@ public class TimerPanel extends JPanel implements IClockFace {
             // when done counting, set Set button back to Set
             getTimerButton().setText("Set");
             getTimerButton().setEnabled(false);
-            setTimerHasConcluded(true);
+            //setTimerHasConcluded(true);
+            getClock().setTimerGoingOff(true);
         }
         catch (NumberFormatException e)
         {
@@ -490,7 +461,7 @@ public class TimerPanel extends JPanel implements IClockFace {
 
     public void checkIfTimerHasConcluded()
     {
-        if (isTimerHasConcluded()) {
+        if (getClock().isTimerGoingOff()) {
             getClock().changeToTimerPanel();
         }
     }

@@ -3,10 +3,12 @@ package v5;
 import java.text.ParseException;
 import java.time.DayOfWeek;
 import java.util.ArrayList;
+import java.util.List;
 
-import static v5.Time.AMPM;
+import v5.Time.AMPM;
 
-@SuppressWarnings("unused")
+import static java.time.DayOfWeek.*;
+
 /** An Alarm is similar to a Clock.
  * The differences may continue to grow but
  * as for now, an Alarm knows all the days
@@ -19,61 +21,51 @@ import static v5.Time.AMPM;
  */
 public class Alarm extends Clock
 {
-    //Alarm specific parameters
     private ArrayList<DayOfWeek> days;
-    private DayOfWeek currentDay;
 
-    // Getters
     public ArrayList<DayOfWeek> getDays() { return this.days; }
-    public DayOfWeek getCurrentDay() { return this.currentDay; }
 
-    // Setters
     protected void setDays(ArrayList<DayOfWeek> days) { this.days = days; }
-    protected void setCurrentDay(DayOfWeek currentDay) { this.currentDay = currentDay; }
 
-    // Constructors
-    public Alarm() throws ParseException
+    public Alarm() throws ParseException, InvalidInputException
     {
         super(new Clock());
     }
     public Alarm(Clock clock, int hours, boolean isUpdateAlarm) throws ParseException
     {
         super(clock);
-        setHours(hours);
+        setHours(hours, true);
         setUpdateAlarm(isUpdateAlarm);
     }
-    public Alarm(Clock clock, int hours, int minutes, AMPM time, boolean isUpdateAlarm, ArrayList<DayOfWeek> days) throws ParseException
+    public Alarm(int hours, int minutes, AMPM time, boolean isUpdateAlarm, ArrayList<DayOfWeek> days) throws ParseException, InvalidInputException
     {
-        setHours(hours);
+        super();
+        setHours(hours, true);
         setMinutes(minutes);
         setSeconds(0);
         setAMPM(time);
         setDays(days);
         setUpdateAlarm(isUpdateAlarm);
     }
-
-    // Helper methods
-    public void printAlarmStatus()
-    { this.printAlarmStatus(this.getClass(), ""); }
-    public void printAlarmStatus(String message)
-    { this.printAlarmStatus(this.getClass(), message); }
-    public void printAlarmStatus(Class clazz, String status)
+    public List<String> getDaysShortened()
     {
-        this.printClockStatus(clazz, status);
-        System.out.print("days: ");
-        if (null != days)
-        {
-            for(DayOfWeek day: days)
-            { System.out.print("\t"+day); }
+        List<String> shortenedDays = new ArrayList<>();
+        if (getDays().contains(MONDAY) && getDays().contains(TUESDAY) &&
+                getDays().contains(WEDNESDAY) && getDays().contains(THURSDAY) &&
+                getDays().contains(FRIDAY)) { shortenedDays.add("Wk "); }
+        else if (getDays().contains(SATURDAY) && getDays().contains(SUNDAY)) { shortenedDays.add("Wd"); }
+        else {
+            for(DayOfWeek day : getDays())
+            {
+                if (day == MONDAY) { shortenedDays.add("M "); }
+                if (day == TUESDAY) { shortenedDays.add("T "); }
+                if (day == WEDNESDAY) { shortenedDays.add("W "); }
+                if (day == THURSDAY) { shortenedDays.add("Th "); }
+                if (day == FRIDAY) { shortenedDays.add("F "); }
+                if (day == SATURDAY) { shortenedDays.add("S "); }
+                if (day == SUNDAY) { shortenedDays.add("Su "); }
+            }
         }
-        else
-        {
-            System.out.println("\t'No days'");
-        }
-    }
-    protected void setCurrentDay()
-    {
-        // alarm knows which days it should go off
-        // it also is a clock, and knows that value
+        return shortenedDays;
     }
 }

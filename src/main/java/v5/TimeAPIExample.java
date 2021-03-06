@@ -19,10 +19,12 @@ public class TimeAPIExample
         int month = date.getMonthValue();
         Month aMonth = date.getMonth();
         int day = date.getDayOfMonth();
+        DayOfWeek dayOfWeek = date.getDayOfWeek();
         System.out.println("Year: " + year);
         System.out.println("Month Value: " + month);
         System.out.println("Month: " + aMonth);
         System.out.println("Day of Month: " + day);
+        System.out.println("Day of Week: " + dayOfWeek);
 
         for(Month m : java.time.Month.values())
         {
@@ -39,5 +41,7 @@ public class TimeAPIExample
 
         LocalTime presetTime = LocalTime.of(11, 21, 35);
         System.out.println("Preset Time:  " + presetTime);
+
+
     }
 }

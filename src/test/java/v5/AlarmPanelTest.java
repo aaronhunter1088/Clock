@@ -25,7 +25,7 @@ public class AlarmPanelTest extends Object {
     private static Alarm alarm;
 
     @BeforeClass
-    public static void setupBeforeClass() throws InterruptedException, ParseException
+    public static void setupBeforeClass() throws InterruptedException, ParseException, InvalidInputException
     {
         clock = new Clock();
         clock.setVisible(true);

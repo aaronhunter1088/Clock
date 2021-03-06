@@ -1,5 +1,11 @@
 package v5;
 
+/**
+ * Constants for Clock application
+ *
+ * @author Michael Ball
+ * @version 2.5
+ */
 public class ClockConstants
 {
     protected static final String HIDE = "Hide";

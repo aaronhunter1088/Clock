@@ -5,14 +5,15 @@ import java.awt.*;
 import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
 
+import static v5.ClockConstants.*;
+import static v5.ClockConstants.FULL_TIME_SETTING;
+
 /** The menu bar for the Clock.
  *
- * Alarms are working. Adding days.
- *
- * Timers are coming soon!!
+ * Option to stop Alarm coming in 2.5
  *
  * @author Michael Ball
- * @version 4
+ * @version 2.5
  */
 public class ClockMenuBar extends JMenuBar {
     private static final long serialVersionUID = 1L;
@@ -30,7 +31,7 @@ public class ClockMenuBar extends JMenuBar {
     // Options for alarmFeature_Menu
     protected JMenuItem setAlarms;
     // Constructor
-    public ClockMenuBar()
+    public ClockMenuBar(Clock clock)
     {
         setForeground(Color.WHITE);
         setBackground(Color.BLACK);
@@ -39,13 +40,16 @@ public class ClockMenuBar extends JMenuBar {
         setFeaturesMenu(new JMenu("Features"));
         // Settings menu choices
         setMilitaryTimeSetting(new JMenuItem(ClockConstants.SHOW + ClockConstants.SPACE + ClockConstants.MILITARY_TIME_SETTING));
-        getMilitaryTimeSetting().setMnemonic('M');
+        getMilitaryTimeSetting().setAccelerator(KeyStroke.getKeyStroke(
+                KeyEvent.VK_M, InputEvent.CTRL_DOWN_MASK));
         getMilitaryTimeSetting().setForeground(Color.WHITE);
         setFullTimeSetting(new JMenuItem(ClockConstants.SHOW + ClockConstants.SPACE + ClockConstants.FULL_TIME_SETTING));
-        getFullTimeSetting().setMnemonic('F');
+        getFullTimeSetting().setAccelerator(KeyStroke.getKeyStroke(
+                KeyEvent.VK_F, InputEvent.CTRL_DOWN_MASK));
         getFullTimeSetting().setForeground(Color.WHITE);
         setPartialTimeSetting(new JMenuItem(ClockConstants.SHOW + ClockConstants.SPACE + ClockConstants.PARTIAL_TIME_SETTING));
-        getPartialTimeSetting().setMnemonic('P');
+        getPartialTimeSetting().setAccelerator(KeyStroke.getKeyStroke(
+                KeyEvent.VK_P, InputEvent.CTRL_DOWN_MASK));
         getPartialTimeSetting().setForeground(Color.WHITE);
         // Features menu choices
         setClockFeature(new JMenuItem("View Clock"));
@@ -83,6 +87,57 @@ public class ClockMenuBar extends JMenuBar {
         getTimerFeature().setForeground(Color.WHITE);
         getSetAlarms().setForeground(Color.WHITE);
         getSetAlarms().setBackground(Color.BLACK);
+        // Set functionality
+        // Settings Actions for Settings menu
+        getMilitaryTimeSetting().addActionListener(action -> {
+            if (clock.isShowMilitaryTime())
+            {
+                clock.setShowMilitaryTime(false);
+                getMilitaryTimeSetting().setText(HIDE + SPACE + MILITARY_TIME_SETTING);
+            }
+            else
+            {
+                clock.setShowMilitaryTime(true);
+                getMilitaryTimeSetting().setText(SHOW + SPACE + STANDARD_TIME_SETTING);
+            }
+        });
+        getFullTimeSetting().addActionListener(action -> {
+            if (clock.isShowFullDate())
+            {
+                clock.setShowFullDate(false);
+                clock.setShowPartialDate(false);
+                getFullTimeSetting().setText(SHOW + SPACE + FULL_TIME_SETTING);
+            }
+            else
+            {
+                clock.setShowFullDate(true);
+                clock.setShowPartialDate(false);
+                getFullTimeSetting().setText(HIDE + SPACE + FULL_TIME_SETTING);
+            }
+            getPartialTimeSetting().setText(SHOW + SPACE + PARTIAL_TIME_SETTING);
+        });
+        getPartialTimeSetting().addActionListener(action -> {
+            if (clock.isShowPartialDate())
+            {
+                clock.setShowPartialDate(false);
+                clock.setShowFullDate(false);
+                getPartialTimeSetting().setText(SHOW + SPACE + PARTIAL_TIME_SETTING);
+            }
+            else
+            {
+                clock.setShowPartialDate(true);
+                clock.setShowFullDate(false);
+                getPartialTimeSetting().setText(HIDE + SPACE + PARTIAL_TIME_SETTING);
+            }
+            getFullTimeSetting().setText(SHOW + SPACE + FULL_TIME_SETTING);
+        });
+        // Features Actions for Features menu
+        getClockFeature().addActionListener(action -> clock.changeToClockPanel());
+        getSetAlarms().addActionListener(action -> clock.changeToAlarmPanel());
+        getTimerFeature().addActionListener(action -> clock.changeToTimerPanel());
+        // Add both menus to main menu
+        add(getSettingsMenu());
+        add(getFeaturesMenu());
     }
     // Getters
     public JMenu getSettingsMenu() { return this.settingsMenu; }

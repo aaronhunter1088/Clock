@@ -6,28 +6,32 @@ import java.text.ParseException;
 
 import static java.lang.Thread.sleep;
 
+/**
+ * Main application to start Clock
+ *
+ * @author Michael Ball
+ * @version 2.5
+ */
 public class Main
 {
-    public static void main(String[] args) throws ParseException
+    @SuppressWarnings({"BusyWait", "InfiniteLoopStatement"})
+    public static void main(String[] args) throws ParseException, InvalidInputException
     {
         Clock clock = new Clock();
-        //Clock clock = new Clock(11, 59, 50, Time.Month.FEBRUARY, Time.Day.SUNDAY, 21, 2021, Time.AMPM.PM);
         clock.setVisible(true);
         clock.getContentPane().setBackground(Color.BLACK);
-        //clock.setSize(new Dimension(700, 300));
         clock.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         clock.setBounds(200, 200, 700, 300);
         try
         {
-            while (true)
-            {
+            while (true) {
                 clock.tick();
                 // check alarms
                 sleep(250);
                 clock.getAlarmPanel().checkIfAnyAlarmsAreGoingOff();
                 clock.getTimerPanel().checkIfTimerHasConcluded();
-                if (clock.getTimerPanel().isTimerHasConcluded()) {
-                    clock.getTimerPanel().setTimerHasConcluded(false);
+                if (clock.isTimerGoingOff()) {
+                    clock.setTimerGoingOff(false);
                 }
                 sleep(750);
             }

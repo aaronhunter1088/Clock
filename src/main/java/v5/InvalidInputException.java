@@ -14,7 +14,7 @@ package v5;
  * It forces the programmer to deal with the exception."
  *
  * @author michael ball
- * @version 2.4
+ * @version 2.5
  */
 public class InvalidInputException extends Exception {
 

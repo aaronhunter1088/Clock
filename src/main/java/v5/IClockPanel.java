@@ -6,9 +6,9 @@ package v5;
  * sure it has updated itself accordingly.
  *
  * @author Michael Ball
- * @version 4
+ * @version 2.5
  */
-public interface IClockFace {
+public interface IClockPanel {
 
     void updateLabels();
     void addComponentsToPanel();

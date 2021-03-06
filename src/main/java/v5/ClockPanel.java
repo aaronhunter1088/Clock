@@ -2,10 +2,7 @@ package v5;
 
 import javax.swing.*;
 import java.awt.*;
-import java.util.Calendar;
-import java.util.Date;
 
-@SuppressWarnings("unused")
 /** The ClockPanel is the main panel and is
  * visible first to the user. Here you can
  * see the time and date.
@@ -14,16 +11,16 @@ import java.util.Date;
  * look.
  *
  * @author michael ball
- * @version 2.4
+ * @version 2.5
  */
-public class ClockPanel extends JPanel implements IClockFace {
+public class ClockPanel extends JPanel implements IClockPanel {
 
     private GridBagLayout layout;
     private GridBagConstraints constraints;
-    private JLabel jlbl1 = new JLabel("", SwingConstants.CENTER);
-    private JLabel jlbl2 = new JLabel("", SwingConstants.CENTER);
+    private JLabel jlbl1;
+    private JLabel jlbl2;
     private Clock clock;
-    // Constructor
+
     public ClockPanel(Clock clock)
     {
         setClock(clock);
@@ -37,30 +34,31 @@ public class ClockPanel extends JPanel implements IClockFace {
         setupClockPanel(getClock());
         addComponentsToPanel();
     }
-    // Getters
+
     public GridBagLayout getGridBagLayout() { return this.layout; }
     public GridBagConstraints getGridBagConstraints() { return this.constraints; }
     public Clock getClock() { return this.clock; }
     public JLabel getJlbl1() { return this.jlbl1; }
     public JLabel getJlbl2() { return this.jlbl2; }
-    // Setters
+
     private void setGridBagLayout(GridBagLayout layout) { this.layout = layout; }
     private void setGridBagConstraints(GridBagConstraints constraints) { this.constraints = constraints; }
     private void setClock(Clock clock) { this.clock = clock; }
     public void setJlbl1(JLabel jlbl1) { this.jlbl1 = jlbl1; }
     public void setJlbl2(JLabel jlbl2) { this.jlbl2 = jlbl2; }
-    // Helper methods
+
     public void setupClockPanel(Clock clock)
     {
         clock.setDateChanged(false);
         clock.setShowFullDate(false);
         clock.setShowPartialDate(false);
         clock.setShowMilitaryTime(false);
+        setJlbl1(new JLabel("", SwingConstants.CENTER));
+        setJlbl2(new JLabel("", SwingConstants.CENTER));
     }
     @Override
     public void addComponentsToPanel()
     {
-        updateLabels();
         addComponent(getJlbl1(), 0,0,1,1, 0,0);
         addComponent(getJlbl2(), 1,0,1,1, 0,0);
     }
