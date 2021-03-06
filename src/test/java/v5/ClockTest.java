@@ -8,6 +8,7 @@ import org.mockito.junit.MockitoJUnitRunner;
 
 import java.text.ParseException;
 import java.time.LocalDate;
+import java.util.ArrayList;
 
 
 import static java.time.DayOfWeek.*;
@@ -21,19 +22,19 @@ public class ClockTest {
     private static Clock clock;
 
     @BeforeClass
-    public static void setup() throws ParseException, InvalidInputException
+    public static void setup() throws InvalidInputException
     {
         clock = new Clock();
     }
 
     @Before
-    public void beforeEachTest() throws InvalidInputException, ParseException
+    public void beforeEachTest() throws InvalidInputException
     {
         clock = new Clock();
     }
 
     @Test
-    public void testBeginningDayLightSavingsTimeIsProperlySet() throws ParseException, InvalidInputException
+    public void testBeginningDayLightSavingsTimeIsProperlySet() throws InvalidInputException
     {
         clock.setDaylightSavingsTimeDates();
         assertEquals("For 2021, Beginning DST Day should be 14th", 14, clock.getBeginDaylightSavingsTimeDate().getDayOfMonth());
@@ -61,30 +62,29 @@ public class ClockTest {
         assertNotEquals("Date should not be equal", clock.getDate(), anotherDay);
     }
 
-
     @Test
-    public void testIsDateDaylightSavingsDayReturnsFalseWhenNotEndingDST() throws InvalidInputException, ParseException
+    public void testIsDateDaylightSavingsDayReturnsFalseWhenNotEndingDST() throws InvalidInputException
     {
         clock = new Clock(5, 42, 0, NOVEMBER, SATURDAY, 5, 2022, PM);
         assertFalse(clock.isTodayDaylightSavingsTime());
     }
 
     @Test
-    public void testIsTodayDaylightSavingsDayReturnsTrueWhenIsBeginningDST() throws InvalidInputException, ParseException
+    public void testIsTodayDaylightSavingsDayReturnsTrueWhenIsBeginningDST() throws InvalidInputException
     {
         clock = new Clock(5, 42, 0, MARCH, SUNDAY, 13, 2022, PM);
         assertTrue(clock.isTodayDaylightSavingsTime());
     }
 
     @Test
-    public void testIsTodayDaylightSavingsDayReturnsTrueWhenIsEndingDST() throws InvalidInputException, ParseException
+    public void testIsTodayDaylightSavingsDayReturnsTrueWhenIsEndingDST() throws InvalidInputException
     {
         clock = new Clock(5, 42, 0, NOVEMBER, SUNDAY, 6, 2022, PM);
         assertTrue(clock.isTodayDaylightSavingsTime());
     }
 
     @Test
-    public void testClockBecomesAMWhenMidnightStarts() throws ParseException, InvalidInputException
+    public void testClockBecomesAMWhenMidnightStarts() throws InvalidInputException
     {
         //(int hours, int minutes, int seconds, Time.Month month, Time.Day day, int date, int year, Time.AMPM ampm)
         clock = new Clock(11, 59, 50, FEBRUARY, SUNDAY, 21, 2021, PM);
@@ -101,4 +101,20 @@ public class ClockTest {
         assertEquals("Year should be 2021", 2021, clock.getYear());
         assertEquals("AMPM should be AM", Time.AMPM.AM, clock.getAMPM());
     }
+
+    @Test
+    public void testWhenClockInMilitaryTimeAlarmStillTriggers() throws InvalidInputException
+    {
+        clock = new Clock(1, 0, 59, MARCH, SATURDAY, 6, 2021, PM);
+        clock.setShowMilitaryTime(true);
+        Alarm alarm = new Alarm(1, 1, PM, false, new ArrayList<>(){{add(SATURDAY);}});
+        clock.setListOfAlarms(new ArrayList<>(){{add(alarm);}});
+
+        assertTrue(clock.getListOfAlarms().size() == 1);
+
+        clock.tick();
+        clock.getAlarmPanel().checkIfAnyAlarmsAreGoingOff();
+        assertTrue(clock.getAlarmPanel().isAlarmIsGoingOff());
+    }
+
 }

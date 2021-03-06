@@ -27,17 +27,17 @@ public class Alarm extends Clock
 
     protected void setDays(ArrayList<DayOfWeek> days) { this.days = days; }
 
-    public Alarm() throws ParseException, InvalidInputException
+    public Alarm() throws InvalidInputException
     {
         super(new Clock());
     }
-    public Alarm(Clock clock, int hours, boolean isUpdateAlarm) throws ParseException
+    public Alarm(Clock clock, int hours, boolean isUpdateAlarm)
     {
         super(clock);
         setHours(hours, true);
         setUpdateAlarm(isUpdateAlarm);
     }
-    public Alarm(int hours, int minutes, AMPM time, boolean isUpdateAlarm, ArrayList<DayOfWeek> days) throws ParseException, InvalidInputException
+    public Alarm(int hours, int minutes, AMPM time, boolean isUpdateAlarm, ArrayList<DayOfWeek> days) throws InvalidInputException
     {
         super();
         setHours(hours, true);

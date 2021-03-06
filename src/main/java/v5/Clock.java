@@ -539,14 +539,21 @@ public class Clock extends JFrame
         String defaultText = "";
         if (labelVersion == 1)
         {
-            if (isShowFullDate() && !isShowPartialDate()) defaultText += getFullDateAsStr();
-            else if (isShowPartialDate() && !isShowFullDate()) defaultText += getPartialDateAsStr();
-            else defaultText += getDateAsStr();
+            if (isShowFullDate() && !isShowPartialDate()) defaultText = getFullDateAsStr();
+            else if (isShowPartialDate() && !isShowFullDate()) defaultText = getPartialDateAsStr();
+            else defaultText = getDateAsStr();
         }
         else if (labelVersion == 2)
         {
-            if (!isShowMilitaryTime()) defaultText += getTimeAsStr();
-            else if (isShowMilitaryTime()) defaultText += getMilitaryTimeAsStr();
+            if (!isShowMilitaryTime()) {
+                defaultText = getTimeAsStr();
+                // change alarms to reflect normal time
+
+            }
+            else if (isShowMilitaryTime()) {
+                defaultText = getMilitaryTimeAsStr();
+                // change alarms to reflect military time
+            }
         }
         else if (labelVersion == 3)
         {
@@ -574,8 +581,6 @@ public class Clock extends JFrame
     {
         UIManager.put("MenuItem.background", Color.BLACK);
         setClockMenuBar(new ClockMenuBar(this));
-
-        // Set the Clock's menu to ClockMenuBar
         setJMenuBar(getClockMenuBar());
     }
     public void changeToClockPanel()
