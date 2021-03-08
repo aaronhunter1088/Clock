@@ -25,7 +25,6 @@ v3/AlarmPanelTest$1.class
 v4/InvalidInputExceptionTest.class
 v5/InvalidInputExceptionTest$1.class
 v3/ClockTest.class
-v5/ClockPanelTest.class
 v5/ClockTest$2.class
 v5/ITimeTest.class
 v3/ClockFaceTest.class

@@ -13,7 +13,6 @@ import java.util.ArrayList;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.function.Predicate;
-import java.time.DayOfWeek;
 
 import static org.junit.Assert.*;
 import static java.time.DayOfWeek.*;
@@ -57,22 +56,6 @@ public class AlarmPanelTest extends Object {
         testAlarmPanel.stopAlarm();
         assertFalse("Alarm is off", testAlarmPanel.isAlarmIsGoingOff());
         assertNull("Music Player is null", testAlarmPanel.getMusicPlayer());
-    }
-
-    @Test
-    public void setUpdatingAlarm() {
-    }
-
-    @Test
-    public void convertStringToTimeAMPM() {
-    }
-
-    @Test
-    public void setupCreatedAlarmsFunctionality() {
-    }
-
-    @Test
-    public void createAlarm() {
     }
 
     @Test

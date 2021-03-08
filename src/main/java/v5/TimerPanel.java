@@ -255,7 +255,7 @@ public class TimerPanel extends JPanel implements IClockPanel, Runnable
     {
         getResetButton().addActionListener(this::resetTimerFields);
     }
-    protected boolean validateFirstTextField()
+    public boolean validateFirstTextField()
     {
         if (StringUtils.equals(getJTextField1().getText(), "Hour"))
         {
@@ -269,7 +269,7 @@ public class TimerPanel extends JPanel implements IClockPanel, Runnable
         return Integer.parseInt(getJTextField1().getText()) < 24 &&
                 Integer.parseInt(getJTextField1().getText()) >= 0;
     }
-    protected boolean validateSecondTextField()
+    public boolean validateSecondTextField()
     {
         if (StringUtils.equals(getJTextField2().getText(), "Min"))
         {
@@ -280,9 +280,10 @@ public class TimerPanel extends JPanel implements IClockPanel, Runnable
             return false;
         }
         // 70 minutes given
-        return Integer.parseInt(getJTextField2().getText()) < 60;
+        return Integer.parseInt(getJTextField2().getText()) < 60 &&
+                Integer.parseInt(getJTextField2().getText()) >= 0;
     }
-    protected boolean validateThirdTextField()
+    public boolean validateThirdTextField()
     {
         if (StringUtils.equals(getJTextField3().getText(), "Sec"))
         {
@@ -293,7 +294,8 @@ public class TimerPanel extends JPanel implements IClockPanel, Runnable
             return false;
         }
         // 70 seconds given
-        return Integer.parseInt(getJTextField3().getText()) < 60;
+        return Integer.parseInt(getJTextField3().getText()) < 60 &&
+                Integer.parseInt(getJTextField3().getText()) >= 0;
     }
     public void startTimer()
     {

@@ -15,7 +15,8 @@ import static org.junit.Assert.assertTrue;
 public class ClockFaceTest {
 
 	@Test
-	public void testClockFacesAreDifferent() {
+	public void testClockFacesAreDifferent()
+	{
 		ClockFace c1 = ClockFace.StartFace;
 		ClockFace c2 = ClockFace.AlarmFace;
 		assertTrue(c1 != c2);

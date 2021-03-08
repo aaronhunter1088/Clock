@@ -27,7 +27,6 @@ public class InvalidInputExceptionTest extends Exception {
 	@Before
 	public void setUp() {
 		goodMonth = AUGUST;
-		badMonth = null;
 	}
 
 	@Test
