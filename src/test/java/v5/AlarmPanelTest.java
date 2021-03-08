@@ -100,6 +100,7 @@ public class AlarmPanelTest extends Object {
     public AlarmPanel createAndSetupAlarmPanel()
     {
         AlarmPanel testAlarmPanel = clock.getAlarmPanel();
+        testAlarmPanel.setAlarm(alarm);
         testAlarmPanel.setupMusicPlayer();
         return testAlarmPanel;
     }

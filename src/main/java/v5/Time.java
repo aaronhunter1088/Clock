@@ -1,6 +1,8 @@
 package v5;
 
-/** Enumeration class v5.Time - The values used by the clock to distinguish
+/**
+ * Enumeration class v5.Time
+ * The values used by the clock to distinguish
  * before midday or after midday.
  * 
  * @author michael ball

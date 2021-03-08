@@ -34,6 +34,6 @@ public class TimeTest extends Object {
     public void testStringValueIsReturned() {
         DayOfWeek monday = MONDAY;
         String textOfMonday = monday.toString();
-        assertEquals("Monday", textOfMonday);
+        assertEquals("MONDAY", textOfMonday);
     }
 }

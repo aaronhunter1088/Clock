@@ -1,6 +1,5 @@
 package v5;
 
-@SuppressWarnings("unused")
 /** This class is used to determine that an error
  * can occurred while the Clock was running. It is
  * a checked exception, meaning the clock will always
@@ -16,8 +15,8 @@ package v5;
  * @author michael ball
  * @version 2.5
  */
-public class InvalidInputException extends Exception {
-
+public class InvalidInputException extends Exception
+{
 	private static final long serialVersionUID = 1L;
 	private String message;
 	private Throwable cause;

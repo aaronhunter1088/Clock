@@ -3,8 +3,6 @@ package v5;
 import javazoom.jl.decoder.JavaLayerException;
 import javazoom.jl.player.advanced.AdvancedPlayer;
 import org.apache.commons.lang.StringUtils;
-import org.springframework.lang.Nullable;
-
 import javax.swing.*;
 import java.awt.*;
 import java.io.InputStream;
@@ -14,12 +12,12 @@ import java.util.ArrayList;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-
 import static v5.Time.AMPM.AM;
 import static v5.Time.AMPM.PM;
 import static java.time.DayOfWeek.*;
 
-/** The AlarmPanel is used to set and view alarms. The
+/**
+ * The AlarmPanel is used to set and view alarms. The
  * alarms can be viewed in the textarea and in the
  * menu (if you ctrl + a into the panel).
  * Clicking on an alarm in the View Alarms menu will
@@ -66,7 +64,7 @@ public class AlarmPanel extends JPanel implements IClockPanel
     private boolean updatingAlarm;
     private boolean alarmIsGoingOff;
     private AdvancedPlayer musicPlayer;
-    // Constructor
+
     public AlarmPanel(Clock clock)
     {
         super();
@@ -83,7 +81,7 @@ public class AlarmPanel extends JPanel implements IClockPanel
         updateLabels();
         addComponentsToPanel();
     }
-    // Getters
+
     public GridBagLayout getGridBagLayout() { return this.layout; }
     public GridBagConstraints getGridBagConstraints() { return this.constraints; }
     public Clock getClock() { return this.clock; }
@@ -112,7 +110,6 @@ public class AlarmPanel extends JPanel implements IClockPanel
     public JCheckBox getWkendCheckBox() { return wkendCheckBox; }
     public boolean isAlarmIsGoingOff() { return alarmIsGoingOff; }
 
-    // Setters
     protected void setGridBagLayout(GridBagLayout layout) { this.layout = layout; }
     protected void setGridBagConstraints(GridBagConstraints constraints) { this.constraints = constraints; }
     protected void setClock(Clock clock) { this.clock = clock; }
@@ -220,44 +217,6 @@ public class AlarmPanel extends JPanel implements IClockPanel
         // setup checkboxes
         setupCheckboxes();
     }
-    @Override
-    public void addComponentsToPanel()
-    {
-        //addComponent(getJAlarmLbl1(), 0,0,1,1, 15,7, GridBagConstraints.VERTICAL); // H
-        addComponent(getJAlarmLbl1(),0,0,1,1,0,0,   GridBagConstraints.CENTER, new Insets(0,0,0,0)); // H
-        addComponent(getJTextField1(),0,1,1,1, 0,0, GridBagConstraints.CENTER, new Insets(0,0,0,0)); // textField
-        addComponent(getJAlarmLbl2(),0,2,1,1, 0,0, GridBagConstraints.CENTER, new Insets(0,0,0,0)); // M
-        addComponent(getJTextField2(),0,3,1,1, 0,0, GridBagConstraints.CENTER, new Insets(0,0,0,0)); // textField
-        addComponent(getJAlarmLbl3(),0,4,1,1, 0,0, GridBagConstraints.CENTER, new Insets(0,0,0,0)); // Time (AM/PM)
-        addComponent(getJTextField3(),0,5,1,1, 0,0, GridBagConstraints.CENTER, new Insets(0,0,0,0)); // textField
-        addComponent(getJScrollPane(),0,6,4,3, 0,0, GridBagConstraints.BOTH, new Insets(1,1,1,1)); // textArea
-        // new column, first column
-        addComponent(getMondayCheckBox(), 1,0,2,1, 0,0, GridBagConstraints.NONE, new Insets(0,0,0,0)); // Sqr Monday
-        addComponent(getTuesdayCheckBox(), 2, 0, 2, 1, 1, 0, GridBagConstraints.NONE, new Insets(0,0,0,0)); // Sqr Tuesday
-        addComponent(getWednesdayCheckBox(), 3, 0, 2, 1, 2, 0, GridBagConstraints.NONE, new Insets(0,0,0,0)); // Sqr Wednesday
-        // new column, second column
-        addComponent(getThursdayCheckBox(), 1, 2, 2, 1, 0, 0, GridBagConstraints.NONE, new Insets(0,0,0,0)); // Sqr Thursday
-        addComponent(getFridayCheckBox(), 2, 2, 2, 1, 1, 0, GridBagConstraints.NONE, new Insets(0,0,0,0)); // Sqr Friday
-        addComponent(getSaturdayCheckBox(), 3, 2, 2, 1, 0, 0, GridBagConstraints.NONE, new Insets(0,0,0,0)); // Sqr Saturday
-        // new column, third column
-        addComponent(getSundayCheckBox(), 1, 4, 2, 1, 0, 0, GridBagConstraints.NONE, new Insets(0,0,0,0)); // Sqr Sunday
-        addComponent(getWeekCheckBox(), 2, 4, 2, 1, 1, 0, GridBagConstraints.NONE, new Insets(0,0,0,0)); // Sqr Weekend
-        addComponent(getWkendCheckBox(), 3, 4, 2, 1, 1, 0, GridBagConstraints.NONE, new Insets(0,0,0,0)); // Sqr Weekend
-        // set button
-        addComponent(getJSetAlarmButton(), 3, 6, 2, 1, 1, 1, GridBagConstraints.CENTER, new Insets(0,0,0,0)); // Set button
-        // header and alarms
-        addComponent(getJAlarmLbl4(), 5, 0, 4, 1, 2, 2, GridBagConstraints.BOTH, new Insets(0,0,0,0));
-    }
-
-    @Override
-    public void updateLabels()
-    {
-        getJAlarmLbl1().setText(getClock().defaultText(3)); // H
-        getJAlarmLbl2().setText(getClock().defaultText(4)); // M
-        getJAlarmLbl3().setText(getClock().defaultText(5)); // T
-        getJAlarmLbl4().setText(getClock().defaultText(6)); // All Alarms label...
-        getClock().repaint();
-    }
     public void checkIfAnyAlarmsAreGoingOff()
     {
         // alarm has reference to time
@@ -283,7 +242,7 @@ public class AlarmPanel extends JPanel implements IClockPanel
                     else if (getClock().isShowMilitaryTime()) // if in military time, change clocks hours back temporarily
                     {
                         int hours = getClock().getHours();
-                        getClock().setHours(hours-12, true);
+                        getClock().setHours(hours-12);
                         if (alarm.getTimeAsStr().equals(getClock().getTimeAsStr())
                                 &&
                             day == getClock().getDayOfWeek())
@@ -367,25 +326,12 @@ public class AlarmPanel extends JPanel implements IClockPanel
                         //updateTheAlarm(menuItem);
                         updateTheAlarm(getAlarm());
                     }
-                    /*else // when is this reachable
-                    {
-                        System.out.println("menuItem: " + menuItem.getText());
-                        System.out.println("alarm: " + getAlarm().getTimeAsStr()); // should be the same
-                        getAlarm().setUpdateAlarm(true);
-                        deleteAlarmMenuItemFromViewAlarms(getAlarm());
-                        System.out.println("Size of listOfAlarms before removal " + getClock().getListOfAlarms().size());
-                        getClock().getListOfAlarms().remove(getAlarm());
-                        System.out.println("Size of listOfAlarms after removal " + getClock().getListOfAlarms().size());
-                        resetJTextArea();
-                        setupCheckboxes();
-                    }*/
                     getClock().changeToAlarmPanel();
                 });
             }
         }
     }
-    //protected void updateTheAlarm(@Nullable JMenuItem menuItem)
-    protected void updateTheAlarm(@Nullable Alarm alarmToUpdate)
+    protected void updateTheAlarm(Alarm alarmToUpdate)
     {
         if (null != alarmToUpdate)
         {
@@ -465,7 +411,7 @@ public class AlarmPanel extends JPanel implements IClockPanel
                         setupAlarmsInMenuFunctionality();
                         setUpdatingAlarm(false);
                         resetJTextArea();
-                        resetJCheckboxes(false);
+                        resetJCheckboxes();
                         resetJAlarmLabel4();
                         // determine how to update alarm (update/delete)
                     }
@@ -503,7 +449,7 @@ public class AlarmPanel extends JPanel implements IClockPanel
                         System.err.println("Size of listOfAlarms after adding " + getClock().getListOfAlarms().size());
                         // display list of alarms below All Alarms
                         resetJTextArea();
-                        resetJCheckboxes(false);
+                        resetJCheckboxes();
                         setupAlarmsInMenuFunctionality();
                         // erase input in textFields
                         getJTextField1().setText("");
@@ -546,18 +492,6 @@ public class AlarmPanel extends JPanel implements IClockPanel
                                     getClock().getListOfAlarms().size() + " Alarm Added" :
                                     getClock().getListOfAlarms().size() + " Alarms Added"
                     );
-        }
-    }
-    @Override
-    public void printStackTrace(Exception e, String message)
-    {
-        if (null != message)
-            System.err.println(message);
-        else
-            System.err.println(e.getMessage());
-        for(StackTraceElement ste : e.getStackTrace())
-        {
-            System.out.println(ste.toString());
         }
     }
     protected void printStackTrace(Exception e)
@@ -837,43 +771,43 @@ public class AlarmPanel extends JPanel implements IClockPanel
             alarm.getDaysShortened().forEach(day -> getJTextArea().append(day));
         }
     }
-    protected void resetJCheckboxes(boolean set)
+    protected void resetJCheckboxes()
     {
         if (getSundayCheckBox().isSelected())
         {
-            getSundayCheckBox().setSelected(set);
+            getSundayCheckBox().setSelected(false);
         }
         if (getMondayCheckBox().isSelected())
         {
-            getMondayCheckBox().setSelected(set);
+            getMondayCheckBox().setSelected(false);
         }
         if (getTuesdayCheckBox().isSelected())
         {
-            getTuesdayCheckBox().setSelected(set);
+            getTuesdayCheckBox().setSelected(false);
         }
         if (getWednesdayCheckBox().isSelected())
         {
-            getWednesdayCheckBox().setSelected(set);
+            getWednesdayCheckBox().setSelected(false);
         }
         if (getThursdayCheckBox().isSelected())
         {
-            getThursdayCheckBox().setSelected(set);
+            getThursdayCheckBox().setSelected(false);
         }
         if (getFridayCheckBox().isSelected())
         {
-            getFridayCheckBox().setSelected(set);
+            getFridayCheckBox().setSelected(false);
         }
         if (getSaturdayCheckBox().isSelected())
         {
-            getSaturdayCheckBox().setSelected(set);
+            getSaturdayCheckBox().setSelected(false);
         }
         if (getWeekCheckBox().isSelected())
         {
-            getWeekCheckBox().setSelected(set);
+            getWeekCheckBox().setSelected(false);
         }
         if (getWkendCheckBox().isSelected())
         {
-            getWkendCheckBox().setSelected(set);
+            getWkendCheckBox().setSelected(false);
         }
     }
     public void setCheckboxesIfWasSelected(Alarm alarmToUpdate)
@@ -1011,5 +945,54 @@ public class AlarmPanel extends JPanel implements IClockPanel
         getGridBagConstraints().insets = insets;
         getGridBagLayout().setConstraints(cpt, getGridBagConstraints());
         add(cpt);
+    }
+    @Override
+    public void printStackTrace(Exception e, String message)
+    {
+        if (null != message)
+            System.err.println(message);
+        else
+            System.err.println(e.getMessage());
+        for(StackTraceElement ste : e.getStackTrace())
+        {
+            System.out.println(ste.toString());
+        }
+    }
+    @Override
+    public void addComponentsToPanel()
+    {
+        //addComponent(getJAlarmLbl1(), 0,0,1,1, 15,7, GridBagConstraints.VERTICAL); // H
+        addComponent(getJAlarmLbl1(),0,0,1,1,0,0,   GridBagConstraints.CENTER, new Insets(0,0,0,0)); // H
+        addComponent(getJTextField1(),0,1,1,1, 0,0, GridBagConstraints.CENTER, new Insets(0,0,0,0)); // textField
+        addComponent(getJAlarmLbl2(),0,2,1,1, 0,0, GridBagConstraints.CENTER, new Insets(0,0,0,0)); // M
+        addComponent(getJTextField2(),0,3,1,1, 0,0, GridBagConstraints.CENTER, new Insets(0,0,0,0)); // textField
+        addComponent(getJAlarmLbl3(),0,4,1,1, 0,0, GridBagConstraints.CENTER, new Insets(0,0,0,0)); // Time (AM/PM)
+        addComponent(getJTextField3(),0,5,1,1, 0,0, GridBagConstraints.CENTER, new Insets(0,0,0,0)); // textField
+        addComponent(getJScrollPane(),0,6,4,3, 0,0, GridBagConstraints.BOTH, new Insets(1,1,1,1)); // textArea
+        // new column, first column
+        addComponent(getMondayCheckBox(), 1,0,2,1, 0,0, GridBagConstraints.NONE, new Insets(0,0,0,0)); // Sqr Monday
+        addComponent(getTuesdayCheckBox(), 2, 0, 2, 1, 1, 0, GridBagConstraints.NONE, new Insets(0,0,0,0)); // Sqr Tuesday
+        addComponent(getWednesdayCheckBox(), 3, 0, 2, 1, 2, 0, GridBagConstraints.NONE, new Insets(0,0,0,0)); // Sqr Wednesday
+        // new column, second column
+        addComponent(getThursdayCheckBox(), 1, 2, 2, 1, 0, 0, GridBagConstraints.NONE, new Insets(0,0,0,0)); // Sqr Thursday
+        addComponent(getFridayCheckBox(), 2, 2, 2, 1, 1, 0, GridBagConstraints.NONE, new Insets(0,0,0,0)); // Sqr Friday
+        addComponent(getSaturdayCheckBox(), 3, 2, 2, 1, 0, 0, GridBagConstraints.NONE, new Insets(0,0,0,0)); // Sqr Saturday
+        // new column, third column
+        addComponent(getSundayCheckBox(), 1, 4, 2, 1, 0, 0, GridBagConstraints.NONE, new Insets(0,0,0,0)); // Sqr Sunday
+        addComponent(getWeekCheckBox(), 2, 4, 2, 1, 1, 0, GridBagConstraints.NONE, new Insets(0,0,0,0)); // Sqr Weekend
+        addComponent(getWkendCheckBox(), 3, 4, 2, 1, 1, 0, GridBagConstraints.NONE, new Insets(0,0,0,0)); // Sqr Weekend
+        // set button
+        addComponent(getJSetAlarmButton(), 3, 6, 2, 1, 1, 1, GridBagConstraints.CENTER, new Insets(0,0,0,0)); // Set button
+        // header and alarms
+        addComponent(getJAlarmLbl4(), 5, 0, 4, 1, 2, 2, GridBagConstraints.BOTH, new Insets(0,0,0,0));
+    }
+    @Override
+    public void updateLabels()
+    {
+        getJAlarmLbl1().setText(getClock().defaultText(3)); // H
+        getJAlarmLbl2().setText(getClock().defaultText(4)); // M
+        getJAlarmLbl3().setText(getClock().defaultText(5)); // T
+        getJAlarmLbl4().setText(getClock().defaultText(6)); // All Alarms label...
+        getClock().repaint();
     }
 }

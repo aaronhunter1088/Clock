@@ -1,6 +1,7 @@
 package v5;
 
-/** This enum is used to distinguish which panel the
+/**
+ * This enum is used to distinguish which panel the
  * main Clock GUI is using, i.e., ClockFace or AlarmFace,
  * TimerFace....
  *

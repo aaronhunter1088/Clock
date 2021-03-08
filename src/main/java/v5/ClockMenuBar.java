@@ -4,11 +4,11 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
-
 import static v5.ClockConstants.*;
 import static v5.ClockConstants.FULL_TIME_SETTING;
 
-/** The menu bar for the Clock.
+/**
+ * The menu bar for the Clock.
  *
  * Option to stop Alarm coming in 2.5
  *
@@ -30,7 +30,7 @@ public class ClockMenuBar extends JMenuBar {
     protected JMenuItem timerFeature;
     // Options for alarmFeature_Menu
     protected JMenuItem setAlarms;
-    // Constructor
+
     public ClockMenuBar(Clock clock)
     {
         setForeground(Color.WHITE);

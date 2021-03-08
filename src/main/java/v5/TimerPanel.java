@@ -9,22 +9,17 @@ import java.awt.event.ActionEvent;
 import java.awt.event.FocusEvent;
 import java.awt.event.FocusListener;
 
-/** This is the newest panel, the Timer panel.
- * It is part of version 2.4
+/** This is the Timer panel.
  *
  * The timer panel is used to set a timer.
  * Giving the panel some Hours, some Minutes,
- * and some Seconds, it will sound an alarm
+ * and some Seconds, it will display the panel
  * when the timer reaches '00:00:00'.
- *
- * Timers are a new "Feature".
- * They are visible under the View Timers menu
- * which is under the Features menu
  *
  * @author michael ball
  * @version 2.5
  */
-public class TimerPanel extends JPanel implements IClockPanel
+public class TimerPanel extends JPanel implements IClockPanel, Runnable
 {
     private GridBagLayout layout;
     private GridBagConstraints constraints;
@@ -252,35 +247,9 @@ public class TimerPanel extends JPanel implements IClockPanel
         getResetButton().setBorder(new LineBorder(Color.WHITE));
         setBackground(Color.BLACK);
     }
-    @Override
-    public void addComponentsToPanel()
-    {
-        setComponentOrientation(ComponentOrientation.LEFT_TO_RIGHT);
-        addComponent(getJTextField1(), 0,0,1,1,0,0, GridBagConstraints.HORIZONTAL); // TextField 1
-        addComponent(getJTextField2(), 0,1,1,1,0,0, GridBagConstraints.HORIZONTAL); // TextField 2
-        addComponent(getJTextField3(), 0,2,1,1,0,0, GridBagConstraints.HORIZONTAL); // TextField 3
-        addComponent(getResetButton(), 1, 0, 3, 1, 0, 0, GridBagConstraints.HORIZONTAL); // Reset Button
-        addComponent(getTimerButton(), 2,0,3,1,0,0, GridBagConstraints.HORIZONTAL); // Set Timer Button
-    }
-    @Override
-    public void updateLabels()
-    {
-        getJTextField1().grabFocus();
-        getClock().repaint();
-    }
     protected void setupTimerButton()
     {
-        getTimerButton().addActionListener(action -> {
-            try
-            {
-                startOrPauseTimer();
-            }
-            catch (InterruptedException e)
-            {
-                printStackTrace(e);
-            }
-        });
-
+        getTimerButton().addActionListener(action ->  this.run());
     }
     protected void setupResetButton()
     {
@@ -326,45 +295,34 @@ public class TimerPanel extends JPanel implements IClockPanel
         // 70 seconds given
         return Integer.parseInt(getJTextField3().getText()) < 60;
     }
-    //TODO: Using deprecated Thread.resume(). Fix
-    public void startOrPauseTimer() throws InterruptedException
+    public void startTimer()
     {
-        if (StringUtils.equals(getTimerButton().getText(), "Set") ||
-            StringUtils.equals(getTimerButton().getText(), "Resume Timer"))
-            // button says Set, starting Timer
+        getTimerButton().setText("Pause Timer");
+        getTimerButton().repaint();
+        getTimerButton().updateUI();
+        //System.err.println(countdownThread.getName() + " is in state: " + countdownThread.getState());
+        if (countdownThread.getState() == Thread.State.NEW)
         {
-            getTimerButton().setText("Pause Timer");
-            getTimerButton().repaint();
-            getTimerButton().updateUI();
-            if (countdownThread.getState() == Thread.State.NEW)
-            {
-                countdownThread.start();
-                //setTimerHasConcluded(false);
-                getClock().setTimerGoingOff(false);
-            }
-            else
-            {
-                countdownThread.resume();
-            }
+            countdownThread.start(); // calls the run method of this class
+            //setTimerHasConcluded(false);
+            getClock().setTimerGoingOff(false);
         }
-        else // button says Pause Timer, so pausing timer
+        else if (countdownThread.getState() == Thread.State.TERMINATED)
         {
-            getTimerButton().setText("Resume Timer");
-            getTimerButton().repaint();
-            getTimerButton().updateUI();
-            // stop counting
-            pauseCountDown(countdownThread);
+            countdownThread = new Thread(this::performCountDown);
+            countdownThread.start();
         }
-
+        else if (countdownThread.getState() == Thread.State.TIMED_WAITING)
+        {
+            countdownThread.notify();
+        }
     }
-    public void resetTimerFields(ActionEvent action)
+    public void pauseTimer() throws InterruptedException
     {
-        getJTextField1().setText("Hour");
-        getJTextField2().setText("Min");
-        getJTextField3().setText("Sec");
-        getTimerButton().setText("Set");
-        getTimerButton().setEnabled(false);
-        countdownThread = new Thread(this::performCountDown);
+        getTimerButton().setText("Resume Timer");
+        getTimerButton().repaint();
+        getTimerButton().updateUI();
+        countdownThread.interrupt();
     }
     public void performCountDown()
     {
@@ -377,8 +335,8 @@ public class TimerPanel extends JPanel implements IClockPanel
             // reduce the total, keeping hours, minutes, and seconds current
             //for(int i = totalSeconds; i > 0; i--)
             while (Integer.parseInt(getJTextField3().getText()) > 0 ||
-                   Integer.parseInt(getJTextField2().getText()) > 0 ||
-                   Integer.parseInt(getJTextField1().getText()) > 0 )
+                    Integer.parseInt(getJTextField2().getText()) > 0 ||
+                    Integer.parseInt(getJTextField1().getText()) > 0 )
             {
                 if (Integer.parseInt(getJTextField3().getText()) >= 0)
                 {
@@ -406,27 +364,19 @@ public class TimerPanel extends JPanel implements IClockPanel
             //setTimerHasConcluded(true);
             getClock().setTimerGoingOff(true);
         }
-        catch (NumberFormatException e)
-        {
-            printStackTrace(e, getJTextField3().getText() + " is empty");
-        }
         catch (Exception e)
         {
             printStackTrace(e);
         }
     }
-    //TODO: Using deprecated method Thread.suspend(). Fix
-    public void pauseCountDown(Thread t)
+    public void resetTimerFields(ActionEvent action)
     {
-        try
-        {
-            t.suspend();
-            System.err.println(t.getName()+ " is in state " + t.getState());
-        }
-        catch (Exception e)
-        {
-            printStackTrace(e);
-        }
+        getJTextField1().setText("Hour");
+        getJTextField2().setText("Min");
+        getJTextField3().setText("Sec");
+        getTimerButton().setText("Set");
+        getTimerButton().setEnabled(false);
+        //countdownThread = new Thread(this::performCountDown);
     }
     public void printStackTrace(Exception e, String message)
     {
@@ -441,7 +391,6 @@ public class TimerPanel extends JPanel implements IClockPanel
     }
     protected void printStackTrace(Exception e)
     { printStackTrace(e, ""); }
-    @SuppressWarnings("Duplicates")
     public void addComponent(Component cpt, int gridy, int gridx, double gwidth, double gheight, int ipadx, int ipady, int fill)
     {
         getGridBagConstraints().gridx = gridx;
@@ -458,11 +407,46 @@ public class TimerPanel extends JPanel implements IClockPanel
         getGridBagLayout().setConstraints(cpt, getGridBagConstraints());
         add(cpt);
     }
-
     public void checkIfTimerHasConcluded()
     {
         if (getClock().isTimerGoingOff()) {
             getClock().changeToTimerPanel();
+        }
+    }
+    @Override
+    public void addComponentsToPanel()
+    {
+        setComponentOrientation(ComponentOrientation.LEFT_TO_RIGHT);
+        addComponent(getJTextField1(), 0,0,1,1,0,0, GridBagConstraints.HORIZONTAL); // TextField 1
+        addComponent(getJTextField2(), 0,1,1,1,0,0, GridBagConstraints.HORIZONTAL); // TextField 2
+        addComponent(getJTextField3(), 0,2,1,1,0,0, GridBagConstraints.HORIZONTAL); // TextField 3
+        addComponent(getResetButton(), 1, 0, 3, 1, 0, 0, GridBagConstraints.HORIZONTAL); // Reset Button
+        addComponent(getTimerButton(), 2,0,3,1,0,0, GridBagConstraints.HORIZONTAL); // Set Timer Button
+    }
+    @Override
+    public void updateLabels()
+    {
+        getJTextField1().grabFocus();
+        getClock().repaint();
+    }
+    @Override
+    public void run() // called when we hit the Start Timer button
+    {
+        try
+        {
+            if (StringUtils.equals(getTimerButton().getText(), "Set") ||
+                StringUtils.equals(getTimerButton().getText(), "Resume Timer"))
+            {
+                startTimer();
+            }
+            else
+            {
+                pauseTimer();
+            }
+        }
+        catch (InterruptedException e)
+        {
+            printStackTrace(e);
         }
     }
 }

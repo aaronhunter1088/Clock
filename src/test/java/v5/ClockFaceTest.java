@@ -8,6 +8,7 @@ import v2.ClockFace;
 import java.util.ArrayList;
 import java.util.List;
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
 @RunWith(MockitoJUnitRunner.class)
@@ -30,4 +31,10 @@ public class ClockFaceTest {
 		assertTrue(ClockFace.values().length == clockFaces.size());
 	}
 
+	@Test
+	public void testToStringPrintsFaceName()
+	{
+		ClockFace cf = ClockFace.AlarmFace;
+		assertEquals("Printed the Name", "AlarmFace", cf.toString());
+	}
 }

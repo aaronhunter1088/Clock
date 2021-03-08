@@ -3,7 +3,8 @@ package v5;
 import javax.swing.*;
 import java.awt.*;
 
-/** The ClockPanel is the main panel and is
+/**
+ * The ClockPanel is the main panel and is
  * visible first to the user. Here you can
  * see the time and date.
  * Clicking on the menu options under
@@ -56,25 +57,6 @@ public class ClockPanel extends JPanel implements IClockPanel {
         setJlbl1(new JLabel("", SwingConstants.CENTER));
         setJlbl2(new JLabel("", SwingConstants.CENTER));
     }
-    @Override
-    public void addComponentsToPanel()
-    {
-        addComponent(getJlbl1(), 0,0,1,1, 0,0);
-        addComponent(getJlbl2(), 1,0,1,1, 0,0);
-    }
-    @Override
-    public void updateLabels()
-    {
-        getJlbl1().setText(getClock().defaultText(1));
-        getJlbl2().setText(getClock().defaultText(2));
-        if (getClock().isShowFullDate()) getJlbl1().setFont(Clock.font40);
-        else if (getClock().isShowPartialDate()) getJlbl1().setFont(Clock.font50);
-        else getJlbl1().setFont(Clock.font60);
-        getJlbl2().setFont(Clock.font50);
-        getJlbl1().setForeground(Color.WHITE);
-        getJlbl2().setForeground(Color.WHITE);
-        getClock().repaint();
-    }
     public void printStackTrace(Exception e, String message)
     {
         if (null != message)
@@ -100,5 +82,24 @@ public class ClockPanel extends JPanel implements IClockPanel {
         getGridBagConstraints().insets = new Insets(0,0,0,0);
         getGridBagLayout().setConstraints(cpt, getGridBagConstraints());
         add(cpt);
+    }
+    @Override
+    public void addComponentsToPanel()
+    {
+        addComponent(getJlbl1(), 0,0,1,1, 0,0);
+        addComponent(getJlbl2(), 1,0,1,1, 0,0);
+    }
+    @Override
+    public void updateLabels()
+    {
+        getJlbl1().setText(getClock().defaultText(1));
+        getJlbl2().setText(getClock().defaultText(2));
+        if (getClock().isShowFullDate()) getJlbl1().setFont(Clock.font40);
+        else if (getClock().isShowPartialDate()) getJlbl1().setFont(Clock.font50);
+        else getJlbl1().setFont(Clock.font60);
+        getJlbl2().setFont(Clock.font50);
+        getJlbl1().setForeground(Color.WHITE);
+        getJlbl2().setForeground(Color.WHITE);
+        getClock().repaint();
     }
 }

@@ -1,15 +1,13 @@
 package v5;
 
-import java.text.ParseException;
 import java.time.DayOfWeek;
 import java.util.ArrayList;
 import java.util.List;
-
 import v5.Time.AMPM;
-
 import static java.time.DayOfWeek.*;
 
-/** An Alarm is similar to a Clock.
+/**
+ * An Alarm is similar to a Clock.
  * The differences may continue to grow but
  * as for now, an Alarm knows all the days
  * it should go off, the time at which to
@@ -22,9 +20,7 @@ import static java.time.DayOfWeek.*;
 public class Alarm extends Clock
 {
     private ArrayList<DayOfWeek> days;
-
     public ArrayList<DayOfWeek> getDays() { return this.days; }
-
     protected void setDays(ArrayList<DayOfWeek> days) { this.days = days; }
 
     public Alarm() throws InvalidInputException
@@ -34,19 +30,21 @@ public class Alarm extends Clock
     public Alarm(Clock clock, int hours, boolean isUpdateAlarm)
     {
         super(clock);
-        setHours(hours, true);
+        setHours(hours);
+        setDays(new ArrayList<>(){{add(clock.getDayOfWeek());}});
         setUpdateAlarm(isUpdateAlarm);
     }
     public Alarm(int hours, int minutes, AMPM time, boolean isUpdateAlarm, ArrayList<DayOfWeek> days) throws InvalidInputException
     {
         super();
-        setHours(hours, true);
+        setHours(hours);
         setMinutes(minutes);
         setSeconds(0);
         setAMPM(time);
         setDays(days);
         setUpdateAlarm(isUpdateAlarm);
     }
+
     public List<String> getDaysShortened()
     {
         List<String> shortenedDays = new ArrayList<>();

@@ -13,11 +13,10 @@ import static java.time.DayOfWeek.*;
 import static v5.ClockConstants.*;
 import static v5.Time.AMPM.*;
 
-/** A simple application which displays the time and date. The time
+/**
+ * The clock object to set a time and date. The time
  * can be view in military time or not, and the date fully expressed,
  * partially expressed or standard expression.
- * 
- * You can also set Alarms and create a single Timer.
  * 
  * @author Michael Ball 
  * @version 2.5
@@ -122,22 +121,8 @@ public class Clock extends JFrame
         if (this.minutes <= 9) setMinutesAsStr("0"+this.minutes);
         else setMinutesAsStr(Integer.toString(this.minutes));
     }
-    protected void setHours(int hours, boolean hardSetHour) {
-        if (hardSetHour)
-        {
-            this.hours = hours;
-        }
-        else
-        {
-            if (hours == 0 && !isShowMilitaryTime()) {
-                this.hours = 12;
-            }
-            else if (hours == 0 && isShowMilitaryTime()) {
-                this.hours = 0;
-            }
-            else
-                this.hours = hours;
-        }
+    protected void setHours(int hours) {
+        this.hours = hours;
         if (this.hours <= 9) this.hoursAsStr = "0"+hours;
         else this.hoursAsStr = Integer.toString(this.hours);
     }
@@ -177,7 +162,7 @@ public class Clock extends JFrame
         setShowMilitaryTime(false);
         setSeconds(LocalTime.now().getSecond()); // sets secsAsStr
         setMinutes(LocalTime.now().getMinute()); // sets minutesAsStr
-        setHours(LocalTime.now().getHour(), true); // sets hoursAsStr
+        setHours(LocalTime.now().getHour()); // sets hoursAsStr
         setMonth(LocalDate.now().getMonth());
         setDayOfWeek(LocalDate.now().getDayOfWeek());
         setDayOfMonth(LocalDate.now().getDayOfMonth());
@@ -219,7 +204,7 @@ public class Clock extends JFrame
         setTimerPanel(new TimerPanel(this));
         setSeconds(seconds);
         setMinutes(minutes);
-        setHours(hours, true);
+        setHours(hours);
         setMonth(month);
         setDayOfWeek(dayOfWeek);
         setDayOfMonth(dayOfMonth);
@@ -249,7 +234,7 @@ public class Clock extends JFrame
         setAlarmPanel(new AlarmPanel(this));
         setSeconds(clock.getSeconds());
         setMinutes(clock.getMinutes());
-        setHours(clock.getHours(), true);
+        setHours(clock.getHours());
         setAMPM(clock.getAMPM());
         setMonth(clock.getMonth());
         setDayOfMonth(clock.getDayOfMonth());
@@ -265,23 +250,23 @@ public class Clock extends JFrame
     {
         if (time == AM && showMilitaryTime) // Daytime and we show Military v2.Time
         {
-            if (getHours() == 12) setHours(0, true);
-            else setHours(getHours(), true);
+            if (getHours() == 12) setHours(0);
+            else setHours(getHours());
         }
         else if (time == AM) // DayTime and we do not show Military v2.Time
         {
-            if (getHours() == 0) setHours(12, true);
-            else setHours(getHours(), true);
+            if (getHours() == 0) setHours(12);
+            else setHours(getHours());
         }
         else if (time == PM && showMilitaryTime) // NightTime and we show Military v2.Time
         {
-            if (getHours() == 24) setHours(0, true);
-            else if (getHours() < 12) setHours(getHours() + 12, true);
-            else setHours(getHours(), true);
+            if (getHours() == 24) setHours(0);
+            else if (getHours() < 12) setHours(getHours() + 12);
+            else setHours(getHours());
         }
         else if (time == PM) // NightTime and we do not show Military v2.Time
         {
-            if (getHours() > 12) setHours(getHours() - 12, true);
+            if (getHours() > 12) setHours(getHours() - 12);
         }
     }
     /**
@@ -355,10 +340,10 @@ public class Clock extends JFrame
             if (getMinutes() == 60)
             {
                 setMinutes(0);
-                setHours(getHours()+1, true);
+                setHours(getHours()+1);
                 if (getHours() == 12 && getMinutes() == 0 && getSeconds() == 0 && !isShowMilitaryTime())
                 {
-                    setHours(12, true);
+                    setHours(12);
                     setHoursAsStr("12");
                     if (getAMPM() == PM)
                     {
@@ -373,13 +358,13 @@ public class Clock extends JFrame
                 }
                 else if (getHours() == 13 && !isShowMilitaryTime())
                 {
-                    setHours(1, true);
+                    setHours(1);
                     setHoursAsStr("01");
                     setDateChanged(false);
                 }
                 else if (getHours() == 24 && getMinutes() == 0 && getSeconds() == 0 && isShowMilitaryTime())
                 {
-                    setHours(0, true);
+                    setHours(0);
                     setHoursAsStr("00");
                     setAMPM(AM);
                     setDateChanged(true);
@@ -391,7 +376,7 @@ public class Clock extends JFrame
                 }
                 else
                 {
-                    setHours(getHours(), true);
+                    setHours(getHours());
                 }
             }
         }
@@ -524,12 +509,12 @@ public class Clock extends JFrame
         {
             if (getMonth() == MARCH && getAMPM() == AM)
             {
-                setHours(3, true);
+                setHours(3);
                 setDaylightSavingsTime(false);
             }
             else if (getMonth() == NOVEMBER && getAMPM() == AM)
             { // && daylightSavingsTime
-                setHours(1, true);
+                setHours(1);
                 setDaylightSavingsTime(false);
             }
         }
@@ -585,6 +570,7 @@ public class Clock extends JFrame
     }
     public void changeToClockPanel()
     {
+        //System.err.println("CurrentFace: " + getFacePanel().toString());
         if (getFacePanel() == ClockFace.TimerFace)
             remove(getTimerPanel());
         else if (getFacePanel() == ClockFace.AlarmFace)
@@ -593,29 +579,36 @@ public class Clock extends JFrame
         add(getClockPanel());
         this.repaint();
         this.setVisible(true);
+        //System.err.println("ChangedToFace: " + getFacePanel().toString());
     }
     public void changeToAlarmPanel()
     {
+        //System.err.println("CurrentFace: " + getFacePanel().toString());
         if (getFacePanel() == ClockFace.ClockFace)
             remove(getClockPanel());
         else if (getFacePanel() == ClockFace.TimerFace)
             remove(getTimerPanel());
-        setFacePanel(ClockFace.AlarmFace);
         if (getAlarmPanel().getMusicPlayer() != null) { getAlarmPanel().setMusicPlayer(null); }
-        add(getAlarmPanel());
+        if (getFacePanel() != ClockFace.AlarmFace)
+            add(getAlarmPanel());
+        setFacePanel(ClockFace.AlarmFace);
         this.repaint();
         this.setVisible(true);
+        //System.err.println("ChangedToFace: " + getFacePanel().toString());
     }
     public void changeToTimerPanel()
     {
+        //System.err.println("CurrentFace: " + getFacePanel().toString());
         if (getFacePanel() == ClockFace.ClockFace)
             remove(getClockPanel());
         else if (getFacePanel() == ClockFace.AlarmFace)
             remove(getAlarmPanel());
+        if (getFacePanel() != ClockFace.TimerFace)
+            add(getTimerPanel());
         setFacePanel(ClockFace.TimerFace);
-        add(getTimerPanel());
         this.repaint();
         this.setVisible(true);
+        //System.err.println("ChangedToFace: " + getFacePanel().toString());
     }
     public void tick()
     {
@@ -642,7 +635,7 @@ public class Clock extends JFrame
             {
                 setSeconds(LocalTime.now().getSecond());
                 setMinutes(LocalTime.now().getMinute());
-                setHours(LocalTime.now().getHour(), true);
+                setHours(LocalTime.now().getHour());
             }
         }
         catch (Exception e)

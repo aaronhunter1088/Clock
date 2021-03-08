@@ -164,29 +164,6 @@
 				</configuration>
 			</plugin>
 
-			<!-- Generate build.properties file -->
-            <plugin>
-            	<groupId>org.codehaus.mojo</groupId>
-            	<artifactId>properties-maven-plugin</artifactId>
-            	<version>${maven.properties.version}</version>
-            	<executions>
-            		<execution>
-            			<phase>generate-resources</phase>
-            			<goals>
-            				<goal>read-project-properties</goal>
-            			</goals>
-            			<configuration>
-            				<files>
-            					<file>${basedir}/dist/build.properties</file>
-            				</files>
-            				<tasks>
-            					<echo>BuildTime : ${build.time}</echo>
-            				</tasks>
-            			</configuration>
-            		</execution>
-            	</executions>
-            </plugin>
-
 			<!-- Binds to Package phase, but will not run... -->
             <!-- When creating a jar, update MANIFEST.MF file and place JAR in specified outputDirectory -->
             <plugin>
