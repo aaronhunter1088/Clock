@@ -20,5 +20,5 @@ When the Timer is finished, it will reset to the default values. You can go back
 Clock view if so desired. When the Timer is finished, it will change to the Timer panel to indicate
 it has finished.
 
-In v2.5, the cloc uses the new Time API and the code was condensed to be as concise as possible and 
+In v2.5, the clock uses the new Time API and the code was condensed to be as concise as possible and 
 remove any deprecated methods.
