@@ -23,9 +23,6 @@ it has finished.
 Coming Soon: v5
 
 Enhancement:
-A new button which exclusively shuts off an alarm instead of going through the menu (which has
-potential to delete alarm)
-Enhancement:
 Using the new Time API
 Enhancement:
 Restructure the code to be as concise as possible and remove any deprecated methods

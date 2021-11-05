@@ -79,6 +79,12 @@ public class AlarmPanelTest extends Object {
         assertTrue("Alarm should not be triggered to go off!", alarm.isAlarmGoingOff());
     }
 
+    @Test
+    public void testRangeIsCorrect()
+    {
+        assertFalse(12 <= 0);
+        assertFalse(12 > 23);
+    }
     // Helper methods
     public AlarmPanel createAndSetupAlarmPanel()
     {

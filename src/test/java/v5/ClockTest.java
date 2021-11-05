@@ -117,4 +117,9 @@ public class ClockTest {
         assertTrue(clock.getAlarmPanel().isAlarmIsGoingOff());
     }
 
+    @Test
+    public void testClockIncreasesByOneMinute(){
+
+    }
+
 }

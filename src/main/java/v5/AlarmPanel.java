@@ -233,7 +233,7 @@ public class AlarmPanel extends JPanel implements IClockPanel
                     {
                         // time for alarm to be triggered on
                         setCurrentAlarmGoingOff(alarm);
-                        alarm.setAlarmGoingOff(true);
+                        alarm.setIsAlarmGoingOff(true);
                         setAlarmIsGoingOff(true);
                         System.out.print("Alarm " + getCurrentAlarmGoingOff().getTimeAsStr() + " matches clock's time. ");
                         System.out.println("Sounding alarm...");
@@ -249,7 +249,7 @@ public class AlarmPanel extends JPanel implements IClockPanel
                         {
                             // time for alarm to be triggered on
                             setCurrentAlarmGoingOff(alarm);
-                            alarm.setAlarmGoingOff(true);
+                            alarm.setIsAlarmGoingOff(true);
                             setAlarmIsGoingOff(true);
                             System.out.print("Alarm " + getCurrentAlarmGoingOff().getTimeAsStr() + " matches clock's time. ");
                             System.out.println("Sounding alarm...");
@@ -305,7 +305,7 @@ public class AlarmPanel extends JPanel implements IClockPanel
                         }
                         else { System.err.println("Music player is null!"); }
                         setCheckboxesIfWasSelected(getAlarm());
-                        getAlarm().setAlarmGoingOff(false);
+                        getAlarm().setIsAlarmGoingOff(false);
                         getAlarm().setUpdateAlarm(true); // this and the boolean below we want true
                         setUpdatingAlarm(true); // we want to continue with the logic that's done in the next if
                         setCurrentAlarmGoingOff(null);
@@ -540,7 +540,7 @@ public class AlarmPanel extends JPanel implements IClockPanel
             getJTextField3().grabFocus();
             throw new InvalidInputException("Time must be AM or PM");
         }
-        else if (Integer.parseInt(getJTextField1().getText()) >= 12 &&
+        else if (Integer.parseInt(getJTextField1().getText()) > 12 &&
                  Integer.parseInt(getJTextField1().getText()) < 24 &&
                 StringUtils.equalsIgnoreCase(getJTextField3().getText(), AM.getStrValue()))
         {
@@ -856,7 +856,7 @@ public class AlarmPanel extends JPanel implements IClockPanel
         {
             ArrayList<DayOfWeek> days = checkWhichCheckBoxesWereChecked();
             Alarm alarm = new Alarm(hour, minutes, ampm, true, days);
-            alarm.setAlarmGoingOff(false);
+            alarm.setIsAlarmGoingOff(false);
             System.out.println("\nCreated an alarm: " + alarm.getTimeAsStr());
             System.out.print("days: ");
             if (null != alarm.getDays())
@@ -920,8 +920,11 @@ public class AlarmPanel extends JPanel implements IClockPanel
             }
             catch (Exception e)
             {
+                System.err.println(e.getCause().getClass().getName() + ": " + e.getMessage());
                 printStackTrace(e);
-                return "An exception occurred while playing music: " + e.getMessage();
+                setupMusicPlayer();
+                getMusicPlayer().play(50);
+                return "Reset music player req'd";
             }
         };
         executor.submit(c);

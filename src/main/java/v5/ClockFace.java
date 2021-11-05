@@ -10,7 +10,10 @@ package v5;
  */
 public enum ClockFace
 {
-	ClockFace, AlarmFace, TimerFace;
+	CLOCKPANEL,
+	ALARMPANEL,
+	TIMERPANEL;
+
 	ClockFace() {
 		
 	}

@@ -29,9 +29,6 @@ public class Main
                 sleep(250);
                 clock.getAlarmPanel().checkIfAnyAlarmsAreGoingOff();
                 clock.getTimerPanel().checkIfTimerHasConcluded();
-                if (clock.isTimerGoingOff()) {
-                    clock.setTimerGoingOff(false);
-                }
                 sleep(750);
             }
         }

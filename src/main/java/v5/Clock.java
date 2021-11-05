@@ -61,7 +61,7 @@ public class Clock extends JFrame
     protected boolean showMilitaryTime = false;
     protected ArrayList<Alarm> listOfAlarms;
 
-    public ClockFace getFacePanel() { return this.facePanel; }
+    public ClockFace getPanelInUse() { return this.facePanel; }
     public ClockMenuBar getClockMenuBar() { return this.menuBar; }
     public ClockPanel getClockPanel() { return this.clockPanel; }
     public AlarmPanel getAlarmPanel() { return this.alarmPanel; }
@@ -103,7 +103,7 @@ public class Clock extends JFrame
     public boolean isShowMilitaryTime() { return this.showMilitaryTime; }
     public ArrayList<Alarm> getListOfAlarms() { return this.listOfAlarms; }
 
-    protected void setFacePanel(ClockFace facePanel) { this.facePanel = facePanel; }
+    protected void setPanelInUse(ClockFace facePanel) { this.facePanel = facePanel; }
     protected void setClockMenuBar(ClockMenuBar menuBar) { this.menuBar = menuBar; }
     protected void setClockPanel(ClockPanel clockPanel) { this.clockPanel = clockPanel; }
     protected void setAlarmPanel(AlarmPanel alarmPanel) { this.alarmPanel = alarmPanel; }
@@ -143,8 +143,8 @@ public class Clock extends JFrame
     protected void setLeapYear(boolean leapYear) { this.leapYear = leapYear; }
     protected void setDaylightSavingsTime(boolean daylightSavingsTime) { this.isDaylightSavingsTime = daylightSavingsTime; }
     protected void setDateChanged(boolean dateChanged) { this.isDateChanged = dateChanged; }
-    protected void setAlarmGoingOff(boolean alarm) { this.alarm = alarm; }
-    protected void setTimerGoingOff(boolean timer) { this.timer = timer; }
+    protected void setIsAlarmGoingOff(boolean alarm) { this.alarm = alarm; }
+    protected void setIsTimerGoingOff(boolean timer) { this.timer = timer; }
     protected void setShowFullDate(boolean showFullDate) { this.showFullDate = showFullDate; }
     protected void setShowPartialDate(boolean showPartialDate) { this.showPartialDate = showPartialDate; }
     protected void setShowMilitaryTime(boolean showMilitaryTime) { this.showMilitaryTime = showMilitaryTime; }
@@ -170,13 +170,13 @@ public class Clock extends JFrame
         setAMPM(LocalTime.now());
         setDaylightSavingsTimeDates();
         setDate(LocalDate.of(getYear(), getMonth(), getDayOfMonth()));
-        setFacePanel(ClockFace.ClockFace);
+        setPanelInUse(ClockFace.CLOCKPANEL);
         setClockPanel(new ClockPanel(this));
         setAlarmPanel(new AlarmPanel(this));
         setTimerPanel(new TimerPanel(this));
         setLeapYear(getDate().isLeapYear());
         setDateChanged(false);
-        setAlarmGoingOff(false);
+        setIsAlarmGoingOff(false);
         add(getClockPanel());
         pack();
     }
@@ -212,11 +212,11 @@ public class Clock extends JFrame
         setAMPM(ampm);
         setDate(LocalDate.of(getYear(), getMonth(), getDayOfMonth()));
         setDaylightSavingsTimeDates();
-        setFacePanel(ClockFace.ClockFace);
+        setPanelInUse(ClockFace.CLOCKPANEL);
         setClockPanel(new ClockPanel(this));
         setLeapYear(getDate().isLeapYear());
         setDateChanged(false);
-        setAlarmGoingOff(false);
+        setIsAlarmGoingOff(false);
         pack();
         add(getClockPanel());
     }
@@ -241,7 +241,7 @@ public class Clock extends JFrame
         setYear(clock.getYear());
         setDate(LocalDate.of(getYear(), getMonth(), getDayOfMonth()));
         setDaylightSavingsTimeDates();
-        setFacePanel(ClockFace.ClockFace);
+        setPanelInUse(ClockFace.CLOCKPANEL);
         setClockPanel(new ClockPanel(this));
         pack();
         add(getClockPanel());
@@ -571,11 +571,11 @@ public class Clock extends JFrame
     public void changeToClockPanel()
     {
         //System.err.println("CurrentFace: " + getFacePanel().toString());
-        if (getFacePanel() == ClockFace.TimerFace)
+        if (getPanelInUse() == ClockFace.TIMERPANEL)
             remove(getTimerPanel());
-        else if (getFacePanel() == ClockFace.AlarmFace)
+        else if (getPanelInUse() == ClockFace.ALARMPANEL)
             remove(getAlarmPanel());
-        setFacePanel(ClockFace.ClockFace);
+        setPanelInUse(ClockFace.CLOCKPANEL);
         add(getClockPanel());
         this.repaint();
         this.setVisible(true);
@@ -584,14 +584,14 @@ public class Clock extends JFrame
     public void changeToAlarmPanel()
     {
         //System.err.println("CurrentFace: " + getFacePanel().toString());
-        if (getFacePanel() == ClockFace.ClockFace)
+        if (getPanelInUse() == ClockFace.CLOCKPANEL)
             remove(getClockPanel());
-        else if (getFacePanel() == ClockFace.TimerFace)
+        else if (getPanelInUse() == ClockFace.TIMERPANEL)
             remove(getTimerPanel());
         if (getAlarmPanel().getMusicPlayer() != null) { getAlarmPanel().setMusicPlayer(null); }
-        if (getFacePanel() != ClockFace.AlarmFace)
+        if (getPanelInUse() != ClockFace.ALARMPANEL)
             add(getAlarmPanel());
-        setFacePanel(ClockFace.AlarmFace);
+        setPanelInUse(ClockFace.ALARMPANEL);
         this.repaint();
         this.setVisible(true);
         //System.err.println("ChangedToFace: " + getFacePanel().toString());
@@ -599,13 +599,13 @@ public class Clock extends JFrame
     public void changeToTimerPanel()
     {
         //System.err.println("CurrentFace: " + getFacePanel().toString());
-        if (getFacePanel() == ClockFace.ClockFace)
+        if (getPanelInUse() == ClockFace.CLOCKPANEL)
             remove(getClockPanel());
-        else if (getFacePanel() == ClockFace.AlarmFace)
+        else if (getPanelInUse() == ClockFace.ALARMPANEL)
             remove(getAlarmPanel());
-        if (getFacePanel() != ClockFace.TimerFace)
+        if (getPanelInUse() != ClockFace.TIMERPANEL)
             add(getTimerPanel());
-        setFacePanel(ClockFace.TimerFace);
+        setPanelInUse(ClockFace.TIMERPANEL);
         this.repaint();
         this.setVisible(true);
         //System.err.println("ChangedToFace: " + getFacePanel().toString());

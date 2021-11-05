@@ -7,6 +7,7 @@ import java.awt.event.ActionEvent;
 import java.text.ParseException;
 
 import static org.junit.Assert.*;
+import static org.mockito.Mockito.mock;
 
 public class TimerPanelTest extends Object
 {
@@ -87,7 +88,7 @@ public class TimerPanelTest extends Object
         timer.getJTextField2().setText("0");
         timer.getJTextField3().setText("5");
         timer.getTimerButton().setText("Set");
-        timer.run();
+        timer.run(mock(ActionEvent.class));
         Thread.sleep(5000);
         assertEquals("Expected timer to be done", 0, Integer.parseInt(timer.getJTextField3().getText()));
     }
@@ -98,9 +99,9 @@ public class TimerPanelTest extends Object
         timer.getJTextField2().setText("1");
         timer.getJTextField3().setText("5");
         timer.getTimerButton().setText("Set");
-        timer.run();
+        timer.run(mock(ActionEvent.class));
         Thread.sleep(5000);
-        timer.run();
+        timer.run(mock(ActionEvent.class));
 
         assertEquals("After 5 seconds, 1 minute is shown", 1, Integer.parseInt(timer.getJTextField2().getText()));
         assertEquals("After 5 seconds, 0 seconds is shown", 0, Integer.parseInt(timer.getJTextField3().getText()));
