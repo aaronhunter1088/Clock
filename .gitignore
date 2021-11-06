@@ -3,4 +3,5 @@
 .project
 .settings/
 .idea/*
-./Clock.iml
+.idea/misc.xml
+Clock.iml
