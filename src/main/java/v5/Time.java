@@ -13,7 +13,7 @@ public enum Time
     Time() {};
     enum AMPM
     {
-        ERROR(0, "Unknown time"), AM(1, "AM"), PM(2, "PM");
+        AM(1, "AM"), PM(2, "PM");
 
         private int value;
         private String strValue;

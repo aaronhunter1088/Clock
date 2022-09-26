@@ -10,7 +10,7 @@
     <description>This is Clock GUI.</description>
     
     <properties>
-		<java.version>11</java.version>
+		<java.version>18</java.version>
     	<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<maven.compiler.version>3.8.1</maven.compiler.version>
 		<maven.properties.version>1.0-alpha-2</maven.properties.version>
