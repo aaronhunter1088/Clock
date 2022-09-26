@@ -187,18 +187,18 @@
 						<manifest>
 							<addDefaultImplementationEntries>true</addDefaultImplementationEntries>
 							<addClasspath>true</addClasspath>
-							<mainClass>v5.Main</mainClass>
+							<mainClass>Clock.Main</mainClass>
 						</manifest>
 						<manifestEntries>
 							<Implementation-Version>${project.version}</Implementation-Version>
 							<Creation-Time-Format>yyyy-MM-dd HH:mm:ss</Creation-Time-Format>
 							<!--suppress UnresolvedMavenProperty -->
 							<Creation-Time>${build.time}</Creation-Time>
-							<mainClass>v5.Main</mainClass>
+							<mainClass>Clock.Main</mainClass>
 						</manifestEntries>
 					</archive>
 					<includes>
-						<include>**/v5/*</include>
+						<include>**/Clock/*</include>
 						<include>**/sounds/*</include>
 					</includes>
 					<excludes>
@@ -281,14 +281,14 @@
 						 <manifest>
 							 <addDefaultImplementationEntries>true</addDefaultImplementationEntries>
 							 <addClasspath>true</addClasspath>
-							 <mainClass>v5.Main</mainClass>
+							 <mainClass>Clock.Main</mainClass>
 						 </manifest>
 						 <manifestEntries>
 							 <Implementation-Version>${project.version}</Implementation-Version>
 							 <Creation-Time-Format>yyyy-MM-dd HH:mm:ss</Creation-Time-Format>
 							 <!--suppress UnresolvedMavenProperty -->
 							 <Creation-Time>${build.time}</Creation-Time>
-							 <mainClass>v5.Main</mainClass>
+							 <mainClass>Clock.Main</mainClass>
 						 </manifestEntries>
 					 </archive>
 				 </configuration>
