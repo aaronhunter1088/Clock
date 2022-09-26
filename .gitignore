@@ -5,3 +5,4 @@ target/*
 .idea/*
 .idea/misc.xml
 Clock.iml
+dist/*
