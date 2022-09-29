@@ -84,6 +84,7 @@ public class Clock extends JFrame
      * @return 'HH:MM:SS TIME' ex: 05:15:24 PM
      */
     public String getTimeAsStr() { return getHoursAsStr()+":"+getMinutesAsStr()+":"+getSecondsAsStr()+" "+getAMPM(); }
+    public String getTimeAsStrAlarmRepresentation() { return getHoursAsStr()+":"+getMinutesAsStr()+" "+getAMPM(); }
     public String getDateAsStr() { return this.month+" "+this.dayOfMonth +", "+this.year; }
     public String getFullDateAsStr() { return this.dayOfWeek+" "+this.month+" "+this.dayOfMonth +", "+this.year; }
     public String getMilitaryTimeAsStr() {
@@ -122,7 +123,7 @@ public class Clock extends JFrame
     }
     protected void setHours(int hours) {
         this.hours = hours;
-        if (this.hours <= 9) this.hoursAsStr = "0"+hours;
+        if (this.hours < 10) this.hoursAsStr = "0"+hours;
         else this.hoursAsStr = Integer.toString(this.hours);
     }
     protected void setAMPM(Time ampm) { this.ampm = ampm; }
@@ -253,12 +254,12 @@ public class Clock extends JFrame
     }
     public void updateHourValueAndHourString(Time time, boolean showMilitaryTime)
     {
-        if (time == Time.AM && showMilitaryTime) // Daytime and we show Military v2.Time
+        if (time == Time.AM && showMilitaryTime) // Daytime and we show Military Time
         {
             if (getHours() == 12) setHours(0);
             else setHours(getHours());
         }
-        else if (time == Time.AM) // DayTime and we do not show Military v2.Time
+        else if (time == Time.AM) // DayTime and we do not show Military Time
         {
             if (getHours() == 0) setHours(12);
             else setHours(getHours());
@@ -266,10 +267,10 @@ public class Clock extends JFrame
         else if (time == Time.PM && showMilitaryTime) // NightTime and we show Military v2.Time
         {
             if (getHours() == 24) setHours(0);
-            else if (getHours() < 12) setHours(getHours() + 12);
+            else if (getHours() < 12 && getHours() >= 0) setHours(getHours() + 12);
             else setHours(getHours());
         }
-        else if (time == Time.PM) // NightTime and we do not show Military v2.Time
+        else if (time == Time.PM) // NightTime and we do not show Military Time
         {
             if (getHours() > 12) setHours(getHours() - 12);
         }
@@ -510,7 +511,7 @@ public class Clock extends JFrame
             }
             default : {}
         }
-        updateHourValueAndHourString(getAMPM(), isShowMilitaryTime());
+        //updateHourValueAndHourString(getAMPM(), isShowMilitaryTime());
         if (isDaylightSavingsTime())
         {
             if (getMonth() == MARCH && getAMPM() == Time.AM)

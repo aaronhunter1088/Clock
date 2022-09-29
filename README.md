@@ -1,4 +1,4 @@
-# Clock v2.2
+# Clock v2.5
 
 This is a simple GUI project which displays the time and allows the user to set alarms. 
 
