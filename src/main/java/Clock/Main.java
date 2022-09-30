@@ -1,6 +1,7 @@
 package Clock;
 
 import javax.swing.*;
+import javax.swing.plaf.metal.MetalLookAndFeel;
 import java.awt.*;
 import java.text.ParseException;
 import static java.lang.Thread.sleep;
@@ -21,6 +22,9 @@ public class Main
         clock.getContentPane().setBackground(Color.BLACK);
         clock.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         clock.setBounds(200, 200, 700, 300);
+        SwingUtilities.invokeLater(() -> {
+            SwingUtilities.updateComponentTreeUI(clock);
+        });
         try
         {
             while (true) {

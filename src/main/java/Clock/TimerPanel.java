@@ -508,7 +508,6 @@ public class TimerPanel extends JPanel implements IClockPanel
         addComponent(getResetButton(), 1, 0, 3, 1, 0, 0, GridBagConstraints.HORIZONTAL); // Reset Button
         addComponent(getTimerButton(), 2,0,3,1,0,0, GridBagConstraints.HORIZONTAL); // Set Timer Button
     }
-    @Override
     public void updateLabels()
     {
         getJTextField1().grabFocus();
