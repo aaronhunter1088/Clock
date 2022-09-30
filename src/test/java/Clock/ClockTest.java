@@ -106,7 +106,7 @@ public class ClockTest {
     {
         clock = new Clock(1, 0, 59, MARCH, SATURDAY, 6, 2021, Time.PM);
         clock.setShowMilitaryTime(true);
-        Alarm alarm = new Alarm(1, 1, Time.PM, false, new ArrayList<>(){{add(SATURDAY);}});
+        Alarm alarm = new Alarm(1, 1, Time.PM, false, new ArrayList<>(){{add(SATURDAY);}}, clock);
         clock.setListOfAlarms(new ArrayList<>(){{add(alarm);}});
 
         assertTrue(clock.getListOfAlarms().size() == 1);

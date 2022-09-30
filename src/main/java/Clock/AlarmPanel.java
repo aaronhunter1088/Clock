@@ -9,6 +9,7 @@ import java.io.InputStream;
 import java.text.ParseException;
 import java.time.DayOfWeek;
 import java.util.ArrayList;
+import java.util.Locale;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -63,24 +64,26 @@ public class AlarmPanel extends JPanel implements IClockPanel
     private boolean updatingAlarm;
     private boolean alarmIsGoingOff;
     private AdvancedPlayer musicPlayer;
+    public static ClockFace facePanel;
 
     public AlarmPanel(Clock clock)
     {
         super();
         setClock(clock);
-        setMaximumSize(Clock.panelSize);
+        setFacePanel(ClockFace.ALARMPANEL);
+        setMaximumSize(new Dimension(200, 100));
         setGridBagLayout(new GridBagLayout());
-        setLayout(getGridBagLayout());
+        setLayout(layout);
         setGridBagConstraints(new GridBagConstraints());
-        setBackground(Color.WHITE); // was black
+        setBackground(Color.BLACK); // was black
         setForeground(Color.BLACK);
         setupAlarmPanel(getClock());
         setupAlarmButton();
         setupMusicPlayer();
-        updateLabels();
-        setBorder(BorderFactory.createLineBorder(Color.RED));
-        SwingUtilities.updateComponentTreeUI(this);
+        //updateLabels();
+        //setBorder(BorderFactory.createLineBorder(Color.RED));
         addComponentsToPanel();
+        SwingUtilities.updateComponentTreeUI(this);
     }
 
     public GridBagLayout getGridBagLayout() { return this.layout; }
@@ -94,7 +97,7 @@ public class AlarmPanel extends JPanel implements IClockPanel
     public JTextField getJTextField1() { return this.jtextField1; }
     public JTextField getJTextField2() { return this.jtextField2; }
     public JTextField getJTextField3() { return this.jtextField3; }
-    public JButton getJSetAlarmButton() { return this.jSetAlarmButton; }
+    public JButton getSetAlarmButton() { return this.jSetAlarmButton; }
     public JScrollPane getJScrollPane() { return this.scrollPane; }
     public JTextArea getJTextArea() { return this.jTextArea; }
     public boolean isUpdatingAlarm() { return updatingAlarm; }
@@ -122,7 +125,7 @@ public class AlarmPanel extends JPanel implements IClockPanel
     protected void setJTextField1(JTextField jtextField1) { this.jtextField1 = jtextField1; }
     protected void setJTextField2(JTextField jtextField2) { this.jtextField2 = jtextField2; }
     protected void setJTextField3(JTextField jtextField3) { this.jtextField3 = jtextField3; }
-    protected void setJSetAlarmButton(JButton jSetAlarmButton) { this.jSetAlarmButton = jSetAlarmButton; }
+    protected void setSetAlarmButton(JButton jSetAlarmButton) { this.jSetAlarmButton = jSetAlarmButton; }
     protected void setJScrollPane(JScrollPane scrollPane) { this.scrollPane = scrollPane; }
     protected void setJTextArea(final JTextArea jTextArea) { this.jTextArea = jTextArea; }
     protected void setUpdatingAlarm(boolean updatingAlarm) { this.updatingAlarm = updatingAlarm; }
@@ -138,7 +141,68 @@ public class AlarmPanel extends JPanel implements IClockPanel
     protected void setWeekCheckBox(JCheckBox weekCheckBox) { this.weekCheckBox = weekCheckBox; }
     protected void setWkendCheckBox(JCheckBox wkendCheckBox) { this.wkendCheckBox = wkendCheckBox; }
     protected void setAlarmIsGoingOff(boolean alarmIsGoingOff) { this.alarmIsGoingOff = alarmIsGoingOff; }
+    protected void setFacePanel(ClockFace panelChoice) { facePanel = panelChoice; }
     // Helper methods
+    public void setupAlarmPanel(Clock clock)
+    {
+        clock.setIsDateChanged(false);
+        clock.setShowFullDate(false);
+        clock.setShowPartialDate(false);
+        clock.setShowMilitaryTime(false);
+        setJAlarmLbl1(new JLabel("Hours", SwingConstants.CENTER)); // H
+        //getJAlarmLbl1().setBorder(BorderFactory.createLineBorder(Color.RED));
+        setJAlarmLbl2(new JLabel("Minutes", SwingConstants.CENTER)); // M
+        //getJAlarmLbl2().setBorder(BorderFactory.createLineBorder(Color.RED));
+        setJAlarmLbl3(new JLabel("AM/PM", SwingConstants.CENTER)); // Time (AM/PM)
+        //getJAlarmLbl3().setBorder(BorderFactory.createLineBorder(Color.RED));
+        setJTextField1(new JTextField(2)); // Hour textField
+        getJTextField1().setSize(new Dimension(50,50));
+        setJTextField2(new JTextField(2)); // Min textField
+        getJTextField2().setSize(new Dimension(50,50));
+        getJTextField2().setMaximumSize(getJTextField2().getSize());
+        setJTextField3(new JTextField(2)); // Time textField
+        getJTextField3().setSize(new Dimension(50,50));
+        setJAlarmLbl4(new JLabel("Current Alarms", SwingConstants.CENTER)); // Current Alarms
+        getJTextField1().requestFocusInWindow();
+        getJTextField1().setText("");
+        //getJTextField1().setBorder(BorderFactory.createLineBorder(Color.RED));
+        getJTextField1().setText("");
+        //getJTextField2().setBorder(BorderFactory.createLineBorder(Color.RED));
+        getJTextField1().setText("");
+        //getJTextField3().setBorder(BorderFactory.createLineBorder(Color.RED));
+        getJAlarmLbl1().setFont(Clock.font20); // H
+        getJAlarmLbl2().setFont(Clock.font20); // M
+        getJAlarmLbl3().setFont(Clock.font20); // T
+        getJAlarmLbl4().setFont(Clock.font20); // All Alarms
+        getJAlarmLbl1().setForeground(Color.WHITE);
+        getJAlarmLbl2().setForeground(Color.WHITE);
+        getJAlarmLbl3().setForeground(Color.WHITE);
+        getJAlarmLbl4().setForeground(Color.WHITE);
+        // setup textarea
+        setJTextArea(new JTextArea(2, 2));
+        getJTextArea().setSize(new Dimension(100, 100));
+        getJTextArea().setFont(Clock.font10); // message
+        getJTextArea().setVisible(true);
+        getJTextArea().setEditable(false);
+        getJTextArea().setLineWrap(false);
+        getJTextArea().setWrapStyleWord(false);
+        getJTextArea().setBackground(Color.BLACK);
+        getJTextArea().setForeground(Color.WHITE);
+        // setup scrollPane
+        setJScrollPane(new JScrollPane(getJTextArea()));
+        getJScrollPane().setHorizontalScrollBar(null);
+        getJScrollPane().setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
+        getJScrollPane().setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED);
+        getJScrollPane().setSize(getJTextArea().getSize());
+        // setup Set button
+        setSetAlarmButton(new JButton("Set"));
+        getSetAlarmButton().setFont(Clock.font20);
+        getSetAlarmButton().setOpaque(true);
+        getSetAlarmButton().setBackground(Color.BLACK);
+        getSetAlarmButton().setForeground(Color.BLACK);
+        // setup checkboxes
+        setupCheckboxes();
+    }
     public void setupMusicPlayer()
     {
         InputStream inputStream = null;
@@ -154,332 +218,7 @@ public class AlarmPanel extends JPanel implements IClockPanel
             printStackTrace(e, "A JavaLayerException occurred: " + e.getMessage());
         }
     }
-    public Time convertStringToTimeAMPM(String ampm) throws InvalidInputException
-    {
-        if (StringUtils.equals("AM", ampm.toUpperCase()))
-        { return Time.AM; }
-        else if (StringUtils.equals("PM", ampm.toUpperCase()))
-        { return Time.PM; }
-        else throw new InvalidInputException("Invalid time input");
-    }
-    public void setupAlarmPanel(Clock clock)
-    {
-        clock.setIsDateChanged(false);
-        clock.setShowFullDate(false);
-        clock.setShowPartialDate(false);
-        clock.setShowMilitaryTime(false);
-        setJAlarmLbl1(new JLabel("H", SwingConstants.CENTER)); // H
-        setJAlarmLbl2(new JLabel("M", SwingConstants.CENTER)); // M
-        setJAlarmLbl3(new JLabel("T", SwingConstants.CENTER)); // Time (AM/PM)
-        setJTextField1(new JTextField(2)); // Hour textField
-        getJTextField1().setSize(new Dimension(50,50));
-        setJTextField2(new JTextField(2)); // Min textField
-        getJTextField2().setSize(new Dimension(50,50));
-        getJTextField2().setMaximumSize(getJTextField2().getSize());
-        setJTextField3(new JTextField(2)); // Time textField
-        getJTextField3().setSize(new Dimension(50,50));
-        setJAlarmLbl4(new JLabel("Current Alarms", SwingConstants.CENTER)); // Current Alarms
-        getJTextField1().requestFocusInWindow();
-        getJTextField1().setText("");
-        getJTextField1().setBorder(BorderFactory.createLineBorder(Color.BLACK));
-        getJTextField1().setText("");
-        getJTextField2().setBorder(BorderFactory.createLineBorder(Color.BLACK));
-        getJTextField1().setText("");
-        getJTextField3().setBorder(BorderFactory.createLineBorder(Color.BLACK));
-        getJAlarmLbl1().setFont(Clock.font20); // H
-        getJAlarmLbl2().setFont(Clock.font20); // M
-        getJAlarmLbl3().setFont(Clock.font20); // T
-        getJAlarmLbl4().setFont(Clock.font20); // All Alarms
-        getJAlarmLbl1().setForeground(Color.WHITE);
-        getJAlarmLbl2().setForeground(Color.WHITE);
-        getJAlarmLbl3().setForeground(Color.WHITE);
-        getJAlarmLbl4().setForeground(Color.WHITE);
-        // setup textarea
-        setJTextArea(new JTextArea(2, 5));
-        getJTextArea().setMaximumSize(new Dimension(100, 100));
-        getJTextArea().setFont(Clock.font10); // message
-        getJTextArea().setVisible(true);
-        getJTextArea().setEditable(false);
-        getJTextArea().setLineWrap(false);
-        getJTextArea().setWrapStyleWord(false);
-        getJTextArea().setBackground(Color.BLACK);
-        getJTextArea().setForeground(Color.WHITE);
-        // setup scrollPane
-        setJScrollPane(new JScrollPane(getJTextArea()));
-        getJScrollPane().setHorizontalScrollBar(null);
-        getJScrollPane().setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
-        getJScrollPane().setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED);
-        getJScrollPane().setSize(new Dimension(200,200));
-        // setup Set button
-        setJSetAlarmButton(new JButton("Set"));
-        getJSetAlarmButton().setFont(Clock.font20);
-        getJSetAlarmButton().setOpaque(true);
-        getJSetAlarmButton().setBackground(Color.BLACK);
-        getJSetAlarmButton().setForeground(Color.BLACK);
-        // setup checkboxes
-        setupCheckboxes();
-    }
-    public void checkIfAnyAlarmsAreGoingOff()
-    {
-        // alarm has reference to time
-        // check all alarms
-        // if any alarm matches clock's time, an alarm should be going off
-        getClock().getListOfAlarms().forEach(
-            (alarm) ->
-            {
-                for(DayOfWeek day : alarm.getDays())
-                {
-                    if (alarm.getTimeAsStr().equals(getClock().getTimeAsStr())
-                            &&
-                        day == getClock().getDayOfWeek())
-                    {
-                        // time for alarm to be triggered on
-                        setCurrentAlarmGoingOff(alarm);
-                        alarm.setIsAlarmGoingOff(true);
-                        setAlarmIsGoingOff(true);
-                        System.out.print("Alarm " + getCurrentAlarmGoingOff().getTimeAsStr() + " matches clock's time. ");
-                        System.out.println("Sounding alarm...");
-                        //System.out.println("Clock's time is " + getClock().getTimeAsStr());
-                    }
-                    else if (getClock().isShowMilitaryTime()) // if in military time, change clocks hours back temporarily
-                    {
-                        int hours = getClock().getHours();
-                        getClock().setHours(hours-12);
-                        if (alarm.getTimeAsStr().equals(getClock().getTimeAsStr())
-                                &&
-                            day == getClock().getDayOfWeek())
-                        {
-                            // time for alarm to be triggered on
-                            setCurrentAlarmGoingOff(alarm);
-                            alarm.setIsAlarmGoingOff(true);
-                            setAlarmIsGoingOff(true);
-                            System.out.print("Alarm " + getCurrentAlarmGoingOff().getTimeAsStr() + " matches clock's time. ");
-                            System.out.println("Sounding alarm...");
-                            //System.out.println("Clock's time is " + getClock().getTimeAsStr());
-                        }
-                    }
-                }
-            }
-        );
-        // update lbl1 and lbl2 to display alarm
-        // user must "view that alarm" to turn it off
-        Alarm currentAlarm = getCurrentAlarmGoingOff();
-        ExecutorService executor = Executors.newCachedThreadPool();
-        if (null != currentAlarm && currentAlarm.isAlarmGoingOff())
-        {
-            triggerAlarm(executor);
-        }
-    }
-    public void setupAlarmsInMenuFunctionality()
-    {
-        // get the view alarms menu
-        // for each except the Set Alarms (option1)
-        // create an action listener which
-        // takes the alarmClock, set the hour, min, and ampm
-        // in the textFields and we will set a boolean to true
-        // which will allow editing the textFields to any value
-        // changing all values to 0 or explicitly Time to 0
-        // will delete the alarm
-        // changing the values and clicking Set will save the alarm
-        //05:06:00 PM
-        for(int i = 0; i < getClock().getClockMenuBar().getAlarmFeature_Menu().getItemCount(); i++)
-        {
-            if (!getClock().getClockMenuBar().getAlarmFeature_Menu().getItem(i).getText().equals("Set Alarms"))
-            {
-                JMenuItem menuItem = getClock().getClockMenuBar().getAlarmFeature_Menu().getItem(i);
-                menuItem.addActionListener(action ->
-                {
-                    getClock().getListOfAlarms().forEach(
-                        (alarm) ->
-                        {
-                            if (alarm.getTimeAsStr().equals(menuItem.getText()))
-                            { setAlarm(alarm); }
-                        }
-                    );
-                    if (null == getMusicPlayer()) { setupMusicPlayer(); }
-                    // if an alarm is going off and we clicked on it in the menuBar
-                    if (null != getCurrentAlarmGoingOff())
-                    {
-                        setAlarm(getCurrentAlarmGoingOff());
-                        if (null != getMusicPlayer())
-                        {
-                            stopAlarm();
-                        }
-                        else { System.err.println("Music player is null!"); }
-                        setCheckboxesIfWasSelected(getAlarm());
-                        getAlarm().setIsAlarmGoingOff(false);
-                        getAlarm().setUpdateAlarm(true); // this and the boolean below we want true
-                        setUpdatingAlarm(true); // we want to continue with the logic that's done in the next if
-                        setCurrentAlarmGoingOff(null);
-                        System.out.println("Size of listOfAlarms before removing " + getClock().getListOfAlarms().size());
-                        // remove alarm from list of alarms
-                        getClock().getListOfAlarms().remove(getAlarm());
-                        System.out.println("Size of listOfAlarms after removing " + getClock().getListOfAlarms().size());
-                        deleteAlarmMenuItemFromViewAlarms(getAlarm());
-                        resetJTextArea();
-                        getClock().getAlarmPanel().getJTextField1().setText(getAlarm().getHoursAsStr());
-                        getClock().getAlarmPanel().getJTextField2().setText(getAlarm().getMinutesAsStr());
-                        getClock().getAlarmPanel().getJTextField3().setText(getAlarm().getAMPM().getStrValue());
-                        getJAlarmLbl4().setText("Alarm off.");
-                    }
-                    // we are updating an alarm by clicking on it in the menuBar
-                    else if (null != getAlarm() && getAlarm().isUpdateAlarm())
-                    {
-                        //updateTheAlarm(menuItem);
-                        updateTheAlarm(getAlarm());
-                    }
-                    getClock().changeToAlarmPanel();
-                });
-            }
-        }
-    }
-    protected void updateTheAlarm(Alarm alarmToUpdate)
-    {
-        if (null != alarmToUpdate)
-        {
-            System.out.println("Updating an alarm: " + alarmToUpdate.getTimeAsStr());
-            getJTextField1().setText(alarmToUpdate.getHoursAsStr());
-            getJTextField2().setText(alarmToUpdate.getMinutesAsStr());
-            getJTextField3().setText(alarmToUpdate.getAMPM().toString());
-            setCheckboxesIfWasSelected(alarmToUpdate);
-        }
-        setUpdatingAlarm(true);
-        // remove alarm from list of alarms
-        deleteAlarmMenuItemFromViewAlarms(getAlarm());
-        System.err.println("Size of listOfAlarms before removing " + getClock().getListOfAlarms().size());
-        getClock().getListOfAlarms().remove(getAlarm());
-        System.err.println("Size of listOfAlarms after removing " + getClock().getListOfAlarms().size());
-        resetJTextArea();
-        getJAlarmLbl4().setText("Updating alarm");
-    }
-    protected void setupAlarmButton()
-    {
-        getJSetAlarmButton().addActionListener(action ->
-        {
-            //JCheckBox cbLog = (JCheckBox)(AbstractButton)action.getSource();
-            //System.err.println("cbLog isSelected: " + cbLog.isSelected());
-            //System.err.println("cbLog isEnabled: " + cbLog.isEnabled());
-            // check if h, m, and time are set. exit if not
-            Alarm alarm;
-            boolean validated;
-            try
-            {
-                validated = validateFirstTextField() && validateSecondTextField() // Hours and Minutes
-                && validateThirdTextField() && validateOnTheCheckBoxes(); // Time and Checkboxes
 
-                if (!validated)
-                {
-                    setAlarm(new Alarm());
-                    getClock().changeToAlarmPanel();
-                }
-                else // validated is true
-                {
-                    // Passed validation
-                    if (isUpdatingAlarm())
-                    {
-                        alarm = createAlarm();
-                        alarm.setUpdateAlarm(false); // at this point, we are doing updating
-                        setAlarm(alarm);
-                        // add clock to list of alarms
-                        if (getClock().getListOfAlarms().size() == 0)
-                        {
-                            addAlarmMenuItemFromAlarm(alarm);
-                            getClock().getListOfAlarms().add(alarm);
-                        }
-                        else
-                        {
-                            boolean addToList = false;
-                            for(int i = 0; i < getClock().getListOfAlarms().size(); i++)
-                            {
-                                if (!getClock().getListOfAlarms().get(i).getTimeAsStr().equals(alarm.getTimeAsStr()) &&
-                                     getClock().getListOfAlarms().get(i).getDays() != alarm.getDays())
-                                { addToList = true; }
-                                else
-                                {
-                                    addToList = false;
-                                    System.err.println("Tried updating an alarm but it already exists! Cannot create duplicate alarm.");
-                                }
-                            }
-                            if (addToList)
-                            {
-                                addAlarmMenuItemFromAlarm(alarm);
-                                getClock().getListOfAlarms().add(alarm);
-                            }
-                        }
-                        System.err.println("Size of listOfAlarms before adding " + (getClock().getListOfAlarms().size()-1));
-                        System.err.println("Size of listOfAlarms after adding " + getClock().getListOfAlarms().size());
-                        // restart viewAlarms menu
-                        //resetViewAlarmsMenu(getClock().getListOfAlarms());
-                        setupAlarmsInMenuFunctionality();
-                        setUpdatingAlarm(false);
-                        resetJTextArea();
-                        resetJCheckboxes();
-                        resetJAlarmLabel4();
-                        // determine how to update alarm (update/delete)
-                    }
-                    else // creating a new alarm
-                    {
-                        alarm = createAlarm();
-                        setAlarm(alarm);
-                        setUpdatingAlarm(false);
-                        if (getClock().getListOfAlarms().size() == 0)
-                        {
-                            addAlarmMenuItemFromAlarm(alarm);
-                            getClock().getListOfAlarms().add(alarm);
-                        }
-                        else
-                        {
-                            boolean addToList = false;
-                            for(int i = 0; i < getClock().getListOfAlarms().size(); i++)
-                            {
-                                if (!getClock().getListOfAlarms().get(i).getTimeAsStr().equals(alarm.getTimeAsStr()) ||
-                                     getClock().getListOfAlarms().get(i).getDays() != alarm.getDays())
-                                { addToList = true; }
-                                else
-                                {
-                                    addToList = false;
-                                    System.err.println("Tried adding an alarm but it already exists! Cannot create duplicate alarm.");
-                                }
-                            }
-                            if (addToList)
-                            {
-                                addAlarmMenuItemFromAlarm(alarm);
-                                getClock().getListOfAlarms().add(alarm);
-                            }
-                        }
-                        System.err.println("Size of listOfAlarms before adding " + (getClock().getListOfAlarms().size()-1));
-                        System.err.println("Size of listOfAlarms after adding " + getClock().getListOfAlarms().size());
-                        // display list of alarms below All Alarms
-                        resetJTextArea();
-                        resetJCheckboxes();
-                        setupAlarmsInMenuFunctionality();
-                        // erase input in textFields
-                        getJTextField1().setText("");
-                        getJTextField2().setText("");
-                        getJTextField3().setText("");
-                        resetJAlarmLabel4();
-                    }
-                    getClock().changeToClockPanel();
-                }
-            }
-            catch (InvalidInputException | ParseException e)
-            {
-                getJTextArea().setLineWrap(true);
-                getJTextArea().setWrapStyleWord(true);
-                getJTextArea().setText(e.getMessage());
-                try
-                {
-                    setAlarm(new Alarm());
-                    getClock().changeToAlarmPanel();
-                }
-                catch (InvalidInputException pe)
-                {
-                    System.err.println("Couldn't create a new alarm");
-                    printStackTrace(pe);
-                }
-            }
-        });
-    }
     protected void resetJAlarmLabel4()
     {
         if (getClock().getListOfAlarms().size() == 0)
@@ -567,8 +306,488 @@ public class AlarmPanel extends JPanel implements IClockPanel
         return true;
     }
     protected boolean validateACheckboxWasSelected()
+    { return checkWhichCheckBoxesWereChecked().size() != 0;}
+
+    protected void addAlarmMenuItemFromAlarm(Alarm alarm)
     {
-        return checkWhichCheckBoxesWereChecked().size() != 0;
+        JMenuItem alarmItem = new JMenuItem(alarm.getAlarmAsString());
+        alarmItem.setForeground(Color.WHITE);
+        alarmItem.setBackground(Color.BLACK);
+        System.err.println("Size of viewAlarms before adding " + getClock().getClockMenuBar().getAlarmFeature_Menu().getItemCount());
+        getClock().getClockMenuBar().getAlarmFeature_Menu().add(alarmItem);
+        System.err.println("Size of viewAlarms after adding " + getClock().getClockMenuBar().getAlarmFeature_Menu().getItemCount());
+    }
+    protected void deleteAlarmMenuItemFromViewAlarms(Alarm alarm)
+    {
+        System.err.println("Size of viewAlarms before removal " + getClock().getClockMenuBar().getAlarmFeature_Menu().getItemCount());
+        for(int i = 0; i < getClock().getClockMenuBar().getAlarmFeature_Menu().getItemCount(); i++)
+        {
+            if (getClock().getClockMenuBar().getAlarmFeature_Menu().getItem(i).getText().equals(alarm.getAlarmAsString()))
+            {
+                getClock().getClockMenuBar().getAlarmFeature_Menu().remove(getClock().getClockMenuBar().getAlarmFeature_Menu().getItem(i));
+            }
+        }
+        System.err.println("Size of viewAlarms after removal " + getClock().getClockMenuBar().getAlarmFeature_Menu().getItemCount());
+    }
+    protected void resetJTextArea()
+    {
+        getJTextArea().setText("");
+        for(Alarm alarm : getClock().getListOfAlarms())
+        {
+            if (!StringUtils.isEmpty(getJTextArea().getText()))
+            {
+                getJTextArea().append("\n");
+            }
+            getJTextArea().append(alarm.getAlarmAsString() + "\n");
+            alarm.getDaysShortened().forEach(day -> getJTextArea().append(day));
+        }
+    }
+
+    protected void setupAlarmButton()
+    {
+        getSetAlarmButton().addActionListener(action ->
+        {
+            //JCheckBox cbLog = (JCheckBox)(AbstractButton)action.getSource();
+            //System.err.println("cbLog isSelected: " + cbLog.isSelected());
+            //System.err.println("cbLog isEnabled: " + cbLog.isEnabled());
+            // check if h, m, and time are set. exit if not
+            Alarm alarm;
+            boolean validated;
+            try
+            {
+                validated = validateFirstTextField() && validateSecondTextField() // Hours and Minutes
+                        && validateThirdTextField() && validateOnTheCheckBoxes(); // Time and Checkboxes
+
+                if (!validated)
+                {
+                    setAlarm(null); // new Alarm()
+                    //getClock().changeToAlarmPanel();
+                }
+                else // validated is true
+                {
+                    // Passed validation
+                    if (isUpdatingAlarm())
+                    {
+                        alarm = createAlarm();
+                        alarm.setIsAlarmUpdating(false); // at this point, we are doing updating
+                        setAlarm(alarm);
+                        // add clock to list of alarms
+                        if (getClock().getListOfAlarms().size() == 0)
+                        {
+                            addAlarmMenuItemFromAlarm(alarm);
+                            getClock().getListOfAlarms().add(alarm);
+                        }
+                        else
+                        {
+                            boolean addToList = false;
+                            for(int i = 0; i < getClock().getListOfAlarms().size(); i++)
+                            {
+                                if (!getClock().getListOfAlarms().get(i).getAlarmAsString().equals(alarm.getAlarmAsString()) &&
+                                        getClock().getListOfAlarms().get(i).getDays() != alarm.getDays())
+                                { addToList = true; }
+                                else
+                                {
+                                    addToList = false;
+                                    System.err.println("Tried updating an alarm but it already exists! Cannot create duplicate alarm.");
+                                }
+                            }
+                            if (addToList)
+                            {
+                                addAlarmMenuItemFromAlarm(alarm);
+                                getClock().getListOfAlarms().add(alarm);
+                            }
+                        }
+                        System.err.println("Size of listOfAlarms before adding " + (getClock().getListOfAlarms().size()-1));
+                        System.err.println("Size of listOfAlarms after adding " + getClock().getListOfAlarms().size());
+                        // restart viewAlarms menu
+                        //resetViewAlarmsMenu(getClock().getListOfAlarms());
+                        setupAlarmsInMenuFunctionality();
+                        setUpdatingAlarm(false);
+                        resetJTextArea();
+                        resetJCheckboxes();
+                        resetJAlarmLabel4();
+                        // determine how to update alarm (update/delete)
+                    }
+                    else // creating a new alarm
+                    {
+                        alarm = createAlarm();
+                        setAlarm(alarm);
+                        setUpdatingAlarm(false);
+                        if (getClock().getListOfAlarms().size() == 0)
+                        {
+                            addAlarmMenuItemFromAlarm(alarm);
+                            getClock().getListOfAlarms().add(alarm);
+                        }
+                        else
+                        {
+                            System.err.println("Size of listOfAlarms before adding " + (getClock().getListOfAlarms().size()));
+                            boolean addToList = false;
+                            for(int i = 0; i < getClock().getListOfAlarms().size(); i++)
+                            {
+                                if (!getClock().getListOfAlarms().get(i).getAlarmAsString().equals(alarm.getAlarmAsString()) ||
+                                        getClock().getListOfAlarms().get(i).getDays() != alarm.getDays())
+                                { addToList = true; }
+                                else
+                                {
+                                    addToList = false;
+                                    System.err.println("Tried adding an alarm but it already exists! Cannot create duplicate alarm.");
+                                }
+                            }
+                            if (addToList)
+                            {
+                                addAlarmMenuItemFromAlarm(alarm);
+                                getClock().getListOfAlarms().add(alarm);
+                            }
+                        }
+                        System.err.println("Size of listOfAlarms after adding " + getClock().getListOfAlarms().size());
+                        // display list of alarms below All Alarms
+                        resetJTextArea();
+                        resetJCheckboxes();
+                        setupAlarmsInMenuFunctionality();
+                        // erase input in textFields
+                        getJTextField1().setText("");
+                        getJTextField2().setText("");
+                        getJTextField3().setText("");
+                        resetJAlarmLabel4();
+                    }
+                    //getClock().changeToClockPanel();
+                }
+            }
+            catch (InvalidInputException | ParseException e)
+            {
+                getJTextArea().setLineWrap(true);
+                getJTextArea().setWrapStyleWord(true);
+                getJTextArea().setText(e.getMessage());
+                try
+                {
+                    //setAlarm(new Alarm());
+                    //getClock().changeToAlarmPanel();
+                }
+                finally //catch (InvalidInputException pe)
+                {
+                    System.err.println("Couldn't create a new alarm");
+                    //printStackTrace(pe);
+                }
+            }
+        });
+    }
+    /**
+     * Creates an alarm and sets the latest one created as the currentAlarm
+     * defined in setAlarm
+     * @return Alarm
+     * @throws ParseException will be thrown if hour, minutes, or time is inappropriate.
+     */
+    public Alarm createAlarm() throws ParseException, InvalidInputException
+    {
+        int hour = Integer.parseInt(getJTextField1().getText());
+        int minutes = Integer.parseInt(getJTextField2().getText());
+        Time ampm = convertStringToTimeAMPM(getJTextField3().getText());
+        boolean valid;
+        valid = validateFirstTextField() && validateSecondTextField()
+                && validateThirdTextField() && validateACheckboxWasSelected();
+        if (valid)
+        {
+            ArrayList<DayOfWeek> days = checkWhichCheckBoxesWereChecked();
+            Alarm alarm = new Alarm(hour, minutes, ampm, true, days, getClock());
+            alarm.setIsAlarmGoingOff(false);
+            alarm.setIsAlarmUpdating(false);
+            System.out.println("\nCreated an alarm: " + alarm.getAlarmAsString());
+            System.out.print("days: ");
+            if (null != alarm.getDays())
+            {
+                for(DayOfWeek day: days)
+                { System.out.print("\t"+day); }
+            }
+            System.out.println();
+            return alarm;
+        }
+        else
+        {
+            return null;
+        }
+    }
+    protected void updateTheAlarm(Alarm alarmToUpdate)
+    {
+        if (null != alarmToUpdate) {
+            System.out.println("Updating an alarm: " + alarmToUpdate.getAlarmAsString() + alarmToUpdate.getDays());
+            if (alarmToUpdate.getHours() < 10 && alarmToUpdate.getHours() != 0) {
+                getJTextField1().setText("0" + alarmToUpdate.getHours());
+            } else if (alarmToUpdate.getHours() == 0 && alarmToUpdate.getMinutes() != 0) {
+                getJTextField1().setText("00");
+            } else {
+                getJTextField1().setText(alarmToUpdate.getHoursAsStr());
+            }
+            if (alarmToUpdate.getMinutes() < 10 && alarmToUpdate.getMinutes() != 0) {
+                getJTextField2().setText("0" + alarmToUpdate.getMinutes());
+            } else if (alarmToUpdate.getMinutes() == 0 && alarmToUpdate.getHours() != 0) {
+                getJTextField2().setText("00");
+            } else {
+                getJTextField2().setText(alarmToUpdate.getMinutesAsStr());
+            }
+            getJTextField3().setText(alarmToUpdate.getAMPM().getStrValue());
+            setCheckboxesIfWasSelected(alarmToUpdate);
+        }
+        setUpdatingAlarm(true);
+        // remove alarm from list of alarms
+        deleteAlarmMenuItemFromViewAlarms(alarmToUpdate);
+        System.err.println("Size of listOfAlarms before removing " + getClock().getListOfAlarms().size());
+        getClock().getListOfAlarms().remove(alarmToUpdate);
+        System.err.println("Size of listOfAlarms after removing " + getClock().getListOfAlarms().size());
+        resetJTextArea();
+        getJAlarmLbl4().setText("Updating alarm");
+    }
+    public void triggerAlarm(ExecutorService executor)
+    {
+        setAlarmIsGoingOff(true);
+        getClock().getClockPanel().getJlbl1().setText(getCurrentAlarmGoingOff().getAlarmAsString());
+        getClock().getClockPanel().getJlbl2().setText("is going off!");
+        // play sound
+        Callable<String> c = () -> {
+            try
+            {
+                setupMusicPlayer();
+                getMusicPlayer().play(50);
+                //System.err.println("Alarm is going off.");
+                return "Alarm triggered";
+            }
+            catch (Exception e)
+            {
+                System.err.println(e.getCause().getClass().getName() + ": " + e.getMessage());
+                printStackTrace(e);
+                setupMusicPlayer();
+                getMusicPlayer().play(50);
+                return "Reset music player req'd";
+            }
+        };
+        executor.submit(c);
+    }
+    public void stopAlarm()
+    {
+        setMusicPlayer(null);
+        setAlarmIsGoingOff(false);
+        System.out.println("Stopping music. New music player setup and ready for new alarm");
+        System.out.println(getAlarm().getAlarmAsString()+" alarm turned off.\n");
+    }
+    public void checkIfAnyAlarmsAreGoingOff()
+    {
+        // alarm has reference to time
+        // check all alarms
+        // if any alarm matches clock's time, an alarm should be going off
+        getClock().getListOfAlarms().forEach(
+                (alarm) ->
+                {
+                    if (alarm.isAlarmGoingOff()) {
+                        for(DayOfWeek day : alarm.getDays())
+                        {
+                            if (alarm.getAlarmAsString().equals(getClock().getTimeAsStrAlarmRepresentation())
+                                    &&
+                                    day == getClock().getDayOfWeek())
+                            {
+                                // time for alarm to be triggered on
+                                setCurrentAlarmGoingOff(alarm);
+                                alarm.setIsAlarmGoingOff(true);
+                                setAlarmIsGoingOff(true);
+                                System.out.print("Alarm " + getCurrentAlarmGoingOff().getAlarmAsString() + " matches clock's time. ");
+                                System.out.println("Sounding alarm...");
+                                //System.out.println("Clock's time is " + getClock().getTimeAsStr());
+                            }
+                            else if (getClock().isShowMilitaryTime()) // if in military time, change clocks hours back temporarily
+                            {
+                                int hours = getClock().getHours();
+                                getClock().setHours(hours-12);
+                                if (alarm.getAlarmAsString().equals(getClock().getTimeAsStrAlarmRepresentation())
+                                        &&
+                                        day == getClock().getDayOfWeek())
+                                {
+                                    // time for alarm to be triggered on
+                                    setCurrentAlarmGoingOff(alarm);
+                                    alarm.setIsAlarmGoingOff(true);
+                                    setAlarmIsGoingOff(true);
+                                    System.out.print("Alarm " + getCurrentAlarmGoingOff().getAlarmAsString() + " matches clock's time. ");
+                                    System.out.println("Sounding alarm...");
+                                    //System.out.println("Clock's time is " + getClock().getTimeAsStr());
+                                }
+                            }
+                        }
+                    } else {
+                        //System.err.println(alarm.getAlarmAsString() + " is not going off.");
+                    }
+                }
+        );
+        // update lbl1 and lbl2 to display alarm
+        // user must "view that alarm" to turn it off
+        Alarm currentAlarm = getCurrentAlarmGoingOff();
+        ExecutorService executor = Executors.newCachedThreadPool();
+        if (null != currentAlarm && currentAlarm.isAlarmGoingOff())
+        {
+            triggerAlarm(executor);
+        }
+    }
+    public void setupAlarmsInMenuFunctionality()
+    {
+        // get the view alarms menu
+        // for each except the Set Alarms (option1)
+        // create an action listener which
+        // takes the alarmClock, set the hour, min, and ampm
+        // in the textFields, and we will set a boolean to true
+        // which will allow editing the textFields to any value
+        // changing all values to 0 or explicitly Time to 0
+        // will delete the alarm
+        // changing the values and clicking Set will save the alarm
+        //05:06:00 PM
+        for(int i = 0; i < getClock().getClockMenuBar().getAlarmFeature_Menu().getItemCount(); i++)
+        {
+            if (!getClock().getClockMenuBar().getAlarmFeature_Menu().getItem(i).getText().equals("Set Alarms"))
+            {
+                JMenuItem menuItem = getClock().getClockMenuBar().getAlarmFeature_Menu().getItem(i);
+                menuItem.addActionListener(action ->
+                {
+                    getClock().getListOfAlarms().forEach(
+                            (alarm) ->
+                            {
+                                if (alarm.getAlarmAsString().equals(menuItem.getText()))
+                                { setAlarm(alarm); }
+                            }
+                    );
+                    if (null == getMusicPlayer()) { setupMusicPlayer(); }
+                    // if an alarm is going off and we clicked on it in the menuBar
+                    if (null != getCurrentAlarmGoingOff())
+                    {
+                        setAlarm(getCurrentAlarmGoingOff());
+                        if (null != getMusicPlayer())
+                        {
+                            stopAlarm();
+                        }
+                        else { System.err.println("Music player is null!"); }
+                        setCheckboxesIfWasSelected(getAlarm());
+                        getAlarm().setIsAlarmGoingOff(false);
+                        getAlarm().setIsAlarmUpdating(true); // this and the boolean below we want true
+                        setUpdatingAlarm(true); // we want to continue with the logic that's done in the next if
+                        setCurrentAlarmGoingOff(null);
+                        System.out.println("Size of listOfAlarms before removing " + getClock().getListOfAlarms().size());
+                        // remove alarm from list of alarms
+                        getClock().getListOfAlarms().remove(getAlarm());
+                        System.out.println("Size of listOfAlarms after removing " + getClock().getListOfAlarms().size());
+                        deleteAlarmMenuItemFromViewAlarms(getAlarm());
+                        resetJTextArea();
+                        getClock().getAlarmPanel().getJTextField1().setText(getAlarm().getHoursAsStr());
+                        getClock().getAlarmPanel().getJTextField2().setText(getAlarm().getMinutesAsStr());
+                        getClock().getAlarmPanel().getJTextField3().setText(getAlarm().getAMPM().getStrValue());
+                        getJAlarmLbl4().setText("Alarm off.");
+                    }
+                    // we are updating an alarm by clicking on it in the menuBar
+                    else if (null != getAlarm()) // && getAlarm().isUpdatingAlarm())
+                    {
+                        //updateTheAlarm(menuItem);
+                        updateTheAlarm(getAlarm());
+                        getJTextField1().setText(getAlarm().getHoursAsStr());
+                        getJTextField2().setText(getAlarm().getMinutesAsStr());
+                        getJTextField3().setText(getAlarm().getAMPM().getStrValue());
+                    }
+                    getClock().changeToAlarmPanel(false);
+                });
+            }
+        }
+    }
+
+    protected ArrayList<DayOfWeek> checkWhichCheckBoxesWereChecked()
+    {
+        ArrayList<DayOfWeek> daysSelected = new ArrayList<>();
+        if (getMondayCheckBox().isSelected())
+        { daysSelected.add(MONDAY); }
+        if (getTuesdayCheckBox().isSelected())
+        { daysSelected.add(TUESDAY); }
+        if (getWednesdayCheckBox().isSelected())
+        { daysSelected.add(WEDNESDAY); }
+        if (getThursdayCheckBox().isSelected())
+        { daysSelected.add(THURSDAY); }
+        if (getFridayCheckBox().isSelected())
+        { daysSelected.add(FRIDAY); }
+        if (getSaturdayCheckBox().isSelected())
+        { daysSelected.add(SATURDAY); }
+        if (getSundayCheckBox().isSelected())
+        { daysSelected.add(SUNDAY); }
+        if (getWeekCheckBox().isSelected())
+        {
+            if (!daysSelected.contains(MONDAY)) daysSelected.add(MONDAY);
+            if (!daysSelected.contains(TUESDAY)) daysSelected.add(TUESDAY);
+            if (!daysSelected.contains(WEDNESDAY)) daysSelected.add(WEDNESDAY);
+            if (!daysSelected.contains(THURSDAY)) daysSelected.add(THURSDAY);
+            if (!daysSelected.contains(FRIDAY)) daysSelected.add(FRIDAY);
+        } // add Monday - Friday
+        if (getWkendCheckBox().isSelected())
+        {
+            if (!daysSelected.contains(SATURDAY)) daysSelected.add(SATURDAY);
+            if (!daysSelected.contains(SUNDAY)) daysSelected.add(SUNDAY);
+        } // add Saturday and Sunday
+        return daysSelected;
+    }
+    protected void resetJCheckboxes()
+    {
+        if (getSundayCheckBox().isSelected())
+        {
+            getSundayCheckBox().setSelected(false);
+        }
+        if (getMondayCheckBox().isSelected())
+        {
+            getMondayCheckBox().setSelected(false);
+        }
+        if (getTuesdayCheckBox().isSelected())
+        {
+            getTuesdayCheckBox().setSelected(false);
+        }
+        if (getWednesdayCheckBox().isSelected())
+        {
+            getWednesdayCheckBox().setSelected(false);
+        }
+        if (getThursdayCheckBox().isSelected())
+        {
+            getThursdayCheckBox().setSelected(false);
+        }
+        if (getFridayCheckBox().isSelected())
+        {
+            getFridayCheckBox().setSelected(false);
+        }
+        if (getSaturdayCheckBox().isSelected())
+        {
+            getSaturdayCheckBox().setSelected(false);
+        }
+        if (getWeekCheckBox().isSelected())
+        {
+            getWeekCheckBox().setSelected(false);
+        }
+        if (getWkendCheckBox().isSelected())
+        {
+            getWkendCheckBox().setSelected(false);
+        }
+    }
+    public void setCheckboxesIfWasSelected(Alarm alarmToUpdate)
+    {
+        if (alarmToUpdate.getDays().contains(MONDAY)) { getMondayCheckBox().setSelected(true); }
+        if (alarmToUpdate.getDays().contains(TUESDAY)) { getTuesdayCheckBox().setSelected(true); }
+        if (alarmToUpdate.getDays().contains(WEDNESDAY)) { getWednesdayCheckBox().setSelected(true); }
+        if (alarmToUpdate.getDays().contains(THURSDAY)) { getThursdayCheckBox().setSelected(true); }
+        if (alarmToUpdate.getDays().contains(FRIDAY)) { getFridayCheckBox().setSelected(true); }
+        if (alarmToUpdate.getDays().contains(SATURDAY)) { getSaturdayCheckBox().setSelected(true); }
+        if (alarmToUpdate.getDays().contains(SUNDAY)) { getSundayCheckBox().setSelected(true); }
+        if (alarmToUpdate.getDays().contains(MONDAY) &&
+                alarmToUpdate.getDays().contains(TUESDAY) &&
+                alarmToUpdate.getDays().contains(WEDNESDAY) &&
+                alarmToUpdate.getDays().contains(THURSDAY) &&
+                alarmToUpdate.getDays().contains(FRIDAY)) {
+            getMondayCheckBox().setSelected(true);
+            getTuesdayCheckBox().setSelected(true);
+            getWednesdayCheckBox().setSelected(true);
+            getThursdayCheckBox().setSelected(true);
+            getFridayCheckBox().setSelected(true);
+            getWeekCheckBox().setSelected(true);
+        }
+        if (alarmToUpdate.getDays().contains(SATURDAY) &&
+                alarmToUpdate.getDays().contains(SUNDAY)) {
+            getSaturdayCheckBox().setSelected(true);
+            getSundayCheckBox().setSelected(true);
+            getWkendCheckBox().setSelected(true);
+        }
     }
     protected void setupCheckboxes()
     {
@@ -640,7 +859,7 @@ public class AlarmPanel extends JPanel implements IClockPanel
             }
         });
 
-        setThursdayCheckBox(new JCheckBox(THURSDAY.toString().substring(0,1), false));
+        setThursdayCheckBox(new JCheckBox(THURSDAY.toString().substring(0,1)+THURSDAY.toString().substring(1,2).toLowerCase(Locale.ROOT), false));
         getThursdayCheckBox().setFont(Clock.font20);
         getThursdayCheckBox().setBackground(Color.BLACK);
         getThursdayCheckBox().setForeground(Color.WHITE);
@@ -723,234 +942,31 @@ public class AlarmPanel extends JPanel implements IClockPanel
         getWkendCheckBox().setBackground(Color.BLACK);
         getWkendCheckBox().setForeground(Color.WHITE);
         getWkendCheckBox().addActionListener(action -> {
-                if (!getWkendCheckBox().isSelected())
-                {
-                    System.err.println("Weekend checkbox not selected!");
-                    getWkendCheckBox().setSelected(false);
-                    getSaturdayCheckBox().setSelected(false);
-                    getSundayCheckBox().setSelected(false);
-                }
-                else
-                {
-                    System.err.println("Weekend checkbox selected!");
-                    getWkendCheckBox().setSelected(true);
-                    getSaturdayCheckBox().setSelected(true);
-                    getSundayCheckBox().setSelected(true);
-                }
-            });
-    }
-    protected void addAlarmMenuItemFromAlarm(Clock alarm)
-    {
-        JMenuItem alarmItem = new JMenuItem(alarm.getTimeAsStr());
-        alarmItem.setForeground(Color.WHITE);
-        alarmItem.setBackground(Color.BLACK);
-        System.err.println("Size of viewAlarms before adding " + getClock().getClockMenuBar().getAlarmFeature_Menu().getItemCount());
-        getClock().getClockMenuBar().getAlarmFeature_Menu().add(alarmItem);
-        System.err.println("Size of viewAlarms after adding " + getClock().getClockMenuBar().getAlarmFeature_Menu().getItemCount());
-    }
-    protected void deleteAlarmMenuItemFromViewAlarms(Clock alarm)
-    {
-        System.err.println("Size of viewAlarms before removal " + getClock().getClockMenuBar().getAlarmFeature_Menu().getItemCount());
-        for(int i = 0; i < getClock().getClockMenuBar().getAlarmFeature_Menu().getItemCount(); i++)
-        {
-            if (getClock().getClockMenuBar().getAlarmFeature_Menu().getItem(i).getText().equals(alarm.getTimeAsStr()))
+            if (!getWkendCheckBox().isSelected())
             {
-                getClock().getClockMenuBar().getAlarmFeature_Menu().remove(getClock().getClockMenuBar().getAlarmFeature_Menu().getItem(i));
+                System.err.println("Weekend checkbox not selected!");
+                getWkendCheckBox().setSelected(false);
+                getSaturdayCheckBox().setSelected(false);
+                getSundayCheckBox().setSelected(false);
             }
-        }
-        System.err.println("Size of viewAlarms after removal " + getClock().getClockMenuBar().getAlarmFeature_Menu().getItemCount());
-    }
-    protected void resetJTextArea()
-    {
-        getJTextArea().setText("");
-        for(Alarm alarm : getClock().getListOfAlarms())
-        {
-            if (!StringUtils.isEmpty(getJTextArea().getText()))
+            else
             {
-                getJTextArea().append("\n");
+                System.err.println("Weekend checkbox selected!");
+                getWkendCheckBox().setSelected(true);
+                getSaturdayCheckBox().setSelected(true);
+                getSundayCheckBox().setSelected(true);
             }
-            getJTextArea().append(alarm.getTimeAsStr() + "\n");
-            alarm.getDaysShortened().forEach(day -> getJTextArea().append(day));
-        }
+        });
     }
-    protected void resetJCheckboxes()
+    public Time convertStringToTimeAMPM(String ampm) throws InvalidInputException
     {
-        if (getSundayCheckBox().isSelected())
-        {
-            getSundayCheckBox().setSelected(false);
-        }
-        if (getMondayCheckBox().isSelected())
-        {
-            getMondayCheckBox().setSelected(false);
-        }
-        if (getTuesdayCheckBox().isSelected())
-        {
-            getTuesdayCheckBox().setSelected(false);
-        }
-        if (getWednesdayCheckBox().isSelected())
-        {
-            getWednesdayCheckBox().setSelected(false);
-        }
-        if (getThursdayCheckBox().isSelected())
-        {
-            getThursdayCheckBox().setSelected(false);
-        }
-        if (getFridayCheckBox().isSelected())
-        {
-            getFridayCheckBox().setSelected(false);
-        }
-        if (getSaturdayCheckBox().isSelected())
-        {
-            getSaturdayCheckBox().setSelected(false);
-        }
-        if (getWeekCheckBox().isSelected())
-        {
-            getWeekCheckBox().setSelected(false);
-        }
-        if (getWkendCheckBox().isSelected())
-        {
-            getWkendCheckBox().setSelected(false);
-        }
+        if (StringUtils.equals("AM", ampm.toUpperCase()))
+        { return Time.AM; }
+        else if (StringUtils.equals("PM", ampm.toUpperCase()))
+        { return Time.PM; }
+        else throw new InvalidInputException("Invalid time input");
     }
-    public void setCheckboxesIfWasSelected(Alarm alarmToUpdate)
-    {
-        if (alarmToUpdate.getDays().contains(MONDAY)) { getMondayCheckBox().setSelected(true); }
-        if (alarmToUpdate.getDays().contains(TUESDAY)) { getTuesdayCheckBox().setSelected(true); }
-        if (alarmToUpdate.getDays().contains(WEDNESDAY)) { getWednesdayCheckBox().setSelected(true); }
-        if (alarmToUpdate.getDays().contains(THURSDAY)) { getThursdayCheckBox().setSelected(true); }
-        if (alarmToUpdate.getDays().contains(FRIDAY)) { getFridayCheckBox().setSelected(true); }
-        if (alarmToUpdate.getDays().contains(SATURDAY)) { getSaturdayCheckBox().setSelected(true); }
-        if (alarmToUpdate.getDays().contains(SUNDAY)) { getSundayCheckBox().setSelected(true); }
-        if (alarmToUpdate.getDays().contains(MONDAY) &&
-                alarmToUpdate.getDays().contains(TUESDAY) &&
-                alarmToUpdate.getDays().contains(WEDNESDAY) &&
-                alarmToUpdate.getDays().contains(THURSDAY) &&
-                alarmToUpdate.getDays().contains(FRIDAY)) {
-            getMondayCheckBox().setSelected(true);
-            getTuesdayCheckBox().setSelected(true);
-            getWednesdayCheckBox().setSelected(true);
-            getThursdayCheckBox().setSelected(true);
-            getFridayCheckBox().setSelected(true);
-            getWeekCheckBox().setSelected(true);
-        }
-        if (alarmToUpdate.getDays().contains(SATURDAY) &&
-                alarmToUpdate.getDays().contains(SUNDAY)) {
-            getSaturdayCheckBox().setSelected(true);
-            getSundayCheckBox().setSelected(true);
-            getWkendCheckBox().setSelected(true);
-        }
-    }
-    /**
-     * Creates an alarm and sets the latest one created as the currentAlarm
-     * defined in setAlarm
-     * @return Alarm
-     * @throws ParseException will be thrown if hour, minutes, or time is inappropriate.
-     */
-    public Alarm createAlarm() throws ParseException, InvalidInputException
-    {
-        int hour = Integer.parseInt(getJTextField1().getText());
-        int minutes = Integer.parseInt(getJTextField2().getText());
-        Time ampm = convertStringToTimeAMPM(getJTextField3().getText());
-        boolean valid;
-        valid = validateFirstTextField() && validateSecondTextField()
-                && validateThirdTextField() && validateACheckboxWasSelected();
-        if (valid)
-        {
-            ArrayList<DayOfWeek> days = checkWhichCheckBoxesWereChecked();
-            Alarm alarm = new Alarm(hour, minutes, ampm, true, days);
-            alarm.setIsAlarmGoingOff(false);
-            System.out.println("\nCreated an alarm: " + alarm.getTimeAsStr());
-            System.out.print("days: ");
-            if (null != alarm.getDays())
-            {
-                for(DayOfWeek day: days)
-                { System.out.print("\t"+day); }
-            }
-            System.out.println();
-            return alarm;
-        }
-        else
-        {
-            return null;
-        }
-    }
-    protected ArrayList<DayOfWeek> checkWhichCheckBoxesWereChecked()
-    {
-        ArrayList<DayOfWeek> daysSelected = new ArrayList<>();
-        if (getMondayCheckBox().isSelected())
-        { daysSelected.add(MONDAY); }
-        if (getTuesdayCheckBox().isSelected())
-        { daysSelected.add(TUESDAY); }
-        if (getWednesdayCheckBox().isSelected())
-        { daysSelected.add(WEDNESDAY); }
-        if (getThursdayCheckBox().isSelected())
-        { daysSelected.add(THURSDAY); }
-        if (getFridayCheckBox().isSelected())
-        { daysSelected.add(FRIDAY); }
-        if (getSaturdayCheckBox().isSelected())
-        { daysSelected.add(SATURDAY); }
-        if (getSundayCheckBox().isSelected())
-        { daysSelected.add(SUNDAY); }
-        if (getWeekCheckBox().isSelected())
-        {
-            if (!daysSelected.contains(MONDAY)) daysSelected.add(MONDAY);
-            if (!daysSelected.contains(TUESDAY)) daysSelected.add(TUESDAY);
-            if (!daysSelected.contains(WEDNESDAY)) daysSelected.add(WEDNESDAY);
-            if (!daysSelected.contains(THURSDAY)) daysSelected.add(THURSDAY);
-            if (!daysSelected.contains(FRIDAY)) daysSelected.add(FRIDAY);
-        } // add Monday - Friday
-        if (getWkendCheckBox().isSelected())
-        {
-            if (!daysSelected.contains(SATURDAY)) daysSelected.add(SATURDAY);
-            if (!daysSelected.contains(SUNDAY)) daysSelected.add(SUNDAY);
-        } // add Saturday and Sunday
-        return daysSelected;
-    }
-    public void triggerAlarm(ExecutorService executor)
-    {
-        setAlarmIsGoingOff(true);
-        getClock().getClockPanel().getJlbl1().setText(getCurrentAlarmGoingOff().getTimeAsStr());
-        getClock().getClockPanel().getJlbl2().setText("is going off!");
-        // play sound
-        Callable<String> c = () -> {
-            try
-            {
-                getClock().getAlarmPanel().setupMusicPlayer();
-                getClock().getAlarmPanel().getMusicPlayer().play(50);
-                //System.err.println("Alarm is going off.");
-                return "Alarm triggered";
-            }
-            catch (Exception e)
-            {
-                System.err.println(e.getCause().getClass().getName() + ": " + e.getMessage());
-                printStackTrace(e);
-                setupMusicPlayer();
-                getMusicPlayer().play(50);
-                return "Reset music player req'd";
-            }
-        };
-        executor.submit(c);
-    }
-    public void stopAlarm()
-    {
-        setMusicPlayer(null);
-        setAlarmIsGoingOff(false);
-        System.out.println("Stopping music. New music player setup and ready for new alarm");
-        System.out.println(getAlarm().getTimeAsStr()+" alarm turned off.\n");
-    }
-    public void addComponent(Component cpt, int gridy, int gridx, double gwidth, double gheight, int ipadx, int ipady, int fill, Insets insets)
-    {
-        getGridBagConstraints().gridx = gridx;
-        getGridBagConstraints().gridy = gridy;
-        getGridBagConstraints().gridwidth = (int)Math.ceil(gwidth);
-        getGridBagConstraints().gridheight = (int)Math.ceil(gheight);
-        getGridBagConstraints().fill = fill;
-        getGridBagConstraints().ipadx = ipadx;
-        getGridBagConstraints().ipady = ipady;
-        getGridBagConstraints().insets = insets;
-        getGridBagLayout().setConstraints(cpt, getGridBagConstraints());
-        add(cpt);
-    }
+
     @Override
     public void printStackTrace(Exception e, String message)
     {
@@ -963,17 +979,38 @@ public class AlarmPanel extends JPanel implements IClockPanel
             System.out.println(ste.toString());
         }
     }
+    public void addComponent(Component cpt, int gridy, int gridx, double gwidth, double gheight, int ipadx, int ipady, int fill, Insets insets)
+    {
+        //setGridBagConstraints(new GridBagConstraints());
+        getGridBagConstraints().gridx = gridx;
+        getGridBagConstraints().gridy = gridy;
+        getGridBagConstraints().gridwidth = (int)Math.ceil(gwidth);
+        getGridBagConstraints().gridheight = (int)Math.ceil(gheight);
+        getGridBagConstraints().fill = fill;
+        //getGridBagConstraints().anchor = GridBagConstraints.CENTER;
+        getGridBagConstraints().ipadx = ipadx;
+        getGridBagConstraints().ipady = ipady;
+        getGridBagConstraints().insets = insets;
+        getGridBagLayout().setConstraints(cpt, getGridBagConstraints());
+        add(cpt);
+    }
     @Override
     public void addComponentsToPanel()
     {
         //addComponent(getJAlarmLbl1(), 0,0,1,1, 15,7, GridBagConstraints.VERTICAL); // H
-        addComponent(getJAlarmLbl1(),0,0,1,1,0,0,   GridBagConstraints.CENTER, new Insets(0,0,0,0)); // H
-        addComponent(getJTextField1(),0,1,1,1, 0,0, GridBagConstraints.CENTER, new Insets(0,0,0,0)); // textField
-        addComponent(getJAlarmLbl2(),0,2,1,1, 0,0, GridBagConstraints.CENTER, new Insets(0,0,0,0)); // M
-        addComponent(getJTextField2(),0,3,1,1, 0,0, GridBagConstraints.CENTER, new Insets(0,0,0,0)); // textField
-        addComponent(getJAlarmLbl3(),0,4,1,1, 0,0, GridBagConstraints.CENTER, new Insets(0,0,0,0)); // Time (AM/PM)
-        addComponent(getJTextField3(),0,5,1,1, 0,0, GridBagConstraints.CENTER, new Insets(0,0,0,0)); // textField
-        addComponent(getJScrollPane(),0,6,5,3, 0,0, GridBagConstraints.BOTH, new Insets(1,1,1,1)); // textArea
+        //getGridBagConstraints().fill = GridBagConstraints.HORIZONTAL;
+        addComponent(getJAlarmLbl1(),0,0,1,1,0,0,   GridBagConstraints.BOTH, new Insets(0,0,0,0)); // H
+        addComponent(getJTextField1(),0,1,1,1, 0,0, GridBagConstraints.BOTH, new Insets(0,0,0,0)); // textField
+        addComponent(getJAlarmLbl2(),0,2,1,1, 0,0, GridBagConstraints.BOTH, new Insets(0,0,0,0)); // M
+        addComponent(getJTextField2(),0,3,1,1, 0,0, GridBagConstraints.BOTH, new Insets(0,0,0,0)); // textField
+        addComponent(getJAlarmLbl3(),0,4,1,1, 0,0, GridBagConstraints.BOTH, new Insets(0,0,0,0)); // Time (AM/PM)
+        addComponent(getJTextField3(),0,5,1,1, 0,0, GridBagConstraints.BOTH, new Insets(0,0,0,0)); // textField
+        addComponent(getJAlarmLbl4(), 0, 6, 2, 1, 2, 2, GridBagConstraints.BOTH, new Insets(0,0,0,0));
+        getGridBagConstraints().weighty = 4;
+        getGridBagConstraints().weightx = 2;
+        addComponent(getJScrollPane(),1,6,2,4, 0,0, GridBagConstraints.BOTH, new Insets(1,1,1,1)); // textArea
+        getGridBagConstraints().weighty = 1;
+        getGridBagConstraints().weightx = 1;
         // new column, first column
         addComponent(getMondayCheckBox(), 1,0,2,1, 0,0, GridBagConstraints.NONE, new Insets(0,0,0,0)); // Sqr Monday
         addComponent(getTuesdayCheckBox(), 2, 0, 2, 1, 1, 0, GridBagConstraints.NONE, new Insets(0,0,0,0)); // Sqr Tuesday
@@ -987,17 +1024,15 @@ public class AlarmPanel extends JPanel implements IClockPanel
         addComponent(getWeekCheckBox(), 2, 4, 2, 1, 1, 0, GridBagConstraints.NONE, new Insets(0,0,0,0)); // Sqr Weekend
         addComponent(getWkendCheckBox(), 3, 4, 2, 1, 1, 0, GridBagConstraints.NONE, new Insets(0,0,0,0)); // Sqr Weekend
         // set button
-        addComponent(getJSetAlarmButton(), 3, 6, 2, 1, 1, 1, GridBagConstraints.CENTER, new Insets(0,0,0,0)); // Set button
+        addComponent(getSetAlarmButton(), 4, 2, 2, 1, 1, 1, GridBagConstraints.CENTER, new Insets(0,0,0,0)); // Set button
         // header and alarms
-        addComponent(getJAlarmLbl4(), 5, 0, 4, 1, 2, 2, GridBagConstraints.BOTH, new Insets(0,0,0,0));
     }
-    @Override
-    public void updateLabels()
-    {
-        getJAlarmLbl1().setText(getClock().defaultText(3)); // H
-        getJAlarmLbl2().setText(getClock().defaultText(4)); // M
-        getJAlarmLbl3().setText(getClock().defaultText(5)); // T
-        getJAlarmLbl4().setText(getClock().defaultText(6)); // All Alarms label...
-        getClock().repaint();
-    }
+//    public void updateLabels()
+//    {
+//        getJAlarmLbl1().setText(getClock().defaultText(3)); // H
+//        getJAlarmLbl2().setText(getClock().defaultText(4)); // M
+//        getJAlarmLbl3().setText(getClock().defaultText(5)); // T
+//        getJAlarmLbl4().setText(getClock().defaultText(6)); // All Alarms label...
+//        getClock().repaint();
+//    }
 }

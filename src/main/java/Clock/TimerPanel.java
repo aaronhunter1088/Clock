@@ -37,10 +37,16 @@ public class TimerPanel extends JPanel implements IClockPanel
     private Thread countdownThread = new Thread(this::performCountDown);
     private boolean timerIsGoingOff;
     private AdvancedPlayer musicPlayer;
+    public static ClockFace facePanel;
+    public static final String SET = "Set";
+    public static final String RESUME_TIMER = "Resume Timer";
+    public static final String PAUSE_TIMER = "Pause Timer";
+    public static final String RESET = "Reset";
 
     public TimerPanel(Clock clock)
     {
         setClock(clock);
+        setClockFace(ClockFace.TIMERPANEL);
         setSize(Clock.panelSize);
         setGridBagLayout(new GridBagLayout());
         setLayout(getGridBagLayout());
@@ -102,6 +108,7 @@ public class TimerPanel extends JPanel implements IClockPanel
     protected void setResetButton(JButton resetButton) { this.resetButton = resetButton; }
     protected void setIsTimerGoingOff(boolean timerIsGoingOff) { this.timerIsGoingOff = timerIsGoingOff; }
     protected void setMusicPlayer(AdvancedPlayer musicPlayer) { this.musicPlayer = musicPlayer; }
+    protected void setClockFace(ClockFace faceChoice) { facePanel = faceChoice; }
 
     public void setupTimerPanel()
     {
@@ -270,14 +277,14 @@ public class TimerPanel extends JPanel implements IClockPanel
         getJTextField1().setHorizontalAlignment(JTextField.CENTER);
         getJTextField2().setHorizontalAlignment(JTextField.CENTER);
         getJTextField3().setHorizontalAlignment(JTextField.CENTER);
-        setTimerButton(new JButton("Set"));
+        setTimerButton(new JButton(SET));
         getTimerButton().setFont(Clock.font20);
         getTimerButton().setOpaque(true);
         getTimerButton().setBackground(Color.BLACK);
         getTimerButton().setForeground(Color.WHITE);
         getTimerButton().setBorder(new LineBorder(Color.WHITE));
         getTimerButton().setEnabled(false);
-        setResetButton(new JButton("Reset"));
+        setResetButton(new JButton(RESET));
         getResetButton().setFont(Clock.font20);
         getResetButton().setOpaque(true);
         getResetButton().setBackground(Color.BLACK);
@@ -337,7 +344,7 @@ public class TimerPanel extends JPanel implements IClockPanel
     }
     public void startTimer()
     {
-        getTimerButton().setText("Pause Timer");
+        getTimerButton().setText(PAUSE_TIMER);
         getTimerButton().repaint();
         getTimerButton().updateUI();
         //System.err.println(countdownThread.getName() + " is in state: " + countdownThread.getState());
@@ -359,7 +366,7 @@ public class TimerPanel extends JPanel implements IClockPanel
     }
     public void pauseTimer() throws InterruptedException
     {
-        getTimerButton().setText("Resume Timer");
+        getTimerButton().setText(RESUME_TIMER);
         getTimerButton().repaint();
         getTimerButton().updateUI();
         countdownThread.interrupt();
@@ -401,8 +408,8 @@ public class TimerPanel extends JPanel implements IClockPanel
                 }
                 Thread.sleep(1000);
             }
-            // when done counting, set Set button back to Set
-            getTimerButton().setText("Set");
+            // when done counting, change the Set button back to say Set
+            getTimerButton().setText(SET);
             getTimerButton().setEnabled(false);
             //setTimerHasConcluded(true);
             getClock().setIsTimerGoingOff(true);
@@ -417,7 +424,7 @@ public class TimerPanel extends JPanel implements IClockPanel
         getJTextField1().setText("Hour");
         getJTextField2().setText("Min");
         getJTextField3().setText("Sec");
-        getTimerButton().setText("Set");
+        getTimerButton().setText(SET);
         getTimerButton().setEnabled(false);
         //countdownThread = new Thread(this::performCountDown);
     }
@@ -436,6 +443,7 @@ public class TimerPanel extends JPanel implements IClockPanel
     { printStackTrace(e, ""); }
     public void addComponent(Component cpt, int gridy, int gridx, double gwidth, double gheight, int ipadx, int ipady, int fill)
     {
+        setGridBagConstraints(new GridBagConstraints());
         getGridBagConstraints().gridx = gridx;
         getGridBagConstraints().gridy = gridy;
         getGridBagConstraints().gridwidth = (int)Math.ceil(gwidth);
@@ -500,7 +508,6 @@ public class TimerPanel extends JPanel implements IClockPanel
         addComponent(getResetButton(), 1, 0, 3, 1, 0, 0, GridBagConstraints.HORIZONTAL); // Reset Button
         addComponent(getTimerButton(), 2,0,3,1,0,0, GridBagConstraints.HORIZONTAL); // Set Timer Button
     }
-    @Override
     public void updateLabels()
     {
         getJTextField1().grabFocus();

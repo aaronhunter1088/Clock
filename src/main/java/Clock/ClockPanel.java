@@ -21,10 +21,12 @@ public class ClockPanel extends JPanel implements IClockPanel {
     private JLabel jlbl1;
     private JLabel jlbl2;
     private Clock clock;
+    public static ClockFace facePanel;
 
     public ClockPanel(Clock clock)
     {
         setClock(clock);
+        setClockFace(ClockFace.CLOCKPANEL);
         setMinimumSize(Clock.defaultSize);
         setGridBagLayout(new GridBagLayout());
         setLayout(getGridBagLayout());
@@ -47,6 +49,7 @@ public class ClockPanel extends JPanel implements IClockPanel {
     private void setClock(Clock clock) { this.clock = clock; }
     public void setJlbl1(JLabel jlbl1) { this.jlbl1 = jlbl1; }
     public void setJlbl2(JLabel jlbl2) { this.jlbl2 = jlbl2; }
+    protected void setClockFace(ClockFace faceChoice) { facePanel = faceChoice; }
 
     public void setupClockPanel(Clock clock)
     {
@@ -89,7 +92,7 @@ public class ClockPanel extends JPanel implements IClockPanel {
         addComponent(getJlbl1(), 0,0,1,1, 0,0);
         addComponent(getJlbl2(), 1,0,1,1, 0,0);
     }
-    @Override
+
     public void updateLabels()
     {
         getJlbl1().setText(getClock().defaultText(1));

@@ -84,6 +84,7 @@ public class Clock extends JFrame
      * @return 'HH:MM:SS TIME' ex: 05:15:24 PM
      */
     public String getTimeAsStr() { return getHoursAsStr()+":"+getMinutesAsStr()+":"+getSecondsAsStr()+" "+getAMPM(); }
+    public String getTimeAsStrAlarmRepresentation() { return getHoursAsStr()+":"+getMinutesAsStr()+" "+getAMPM(); }
     public String getDateAsStr() { return this.month+" "+this.dayOfMonth +", "+this.year; }
     public String getFullDateAsStr() { return this.dayOfWeek+" "+this.month+" "+this.dayOfMonth +", "+this.year; }
     public String getMilitaryTimeAsStr() {
@@ -122,7 +123,7 @@ public class Clock extends JFrame
     }
     protected void setHours(int hours) {
         this.hours = hours;
-        if (this.hours <= 9) this.hoursAsStr = "0"+hours;
+        if (this.hours < 10) this.hoursAsStr = "0"+hours;
         else this.hoursAsStr = Integer.toString(this.hours);
     }
     protected void setAMPM(Time ampm) { this.ampm = ampm; }
@@ -241,35 +242,36 @@ public class Clock extends JFrame
     }
 
     public void setTheTime() {
-        LocalDateTime dateTime = LocalDateTime.now();
+        LocalDateTime dateTime = LocalDateTime.now(); //2022-09-29T22:08:23.701434
         setSeconds(dateTime.getSecond()); // sets secsAsStr
         setMinutes(dateTime.getMinute()); // sets minutesAsStr
-        setHours(dateTime.getHour()); // sets hoursAsStr
+        if (dateTime.getHour() > 12 && !isShowMilitaryTime()) { setHours(dateTime.getHour()-12);}
+        else { setHours(dateTime.getHour()); } // sets hoursAsStr
         setMonth(dateTime.getMonth());
         setDayOfWeek(dateTime.getDayOfWeek());
         setDayOfMonth(dateTime.getDayOfMonth());
         setYear(dateTime.getYear());
         setAMPM(LocalTime.from(dateTime));
     }
-    public void updateHourValueAndHourString(Time time, boolean showMilitaryTime)
+    public void updateHourValueAndHourString()
     {
-        if (time == Time.AM && showMilitaryTime) // Daytime and we show Military v2.Time
+        if (getAMPM() == Time.AM && isShowMilitaryTime()) // Daytime and we show Military Time
         {
-            if (getHours() == 12) setHours(0);
+            if (getHours() > 12) setHours(0);
             else setHours(getHours());
         }
-        else if (time == Time.AM) // DayTime and we do not show Military v2.Time
+        else if (getAMPM() == Time.AM) // DayTime and we do not show Military Time
         {
             if (getHours() == 0) setHours(12);
             else setHours(getHours());
         }
-        else if (time == Time.PM && showMilitaryTime) // NightTime and we show Military v2.Time
+        else if (getAMPM() == Time.PM && isShowMilitaryTime()) // NightTime and we show Military v2.Time
         {
             if (getHours() == 24) setHours(0);
-            else if (getHours() < 12) setHours(getHours() + 12);
+            else if (getHours() < 12 && getHours() >= 0) setHours(getHours() + 12);
             else setHours(getHours());
         }
-        else if (time == Time.PM) // NightTime and we do not show Military v2.Time
+        else if (getAMPM() == Time.PM) // NightTime and we do not show Military Time
         {
             if (getHours() > 12) setHours(getHours() - 12);
         }
@@ -389,6 +391,7 @@ public class Clock extends JFrame
         {
             setIsDateChanged(false);
         }
+        updateHourValueAndHourString();
 
         if (isDateChanged())
         {
@@ -510,7 +513,7 @@ public class Clock extends JFrame
             }
             default : {}
         }
-        updateHourValueAndHourString(getAMPM(), isShowMilitaryTime());
+
         if (isDaylightSavingsTime())
         {
             if (getMonth() == MARCH && getAMPM() == Time.AM)
@@ -537,26 +540,27 @@ public class Clock extends JFrame
         else if (labelVersion == 2)
         {
             if (!isShowMilitaryTime()) {
+                if (getAMPM() == Time.PM && getHours() > 12) { setHours(getHours()-12); }
                 defaultText = getTimeAsStr();
                 // change alarms to reflect normal time
-
             }
             else if (isShowMilitaryTime()) {
                 defaultText = getMilitaryTimeAsStr();
                 // change alarms to reflect military time
+                //setShowMilitaryTime(false);
             }
         }
         else if (labelVersion == 3)
         {
-            defaultText = "H";
+            defaultText = "Hours";
         }
         else if (labelVersion == 4)
         {
-            defaultText = "M";
+            defaultText = "Minutes";
         }
         else if (labelVersion == 5)
         {
-            defaultText = "T";
+            defaultText = "AM/PM";
         }
         else if (labelVersion == 6)
         {
@@ -587,7 +591,7 @@ public class Clock extends JFrame
         this.setVisible(true);
         //System.err.println("ChangedToFace: " + getFacePanel().toString());
     }
-    public void changeToAlarmPanel()
+    public void changeToAlarmPanel(boolean resetValues)
     {
         //System.err.println("CurrentFace: " + getFacePanel().toString());
         if (getPanelInUse() == ClockFace.CLOCKPANEL)
@@ -598,6 +602,13 @@ public class Clock extends JFrame
         if (getPanelInUse() != ClockFace.ALARMPANEL)
             add(getAlarmPanel());
         setPanelInUse(ClockFace.ALARMPANEL);
+        if (resetValues) {
+            getAlarmPanel().getJTextField1().setText("");
+            getAlarmPanel().getJTextField2().setText("");
+            getAlarmPanel().getJTextField3().setText("");
+            getAlarmPanel().resetJCheckboxes();
+            getAlarmPanel().getJAlarmLbl4().setText("Current Alarms");
+        }
         this.repaint();
         this.setVisible(true);
         //System.err.println("ChangedToFace: " + getFacePanel().toString());
