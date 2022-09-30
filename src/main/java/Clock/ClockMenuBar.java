@@ -93,7 +93,7 @@ public class ClockMenuBar extends JMenuBar {
             if (clock.isShowMilitaryTime())
             {
                 clock.setShowMilitaryTime(false);
-                getMilitaryTimeSetting().setText(HIDE + SPACE + MILITARY_TIME_SETTING);
+                getMilitaryTimeSetting().setText(SHOW + SPACE + MILITARY_TIME_SETTING);
             }
             else
             {
@@ -133,7 +133,7 @@ public class ClockMenuBar extends JMenuBar {
         });
         // Features Actions for Features menu
         getClockFeature().addActionListener(action -> clock.changeToClockPanel());
-        getSetAlarms().addActionListener(action -> clock.changeToAlarmPanel());
+        getSetAlarms().addActionListener(action -> clock.changeToAlarmPanel(true));
         getTimerFeature().addActionListener(action -> clock.changeToTimerPanel());
         // Add both menus to main menu
         add(getSettingsMenu());

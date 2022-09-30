@@ -92,7 +92,7 @@ public class ClockPanel extends JPanel implements IClockPanel {
         addComponent(getJlbl1(), 0,0,1,1, 0,0);
         addComponent(getJlbl2(), 1,0,1,1, 0,0);
     }
-    @Override
+
     public void updateLabels()
     {
         getJlbl1().setText(getClock().defaultText(1));

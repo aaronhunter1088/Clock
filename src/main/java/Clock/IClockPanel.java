@@ -11,7 +11,7 @@ package Clock;
  */
 public interface IClockPanel {
 
-    void updateLabels();
+    //void updateLabels();
     void addComponentsToPanel();
     void printStackTrace(Exception e, String message);
 }
