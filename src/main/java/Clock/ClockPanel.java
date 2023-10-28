@@ -1,5 +1,8 @@
 package Clock;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 import javax.swing.*;
 import java.awt.*;
 
@@ -14,8 +17,10 @@ import java.awt.*;
  * @author michael ball
  * @version 2.5
  */
-public class ClockPanel extends JPanel implements IClockPanel {
-
+public class ClockPanel extends JPanel implements IClockPanel
+{
+    private static final long serialVersionUID = 1L;
+    private static final Logger logger = LogManager.getLogger(ClockPanel.class);
     private GridBagLayout layout;
     private GridBagConstraints constraints;
     private JLabel jlbl1;
@@ -63,9 +68,9 @@ public class ClockPanel extends JPanel implements IClockPanel {
     public void printStackTrace(Exception e, String message)
     {
         if (null != message)
-            System.err.println(message);
+            logger.error(message);
         else
-            System.err.println(e.getMessage());
+            logger.error(e.getMessage());
         for(StackTraceElement ste : e.getStackTrace())
         {
             System.out.println(ste.toString());

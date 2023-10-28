@@ -11,16 +11,13 @@ package Clock;
 public enum Time
 {
     AM(1, "AM"), PM(2, "PM");
-
     private int value;
     private String strValue;
-
     Time(int value, String strValue)
     {
         setValue(value);
         setStrValue(strValue);
     }
-
     public int getValue() { return this.value; }
     public String getStrValue() { return this.strValue; }
 

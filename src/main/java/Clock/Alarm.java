@@ -1,5 +1,6 @@
 package Clock;
 
+import java.io.Serializable;
 import java.time.DayOfWeek;
 import java.util.ArrayList;
 import java.util.List;
@@ -17,8 +18,8 @@ import static java.time.DayOfWeek.*;
  * @author michael ball
  * @version 2.5
  */
-public class Alarm
-{
+public class Alarm implements Serializable {
+    private static final long serialVersionUID = 1L;
     protected int minutes;
     protected String minutesAsStr;
     protected int hours;
@@ -27,6 +28,7 @@ public class Alarm
     private ArrayList<DayOfWeek> days;
     protected boolean alarmGoingOff;
     protected boolean updatingAlarm;
+
     protected Clock clock;
 
     public Alarm() throws InvalidInputException

@@ -4,6 +4,9 @@ import javax.swing.*;
 import javax.swing.plaf.metal.MetalLookAndFeel;
 import java.awt.*;
 import java.text.ParseException;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 import static java.lang.Thread.sleep;
 
 /**
@@ -14,9 +17,11 @@ import static java.lang.Thread.sleep;
  */
 public class Main
 {
+    private final static Logger logger = LogManager.getLogger(Main.class);
     @SuppressWarnings({"BusyWait", "InfiniteLoopStatement"})
     public static void main(String[] args) throws ParseException, InvalidInputException
     {
+        logger.info("Starting main...");
         Clock clock = new Clock();
         clock.setVisible(true);
         clock.getContentPane().setBackground(Color.BLACK);
@@ -43,7 +48,7 @@ public class Main
         catch (Exception e)
         {
             for(StackTraceElement ste : e.getStackTrace())
-            { System.err.println(ste); }
+            { logger.error(ste); }
         }
     }
 }

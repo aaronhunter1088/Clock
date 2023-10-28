@@ -4,6 +4,8 @@ import javazoom.jl.decoder.JavaLayerException;
 import javazoom.jl.player.advanced.AdvancedPlayer;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.math.NumberUtils;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import javax.swing.*;
 import javax.swing.border.LineBorder;
@@ -15,7 +17,6 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 /** This is the Timer panel.
- *
  * The timer panel is used to set a timer.
  * Giving the panel some Hours, some Minutes,
  * and some Seconds, it will display the panel
@@ -26,6 +27,7 @@ import java.util.concurrent.Executors;
  */
 public class TimerPanel extends JPanel implements IClockPanel
 {
+    private static final Logger logger = LogManager.getLogger(TimerPanel.class);
     private GridBagLayout layout;
     private GridBagConstraints constraints;
     private JTextField jtextField1; // Hour textField
@@ -347,7 +349,7 @@ public class TimerPanel extends JPanel implements IClockPanel
         getTimerButton().setText(PAUSE_TIMER);
         getTimerButton().repaint();
         getTimerButton().updateUI();
-        //System.err.println(countdownThread.getName() + " is in state: " + countdownThread.getState());
+        //logger.error(countdownThread.getName() + " is in state: " + countdownThread.getState());
         if (countdownThread.getState() == Thread.State.NEW)
         {
             countdownThread.start(); // calls the run method of this class
@@ -431,12 +433,12 @@ public class TimerPanel extends JPanel implements IClockPanel
     public void printStackTrace(Exception e, String message)
     {
         if (null != message)
-            System.err.println(message);
+            logger.error(message);
         else
-            System.err.println(e.getMessage());
+            logger.error(e.getMessage());
         for(StackTraceElement ste : e.getStackTrace())
         {
-            System.out.println(ste.toString());
+            logger.error(ste.toString());
         }
     }
     protected void printStackTrace(Exception e)
@@ -476,12 +478,12 @@ public class TimerPanel extends JPanel implements IClockPanel
                 setupMusicPlayer();
                 getMusicPlayer().play(50);
                 stopSound();
-                //System.err.println("Alarm is going off.");
+                //logger.error("Alarm is going off.");
                 return "Timer triggered";
             }
             catch (Exception e)
             {
-                System.err.println(e.getCause().getClass().getName() + ": " + e.getMessage());
+                logger.error(e.getCause().getClass().getName() + ": " + e.getMessage());
                 printStackTrace(e);
                 setupMusicPlayer();
                 getMusicPlayer().play(50);
@@ -536,17 +538,19 @@ public class TimerPanel extends JPanel implements IClockPanel
 
     public void setupMusicPlayer()
     {
-        InputStream inputStream = null;
+        InputStream inputStream;
         try
         {
             inputStream = ClassLoader.getSystemResourceAsStream("sounds/alarmSound1.mp3");
             if (null != inputStream) { setMusicPlayer(new AdvancedPlayer(inputStream)); }
+            else throw new NullPointerException();
         }
         catch (NullPointerException | JavaLayerException e)
         {
-            if (null == inputStream)
+            if (e instanceof NullPointerException)
                 printStackTrace(e, "An issue occurred while reading the alarm file.");
-            printStackTrace(e, "A JavaLayerException occurred: " + e.getMessage());
+            else
+                printStackTrace(e, "A JavaLayerException occurred: " + e.getMessage());
         }
     }
 }

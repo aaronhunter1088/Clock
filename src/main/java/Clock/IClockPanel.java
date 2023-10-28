@@ -9,9 +9,8 @@ package Clock;
  * @author Michael Ball
  * @version 2.5
  */
-public interface IClockPanel {
-
-    //void updateLabels();
+public interface IClockPanel
+{
     void addComponentsToPanel();
     void printStackTrace(Exception e, String message);
 }

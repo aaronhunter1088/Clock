@@ -8,6 +8,8 @@ import java.util.ArrayList;
 import static java.time.Month.*;
 import static java.time.DayOfWeek.*;
 import static Clock.ClockConstants.*;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 /**
  * The clock object to set a time and date. The time
@@ -19,7 +21,8 @@ import static Clock.ClockConstants.*;
  */
 public class Clock extends JFrame
 {
-    protected static final long serialVersionUID = 1L;
+    private static final Logger logger = LogManager.getLogger(Clock.class);
+    private static final long serialVersionUID = 1L;
     protected static final Dimension defaultSize = new Dimension(700, 300);
     protected static final Dimension panelSize = new Dimension(400, 300);
     protected static final Font font60 = new Font("Courier New", Font.BOLD, 60);
@@ -339,13 +342,16 @@ public class Clock extends JFrame
      */
     public void performTick(int seconds, int minutes, int hours) throws InvalidInputException
     {
+        logger.info("performTick...");
         setSeconds(getSeconds()+seconds);
         if (getSeconds() == 60)
         {
+            logger.info("updating minute");
             setSeconds(0);
             setMinutes(getMinutes()+1);
             if (getMinutes() == 60)
             {
+                logger.info("upddating hour");
                 setMinutes(0);
                 setHours(getHours()+1);
                 if (getHours() == 12 && getMinutes() == 0 && getSeconds() == 0 && !isShowMilitaryTime())
@@ -354,11 +360,13 @@ public class Clock extends JFrame
                     setHoursAsStr("12");
                     if (getAMPM() == Time.PM)
                     {
+                        logger.info("am");
                         setAMPM(Time.AM);
                         setIsDateChanged(true);
                     }
                     else
                     {
+                        logger.info("pm");
                         setIsDateChanged(false);
                         setAMPM(Time.PM);
                     }
@@ -392,9 +400,15 @@ public class Clock extends JFrame
             setIsDateChanged(false);
         }
         updateHourValueAndHourString();
+        if (!isShowMilitaryTime()) {
+            logger.info(getHoursAsStr()+":"+getMinutesAsStr()+":"+getSecondsAsStr());
+        } else {
+            logger.info(getMilitaryTimeAsStr());
+        }
 
         if (isDateChanged())
         {
+            logger.info("date has changed");
             setDayOfMonth(getDayOfMonth()+1);
             setDaylightSavingsTime(isTodayDaylightSavingsTime());
             switch(getDayOfWeek())
@@ -414,6 +428,7 @@ public class Clock extends JFrame
                 if (getDayOfMonth() == 31 && isDateChanged()) {
                     setDayOfMonth(1);
                     setMonth(FEBRUARY);
+                    logger.info("month: " + getMonth());
                 }
                 break;
             }
@@ -422,6 +437,7 @@ public class Clock extends JFrame
                 {
                     setDayOfMonth(1);
                     setMonth(MARCH);
+                    logger.info("month: " + getMonth());
                 }
                 else if (getDayOfMonth() == 28 && isLeapYear() && isDateChanged())
                 {
@@ -435,6 +451,7 @@ public class Clock extends JFrame
                 {
                     setDayOfMonth(1);
                     setMonth(APRIL);
+                    logger.info("month: " + getMonth());
                 }
                 break;
             }
@@ -443,6 +460,7 @@ public class Clock extends JFrame
                 {
                     setDayOfMonth(1);
                     setMonth(MAY);
+                    logger.info("month: " + getMonth());
                 }
                 break;
             }
@@ -451,6 +469,7 @@ public class Clock extends JFrame
                 {
                     setDayOfMonth(1);
                     setMonth(JUNE);
+                    logger.info("month: " + getMonth());
                 }
                 break;
             }
@@ -459,6 +478,7 @@ public class Clock extends JFrame
                 {
                     setDayOfMonth(1);
                     setMonth(JULY);
+                    logger.info("month: " + getMonth());
                 }
                 break;
             }
@@ -467,6 +487,7 @@ public class Clock extends JFrame
                 {
                     setDayOfMonth(1);
                     setMonth(AUGUST);
+                    logger.info("month: " + getMonth());
                 }
                 break;
             }
@@ -475,6 +496,7 @@ public class Clock extends JFrame
                 {
                     setDayOfMonth(1);
                     setMonth(SEPTEMBER);
+                    logger.info("month: " + getMonth());
                 }
                 break;
             }
@@ -483,6 +505,7 @@ public class Clock extends JFrame
                 {
                     setDayOfMonth(1);
                     setMonth(OCTOBER);
+                    logger.info("month: " + getMonth());
                 }
                 break;
             }
@@ -491,6 +514,7 @@ public class Clock extends JFrame
                 {
                     setDayOfMonth(1);
                     setMonth(NOVEMBER);
+                    logger.info("month: " + getMonth());
                 }
                 break;
             }
@@ -499,6 +523,7 @@ public class Clock extends JFrame
                 {
                     setDayOfMonth(1);
                     setMonth(DECEMBER);
+                    logger.info("month: " + getMonth());
                 }
                 break;
             }
@@ -508,6 +533,8 @@ public class Clock extends JFrame
                     setMonth(JANUARY);
                     setYear(getYear()+1);
                     setIsNewYear(true);
+                    logger.info("month: " + getMonth());
+                    logger.info("new year!");
                 }
                 break;
             }
@@ -516,13 +543,16 @@ public class Clock extends JFrame
 
         if (isDaylightSavingsTime())
         {
+            logger.info("!! daylight savings !!");
             if (getMonth() == MARCH && getAMPM() == Time.AM)
             {
+                logger.info("spring forward");
                 setHours(3);
                 setDaylightSavingsTime(false);
             }
             else if (getMonth() == NOVEMBER && getAMPM() == Time.AM)
             { // && daylightSavingsTime
+                logger.info("fall back");
                 setHours(1);
                 setDaylightSavingsTime(false);
             }
@@ -574,13 +604,15 @@ public class Clock extends JFrame
     }
     public void setupMenuBar()
     {
+        logger.info("setupMenuBar");
         UIManager.put("MenuItem.background", Color.BLACK);
         setClockMenuBar(new ClockMenuBar(this));
         setJMenuBar(getClockMenuBar());
     }
     public void changeToClockPanel()
     {
-        //System.err.println("CurrentFace: " + getFacePanel().toString());
+        logger.info("changeToClockPanel");
+        //logger.error("CurrentFace: " + getFacePanel().toString());
         if (getPanelInUse() == ClockFace.TIMERPANEL)
             remove(getTimerPanel());
         else if (getPanelInUse() == ClockFace.ALARMPANEL)
@@ -589,11 +621,12 @@ public class Clock extends JFrame
         add(getClockPanel());
         this.repaint();
         this.setVisible(true);
-        //System.err.println("ChangedToFace: " + getFacePanel().toString());
+        //logger.error("ChangedToFace: " + getFacePanel().toString());
     }
     public void changeToAlarmPanel(boolean resetValues)
     {
-        //System.err.println("CurrentFace: " + getFacePanel().toString());
+        logger.info("changeToAlarmPanel");
+        //logger.error("CurrentFace: " + getFacePanel().toString());
         if (getPanelInUse() == ClockFace.CLOCKPANEL)
             remove(getClockPanel());
         else if (getPanelInUse() == ClockFace.TIMERPANEL)
@@ -607,15 +640,17 @@ public class Clock extends JFrame
             getAlarmPanel().getJTextField2().setText("");
             getAlarmPanel().getJTextField3().setText("");
             getAlarmPanel().resetJCheckboxes();
+            getAlarmPanel().resetJTextArea(); // so error alarms don't show up after navigating out and back in
             getAlarmPanel().getJAlarmLbl4().setText("Current Alarms");
         }
         this.repaint();
         this.setVisible(true);
-        //System.err.println("ChangedToFace: " + getFacePanel().toString());
+        //logger.error("ChangedToFace: " + getFacePanel().toString());
     }
     public void changeToTimerPanel()
     {
-        //System.err.println("CurrentFace: " + getFacePanel().toString());
+        logger.info("changeToTimerPanel");
+        //logger.error("CurrentFace: " + getFacePanel().toString());
         if (getPanelInUse() == ClockFace.CLOCKPANEL)
             remove(getClockPanel());
         else if (getPanelInUse() == ClockFace.ALARMPANEL)
@@ -625,7 +660,7 @@ public class Clock extends JFrame
         setPanelInUse(ClockFace.TIMERPANEL);
         this.repaint();
         this.setVisible(true);
-        //System.err.println("ChangedToFace: " + getFacePanel().toString());
+        //logger.error("ChangedToFace: " + getFacePanel().toString());
     }
     /**
      * The purpose of tick is to start the clock.
@@ -646,6 +681,7 @@ public class Clock extends JFrame
      */
     public void tick(int seconds, int minutes, int hours)
     {
+        logger.info("tick...");
         try
         {
             performTick(seconds, minutes, hours);
@@ -654,6 +690,7 @@ public class Clock extends JFrame
             if (getTimeAsStr().equals("12:00:00" + SPACE + Time.AM.getStrValue()) ||
                 getMilitaryTimeAsStr().equals("0000 hours 00"))
             {
+                logger.info("midnight daily clock update");
                 setSeconds(LocalTime.now().getSecond());
                 setMinutes(LocalTime.now().getMinute());
                 setHours(LocalTime.now().getHour());
@@ -661,15 +698,15 @@ public class Clock extends JFrame
         }
         catch (Exception e)
         {
-            System.err.println("Error! Clock had an exception when performing tick: " + e.getMessage());
+            logger.error("Error! Clock had an exception when performing tick: " + e.getMessage());
         }
     }
     protected void printStackTrace(Exception e)
     {
-        System.err.println(e.getMessage());
+        logger.error(e.getMessage());
         for(StackTraceElement ste : e.getStackTrace())
         {
-            System.out.println(ste.toString());
+            logger.error(ste.toString());
         }
     }
 }

@@ -1,5 +1,8 @@
 package Clock;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.InputEvent;
@@ -9,14 +12,13 @@ import static Clock.ClockConstants.FULL_TIME_SETTING;
 
 /**
  * The menu bar for the Clock.
- *
  * Option to stop Alarm coming in 2.5
- *
  * @author Michael Ball
  * @version 2.5
  */
 public class ClockMenuBar extends JMenuBar {
     private static final long serialVersionUID = 1L;
+    private static final Logger logger = LogManager.getLogger(ClockMenuBar.class);
     // Two main menu options
     protected JMenu settingsMenu;
     protected JMenu featuresMenu;
@@ -33,6 +35,7 @@ public class ClockMenuBar extends JMenuBar {
 
     public ClockMenuBar(Clock clock)
     {
+        logger.info("ClockMenuBar");
         setForeground(Color.WHITE);
         setBackground(Color.BLACK);
         // Menu options

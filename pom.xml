@@ -10,20 +10,28 @@
     <description>This is Clock GUI.</description>
     
     <properties>
-		<java.version>18</java.version>
+		<java.version>11</java.version>
     	<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<maven.compiler.version>3.8.1</maven.compiler.version>
 		<maven.properties.version>1.0-alpha-2</maven.properties.version>
 		<maven.jar.version>3.2.0</maven.jar.version>
 		<maven.surefire.version>3.0.0-M5</maven.surefire.version>
 		<maven.assembly.version>3.3.0</maven.assembly.version>
+		<log4j2.version>2.21.1</log4j2.version>
     </properties>
 
 	<!-- NOTES -->
 	<!-- Assembly:single creates Clock-v#.jar -->
-	<!-- Mvn:package creates Clock-v3-jar-with-dependencies.jar -->
+	<!-- Mvn:package creates Clock-v#-jar-with-dependencies.jar -->
     
     <dependencies>
+
+		<!-- https://mvnrepository.com/artifact/org.apache.logging.log4j/log4j-core -->
+		<dependency>
+			<groupId>org.apache.logging.log4j</groupId>
+			<artifactId>log4j-core</artifactId>
+			<version>${log4j2.version}</version>
+		</dependency>
 
 		<!-- https://mvnrepository.com/artifact/javazoom/jlayer -->
 		<dependency>
@@ -107,7 +115,8 @@
 			<resource>
 				<directory>src/main/resources</directory>
 				<includes>
-					<include>**/sounds/*.mp3</include>
+					<include>**/**</include>
+					<!--<include>**/sounds/*.mp3</include>-->
 				</includes>
 			</resource>
 		</resources>
@@ -134,8 +143,7 @@
 						<phase>test-compile</phase>
 						<configuration>
 							<testExcludes>
-								<exclude>**/v1/*Test.java</exclude>
-								<exclude>**/v2/*Test.java</exclude>
+								<exclude>**/**.java</exclude>
 							</testExcludes>
 						</configuration>
 						<goals>
@@ -152,14 +160,7 @@
 				<version>${maven.surefire.version}</version>
 				<configuration>
 					<excludes>
-						<exclude>**/v1/*.java</exclude>
-						<exclude>**/v2/*.java</exclude>
-						<exclude>**/v3/*.java</exclude>
-						<exclude>**/v4/*.java</exclude>
-						<exclude>**/v1/*Test.java</exclude>
-						<exclude>**/v2/*Test.java</exclude>
-						<exclude>**/v3/*Test.java</exclude>
-						<exclude>**/v4/*Test.java</exclude>
+						<exclude>**/**.java</exclude>
 					</excludes>
 				</configuration>
 			</plugin>
@@ -200,16 +201,10 @@
 					<includes>
 						<include>**/Clock/*</include>
 						<include>**/sounds/*</include>
+						<include>**/logging/*</include>
 					</includes>
 					<excludes>
-						<exclude>**/v1/*.java</exclude>
-						<exclude>**/v2/*.java</exclude>
-						<exclude>**/v3/*.java</exclude>
-						<exclude>**/v4/*.java</exclude>
-						<exclude>**/v1/*Test.java</exclude>
-						<exclude>**/v2/*Test.java</exclude>
-						<exclude>**/v3/*Test.java</exclude>
-						<exclude>**/v4/*Test.java</exclude>
+						<exclude>**/**.java</exclude>
 					</excludes>
             	</configuration>
             </plugin>
@@ -236,26 +231,6 @@
             		</execution>
             	</executions>
             </plugin>
-            
-            <!-- Reference to assembly.xml file -->
-            <!-- <plugin>
-            	<groupId>org.apache.maven.plugins</groupId>
-            	<artifactId>maven-assembly-plugin</artifactId>
-            	<executions>
-            		<execution>
-            			<id>create-archive</id>
-            			<phase>package</phase>
-            			<goals>
-            				<goals>single</goal>
-            			</goals>
-            			<configuration>
-            				<descriptor>location of assembly.xml like src/assembly.xml </descriptor> 
-            				<finalName></finalName>
-            				<outputDirectory>${basedir}/dist/LOCATION</outputDirectory>
-            			</configuration>
-            		</execution>
-            	</executions>
-            </plugin>-->
 
 			<!-- Package: creates runnable jar with dependencies -->
             <plugin>
