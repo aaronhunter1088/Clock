@@ -5,18 +5,18 @@
     
     <groupId>com.example</groupId>
   	<artifactId>clock</artifactId>
-  	<version>2.5</version>
+  	<version>2.6</version>
   	<name>Clock</name>
     <description>This is Clock GUI.</description>
     
     <properties>
 		<java.version>11</java.version>
     	<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-		<maven.compiler.version>3.8.1</maven.compiler.version>
+		<maven.compiler.version>3.11.0</maven.compiler.version>
 		<maven.properties.version>1.0-alpha-2</maven.properties.version>
-		<maven.jar.version>3.2.0</maven.jar.version>
-		<maven.surefire.version>3.0.0-M5</maven.surefire.version>
-		<maven.assembly.version>3.3.0</maven.assembly.version>
+		<maven.jar.version>3.3.0</maven.jar.version>
+		<maven.surefire.version>3.2.1</maven.surefire.version>
+		<maven.assembly.version>3.6.0</maven.assembly.version>
 		<log4j2.version>2.21.1</log4j2.version>
     </properties>
 
