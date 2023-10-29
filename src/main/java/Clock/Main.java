@@ -21,7 +21,7 @@ public class Main
     public static void main(String[] args) throws ParseException, InvalidInputException
     {
         logger.info("Starting main...");
-        Clock clock = new Clock(new AnalogueClockPanel());
+        Clock clock = new Clock();
         clock.setVisible(true);
         clock.getContentPane().setBackground(Color.BLACK);
         clock.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
