@@ -20,7 +20,7 @@ public class AnalogueClockPanel extends JPanel implements IClockPanel, Runnable
     public PanelType panelType;
     private GridBagLayout layout;
     private GridBagConstraints constraints;
-    private String CLOCK_TEXT;
+    private String CLOCK_TEXT = "";
 
     /**
      * Default constructor

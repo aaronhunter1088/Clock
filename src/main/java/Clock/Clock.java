@@ -2,6 +2,8 @@ package Clock;
 
 import javax.swing.*;
 import java.awt.*;
+import java.io.FileNotFoundException;
+import java.net.URL;
 import java.time.*;
 import java.util.ArrayList;
 
@@ -62,8 +64,8 @@ public class Clock extends JFrame
     protected boolean showPartialDate = false;
     protected boolean showMilitaryTime = false;
     protected boolean showDigitalTimeOnAnalogueClock = false;
-
     protected ArrayList<Alarm> listOfAlarms;
+    public ImageIcon icon;
 
     public PanelType getPanelType() { return this.currentPanel; }
     public ClockMenuBar getClockMenuBar() { return this.menuBar; }
@@ -183,6 +185,11 @@ public class Clock extends JFrame
         setIsDateChanged(false);
         setIsAlarmGoingOff(false);
         setSize(Clock.defaultSize);
+        setImageIcon(createImageIcon("src/main/resources/images/clockImageIcon.png"));
+        final Taskbar taskbar = Taskbar.getTaskbar();
+        taskbar.setIconImage(icon.getImage());
+
+        setIconImage(icon.getImage());
         setPanelType(PanelType.DIGITAL_CLOCK);
         add(getDigitalClockPanel());
         //pack();
@@ -260,6 +267,9 @@ public class Clock extends JFrame
         setSize(panelFace.getMaximumSize());
         setBackground(Color.BLACK);
     }
+
+    public void setImageIcon(ImageIcon icon)
+    { this.icon = icon; }
 
     public void setPanel(JPanel panelFace, Clock clock)
     {
@@ -801,5 +811,30 @@ public class Clock extends JFrame
         {
             logger.error(ste.toString());
         }
+    }
+
+    /**
+     * Returns an ImageIcon, or null if the path was invalid.
+     * @param path the path of the image
+     */
+    public ImageIcon createImageIcon(String path)
+    {
+        logger.info("createImageIcon");
+        ImageIcon retImageIcon = null;
+        ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
+        URL resource = classLoader.getResource(path.substring(19));
+        if (resource != null) {
+            retImageIcon = new ImageIcon(resource);
+        }
+        else {
+            resource = classLoader.getResource(path.substring(19));
+            if (resource != null) {
+                retImageIcon = new ImageIcon(resource);
+            } else {
+                logger.error("The path '" + path + "' you provided cannot find a resource. Returning null");
+            }
+
+        }
+        return retImageIcon;
     }
 }
