@@ -78,11 +78,12 @@ public class AnalogueClockPanel extends JPanel implements IClockPanel, Runnable
     {
         logger.info("painting analogue clock panel");
         int xhour, yhour, xminute, yminute, xsecond, ysecond, second, minute, hour;
-        drawStructure(g);
-        //currentDate = new Date();
         currentDate = java.util.Date.from(getClock().getDate().atTime(getClock().getHours(), getClock().getMinutes(), getClock().getSeconds())
                 .atZone(ZoneId.systemDefault())
                 .toInstant());
+        setClockText(clock.getTimeAsStr());
+        drawStructure(g);
+
         formatter.applyPattern("s");
         second = Integer.parseInt(formatter.format(currentDate));
         formatter.applyPattern("m");
@@ -164,7 +165,6 @@ public class AnalogueClockPanel extends JPanel implements IClockPanel, Runnable
         logger.info("updating graphics");
         paint(g);
     }
-
     public void setupDefaultActions(Clock clock)
     {
         logger.info("setupDefaultActions with Clock");
@@ -172,7 +172,6 @@ public class AnalogueClockPanel extends JPanel implements IClockPanel, Runnable
         setClockText(clock.getTimeAsStr());
         setupDefaultActions();
     }
-
     public void setupDefaultActions()
     {
         logger.info("setupDefaultActions");
@@ -185,12 +184,10 @@ public class AnalogueClockPanel extends JPanel implements IClockPanel, Runnable
         setForeground(Color.BLACK);
         start(this);
     }
-
     @Override
     public void addComponentsToPanel() {
         logger.info("addComponentsToPanel");
     }
-
     @Override
     public void printStackTrace(Exception e, String message) {
         logger.error(e.getMessage());
