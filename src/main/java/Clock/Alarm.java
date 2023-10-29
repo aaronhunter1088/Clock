@@ -4,7 +4,9 @@ import java.io.Serializable;
 import java.time.DayOfWeek;
 import java.util.ArrayList;
 import java.util.List;
-import Clock.Time.*;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 import static java.time.DayOfWeek.*;
 
 /**
@@ -20,6 +22,7 @@ import static java.time.DayOfWeek.*;
  */
 public class Alarm implements Serializable {
     private static final long serialVersionUID = 1L;
+    private static final Logger logger = LogManager.getLogger(Alarm.class);
     protected int minutes;
     protected String minutesAsStr;
     protected int hours;
@@ -36,30 +39,44 @@ public class Alarm implements Serializable {
         super();
         setHours(0);
         setMinutes(0);
-        //setAMPM();
-        //setDays(null);
         setIsAlarmUpdating(false);
+        logger.info("Finished creating an Alarm");
     }
     public Alarm(Clock clock, int hours, boolean isUpdateAlarm)
     {
-        //super(clock);
         setClock(clock);
         setHours(hours);
         setDays(new ArrayList<>(){{add(clock.getDayOfWeek());}});
         setIsAlarmUpdating(isUpdateAlarm);
+        logger.info("Finished creating an Alarm from [Clock, hours, isUpdateAlarm]");
     }
     public Alarm(int hours, int minutes, Time time, boolean isUpdateAlarm, ArrayList<DayOfWeek> days, Clock clock) throws InvalidInputException
     {
-        //super();
         setClock(clock);
         setHours(hours);
         setMinutes(minutes);
         setAMPM(time);
         setDays(days);
         setIsAlarmUpdating(isUpdateAlarm);
+        logger.info("Finished creating an Alarm with specific times");
     }
 
-    //@Override
+    public Clock getClock() { return this.clock; }
+    public boolean isAlarmGoingOff() { return alarmGoingOff; }
+    public boolean isUpdatingAlarm() { return updatingAlarm; }
+    public ArrayList<DayOfWeek> getDays() { return this.days; }
+    public int getHours() { return this.hours; }
+    public String getHoursAsStr() { return this.hoursAsStr; }
+    public int getMinutes() { return this.minutes; }
+    public String getMinutesAsStr() { return this.minutesAsStr; }
+    public Time getAMPM() { return this.ampm; }
+
+    protected void setClock(Clock clock) { this.clock = clock; }
+    protected void setIsAlarmGoingOff(boolean alarmGoingOff) { this.alarmGoingOff = alarmGoingOff; }
+    protected void setIsAlarmUpdating(boolean updatingAlarm) { this.updatingAlarm = updatingAlarm; }
+    protected  void setAlarmGoingOff(boolean alarmGoingOff) { this.alarmGoingOff = alarmGoingOff; }
+    protected void setUpdatingAlarm(boolean updatingAlarm) { this.updatingAlarm = updatingAlarm; }
+    protected void setDays(ArrayList<DayOfWeek> days) { this.days = days; }
     public void setHours(int hours) {
         this.hours = hours;
         if (hours < 10) {
@@ -67,11 +84,6 @@ public class Alarm implements Serializable {
         } else
             this.hoursAsStr = String.valueOf(this.hours);
     }
-    //@Override
-    public int getHours() { return this.hours; }
-    public String getHoursAsStr() { return this.hoursAsStr; }
-
-    //@Override
     public void setMinutes(int minutes) {
         this.minutes = minutes;
         if (minutes < 10) {
@@ -80,31 +92,22 @@ public class Alarm implements Serializable {
             this.minutesAsStr = String.valueOf(this.minutes);
         }
     }
-    //@Override
-    public int getMinutes() { return this.minutes; }
-    public String getMinutesAsStr() { return this.minutesAsStr; }
-
-    //@Override
     protected void setAMPM(Time ampm) {
         this.ampm = ampm;
     }
-    //@Override
-    public Time getAMPM() { return this.ampm; }
 
     protected String getAlarmAsString() {
         return this.hoursAsStr + ":" + this.minutesAsStr + " " + this.ampm;
     }
-
-    public ArrayList<DayOfWeek> getDays() { return this.days; }
-
     public List<String> getDaysShortened()
     {
+        logger.info("getDaysShortened");
         List<String> shortenedDays = new ArrayList<>();
         shortenedDays.add("Days: ");
         if (getDays().contains(MONDAY) && getDays().contains(TUESDAY) &&
                 getDays().contains(WEDNESDAY) && getDays().contains(THURSDAY) &&
                 getDays().contains(FRIDAY))
-            { shortenedDays.add("Weekdays "); }
+        { shortenedDays.add("Weekdays "); }
         else if (getDays().contains(SATURDAY) && getDays().contains(SUNDAY)) { shortenedDays.add("Weekend"); }
         else {
             for(DayOfWeek day : getDays())
@@ -121,15 +124,4 @@ public class Alarm implements Serializable {
         shortenedDays.add("\n------");
         return shortenedDays;
     }
-
-    protected void setIsAlarmGoingOff(boolean alarmGoingOff) { this.alarmGoingOff = alarmGoingOff; }
-    protected void setIsAlarmUpdating(boolean updatingAlarm) { this.updatingAlarm = updatingAlarm; }
-
-    protected void setClock(Clock clock) { this.clock = clock; }
-    public Clock getClock() { return this.clock; }
-
-    public boolean isAlarmGoingOff() { return alarmGoingOff; }
-    public boolean isUpdatingAlarm() { return updatingAlarm; }
-
-    protected void setDays(ArrayList<DayOfWeek> days) { this.days = days; }
 }

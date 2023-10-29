@@ -35,19 +35,20 @@ public class ClockTest {
     @Test
     public void testBeginningDayLightSavingsTimeIsProperlySet() throws InvalidInputException
     {
-        clock.setDaylightSavingsTimeDates();
+        clock = new Clock(5, 42, 0, MARCH, THURSDAY, 2, 2021, PM);
         assertEquals("For 2021, Beginning DST Day should be 14th", 14, clock.getBeginDaylightSavingsTimeDate().getDayOfMonth());
         assertEquals("For 2021, Ending DST Day should be 7th", 7, clock.getEndDaylightSavingsTimeDate().getDayOfMonth());
 
         clock = new Clock(5, 42, 0, MARCH, THURSDAY, 3, 2022, PM);
-        clock.setDaylightSavingsTimeDates();
+        //clock.setDaylightSavingsTimeDates();
         assertEquals("For 2022, Beginning DST Day should be 13th", 13, clock.getBeginDaylightSavingsTimeDate().getDayOfMonth());
         assertEquals("For 2022, Ending DST Day should be 6th", 6, clock.getEndDaylightSavingsTimeDate().getDayOfMonth());
     }
 
     @Test
-    public void testIsTodayDaylightSavingsDayReturnsFalseWhenNotBeginningDST()
+    public void testIsTodayDaylightSavingsDayReturnsFalseWhenNotBeginningDST() throws InvalidInputException
     {
+        clock = new Clock(5, 42, 0, MARCH, THURSDAY, 3, 2022, PM);
         assertFalse(clock.isTodayDaylightSavingsTime());
     }
 
@@ -109,7 +110,7 @@ public class ClockTest {
         Alarm alarm = new Alarm(1, 1, Time.PM, false, new ArrayList<>(){{add(SATURDAY);}}, clock);
         clock.setListOfAlarms(new ArrayList<>(){{add(alarm);}});
 
-        assertTrue(clock.getListOfAlarms().size() == 1);
+        assertEquals(1, clock.getListOfAlarms().size());
 
         clock.tick();
         clock.getAlarmPanel().checkIfAnyAlarmsAreGoingOff();

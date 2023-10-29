@@ -1,7 +1,6 @@
 package Clock;
 
 import javax.swing.*;
-import javax.swing.plaf.metal.MetalLookAndFeel;
 import java.awt.*;
 import java.text.ParseException;
 import org.apache.logging.log4j.LogManager;
@@ -22,23 +21,24 @@ public class Main
     public static void main(String[] args) throws ParseException, InvalidInputException
     {
         logger.info("Starting main...");
-        Clock clock = new Clock();
+        Clock clock = new Clock();//new AnalogueClockPanel());
         clock.setVisible(true);
         clock.getContentPane().setBackground(Color.BLACK);
         clock.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        clock.setBounds(200, 200, 700, 300);
         SwingUtilities.invokeLater(() -> {
             SwingUtilities.updateComponentTreeUI(clock);
         });
         try
         {
-            while (true) {
+            while (true)
+            {
                 clock.tick();
                 // check alarms
                 sleep(250);
                 clock.getAlarmPanel().checkIfAnyAlarmsAreGoingOff();
                 clock.getTimerPanel().checkIfTimerHasConcluded();
-                if (clock.isNewYear()) {
+                if (clock.isNewYear())
+                {
                     clock.setDaylightSavingsTimeDates();
                     clock.setIsNewYear(false);
                 }
@@ -46,9 +46,6 @@ public class Main
             }
         }
         catch (Exception e)
-        {
-            for(StackTraceElement ste : e.getStackTrace())
-            { logger.error(ste); }
-        }
+        { logger.error("Couldn't start Clock: " + e.getMessage()); }
     }
 }

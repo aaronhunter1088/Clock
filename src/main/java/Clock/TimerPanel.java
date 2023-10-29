@@ -39,7 +39,7 @@ public class TimerPanel extends JPanel implements IClockPanel
     private Thread countdownThread = new Thread(this::performCountDown);
     private boolean timerIsGoingOff;
     private AdvancedPlayer musicPlayer;
-    public static ClockFace facePanel;
+    public PanelType panelType;
     public static final String SET = "Set";
     public static final String RESUME_TIMER = "Resume Timer";
     public static final String PAUSE_TIMER = "Pause Timer";
@@ -48,7 +48,7 @@ public class TimerPanel extends JPanel implements IClockPanel
     public TimerPanel(Clock clock)
     {
         setClock(clock);
-        setClockFace(ClockFace.TIMERPANEL);
+        setPanelType(PanelType.TIMER);
         setSize(Clock.panelSize);
         setGridBagLayout(new GridBagLayout());
         setLayout(getGridBagLayout());
@@ -110,7 +110,7 @@ public class TimerPanel extends JPanel implements IClockPanel
     protected void setResetButton(JButton resetButton) { this.resetButton = resetButton; }
     protected void setIsTimerGoingOff(boolean timerIsGoingOff) { this.timerIsGoingOff = timerIsGoingOff; }
     protected void setMusicPlayer(AdvancedPlayer musicPlayer) { this.musicPlayer = musicPlayer; }
-    protected void setClockFace(ClockFace faceChoice) { facePanel = faceChoice; }
+    protected void setPanelType(PanelType panelType) { this.panelType = panelType; }
 
     public void setupTimerPanel()
     {

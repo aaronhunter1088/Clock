@@ -68,13 +68,13 @@ public class AlarmPanel extends JPanel implements IClockPanel
     private boolean updatingAlarm;
     private boolean alarmIsGoingOff;
     private AdvancedPlayer musicPlayer;
-    public static ClockFace facePanel;
+    public PanelType panelType;
 
     public AlarmPanel(Clock clock)
     {
         super();
         setClock(clock);
-        setFacePanel(ClockFace.ALARMPANEL);
+        setPanelType(PanelType.ALARM);
         setMaximumSize(new Dimension(200, 100));
         setGridBagLayout(new GridBagLayout());
         setLayout(layout);
@@ -145,7 +145,7 @@ public class AlarmPanel extends JPanel implements IClockPanel
     protected void setWeekCheckBox(JCheckBox weekCheckBox) { this.weekCheckBox = weekCheckBox; }
     protected void setWkendCheckBox(JCheckBox wkendCheckBox) { this.wkendCheckBox = wkendCheckBox; }
     protected void setAlarmIsGoingOff(boolean alarmIsGoingOff) { this.alarmIsGoingOff = alarmIsGoingOff; }
-    protected void setFacePanel(ClockFace panelChoice) { facePanel = panelChoice; }
+    protected void setPanelType(PanelType panelType) { this.panelType = panelType; }
     // Helper methods
     public void setupAlarmPanel(Clock clock)
     {
@@ -205,7 +205,7 @@ public class AlarmPanel extends JPanel implements IClockPanel
         getSetAlarmButton().setBackground(Color.BLACK);
         getSetAlarmButton().setForeground(Color.BLACK);
         // setup checkboxes
-        setupCheckboxes();
+        setupCheckBoxes();
     }
     public void setupMusicPlayer()
     {
@@ -376,6 +376,7 @@ public class AlarmPanel extends JPanel implements IClockPanel
 
                 if (!validated)
                 {
+                    logger.info("not valid inputs. not setting alarm");
                     setAlarm(null); // new Alarm()
                     //getClock().changeToAlarmPanel();
                 }
@@ -384,6 +385,7 @@ public class AlarmPanel extends JPanel implements IClockPanel
                     // Passed validation
                     if (isUpdatingAlarm())
                     {
+                        logger.info("updating alarm");
                         alarm = createAlarm();
                         alarm.setIsAlarmUpdating(false); // at this point, we are doing updating
                         setAlarm(alarm);
@@ -402,10 +404,7 @@ public class AlarmPanel extends JPanel implements IClockPanel
                                         getClock().getListOfAlarms().get(i).getDays() != alarm.getDays())
                                 { addToList = true; }
                                 else
-                                {
-                                    addToList = false;
-                                    logger.error("Tried updating an alarm but it already exists! Cannot create duplicate alarm.");
-                                }
+                                { logger.error("Tried updating an alarm but it already exists! Cannot create duplicate alarm."); }
                             }
                             if (addToList)
                             {
@@ -420,13 +419,13 @@ public class AlarmPanel extends JPanel implements IClockPanel
                         setupAlarmsInMenuFunctionality();
                         setUpdatingAlarm(false);
                         resetJTextArea();
-                        resetJCheckboxes();
+                        resetJCheckBoxes();
                         resetJAlarmLabel4();
                         // determine how to update alarm (update/delete)
                     }
                     else // creating a new alarm
                     {
-                        logger.info("Size of listOfAlarms before adding " + getClock().getListOfAlarms().size());
+                        logger.info("creating new alarm");
                         alarm = createAlarm();
                         setAlarm(alarm);
                         setUpdatingAlarm(false);
@@ -444,9 +443,7 @@ public class AlarmPanel extends JPanel implements IClockPanel
                                         getClock().getListOfAlarms().get(i).getDays() != alarm.getDays())
                                 { addToList = true; }
                                 else
-                                {
-                                    logger.error("Tried adding an alarm but it already exists! Cannot create duplicate alarm.");
-                                }
+                                { logger.error("Tried adding an alarm but it already exists! Cannot create duplicate alarm."); }
                             }
                             if (addToList)
                             {
@@ -457,7 +454,7 @@ public class AlarmPanel extends JPanel implements IClockPanel
                         logger.info("Size of listOfAlarms after adding " + getClock().getListOfAlarms().size());
                         // display list of alarms below All Alarms
                         resetJTextArea();
-                        resetJCheckboxes();
+                        resetJCheckBoxes();
                         setupAlarmsInMenuFunctionality();
                         // erase input in textFields
                         getJTextField1().setText("");
@@ -465,7 +462,6 @@ public class AlarmPanel extends JPanel implements IClockPanel
                         getJTextField3().setText("");
                         resetJAlarmLabel4();
                     }
-                    //getClock().changeToClockPanel();
                 }
             }
             catch (InvalidInputException | ParseException e)
@@ -511,9 +507,7 @@ public class AlarmPanel extends JPanel implements IClockPanel
             return alarm;
         }
         else
-        {
-            return null;
-        }
+        { return null; }
     }
     protected void updateTheAlarm(Alarm alarmToUpdate)
     {
@@ -535,7 +529,7 @@ public class AlarmPanel extends JPanel implements IClockPanel
                 getJTextField2().setText(alarmToUpdate.getMinutesAsStr());
             }
             getJTextField3().setText(alarmToUpdate.getAMPM().getStrValue());
-            setCheckboxesIfWasSelected(alarmToUpdate);
+            setCheckBoxesIfWasSelected(alarmToUpdate);
         }
         setUpdatingAlarm(true);
         // remove alarm from list of alarms
@@ -548,9 +542,10 @@ public class AlarmPanel extends JPanel implements IClockPanel
     }
     public void triggerAlarm(ExecutorService executor)
     {
+        logger.info("triggerAlarm");
         setAlarmIsGoingOff(true);
-        getClock().getClockPanel().getJlbl1().setText(getCurrentAlarmGoingOff().getAlarmAsString());
-        getClock().getClockPanel().getJlbl2().setText("is going off!");
+        getClock().getDigitalClockPanel().getJlbl1().setText(getCurrentAlarmGoingOff().getAlarmAsString());
+        getClock().getDigitalClockPanel().getJlbl2().setText("is going off!");
         // play sound
         Callable<String> c = () -> {
             try
@@ -573,6 +568,7 @@ public class AlarmPanel extends JPanel implements IClockPanel
     }
     public void stopAlarm()
     {
+        logger.info("stopAlarm");
         setMusicPlayer(null);
         setAlarmIsGoingOff(false);
         logger.info("Stopping music. New music player setup and ready for new alarm");
@@ -580,6 +576,7 @@ public class AlarmPanel extends JPanel implements IClockPanel
     }
     public void checkIfAnyAlarmsAreGoingOff()
     {
+        logger.info("checkIfAnyAlarmsAreGoingOff");
         // alarm has reference to time
         // check all alarms
         // if any alarm matches clock's time, an alarm should be going off
@@ -620,6 +617,7 @@ public class AlarmPanel extends JPanel implements IClockPanel
                     }
                 } else {
                     // no operation
+                    logger.info("alarm is not going off");
                 }
             }
         );
@@ -669,7 +667,7 @@ public class AlarmPanel extends JPanel implements IClockPanel
                             stopAlarm();
                         }
                         else { logger.info("Music player is null!"); }
-                        setCheckboxesIfWasSelected(getAlarm());
+                        setCheckBoxesIfWasSelected(getAlarm());
                         getAlarm().setIsAlarmGoingOff(false);
                         getAlarm().setIsAlarmUpdating(true); // this and the boolean below we want true
                         setUpdatingAlarm(true); // we want to continue with the logic that's done in the next if
@@ -702,6 +700,7 @@ public class AlarmPanel extends JPanel implements IClockPanel
 
     protected ArrayList<DayOfWeek> checkWhichCheckBoxesWereChecked()
     {
+        logger.info("checkWhichCheckBoxesWereChecked");
         ArrayList<DayOfWeek> daysSelected = new ArrayList<>();
         if (getMondayCheckBox().isSelected())
         { daysSelected.add(MONDAY); }
@@ -732,8 +731,9 @@ public class AlarmPanel extends JPanel implements IClockPanel
         } // add Saturday and Sunday
         return daysSelected;
     }
-    protected void resetJCheckboxes()
+    protected void resetJCheckBoxes()
     {
+        logger.info("resetJCheckBoxes");
         if (getSundayCheckBox().isSelected())
         { getSundayCheckBox().setSelected(false); }
         if (getMondayCheckBox().isSelected())
@@ -753,8 +753,9 @@ public class AlarmPanel extends JPanel implements IClockPanel
         if (getWkendCheckBox().isSelected())
         { getWkendCheckBox().setSelected(false); }
     }
-    public void setCheckboxesIfWasSelected(Alarm alarmToUpdate)
+    public void setCheckBoxesIfWasSelected(Alarm alarmToUpdate)
     {
+        logger.info("setCheckBoxesIfWasSelected");
         if (alarmToUpdate.getDays().contains(MONDAY)) { getMondayCheckBox().setSelected(true); }
         if (alarmToUpdate.getDays().contains(TUESDAY)) { getTuesdayCheckBox().setSelected(true); }
         if (alarmToUpdate.getDays().contains(WEDNESDAY)) { getWednesdayCheckBox().setSelected(true); }
@@ -781,8 +782,9 @@ public class AlarmPanel extends JPanel implements IClockPanel
             getWkendCheckBox().setSelected(true);
         }
     }
-    protected void setupCheckboxes()
+    protected void setupCheckBoxes()
     {
+        logger.info("setupCheckBoxes");
         setSundayCheckBox(new JCheckBox(SUNDAY.toString().substring(0,2), false));
         getSundayCheckBox().setFont(Clock.font20);
         getSundayCheckBox().setBackground(Color.BLACK);
@@ -952,6 +954,7 @@ public class AlarmPanel extends JPanel implements IClockPanel
     }
     public Time convertStringToTimeAMPM(String ampm) throws InvalidInputException
     {
+        logger.info("convertStringToTimeAMPM");
         if (StringUtils.equals("AM", ampm.toUpperCase()))
         { return Time.AM; }
         else if (StringUtils.equals("PM", ampm.toUpperCase()))
@@ -973,6 +976,7 @@ public class AlarmPanel extends JPanel implements IClockPanel
     }
     public void addComponent(Component cpt, int gridy, int gridx, double gwidth, double gheight, int ipadx, int ipady, int fill, Insets insets)
     {
+        logger.info("addComponent");
         //setGridBagConstraints(new GridBagConstraints());
         getGridBagConstraints().gridx = gridx;
         getGridBagConstraints().gridy = gridy;
@@ -989,6 +993,7 @@ public class AlarmPanel extends JPanel implements IClockPanel
     @Override
     public void addComponentsToPanel()
     {
+        logger.info("addComponentsToPanel");
         //addComponent(getJAlarmLbl1(), 0,0,1,1, 15,7, GridBagConstraints.VERTICAL); // H
         //getGridBagConstraints().fill = GridBagConstraints.HORIZONTAL;
         addComponent(getJAlarmLbl1(),0,0,1,1,0,0,   GridBagConstraints.BOTH, new Insets(0,0,0,0)); // H
@@ -1019,12 +1024,4 @@ public class AlarmPanel extends JPanel implements IClockPanel
         addComponent(getSetAlarmButton(), 4, 2, 2, 1, 1, 1, GridBagConstraints.CENTER, new Insets(0,0,0,0)); // Set button
         // header and alarms
     }
-//    public void updateLabels()
-//    {
-//        getJAlarmLbl1().setText(getClock().defaultText(3)); // H
-//        getJAlarmLbl2().setText(getClock().defaultText(4)); // M
-//        getJAlarmLbl3().setText(getClock().defaultText(5)); // T
-//        getJAlarmLbl4().setText(getClock().defaultText(6)); // All Alarms label...
-//        getClock().repaint();
-//    }
 }

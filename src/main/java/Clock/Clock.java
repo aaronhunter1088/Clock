@@ -31,9 +31,10 @@ public class Clock extends JFrame
     protected static final Font font20 = new Font("Courier New", Font.BOLD, 20);
     protected static final Font font10 = new Font("Courier New", Font.BOLD, 10);
 
-    protected ClockFace facePanel; // used to determine panel in use
+    protected PanelType currentPanel; // used to determine panel in use
     protected ClockMenuBar menuBar;
-    protected ClockPanel clockPanel;
+    protected DigitalClockPanel digitalClockPanel;
+    protected AnalogueClockPanel analogueClockPanel;
     protected AlarmPanel alarmPanel;
     protected TimerPanel timerPanel;
     protected LocalDate beginDaylightSavingsTimeDate;
@@ -60,11 +61,14 @@ public class Clock extends JFrame
     protected boolean showFullDate = false;
     protected boolean showPartialDate = false;
     protected boolean showMilitaryTime = false;
+    protected boolean showDigitalTimeOnAnalogueClock = false;
+
     protected ArrayList<Alarm> listOfAlarms;
 
-    public ClockFace getPanelInUse() { return this.facePanel; }
+    public PanelType getPanelType() { return this.currentPanel; }
     public ClockMenuBar getClockMenuBar() { return this.menuBar; }
-    public ClockPanel getClockPanel() { return this.clockPanel; }
+    public DigitalClockPanel getDigitalClockPanel() { return this.digitalClockPanel; }
+    public AnalogueClockPanel getAnalogueClockPanel() { return this.analogueClockPanel; }
     public AlarmPanel getAlarmPanel() { return this.alarmPanel; }
     public TimerPanel getTimerPanel() { return this.timerPanel; }
     public LocalDate getDate() { return this.date; }
@@ -104,11 +108,13 @@ public class Clock extends JFrame
     public boolean isShowFullDate() { return this.showFullDate; }
     public boolean isShowPartialDate() { return this.showPartialDate; }
     public boolean isShowMilitaryTime() { return this.showMilitaryTime; }
+    public boolean isShowDigitalTimeOnAnalogueClock() { return this.showDigitalTimeOnAnalogueClock; }
     public ArrayList<Alarm> getListOfAlarms() { return this.listOfAlarms; }
 
-    protected void setPanelInUse(ClockFace facePanel) { this.facePanel = facePanel; }
+    protected void setPanelType(PanelType currentPanel) { this.currentPanel = currentPanel; }
     protected void setClockMenuBar(ClockMenuBar menuBar) { this.menuBar = menuBar; }
-    protected void setClockPanel(ClockPanel clockPanel) { this.clockPanel = clockPanel; }
+    protected void setDigitalClockPanel(DigitalClockPanel digitalClockPanel) { this.digitalClockPanel = digitalClockPanel; }
+    protected void setAnalogueClockPanel(AnalogueClockPanel analogueClockPanel) { this.analogueClockPanel = analogueClockPanel; }
     protected void setAlarmPanel(AlarmPanel alarmPanel) { this.alarmPanel = alarmPanel; }
     protected void setTimerPanel(TimerPanel timerPanel) { this.timerPanel = timerPanel; }
     protected void setBeginDaylightSavingsTimeDate(LocalDate beginDaylightSavingsTimeDate) { this.beginDaylightSavingsTimeDate = beginDaylightSavingsTimeDate; }
@@ -152,6 +158,7 @@ public class Clock extends JFrame
     protected void setShowFullDate(boolean showFullDate) { this.showFullDate = showFullDate; }
     protected void setShowPartialDate(boolean showPartialDate) { this.showPartialDate = showPartialDate; }
     protected void setShowMilitaryTime(boolean showMilitaryTime) { this.showMilitaryTime = showMilitaryTime; }
+    protected void setShowDigitalTimeOnAnalogueClock(boolean showDigitalTimeOnAnalogueClock) { this.showDigitalTimeOnAnalogueClock = showDigitalTimeOnAnalogueClock; }
 
     /**
      * This constructor is the main constructor.
@@ -160,6 +167,7 @@ public class Clock extends JFrame
     public Clock() throws InvalidInputException
     {
         super();
+        setBounds(200, 200, 700, 300);
         setResizable(true);
         setListOfAlarms(new ArrayList<>());
         setupMenuBar();
@@ -167,15 +175,17 @@ public class Clock extends JFrame
         setTheTime();
         setDaylightSavingsTimeDates();
         setDate(LocalDate.of(getYear(), getMonth(), getDayOfMonth()));
-        setPanelInUse(ClockFace.CLOCKPANEL);
-        setClockPanel(new ClockPanel(this));
+        setDigitalClockPanel(new DigitalClockPanel(this));
+        setAnalogueClockPanel(new AnalogueClockPanel(this));
         setAlarmPanel(new AlarmPanel(this));
         setTimerPanel(new TimerPanel(this));
         setLeapYear(getDate().isLeapYear());
         setIsDateChanged(false);
         setIsAlarmGoingOff(false);
-        add(getClockPanel());
-        pack();
+        setSize(Clock.defaultSize);
+        setPanelType(PanelType.DIGITAL_CLOCK);
+        add(getDigitalClockPanel());
+        //pack();
     }
     /**
      * This constructor takes in values for all Clock parameters
@@ -209,13 +219,13 @@ public class Clock extends JFrame
         setAMPM(ampm);
         setDate(LocalDate.of(getYear(), getMonth(), getDayOfMonth()));
         setDaylightSavingsTimeDates();
-        setPanelInUse(ClockFace.CLOCKPANEL);
-        setClockPanel(new ClockPanel(this));
+        setPanelType(PanelType.DIGITAL_CLOCK);
+        setDigitalClockPanel(new DigitalClockPanel(this));
         setLeapYear(getDate().isLeapYear());
         setIsDateChanged(false);
         setIsAlarmGoingOff(false);
         pack();
-        add(getClockPanel());
+        add(getDigitalClockPanel());
     }
     /**
      * This clock creates a new clock based on another
@@ -238,10 +248,47 @@ public class Clock extends JFrame
         setYear(clock.getYear());
         setDate(LocalDate.of(getYear(), getMonth(), getDayOfMonth()));
         setDaylightSavingsTimeDates();
-        setPanelInUse(ClockFace.CLOCKPANEL);
-        setClockPanel(new ClockPanel(this));
+        setPanelType(PanelType.DIGITAL_CLOCK);
+        setDigitalClockPanel(new DigitalClockPanel(this));
         pack();
-        add(getClockPanel());
+        add(getDigitalClockPanel());
+    }
+    public Clock(JPanel panelFace) throws InvalidInputException
+    {
+        this();
+        setPanel(panelFace, this);
+        setSize(panelFace.getMaximumSize());
+        setBackground(Color.BLACK);
+    }
+
+    public void setPanel(JPanel panelFace, Clock clock)
+    {
+        remove(getDigitalClockPanel()); // remove default first
+        if (panelFace instanceof DigitalClockPanel)
+        {
+            setDigitalClockPanel((DigitalClockPanel)panelFace);
+            setPanelType(PanelType.DIGITAL_CLOCK);
+            getDigitalClockPanel().setClock(clock);
+            add(panelFace);
+        } else if (panelFace instanceof AnalogueClockPanel)
+        {
+            setAnalogueClockPanel((AnalogueClockPanel)panelFace);
+            setPanelType(PanelType.ANALOGUE_CLOCK);
+            getAnalogueClockPanel().setClock(clock);
+            add(panelFace);
+        } else if (panelFace instanceof AlarmPanel)
+        {
+            setAlarmPanel((AlarmPanel)panelFace);
+            setPanelType(PanelType.ALARM);
+            getAlarmPanel().setClock(clock);
+            add(panelFace);
+        } else
+        {
+            setTimerPanel((TimerPanel)panelFace);
+            setPanelType(PanelType.TIMER);
+            getTimerPanel().setClock(clock);
+            add(panelFace);
+        }
     }
 
     public void setTheTime() {
@@ -351,7 +398,7 @@ public class Clock extends JFrame
             setMinutes(getMinutes()+1);
             if (getMinutes() == 60)
             {
-                logger.info("upddating hour");
+                logger.info("updating hour");
                 setMinutes(0);
                 setHours(getHours()+1);
                 if (getHours() == 12 && getMinutes() == 0 && getSeconds() == 0 && !isShowMilitaryTime())
@@ -360,13 +407,13 @@ public class Clock extends JFrame
                     setHoursAsStr("12");
                     if (getAMPM() == Time.PM)
                     {
-                        logger.info("am");
+                        logger.info("changing to AM");
                         setAMPM(Time.AM);
                         setIsDateChanged(true);
                     }
                     else
                     {
-                        logger.info("pm");
+                        logger.info("changing to PM");
                         setIsDateChanged(false);
                         setAMPM(Time.PM);
                     }
@@ -574,7 +621,7 @@ public class Clock extends JFrame
                 defaultText = getTimeAsStr();
                 // change alarms to reflect normal time
             }
-            else if (isShowMilitaryTime()) {
+            else {
                 defaultText = getMilitaryTimeAsStr();
                 // change alarms to reflect military time
                 //setShowMilitaryTime(false);
@@ -590,7 +637,7 @@ public class Clock extends JFrame
         }
         else if (labelVersion == 5)
         {
-            defaultText = "AM/PM";
+            defaultText = Time.AM.getStrValue()+"/"+Time.PM.getStrValue();
         }
         else if (labelVersion == 6)
         {
@@ -609,58 +656,104 @@ public class Clock extends JFrame
         setClockMenuBar(new ClockMenuBar(this));
         setJMenuBar(getClockMenuBar());
     }
-    public void changeToClockPanel()
+    public void changeToDigitalClockPanel()
     {
-        logger.info("changeToClockPanel");
-        //logger.error("CurrentFace: " + getFacePanel().toString());
-        if (getPanelInUse() == ClockFace.TIMERPANEL)
+        logger.info("changeToDigitalClockPanel");
+        if (getPanelType() == PanelType.TIMER)
             remove(getTimerPanel());
-        else if (getPanelInUse() == ClockFace.ALARMPANEL)
+        else if (getPanelType() == PanelType.ALARM)
             remove(getAlarmPanel());
-        setPanelInUse(ClockFace.CLOCKPANEL);
-        add(getClockPanel());
+        else if (getPanelType() == PanelType.ANALOGUE_CLOCK)
+        {
+            getAnalogueClockPanel().stop();
+            getAnalogueClockPanel().getClock().getClockMenuBar().getSettingsMenu().add(getAnalogueClockPanel().getClock().getClockMenuBar().getMilitaryTimeSetting());
+            getAnalogueClockPanel().getClock().getClockMenuBar().getSettingsMenu().add(getAnalogueClockPanel().getClock().getClockMenuBar().getFullTimeSetting());
+            getAnalogueClockPanel().getClock().getClockMenuBar().getSettingsMenu().add(getAnalogueClockPanel().getClock().getClockMenuBar().getPartialTimeSetting());
+            getAnalogueClockPanel().getClock().getClockMenuBar().getSettingsMenu().remove(getAnalogueClockPanel().getClock().getClockMenuBar().getShowDigitalTimeOnAnalogueClockSetting());
+            remove(getAnalogueClockPanel());
+        }
+        setPanelType(PanelType.DIGITAL_CLOCK);
+        add(getDigitalClockPanel());
+        this.setSize(getAnalogueClockPanel().getMaximumSize());
+        this.setSize(Clock.defaultSize);
         this.repaint();
         this.setVisible(true);
-        //logger.error("ChangedToFace: " + getFacePanel().toString());
+    }
+
+    public void changeToAnalogueClockPanel()
+    {
+        logger.info("changeToAnalogueClockPanel");
+        if (getPanelType() == PanelType.TIMER)
+            remove(getTimerPanel());
+        else if (getPanelType() == PanelType.ALARM)
+            remove(getAlarmPanel());
+        else if (getPanelType() == PanelType.DIGITAL_CLOCK)
+            remove(getDigitalClockPanel());
+        setPanelType(PanelType.ANALOGUE_CLOCK);
+        add(getAnalogueClockPanel());
+        getAnalogueClockPanel().getClock().getClockMenuBar().getSettingsMenu().remove(getAnalogueClockPanel().getClock().getClockMenuBar().getMilitaryTimeSetting());
+        getAnalogueClockPanel().getClock().getClockMenuBar().getSettingsMenu().remove(getAnalogueClockPanel().getClock().getClockMenuBar().getFullTimeSetting());
+        getAnalogueClockPanel().getClock().getClockMenuBar().getSettingsMenu().remove(getAnalogueClockPanel().getClock().getClockMenuBar().getPartialTimeSetting());
+        getAnalogueClockPanel().getClock().getClockMenuBar().getSettingsMenu().add(getAnalogueClockPanel().getClock().getClockMenuBar().getShowDigitalTimeOnAnalogueClockSetting());
+        this.setSize(getAnalogueClockPanel().getMaximumSize());
+        this.setBackground(Color.BLACK);
+        this.repaint();
+        this.setVisible(true);
     }
     public void changeToAlarmPanel(boolean resetValues)
     {
         logger.info("changeToAlarmPanel");
-        //logger.error("CurrentFace: " + getFacePanel().toString());
-        if (getPanelInUse() == ClockFace.CLOCKPANEL)
-            remove(getClockPanel());
-        else if (getPanelInUse() == ClockFace.TIMERPANEL)
+        if (getPanelType() == PanelType.DIGITAL_CLOCK)
+            remove(getDigitalClockPanel());
+        else if (getPanelType() == PanelType.TIMER)
             remove(getTimerPanel());
+        else if (getPanelType() == PanelType.ANALOGUE_CLOCK)
+        {
+            getAnalogueClockPanel().stop();
+            getAnalogueClockPanel().getClock().getClockMenuBar().getSettingsMenu().add(getAnalogueClockPanel().getClock().getClockMenuBar().getMilitaryTimeSetting());
+            getAnalogueClockPanel().getClock().getClockMenuBar().getSettingsMenu().add(getAnalogueClockPanel().getClock().getClockMenuBar().getFullTimeSetting());
+            getAnalogueClockPanel().getClock().getClockMenuBar().getSettingsMenu().add(getAnalogueClockPanel().getClock().getClockMenuBar().getPartialTimeSetting());
+            getAnalogueClockPanel().getClock().getClockMenuBar().getSettingsMenu().remove(getAnalogueClockPanel().getClock().getClockMenuBar().getShowDigitalTimeOnAnalogueClockSetting());
+            remove(getAnalogueClockPanel());
+        }
         if (getAlarmPanel().getMusicPlayer() != null) { getAlarmPanel().setMusicPlayer(null); }
-        if (getPanelInUse() != ClockFace.ALARMPANEL)
+        if (getPanelType() != PanelType.ALARM)
             add(getAlarmPanel());
-        setPanelInUse(ClockFace.ALARMPANEL);
+        setPanelType(PanelType.ALARM);
         if (resetValues) {
             getAlarmPanel().getJTextField1().setText("");
             getAlarmPanel().getJTextField2().setText("");
             getAlarmPanel().getJTextField3().setText("");
-            getAlarmPanel().resetJCheckboxes();
+            getAlarmPanel().resetJCheckBoxes();
             getAlarmPanel().resetJTextArea(); // so error alarms don't show up after navigating out and back in
             getAlarmPanel().getJAlarmLbl4().setText("Current Alarms");
         }
+        this.setSize(Clock.defaultSize);
         this.repaint();
         this.setVisible(true);
-        //logger.error("ChangedToFace: " + getFacePanel().toString());
     }
     public void changeToTimerPanel()
     {
         logger.info("changeToTimerPanel");
-        //logger.error("CurrentFace: " + getFacePanel().toString());
-        if (getPanelInUse() == ClockFace.CLOCKPANEL)
-            remove(getClockPanel());
-        else if (getPanelInUse() == ClockFace.ALARMPANEL)
+        if (getPanelType() == PanelType.DIGITAL_CLOCK)
+            remove(getDigitalClockPanel());
+        else if (getPanelType() == PanelType.ANALOGUE_CLOCK)
+        {
+            getAnalogueClockPanel().stop();
+            getAnalogueClockPanel().getClock().getClockMenuBar().getSettingsMenu().add(getAnalogueClockPanel().getClock().getClockMenuBar().getMilitaryTimeSetting());
+            getAnalogueClockPanel().getClock().getClockMenuBar().getSettingsMenu().add(getAnalogueClockPanel().getClock().getClockMenuBar().getFullTimeSetting());
+            getAnalogueClockPanel().getClock().getClockMenuBar().getSettingsMenu().add(getAnalogueClockPanel().getClock().getClockMenuBar().getPartialTimeSetting());
+            getAnalogueClockPanel().getClock().getClockMenuBar().getSettingsMenu().remove(getAnalogueClockPanel().getClock().getClockMenuBar().getShowDigitalTimeOnAnalogueClockSetting());
+            remove(getAnalogueClockPanel());
+        }
+        else if (getPanelType() == PanelType.ALARM)
             remove(getAlarmPanel());
-        if (getPanelInUse() != ClockFace.TIMERPANEL)
+        if (getPanelType() != PanelType.TIMER)
             add(getTimerPanel());
-        setPanelInUse(ClockFace.TIMERPANEL);
+        setPanelType(PanelType.TIMER);
+        this.setSize(Clock.defaultSize);
         this.repaint();
         this.setVisible(true);
-        //logger.error("ChangedToFace: " + getFacePanel().toString());
     }
     /**
      * The purpose of tick is to start the clock.
@@ -686,7 +779,7 @@ public class Clock extends JFrame
         {
             performTick(seconds, minutes, hours);
             //Updates the clock daily to keep time current
-            getClockPanel().updateLabels();
+            getDigitalClockPanel().updateLabels();
             if (getTimeAsStr().equals("12:00:00" + SPACE + Time.AM.getStrValue()) ||
                 getMilitaryTimeAsStr().equals("0000 hours 00"))
             {

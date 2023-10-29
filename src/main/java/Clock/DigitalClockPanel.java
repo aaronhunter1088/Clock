@@ -7,7 +7,7 @@ import javax.swing.*;
 import java.awt.*;
 
 /**
- * The ClockPanel is the main panel and is
+ * The DigitalClockPanel is the main panel and is
  * visible first to the user. Here you can
  * see the time and date.
  * Clicking on the menu options under
@@ -17,22 +17,22 @@ import java.awt.*;
  * @author michael ball
  * @version 2.5
  */
-public class ClockPanel extends JPanel implements IClockPanel
+public class DigitalClockPanel extends JPanel implements IClockPanel
 {
     private static final long serialVersionUID = 1L;
-    private static final Logger logger = LogManager.getLogger(ClockPanel.class);
+    private static final Logger logger = LogManager.getLogger(DigitalClockPanel.class);
     private GridBagLayout layout;
     private GridBagConstraints constraints;
     private JLabel jlbl1;
     private JLabel jlbl2;
     private Clock clock;
-    public static ClockFace facePanel;
+    public PanelType panelType;
 
-    public ClockPanel(Clock clock)
+    public DigitalClockPanel(Clock clock)
     {
         setClock(clock);
-        setClockFace(ClockFace.CLOCKPANEL);
-        setMinimumSize(Clock.defaultSize);
+        setPanelType(PanelType.DIGITAL_CLOCK);
+        setMaximumSize(Clock.defaultSize);
         setGridBagLayout(new GridBagLayout());
         setLayout(getGridBagLayout());
         setGridBagConstraints(new GridBagConstraints());
@@ -51,10 +51,10 @@ public class ClockPanel extends JPanel implements IClockPanel
 
     private void setGridBagLayout(GridBagLayout layout) { this.layout = layout; }
     private void setGridBagConstraints(GridBagConstraints constraints) { this.constraints = constraints; }
-    private void setClock(Clock clock) { this.clock = clock; }
+    protected void setClock(Clock clock) { this.clock = clock; }
     public void setJlbl1(JLabel jlbl1) { this.jlbl1 = jlbl1; }
     public void setJlbl2(JLabel jlbl2) { this.jlbl2 = jlbl2; }
-    protected void setClockFace(ClockFace faceChoice) { facePanel = faceChoice; }
+    protected void setPanelType(PanelType panelType) { this.panelType = panelType; }
 
     public void setupClockPanel(Clock clock)
     {
