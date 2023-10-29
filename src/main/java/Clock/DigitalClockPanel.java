@@ -41,6 +41,7 @@ public class DigitalClockPanel extends JPanel implements IClockPanel
         setForeground(Color.WHITE);
         setupClockPanel(getClock());
         addComponentsToPanel();
+        logger.info("Finished creating DigitalClock Panel");
     }
 
     public GridBagLayout getGridBagLayout() { return this.layout; }
@@ -58,6 +59,7 @@ public class DigitalClockPanel extends JPanel implements IClockPanel
 
     public void setupClockPanel(Clock clock)
     {
+        logger.info("setupClockPanel");
         clock.setIsDateChanged(false);
         clock.setShowFullDate(false);
         clock.setShowPartialDate(false);
@@ -73,13 +75,14 @@ public class DigitalClockPanel extends JPanel implements IClockPanel
             logger.error(e.getMessage());
         for(StackTraceElement ste : e.getStackTrace())
         {
-            System.out.println(ste.toString());
+            logger.info(ste.toString());
         }
     }
     protected void printStackTrace(Exception e)
     { printStackTrace(e, ""); }
     public void addComponent(Component cpt, int gridy, int gridx, double gwidth, double gheight, int ipadx, int ipady)
     {
+        logger.info("addComponent");
         getGridBagConstraints().gridx = gridx;
         getGridBagConstraints().gridy = gridy;
         getGridBagConstraints().gridwidth = (int)Math.ceil(gwidth);
@@ -94,12 +97,13 @@ public class DigitalClockPanel extends JPanel implements IClockPanel
     @Override
     public void addComponentsToPanel()
     {
+        logger.info("addComponentsToPanel");
         addComponent(getJlbl1(), 0,0,1,1, 0,0);
         addComponent(getJlbl2(), 1,0,1,1, 0,0);
     }
-
     public void updateLabels()
     {
+        logger.info("updateLabels");
         getJlbl1().setText(getClock().defaultText(1));
         getJlbl2().setText(getClock().defaultText(2));
         if (getClock().isShowFullDate()) getJlbl1().setFont(Clock.font40);

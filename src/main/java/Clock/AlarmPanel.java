@@ -88,6 +88,7 @@ public class AlarmPanel extends JPanel implements IClockPanel
         //setBorder(BorderFactory.createLineBorder(Color.RED));
         addComponentsToPanel();
         SwingUtilities.updateComponentTreeUI(this);
+        logger.info("Finished creating Alarm Panel");
     }
 
     public GridBagLayout getGridBagLayout() { return this.layout; }
@@ -149,6 +150,7 @@ public class AlarmPanel extends JPanel implements IClockPanel
     // Helper methods
     public void setupAlarmPanel(Clock clock)
     {
+        logger.info("setupAlarmPanel");
         clock.setIsDateChanged(false);
         clock.setShowFullDate(false);
         clock.setShowPartialDate(false);
@@ -225,7 +227,6 @@ public class AlarmPanel extends JPanel implements IClockPanel
             printStackTrace(e, "A JavaLayerException occurred: " + e.getMessage());
         }
     }
-
     protected void resetJAlarmLabel4()
     {
         logger.info("resetJAlarmLabel4");
@@ -356,7 +357,6 @@ public class AlarmPanel extends JPanel implements IClockPanel
             alarm.getDaysShortened().forEach(day -> getJTextArea().append(day));
         }
     }
-
     protected void setupAlarmButton()
     {
         logger.info("setupAlarmButton");

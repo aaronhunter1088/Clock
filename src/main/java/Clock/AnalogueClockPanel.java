@@ -30,10 +30,12 @@ public class AnalogueClockPanel extends JPanel implements IClockPanel, Runnable
     {
         super();
         setupDefaultActions(clock);
+        logger.info("Finished creating AnalogueClock Panel");
     }
     public AnalogueClockPanel()
     {
         setupDefaultActions();
+        logger.info("Finished creating AnalogueClock Panel");
     }
 
     public void setClock(Clock clock) { this.clock = clock ;}
@@ -47,7 +49,9 @@ public class AnalogueClockPanel extends JPanel implements IClockPanel, Runnable
     public GridBagLayout getGridBagLayout() { return this.layout; }
     public GridBagConstraints getGridBagConstraints() { return this.constraints; }
     public String getCLOCK_TEXT() { return this.CLOCK_TEXT; }
-    private void drawStructure(Graphics g) {
+    private void drawStructure(Graphics g)
+    {
+        logger.info("drawStructure");
         g.setFont(new Font("TimesRoman", Font.BOLD, 20));
         g.setColor(Color.BLACK);
         g.fillOval(xcenter - 150, ycenter - 150, 300, 300);
@@ -68,7 +72,7 @@ public class AnalogueClockPanel extends JPanel implements IClockPanel, Runnable
         g.drawString("10", xcenter - 130, ycenter - 60);
         g.drawString("11", xcenter - 80, ycenter - 110);
         g.drawString("12", xcenter - 10, ycenter - 130);
-        g.setColor(Color.BLACK);
+        g.setColor(Color.BLACK); // needed to avoid second hand delay UI issue
     }
     public void paint(Graphics g)
     {
@@ -109,7 +113,6 @@ public class AnalogueClockPanel extends JPanel implements IClockPanel, Runnable
             g.drawLine(xcenter, ycenter - 1, lastxh, lastyh);
             g.drawLine(xcenter - 1, ycenter, lastxh, lastyh);
         }
-
         // second
         g.setColor(Color.RED);
         g.drawLine(xcenter, ycenter, xsecond, ysecond);

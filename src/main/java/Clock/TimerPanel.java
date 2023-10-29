@@ -87,6 +87,7 @@ public class TimerPanel extends JPanel implements IClockPanel
 
             }
         });
+        logger.info("Finished creating the Timer Panel");
     }
 
     public GridBagLayout getGridBagLayout() { return this.layout; }
@@ -114,6 +115,7 @@ public class TimerPanel extends JPanel implements IClockPanel
 
     public void setupTimerPanel()
     {
+        logger.info("setupTimerPanel");
         setJTextField1(new JTextField("Hour", 4));
         setJTextField2(new JTextField("Min", 4));
         setJTextField3(new JTextField("Sec", 4));
@@ -304,6 +306,7 @@ public class TimerPanel extends JPanel implements IClockPanel
     }
     public boolean validateFirstTextField()
     {
+        logger.info("validateFirstTextField");
         if (StringUtils.equals(getJTextField1().getText(), "Hour"))
         {
             return true;
@@ -318,6 +321,7 @@ public class TimerPanel extends JPanel implements IClockPanel
     }
     public boolean validateSecondTextField()
     {
+        logger.info("validateSecondTextField");
         if (StringUtils.equals(getJTextField2().getText(), "Min"))
         {
             return true;
@@ -332,6 +336,7 @@ public class TimerPanel extends JPanel implements IClockPanel
     }
     public boolean validateThirdTextField()
     {
+        logger.info("validateThirdTextField");
         if (StringUtils.equals(getJTextField3().getText(), "Sec"))
         {
             return true;
@@ -346,6 +351,7 @@ public class TimerPanel extends JPanel implements IClockPanel
     }
     public void startTimer()
     {
+        logger.info("startTimer");
         getTimerButton().setText(PAUSE_TIMER);
         getTimerButton().repaint();
         getTimerButton().updateUI();
@@ -368,6 +374,7 @@ public class TimerPanel extends JPanel implements IClockPanel
     }
     public void pauseTimer() throws InterruptedException
     {
+        logger.info("pauseTimer");
         getTimerButton().setText(RESUME_TIMER);
         getTimerButton().repaint();
         getTimerButton().updateUI();
@@ -375,6 +382,7 @@ public class TimerPanel extends JPanel implements IClockPanel
     }
     public void performCountDown()
     {
+        logger.info("performCountDown");
         try
         {
             // get total number of seconds to count down
@@ -423,6 +431,7 @@ public class TimerPanel extends JPanel implements IClockPanel
     }
     public void resetTimerFields(ActionEvent action)
     {
+        logger.info("resetTimerFields");
         getJTextField1().setText("Hour");
         getJTextField2().setText("Min");
         getJTextField3().setText("Sec");
@@ -445,6 +454,7 @@ public class TimerPanel extends JPanel implements IClockPanel
     { printStackTrace(e, ""); }
     public void addComponent(Component cpt, int gridy, int gridx, double gwidth, double gheight, int ipadx, int ipady, int fill)
     {
+        logger.info("addComponent");
         setGridBagConstraints(new GridBagConstraints());
         getGridBagConstraints().gridx = gridx;
         getGridBagConstraints().gridy = gridy;
@@ -462,6 +472,7 @@ public class TimerPanel extends JPanel implements IClockPanel
     }
     public void checkIfTimerHasConcluded()
     {
+        logger.info("checkIfTimerHasConcluded");
         ExecutorService executor = Executors.newCachedThreadPool();
         if (getClock().isTimerGoingOff()) {
             triggerSound(executor);
@@ -470,6 +481,7 @@ public class TimerPanel extends JPanel implements IClockPanel
     }
     public void triggerSound(ExecutorService executor)
     {
+        logger.info("triggering timer sound");
         setIsTimerGoingOff(true);
         // play sound
         Callable<String> c = () -> {
@@ -495,14 +507,16 @@ public class TimerPanel extends JPanel implements IClockPanel
     }
     public void stopSound()
     {
+        logger.info("stopSound");
         setMusicPlayer(null);
         setIsTimerGoingOff(false);
-        System.out.println("Timer turned off.");
+        logger.info("timer turned off");
     }
 
     @Override
     public void addComponentsToPanel()
     {
+        logger.info("addComponentsToPanel");
         setComponentOrientation(ComponentOrientation.LEFT_TO_RIGHT);
         addComponent(getJTextField1(), 0,0,1,1,0,0, GridBagConstraints.HORIZONTAL); // TextField 1
         addComponent(getJTextField2(), 0,1,1,1,0,0, GridBagConstraints.HORIZONTAL); // TextField 2
@@ -512,21 +526,25 @@ public class TimerPanel extends JPanel implements IClockPanel
     }
     public void updateLabels()
     {
+        logger.info("updateLabels");
         getJTextField1().grabFocus();
         getClock().repaint();
     }
 
     public void run(ActionEvent action) // called when we hit the Start Timer button
     {
+        logger.info("run");
         try
         {
             if (StringUtils.equals(getTimerButton().getText(), "Set") ||
                 StringUtils.equals(getTimerButton().getText(), "Resume Timer"))
             {
+                logger.info("starting timer");
                 startTimer();
             }
             else
             {
+                logger.info("pausing timer");
                 pauseTimer();
             }
         }
@@ -538,6 +556,7 @@ public class TimerPanel extends JPanel implements IClockPanel
 
     public void setupMusicPlayer()
     {
+        logger.info("setupAlarmButton");
         InputStream inputStream;
         try
         {
@@ -552,5 +571,6 @@ public class TimerPanel extends JPanel implements IClockPanel
             else
                 printStackTrace(e, "A JavaLayerException occurred: " + e.getMessage());
         }
+        logger.info("Alarm button set!");
     }
 }

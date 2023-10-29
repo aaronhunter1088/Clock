@@ -172,6 +172,7 @@ public class ClockMenuBar extends JMenuBar {
         // Add both menus to main menu
         add(getSettingsMenu());
         add(getFeaturesMenu());
+        logger.info("Finished creating Clock menu bar");
     }
     // Getters
     public JMenu getSettingsMenu() { return this.settingsMenu; }
@@ -199,7 +200,9 @@ public class ClockMenuBar extends JMenuBar {
     protected void setTimerFeature(JMenuItem timerFeature) { this.timerFeature = timerFeature; }
     // class methods
     @Override
-    protected void paintComponent(Graphics g) {
+    protected void paintComponent(Graphics g)
+    {
+        logger.info("paintComponent");
         super.paintComponent(g);
         Graphics2D g2d = (Graphics2D) g;
         g2d.setColor(Color.BLACK);
