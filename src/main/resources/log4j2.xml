@@ -2,10 +2,11 @@
 <Configuration status="WARN">
 	<Properties>
 		<Property name="basepath">logs</Property>
-		<Property name="masterName">${sys:appName}~Master~Logs</Property>
-		<Property name="instanceName">${sys:appName}~Instance~Logs</Property>
+		<Property name="masterName">Clock~Master~Logs</Property>
+		<Property name="instanceName">Clock~Instance~Logs</Property>
 		<Property name="patternWithColor">%highlight{%-5level}{FATAL=bg_red, ERROR=bg_red, WARN=yellow, INFO=green, DEBUG=cyan} %d{MM-dd-yyyy HH:mm:ss.SSS} [%t] %c:%M:%L - %msg%n</Property>
 		<Property name="patternNoColor">[%-5level] %d{MM-dd-yyyy HH:mm:ss.SSS} [%t] %c:%M:%L - %msg%n</Property>
+		<Property name="date">${date:MM}-${date:dd}-${date:yyyy}</Property>
 		<Property name="rollOverDaily">%d{MM-dd-yyyy}</Property>
 		<Property name="rollOverHourly">%d{MM-dd-yyyy_hh}</Property>
 		<Property name="rollOverMinutely">%d{MM-dd-yyyy_hh-mm}</Property>
@@ -21,8 +22,8 @@
 				<Pattern>${patternNoColor}</Pattern>
 			</PatternLayout>
 		</File>
-		<RollingFile name="RollingFileAppender" fileName="${basepath}/${instanceName}.log"
-			filePattern="${basepath}/${instanceName}_${rollOverDaily}_%i.log">
+		<RollingFile name="RollingFileAppender" fileName="${basepath}/${date}/${instanceName}.log"
+			filePattern="${basepath}/${rollOverDaily}/${instanceName}.log">
 			<PatternLayout>
 				<Pattern>${patternNoColor}</Pattern>
 			</PatternLayout>

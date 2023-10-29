@@ -11,6 +11,9 @@
     
     <properties>
 		<java.version>11</java.version>
+		<outputDirectory>${basedir}/dist/${project.name}</outputDirectory>
+		<finalName>${project.artifactId}-${project.version}</finalName>
+
     	<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<maven.compiler.version>3.11.0</maven.compiler.version>
 		<maven.properties.version>1.0-alpha-2</maven.properties.version>
