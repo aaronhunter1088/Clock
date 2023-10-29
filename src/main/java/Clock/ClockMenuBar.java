@@ -152,15 +152,17 @@ public class ClockMenuBar extends JMenuBar {
         });
         getShowDigitalTimeOnAnalogueClockSetting().addActionListener(action -> {
             logger.info("clicked show digital time or hide on analogue clock");
-            if (clock.isShowDigitalTimeOnAnalogueClock())
+            if (!clock.isShowDigitalTimeOnAnalogueClock())
             {
-                clock.getAnalogueClockPanel().setClockText(clock.getTimeAsStr());
-                clock.setShowDigitalTimeOnAnalogueClock(false);
+                clock.getAnalogueClockPanel().setClockText("");
+                clock.getAnalogueClockPanel().repaint();
+                clock.setShowDigitalTimeOnAnalogueClock(true);
                 getShowDigitalTimeOnAnalogueClockSetting().setText(HIDE + SPACE + DIGITAL_TIME);
             } else
             {
-                clock.getAnalogueClockPanel().setClockText(SPACE);
-                clock.setShowDigitalTimeOnAnalogueClock(true);
+                clock.getAnalogueClockPanel().setClockText(clock.getTimeAsStr());
+                clock.getAnalogueClockPanel().repaint();
+                clock.setShowDigitalTimeOnAnalogueClock(false);
                 getShowDigitalTimeOnAnalogueClockSetting().setText(SHOW + SPACE + DIGITAL_TIME);
             }
         });

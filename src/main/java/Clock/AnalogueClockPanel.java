@@ -81,7 +81,7 @@ public class AnalogueClockPanel extends JPanel implements IClockPanel, Runnable
         currentDate = java.util.Date.from(getClock().getDate().atTime(getClock().getHours(), getClock().getMinutes(), getClock().getSeconds())
                 .atZone(ZoneId.systemDefault())
                 .toInstant());
-        setClockText(clock.getTimeAsStr());
+        setClockText(getCLOCK_TEXT());
         drawStructure(g);
 
         formatter.applyPattern("s");
