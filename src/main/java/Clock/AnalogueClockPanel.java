@@ -74,6 +74,7 @@ public class AnalogueClockPanel extends JPanel implements IClockPanel, Runnable
         g.drawString("12", xcenter - 10, ycenter - 130);
         g.setColor(Color.BLACK); // needed to avoid second hand delay UI issue
     }
+
     public void paint(Graphics g)
     {
         logger.info("painting analogue clock panel");
@@ -81,7 +82,9 @@ public class AnalogueClockPanel extends JPanel implements IClockPanel, Runnable
         currentDate = java.util.Date.from(getClock().getDate().atTime(getClock().getHours(), getClock().getMinutes(), getClock().getSeconds())
                 .atZone(ZoneId.systemDefault())
                 .toInstant());
-        setClockText(getCLOCK_TEXT());
+        if (clock.isShowDigitalTimeOnAnalogueClock()) {
+            setClockText(clock.getTimeAsStr());
+        }
         drawStructure(g);
 
         formatter.applyPattern("s");
@@ -132,6 +135,7 @@ public class AnalogueClockPanel extends JPanel implements IClockPanel, Runnable
         lastxh = xhour;
         lastyh = yhour;
     }
+
     public void start(AnalogueClockPanel panel)
     {
         logger.info("start analogue clock");
@@ -141,11 +145,13 @@ public class AnalogueClockPanel extends JPanel implements IClockPanel, Runnable
             thread.start();
         }
     }
+
     public void stop()
     {
         logger.info("stopping analogue thread");
         thread = null;
     }
+
     public void run()
     {
         logger.info("running analogue clock");
@@ -160,18 +166,23 @@ public class AnalogueClockPanel extends JPanel implements IClockPanel, Runnable
         }
         thread = null;
     }
+
     public void update(Graphics g)
     {
         logger.info("updating graphics");
         paint(g);
     }
+
     public void setupDefaultActions(Clock clock)
     {
         logger.info("setupDefaultActions with Clock");
         setClock(clock);
         setClockText(clock.getTimeAsStr());
+        getClock().setShowDigitalTimeOnAnalogueClock(true);
+        getClock().getClockMenuBar().getShowDigitalTimeOnAnalogueClockSetting().setText(ClockConstants.HIDE + ClockConstants.SPACE + ClockConstants.DIGITAL_TIME);
         setupDefaultActions();
     }
+
     public void setupDefaultActions()
     {
         logger.info("setupDefaultActions");
@@ -184,10 +195,12 @@ public class AnalogueClockPanel extends JPanel implements IClockPanel, Runnable
         setForeground(Color.BLACK);
         start(this);
     }
+
     @Override
     public void addComponentsToPanel() {
         logger.info("addComponentsToPanel");
     }
+
     @Override
     public void printStackTrace(Exception e, String message) {
         logger.error(e.getMessage());
@@ -196,4 +209,5 @@ public class AnalogueClockPanel extends JPanel implements IClockPanel, Runnable
             logger.error(ste.toString());
         }
     }
+
 }
