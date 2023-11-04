@@ -67,6 +67,7 @@ public class DigitalClockPanel extends JPanel implements IClockPanel
         setJlbl1(new JLabel("", SwingConstants.CENTER));
         setJlbl2(new JLabel("", SwingConstants.CENTER));
     }
+
     public void printStackTrace(Exception e, String message)
     {
         if (null != message)
@@ -78,8 +79,10 @@ public class DigitalClockPanel extends JPanel implements IClockPanel
             logger.info(ste.toString());
         }
     }
+
     protected void printStackTrace(Exception e)
     { printStackTrace(e, ""); }
+
     public void addComponent(Component cpt, int gridy, int gridx, double gwidth, double gheight, int ipadx, int ipady)
     {
         logger.info("addComponent");
@@ -94,6 +97,7 @@ public class DigitalClockPanel extends JPanel implements IClockPanel
         getGridBagLayout().setConstraints(cpt, getGridBagConstraints());
         add(cpt);
     }
+
     @Override
     public void addComponentsToPanel()
     {
@@ -101,6 +105,7 @@ public class DigitalClockPanel extends JPanel implements IClockPanel
         addComponent(getJlbl1(), 0,0,1,1, 0,0);
         addComponent(getJlbl2(), 1,0,1,1, 0,0);
     }
+
     public void updateLabels()
     {
         logger.info("updateLabels");

@@ -84,6 +84,15 @@ public class ClockTest {
     }
 
     @Test
+    public void testIsGenericDayDaylightSavingsDay() throws InvalidInputException
+    {
+        clock = new Clock(12,0,0, LocalDate.now().getMonth(), LocalDate.now().getDayOfWeek(),
+                LocalDate.now().getDayOfMonth(), LocalDate.now().getYear(), AM);
+        boolean isDayDaylightSavingsDay = clock.isDaylightSavingsTime();
+
+    }
+
+    @Test
     public void testClockBecomesAMWhenMidnightStarts() throws InvalidInputException
     {
         //(int hours, int minutes, int seconds, Time.Month month, Time.Day day, int date, int year, Time.AMPM ampm)

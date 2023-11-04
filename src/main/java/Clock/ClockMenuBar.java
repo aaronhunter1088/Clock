@@ -43,7 +43,7 @@ public class ClockMenuBar extends JMenuBar {
         // Menu options
         setSettingsMenu(new JMenu("Settings"));
         setFeaturesMenu(new JMenu("Features"));
-        // Settings menu choices
+        // digital clock menu choices
         setMilitaryTimeSetting(new JMenuItem(ClockConstants.SHOW + ClockConstants.SPACE + ClockConstants.MILITARY_TIME_SETTING));
         getMilitaryTimeSetting().setAccelerator(KeyStroke.getKeyStroke(
                 KeyEvent.VK_M, InputEvent.CTRL_DOWN_MASK));
@@ -56,7 +56,7 @@ public class ClockMenuBar extends JMenuBar {
         getPartialTimeSetting().setAccelerator(KeyStroke.getKeyStroke(
                 KeyEvent.VK_P, InputEvent.CTRL_DOWN_MASK));
         getPartialTimeSetting().setForeground(Color.WHITE);
-        // analogue clock settings
+        // analogue clock menu settings
         setShowDigitalTimeOnAnalogueClockSetting(new JMenuItem(ClockConstants.HIDE + SPACE + DIGITAL_TIME));
         getShowDigitalTimeOnAnalogueClockSetting().setAccelerator(KeyStroke.getKeyStroke(
                 KeyEvent.VK_E, InputEvent.CTRL_DOWN_MASK));
@@ -64,19 +64,20 @@ public class ClockMenuBar extends JMenuBar {
 
         // Features menu choices
         setDigitalClockFeature(new JMenuItem("View Digital Clock"));
-        setAnalogueClockFeature(new JMenuItem("View Analogue Clock"));
         getDigitalClockFeature().setAccelerator(KeyStroke.getKeyStroke(
                 KeyEvent.VK_D, InputEvent.CTRL_DOWN_MASK));
+        setAnalogueClockFeature(new JMenuItem("View Analogue Clock"));
         getAnalogueClockFeature().setAccelerator(KeyStroke.getKeyStroke(
                 KeyEvent.VK_C, InputEvent.CTRL_DOWN_MASK));
         setAlarmFeature_Menu(new JMenu("View Alarms"));
         setSetAlarms(new JMenuItem("Set Alarms"));
+        getAlarmFeature_Menu().add(getSetAlarms());
         getSetAlarms().setAccelerator(KeyStroke.getKeyStroke(
                 KeyEvent.VK_A, InputEvent.CTRL_DOWN_MASK));
         setTimerFeature(new JMenuItem("View Timer"));
         getTimerFeature().setAccelerator(KeyStroke.getKeyStroke(
                 KeyEvent.VK_T, InputEvent.CTRL_DOWN_MASK));
-        // Add options to Settings Menu
+        // Add digital clock settings to Menu
         getSettingsMenu().add(getMilitaryTimeSetting());
         getSettingsMenu().add(getFullTimeSetting());
         getSettingsMenu().add(getPartialTimeSetting());
@@ -84,7 +85,6 @@ public class ClockMenuBar extends JMenuBar {
         getFeaturesMenu().add(getDigitalClockFeature());
         getFeaturesMenu().add(getAnalogueClockFeature());
         getFeaturesMenu().add(getAlarmFeature_Menu());
-        getAlarmFeature_Menu().add(getSetAlarms());
         getFeaturesMenu().add(getTimerFeature());
 
         getSettingsMenu().setOpaque(false);
@@ -177,6 +177,7 @@ public class ClockMenuBar extends JMenuBar {
         add(getFeaturesMenu());
         logger.info("Finished creating Clock menu bar");
     }
+
     // Getters
     public JMenu getSettingsMenu() { return this.settingsMenu; }
     public JMenu getFeaturesMenu() { return this.featuresMenu; }
@@ -189,6 +190,7 @@ public class ClockMenuBar extends JMenuBar {
     public JMenuItem getAnalogueClockFeature() { return this.analogueClockFeature; }
     public JMenuItem getSetAlarms() { return this.setAlarms; }
     public JMenuItem getTimerFeature() { return this.timerFeature; }
+
     // Setters
     protected void setSettingsMenu(JMenu settingsMenu) { this.settingsMenu = settingsMenu; }
     protected void setFeaturesMenu(JMenu featuresMenu) { this.featuresMenu = featuresMenu; }
@@ -201,7 +203,7 @@ public class ClockMenuBar extends JMenuBar {
     protected void setAnalogueClockFeature(JMenuItem analogueClockFeature) { this.analogueClockFeature = analogueClockFeature; }
     protected void setSetAlarms(JMenuItem setAlarms) { this.setAlarms = setAlarms; }
     protected void setTimerFeature(JMenuItem timerFeature) { this.timerFeature = timerFeature; }
-    // class methods
+
     @Override
     protected void paintComponent(Graphics g)
     {

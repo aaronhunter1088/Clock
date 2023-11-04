@@ -6,7 +6,10 @@ import java.text.ParseException;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import static Clock.Time.*;
 import static java.lang.Thread.sleep;
+import static java.time.DayOfWeek.*;
+import static java.time.Month.*;
 
 /**
  * Main application to start Clock

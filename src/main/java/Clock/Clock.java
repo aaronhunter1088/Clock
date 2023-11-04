@@ -194,6 +194,7 @@ public class Clock extends JFrame
         add(getDigitalClockPanel());
         //pack();
     }
+
     /**
      * This constructor takes in values for all Clock parameters
      * and sets them based on those inputs.
@@ -210,10 +211,13 @@ public class Clock extends JFrame
     public Clock(int hours, int minutes, int seconds, Month month, DayOfWeek dayOfWeek, int dayOfMonth, int year, Time ampm) throws InvalidInputException
     {
         super();
+        setBounds(200, 200, 700, 300);
         setResizable(true);
         setListOfAlarms(new ArrayList<>());
         setupMenuBar();
         setShowMilitaryTime(false);
+        setDigitalClockPanel(new DigitalClockPanel(this));
+        setAnalogueClockPanel(new AnalogueClockPanel(this));
         setAlarmPanel(new AlarmPanel(this));
         setTimerPanel(new TimerPanel(this));
         setSeconds(seconds);
@@ -226,14 +230,15 @@ public class Clock extends JFrame
         setAMPM(ampm);
         setDate(LocalDate.of(getYear(), getMonth(), getDayOfMonth()));
         setDaylightSavingsTimeDates();
+        setDaylightSavingsTime(isTodayDaylightSavingsTime());
         setPanelType(PanelType.DIGITAL_CLOCK);
-        setDigitalClockPanel(new DigitalClockPanel(this));
         setLeapYear(getDate().isLeapYear());
         setIsDateChanged(false);
         setIsAlarmGoingOff(false);
-        pack();
+        //pack();
         add(getDigitalClockPanel());
     }
+
     /**
      * This clock creates a new clock based on another
      * Clocks values. DBL CHECK: used for creating Alarms
@@ -260,6 +265,7 @@ public class Clock extends JFrame
         pack();
         add(getDigitalClockPanel());
     }
+
     public Clock(JPanel panelFace) throws InvalidInputException
     {
         this();
@@ -313,6 +319,7 @@ public class Clock extends JFrame
         setYear(dateTime.getYear());
         setAMPM(LocalTime.from(dateTime));
     }
+
     public void updateHourValueAndHourString()
     {
         if (getAMPM() == Time.AM && isShowMilitaryTime()) // Daytime and we show Military Time
@@ -336,6 +343,7 @@ public class Clock extends JFrame
             if (getHours() > 12) setHours(getHours() - 12);
         }
     }
+
     /**
      * Beginning date is always the second Sunday
      * Ending date is always the first Sunday
@@ -371,23 +379,25 @@ public class Clock extends JFrame
         }
         setEndDaylightSavingsTimeDate(endDate);
     }
+
     public boolean isTodayDaylightSavingsTime()
     {
-
         if (getDate().isEqual(getBeginDaylightSavingsTimeDate()))
         {
             setDaylightSavingsTime(true);
             return isDaylightSavingsTime();
         }
-        else if (getDate().isEqual(getEndDaylightSavingsTimeDate()) && !isDaylightSavingsTime())
+        else if (getDate().isEqual(getEndDaylightSavingsTimeDate()))
         {
             setDaylightSavingsTime(true);
             return isDaylightSavingsTime();
+        } else
+        {
+            setDaylightSavingsTime(false);
+            return isDaylightSavingsTime();
         }
-
-        setDaylightSavingsTime(false);
-        return isDaylightSavingsTime();
     }
+
     /**
      * updateJLabels performs the logic to update the time, date, month,
      * and many other values. it also updates the values we see on the
@@ -598,7 +608,7 @@ public class Clock extends JFrame
             default : {}
         }
 
-        if (isDaylightSavingsTime())
+        if (isDaylightSavingsTime() && getHours() == 2)
         {
             logger.info("!! daylight savings !!");
             if (getMonth() == MARCH && getAMPM() == Time.AM)
@@ -615,6 +625,7 @@ public class Clock extends JFrame
             }
         }
     } // performTick
+
     public String defaultText(int labelVersion)
     {
         String defaultText = "";
@@ -659,6 +670,7 @@ public class Clock extends JFrame
         }
         return defaultText;
     }
+
     public void setupMenuBar()
     {
         logger.info("setupMenuBar");
@@ -666,6 +678,7 @@ public class Clock extends JFrame
         setClockMenuBar(new ClockMenuBar(this));
         setJMenuBar(getClockMenuBar());
     }
+
     public void changeToDigitalClockPanel()
     {
         logger.info("changeToDigitalClockPanel");
@@ -710,6 +723,7 @@ public class Clock extends JFrame
         this.repaint();
         this.setVisible(true);
     }
+
     public void changeToAlarmPanel(boolean resetValues)
     {
         logger.info("changeToAlarmPanel");
@@ -742,6 +756,7 @@ public class Clock extends JFrame
         this.repaint();
         this.setVisible(true);
     }
+
     public void changeToTimerPanel()
     {
         logger.info("changeToTimerPanel");
@@ -765,6 +780,7 @@ public class Clock extends JFrame
         this.repaint();
         this.setVisible(true);
     }
+
     /**
      * The purpose of tick is to start the clock.
      */
@@ -804,6 +820,7 @@ public class Clock extends JFrame
             logger.error("Error! Clock had an exception when performing tick: " + e.getMessage());
         }
     }
+
     protected void printStackTrace(Exception e)
     {
         logger.error(e.getMessage());
@@ -837,4 +854,5 @@ public class Clock extends JFrame
         }
         return retImageIcon;
     }
+
 }
