@@ -25,6 +25,8 @@ public class Main
     {
         logger.info("Starting main...");
         Clock clock = new Clock();
+                      //new Clock(11, 59, 50, FEBRUARY, SUNDAY, 21, 2021, PM);
+        logger.info(clock.getDate());
         clock.setVisible(true);
         clock.getContentPane().setBackground(Color.BLACK);
         clock.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);

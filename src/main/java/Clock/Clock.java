@@ -5,6 +5,7 @@ import java.awt.*;
 import java.io.FileNotFoundException;
 import java.net.URL;
 import java.time.*;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 
 import static java.time.Month.*;
@@ -177,6 +178,9 @@ public class Clock extends JFrame
         setTheTime();
         setDaylightSavingsTimeDates();
         setDate(LocalDate.of(getYear(), getMonth(), getDayOfMonth()));
+        if (isTodayDaylightSavingsTime()) {
+            setDaylightSavingsTime(true);
+        }
         setDigitalClockPanel(new DigitalClockPanel(this));
         setAnalogueClockPanel(new AnalogueClockPanel(this));
         setAlarmPanel(new AlarmPanel(this));
@@ -350,6 +354,7 @@ public class Clock extends JFrame
      */
     public void setDaylightSavingsTimeDates()
     {
+        logger.info("setting begin and end daylight savings dates");
         int sundayCount = 0;
         int firstOfMonth = 1;
         LocalDate beginDate = LocalDate.of(getYear(), 3, firstOfMonth);
@@ -378,6 +383,9 @@ public class Clock extends JFrame
             endDate = LocalDate.of(year, 11, firstOfMonth++);
         }
         setEndDaylightSavingsTimeDate(endDate);
+        logger.info("begin date: " + beginDate.format(DateTimeFormatter.ofPattern("MM-dd-yyyy")));
+        logger.info("end date: " + endDate.format(DateTimeFormatter.ofPattern("MM-dd-yyyy")));
+        logger.info("daylight savings dates set");
     }
 
     public boolean isTodayDaylightSavingsTime()
@@ -421,6 +429,7 @@ public class Clock extends JFrame
                 logger.info("updating hour");
                 setMinutes(0);
                 setHours(getHours()+1);
+                logger.info("time: " + getTimeAsStr());
                 if (getHours() == 12 && getMinutes() == 0 && getSeconds() == 0 && !isShowMilitaryTime())
                 {
                     setHours(12);
@@ -500,16 +509,20 @@ public class Clock extends JFrame
                 break;
             }
             case FEBRUARY: {
-                if ((getDayOfMonth() == 28 || getDayOfMonth() == 30) && isDateChanged())
-                {
+                if (isLeapYear() && isDateChanged() && getDayOfMonth() == 29) {
+                    setDayOfMonth(29);
+                    setMonth(FEBRUARY);
+                    logger.info("month: " + getMonth());
+                }
+                else if (isLeapYear() && isDateChanged() && getDayOfMonth() == 30) {
                     setDayOfMonth(1);
                     setMonth(MARCH);
                     logger.info("month: " + getMonth());
                 }
-                else if (getDayOfMonth() == 28 && isLeapYear() && isDateChanged())
-                {
-                    setDayOfMonth(29);
-                    setMonth(FEBRUARY);
+                else if (!isLeapYear() && isDateChanged()) {
+                    setDayOfMonth(1);
+                    setMonth(MARCH);
+                    logger.info("month: " + getMonth());
                 }
                 break;
             }
@@ -610,19 +623,21 @@ public class Clock extends JFrame
 
         if (isDaylightSavingsTime() && getHours() == 2)
         {
-            logger.info("!! daylight savings !!");
+            logger.info("!! daylight savings time now !!");
             if (getMonth() == MARCH && getAMPM() == Time.AM)
             {
                 logger.info("spring forward");
                 setHours(3);
                 setDaylightSavingsTime(false);
-            }
-            else if (getMonth() == NOVEMBER && getAMPM() == Time.AM)
-            { // && daylightSavingsTime
+                logger.info("hour set to " + getHours());
+            } else if (getMonth() == NOVEMBER && getAMPM() == Time.AM)
+            {
                 logger.info("fall back");
                 setHours(1);
                 setDaylightSavingsTime(false);
+                logger.info("hour set to " + getHours());
             }
+            logger.info("setting isDaylightSavingsTime to " + isDaylightSavingsTime());
         }
     } // performTick
 
