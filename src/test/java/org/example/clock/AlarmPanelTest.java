@@ -1,4 +1,4 @@
-package Clock;
+package org.example.clock;
 
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -7,6 +7,7 @@ import org.mockito.junit.MockitoJUnitRunner;
 
 import javax.swing.*;
 import java.awt.*;
+import java.util.List;
 import java.text.ParseException;
 import java.time.DayOfWeek;
 import java.util.ArrayList;
@@ -18,7 +19,7 @@ import static org.junit.Assert.*;
 import static java.time.DayOfWeek.*;
 
 @RunWith(MockitoJUnitRunner.class)
-public class AlarmPanelTest extends Object {
+public class AlarmPanelTest {
 
     private static Clock clock;
     private static Alarm alarm;
@@ -72,7 +73,7 @@ public class AlarmPanelTest extends Object {
 
     @Test
     public void alarmWorksAsExpected() {
-        clock.setListOfAlarms(new ArrayList<>(){{add(alarm);}});
+        clock.setListOfAlarms(new ArrayList<Alarm>(){{add(alarm);}});
         clock.getAlarmPanel().checkIfAnyAlarmsAreGoingOff();
         assertTrue("Alarm should be going off!", alarm.isAlarmGoingOff());
         assertEquals("This 'alarm' is set as the current alarm going off", alarm, clock.getAlarmPanel().getCurrentAlarmGoingOff());

@@ -1,4 +1,4 @@
-package Clock;
+package org.example.clock;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -15,21 +15,19 @@ import java.awt.*;
  * look.
  *
  * @author michael ball
- * @version 2.5
+ * @version 2.6
  */
-public class DigitalClockPanel extends JPanel implements IClockPanel
-{
-    private static final long serialVersionUID = 1L;
+public class DigitalClockPanel extends JPanel implements ClockConstants, IClockPanel {
     private static final Logger logger = LogManager.getLogger(DigitalClockPanel.class);
-    private GridBagLayout layout;
-    private GridBagConstraints constraints;
-    private JLabel jlbl1;
-    private JLabel jlbl2;
-    private Clock clock;
-    public PanelType panelType;
+    GridBagLayout layout;
+    GridBagConstraints constraints;
+    JLabel label1;
+    JLabel label2;
+    Clock clock;
+    PanelType panelType;
 
-    public DigitalClockPanel(Clock clock)
-    {
+    DigitalClockPanel(Clock clock) {
+        super();
         setClock(clock);
         setPanelType(PanelType.DIGITAL_CLOCK);
         setMaximumSize(Clock.defaultSize);
@@ -47,25 +45,27 @@ public class DigitalClockPanel extends JPanel implements IClockPanel
     public GridBagLayout getGridBagLayout() { return this.layout; }
     public GridBagConstraints getGridBagConstraints() { return this.constraints; }
     public Clock getClock() { return this.clock; }
-    public JLabel getJlbl1() { return this.jlbl1; }
-    public JLabel getJlbl2() { return this.jlbl2; }
+    public JLabel getLabel1() { return this.label1; }
+    public JLabel getLabel2() { return this.label2; }
+    public PanelType getPanelType() { return this.panelType; }
 
     private void setGridBagLayout(GridBagLayout layout) { this.layout = layout; }
     private void setGridBagConstraints(GridBagConstraints constraints) { this.constraints = constraints; }
-    protected void setClock(Clock clock) { this.clock = clock; }
-    public void setJlbl1(JLabel jlbl1) { this.jlbl1 = jlbl1; }
-    public void setJlbl2(JLabel jlbl2) { this.jlbl2 = jlbl2; }
-    protected void setPanelType(PanelType panelType) { this.panelType = panelType; }
+    public void setLabel1(JLabel label1) { this.label1 = label1; }
+    public void setLabel2(JLabel label2) { this.label2 = label2; }
+    @Override
+    public void setClock(Clock clock) { this.clock = clock; }
+    @Override
+    public void setPanelType(PanelType panelType) { this.panelType = panelType; }
 
-    public void setupClockPanel(Clock clock)
-    {
+    public void setupClockPanel(Clock clock) {
         logger.info("setupClockPanel");
         clock.setIsDateChanged(false);
         clock.setShowFullDate(false);
         clock.setShowPartialDate(false);
         clock.setShowMilitaryTime(false);
-        setJlbl1(new JLabel("", SwingConstants.CENTER));
-        setJlbl2(new JLabel("", SwingConstants.CENTER));
+        setLabel1(new JLabel("", SwingConstants.CENTER));
+        setLabel2(new JLabel("", SwingConstants.CENTER));
     }
 
     public void printStackTrace(Exception e, String message)
@@ -102,21 +102,26 @@ public class DigitalClockPanel extends JPanel implements IClockPanel
     public void addComponentsToPanel()
     {
         logger.info("addComponentsToPanel");
-        addComponent(getJlbl1(), 0,0,1,1, 0,0);
-        addComponent(getJlbl2(), 1,0,1,1, 0,0);
+        addComponent(getLabel1(), 0,0,1,1, 0,0);
+        addComponent(getLabel2(), 1,0,1,1, 0,0);
     }
 
     public void updateLabels()
     {
         logger.info("updateLabels");
-        getJlbl1().setText(getClock().defaultText(1));
-        getJlbl2().setText(getClock().defaultText(2));
-        if (getClock().isShowFullDate()) getJlbl1().setFont(Clock.font40);
-        else if (getClock().isShowPartialDate()) getJlbl1().setFont(Clock.font50);
-        else getJlbl1().setFont(Clock.font60);
-        getJlbl2().setFont(Clock.font50);
-        getJlbl1().setForeground(Color.WHITE);
-        getJlbl2().setForeground(Color.WHITE);
+        if (getClock().getAlarmPanel().getCurrentAlarmGoingOff() != null) {
+            getLabel1().setText(getClock().defaultText(8));
+            getLabel2().setText(getClock().defaultText(9));
+        } else { // default date and time
+            getLabel1().setText(getClock().defaultText(1));
+            getLabel2().setText(getClock().defaultText(2));
+        }
+        if (getClock().isShowFullDate()) getLabel1().setFont(Clock.font40);
+        else if (getClock().isShowPartialDate()) getLabel1().setFont(Clock.font50);
+        else getLabel1().setFont(Clock.font60);
+        getLabel2().setFont(Clock.font50);
+        getLabel1().setForeground(Color.WHITE);
+        getLabel2().setForeground(Color.WHITE);
         getClock().repaint();
     }
 }

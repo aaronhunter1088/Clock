@@ -1,4 +1,4 @@
-package Clock;
+package org.example.clock;
 
 import java.awt.*;
 import java.text.SimpleDateFormat;
@@ -9,55 +9,61 @@ import javax.swing.JPanel;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-public class AnalogueClockPanel extends JPanel implements IClockPanel, Runnable
-{
+import static java.lang.Thread.sleep;
+
+/**
+ * The AnalogueClockPanel is used to view the time
+ * in analogue mode. The time will still show up
+ * below the center in digital format. If you wish
+ * to hide this, the settings allows for that.
+ *
+ * @author michael ball
+ * @version 2.6
+ */
+public class AnalogueClockPanel extends JPanel implements ClockConstants, IClockPanel, Runnable {
     private static final Logger logger = LogManager.getLogger(AnalogueClockPanel.class);
+    private GridBagLayout layout;
+    private GridBagConstraints constraints;
     Thread thread = null;
     SimpleDateFormat formatter = new SimpleDateFormat("s", Locale.getDefault());
     Date currentDate;
     int xcenter = 175, ycenter = 175, lastxs = 0, lastys = 0, lastxm = 0, lastym = 0, lastxh = 0, lastyh = 0;
     Clock clock;
-    public PanelType panelType;
-    private GridBagLayout layout;
-    private GridBagConstraints constraints;
-    private String CLOCK_TEXT = "";
+    PanelType panelType;
+    private String clockText = "";
 
     /**
      * Default constructor
      * @param clock the clock reference
      */
-    public AnalogueClockPanel(Clock clock)
-    {
+    public AnalogueClockPanel(Clock clock) {
         super();
         setupDefaultActions(clock);
         logger.info("Finished creating AnalogueClock Panel");
     }
-    public AnalogueClockPanel()
-    {
-        setupDefaultActions();
-        logger.info("Finished creating AnalogueClock Panel");
-    }
 
+    @Override
     public void setClock(Clock clock) { this.clock = clock ;}
-    protected void setPanelType(PanelType panelType) { this.panelType = panelType; }
+    @Override
+    public void setPanelType(PanelType panelType) { this.panelType = panelType; }
     protected void setGridBagLayout(GridBagLayout layout) { this.layout = layout; }
     protected void setGridBagConstraints(GridBagConstraints constraints) { this.constraints = constraints; }
-    protected void setClockText(String clockText) { this.CLOCK_TEXT = clockText; }
+    protected void setClockText(String clockText) { this.clockText = clockText; }
 
     public Clock getClock() { return this.clock; }
     public PanelType getPanelType() { return this.panelType; }
     public GridBagLayout getGridBagLayout() { return this.layout; }
     public GridBagConstraints getGridBagConstraints() { return this.constraints; }
-    public String getCLOCK_TEXT() { return this.CLOCK_TEXT; }
-    private void drawStructure(Graphics g)
-    {
+    public String getClockText() { return this.clockText; }
+
+    void drawStructure(Graphics g) {
         logger.info("drawStructure");
         g.setFont(new Font("TimesRoman", Font.BOLD, 20));
         g.setColor(Color.BLACK);
         g.fillOval(xcenter - 150, ycenter - 150, 300, 300);
 
         g.setColor(Color.BLUE);
-        g.drawString(CLOCK_TEXT, 120, 260);
+        g.drawString(clockText, 120, 260);
 
         g.setColor(Color.WHITE);
         g.drawString("1", xcenter + 60, ycenter - 110);
@@ -75,8 +81,52 @@ public class AnalogueClockPanel extends JPanel implements IClockPanel, Runnable
         g.setColor(Color.BLACK); // needed to avoid second hand delay UI issue
     }
 
-    public void paint(Graphics g)
-    {
+    void start(AnalogueClockPanel panel) {
+        logger.info("start analogue clock");
+        if (thread == null) {
+            thread = new Thread(panel);
+            thread.start();
+        }
+    }
+
+    void stop() {
+        logger.info("stopping analogue thread");
+        thread = null;
+    }
+
+    void setupDefaultActions(Clock clock) {
+        logger.info("setupDefaultActions with Clock");
+        setClock(clock);
+        setClockText(clock.getTimeAsStr());
+        getClock().setShowDigitalTimeOnAnalogueClock(true);
+        getClock().getClockMenuBar().getShowDigitalTimeOnAnalogueClockSetting().setText(ClockConstants.HIDE + ClockConstants.SPACE + ClockConstants.DIGITAL_TIME);
+        setDefaults();
+    }
+
+    void setDefaults() {
+        logger.info("setupDefaultActions");
+        setPanelType(PanelType.ANALOGUE_CLOCK);
+        setMaximumSize(new Dimension(350, 400));
+        setGridBagLayout(new GridBagLayout());
+        setLayout(layout);
+        setGridBagConstraints(new GridBagConstraints());
+        setBackground(Color.BLACK);
+        setForeground(Color.BLACK);
+        start(this);
+    }
+
+    @Override
+    public void run() {
+        logger.info("starting analogue clock");
+        while (thread != null) {
+            try { sleep(1000); }
+            catch (InterruptedException e) { printStackTrace(e, e.getMessage());}
+            repaint();
+        }
+    }
+
+    @Override
+    public void paint(Graphics g) {
         logger.info("painting analogue clock panel");
         int xhour, yhour, xminute, yminute, xsecond, ysecond, second, minute, hour;
         currentDate = java.util.Date.from(getClock().getDate().atTime(getClock().getHours(), getClock().getMinutes(), getClock().getSeconds())
@@ -103,17 +153,12 @@ public class AnalogueClockPanel extends JPanel implements IClockPanel, Runnable
 
         // second hand start
         //g.setColor(Color.RED);
-        if (xsecond != lastxs || ysecond != lastys)
-        {
-            g.drawLine(xcenter, ycenter, lastxs, lastys);
-        }
-        if (xminute != lastxm || yminute != lastym)
-        {
+        if (xsecond != lastxs || ysecond != lastys) { g.drawLine(xcenter, ycenter, lastxs, lastys); }
+        if (xminute != lastxm || yminute != lastym) {
             g.drawLine(xcenter, ycenter - 1, lastxm, lastym);
             g.drawLine(xcenter - 1, ycenter, lastxm, lastym);
         }
-        if (xhour != lastxh || yhour != lastyh)
-        {
+        if (xhour != lastxh || yhour != lastyh) {
             g.drawLine(xcenter, ycenter - 1, lastxh, lastyh);
             g.drawLine(xcenter - 1, ycenter, lastxh, lastyh);
         }
@@ -136,78 +181,13 @@ public class AnalogueClockPanel extends JPanel implements IClockPanel, Runnable
         lastyh = yhour;
     }
 
-    public void start(AnalogueClockPanel panel)
-    {
-        logger.info("start analogue clock");
-        if (thread == null)
-        {
-            thread = new Thread(panel);
-            thread.start();
-        }
-    }
-
-    public void stop()
-    {
-        logger.info("stopping analogue thread");
-        thread = null;
-    }
-
-    public void run()
-    {
-        logger.info("running analogue clock");
-        while (thread != null)
-        {
-            try
-            {
-                Thread.sleep(100);
-            }
-            catch (InterruptedException e) {}
-            repaint();
-        }
-        thread = null;
-    }
-
-    public void update(Graphics g)
-    {
+    @Override
+    public void update(Graphics g) {
         logger.info("updating graphics");
         paint(g);
     }
 
-    public void setupDefaultActions(Clock clock)
-    {
-        logger.info("setupDefaultActions with Clock");
-        setClock(clock);
-        setClockText(clock.getTimeAsStr());
-        getClock().setShowDigitalTimeOnAnalogueClock(true);
-        getClock().getClockMenuBar().getShowDigitalTimeOnAnalogueClockSetting().setText(ClockConstants.HIDE + ClockConstants.SPACE + ClockConstants.DIGITAL_TIME);
-        setupDefaultActions();
-    }
-
-    public void setupDefaultActions()
-    {
-        logger.info("setupDefaultActions");
-        setPanelType(PanelType.ANALOGUE_CLOCK);
-        setMaximumSize(new Dimension(350, 400));
-        setGridBagLayout(new GridBagLayout());
-        setLayout(layout);
-        setGridBagConstraints(new GridBagConstraints());
-        setBackground(Color.BLACK);
-        setForeground(Color.BLACK);
-        start(this);
-    }
-
     @Override
-    public void addComponentsToPanel() {
-        logger.info("addComponentsToPanel");
-    }
-
-    @Override
-    public void printStackTrace(Exception e, String message) {
-        logger.error(e.getMessage());
-        for(StackTraceElement ste : e.getStackTrace())
-        {
-            logger.error(ste.toString());
-        }
-    }
+    public void addComponentsToPanel() { /* no operation */ }
 
 }

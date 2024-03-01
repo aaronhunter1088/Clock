@@ -1,4 +1,4 @@
-package Clock;
+package org.example.clock;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -7,7 +7,7 @@ import org.mockito.junit.MockitoJUnitRunner;
 import java.util.ArrayList;
 import java.util.List;
 
-import static Clock.PanelType.*;
+import static org.example.clock.PanelType.*;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;

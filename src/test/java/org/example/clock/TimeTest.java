@@ -1,4 +1,4 @@
-package Clock;
+package org.example.clock;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -11,7 +11,7 @@ import static java.time.DayOfWeek.*;
 import static org.junit.Assert.*;
 
 @RunWith(MockitoJUnitRunner.class)
-public class TimeTest extends Object {
+public class TimeTest {
 
     @Before
     public void setUp() throws Exception {

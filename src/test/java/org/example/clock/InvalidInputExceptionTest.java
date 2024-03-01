@@ -1,4 +1,4 @@
-package Clock;
+package org.example.clock;
 
 import org.junit.Before;
 import org.junit.BeforeClass;
@@ -14,7 +14,6 @@ import static org.junit.Assert.*;
 @RunWith(MockitoJUnitRunner.class)
 public class InvalidInputExceptionTest extends Exception {
 
-	private static final long serialVersionUID = 1L;
 	private Month goodMonth, badMonth;
 	private final String INVALID_MONTH = "Invalid month";
 

@@ -1,4 +1,4 @@
-package Clock;
+package org.example.clock;
 
 /**
  * This class is used to determine that an error
@@ -12,11 +12,10 @@ package Clock;
  * exception is thrown.
  * It forces the programmer to deal with the exception."
  * @author michael ball
- * @version 2.5
+ * @version 2.6
  */
-public class InvalidInputException extends Exception
-{
-	private static final long serialVersionUID = 1L;
+public class InvalidInputException extends Exception {
+
 	private String message;
 	private Throwable cause;
 
@@ -24,31 +23,25 @@ public class InvalidInputException extends Exception
 	public String getMessage() {
 		return message;
 	}
-
-	public void setMessage(String message) {
-		this.message = message;
-	}
-
 	public Throwable getCause() {
 		return cause;
 	}
 
+	public void setMessage(String message) {
+		this.message = message;
+	}
 	public void setCause(Throwable cause) {
 		this.cause = cause;
 	}
 
-	public InvalidInputException() { super(); }
-	
-	public InvalidInputException(String message) {
-		super(message);
-		setMessage(message);
-	}
-	
-	public InvalidInputException(Throwable cause) {
-		super(cause);
-		setCause(cause);
-	}
-	
+	public InvalidInputException() { this(null, null); }
+	public InvalidInputException(String message) { this(message, null); }
+	public InvalidInputException(Throwable cause) { this(null, cause); }
+	/**
+	 * Main constructor for InvalidInputException
+	 * @param message the message provided
+	 * @param cause the reason why
+	 */
 	public InvalidInputException(String message, Throwable cause) {
 		super(message, cause);
 		setMessage(message);

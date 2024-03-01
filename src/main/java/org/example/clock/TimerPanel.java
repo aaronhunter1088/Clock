@@ -1,4 +1,4 @@
-package Clock;
+package org.example.clock;
 
 import javazoom.jl.decoder.JavaLayerException;
 import javazoom.jl.player.advanced.AdvancedPlayer;
@@ -16,6 +16,8 @@ import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
+import static java.lang.Thread.sleep;
+
 /** This is the Timer panel.
  * The timer panel is used to set a timer.
  * Giving the panel some Hours, some Minutes,
@@ -23,30 +25,24 @@ import java.util.concurrent.Executors;
  * when the timer reaches '00:00:00'.
  *
  * @author michael ball
- * @version 2.5
+ * @version 2.6
  */
-public class TimerPanel extends JPanel implements IClockPanel
-{
+public class TimerPanel extends JPanel implements ClockConstants, IClockPanel {
     private static final Logger logger = LogManager.getLogger(TimerPanel.class);
-    private GridBagLayout layout;
-    private GridBagConstraints constraints;
-    private JTextField jtextField1; // Hour textField
-    private JTextField jtextField2; // Min textField
-    private JTextField jtextField3; // Second textField
-    private JButton timerButton;
-    private JButton resetButton;
-    private Clock clock;
-    private Thread countdownThread = new Thread(this::performCountDown);
-    private boolean timerIsGoingOff;
-    private AdvancedPlayer musicPlayer;
-    public PanelType panelType;
-    public static final String SET = "Set";
-    public static final String RESUME_TIMER = "Resume Timer";
-    public static final String PAUSE_TIMER = "Pause Timer";
-    public static final String RESET = "Reset";
+    GridBagLayout layout;
+    GridBagConstraints constraints;
+    JTextField textField1, /*Hour textField*/ textField2, /*Min textField*/ textField3; /*Second textField*/
+    JButton timerButton;   // Set Timer button
+    JButton resetButton;   // Reset Timer button
+    Clock clock;           // Reference to the clock
+    Thread countdownThread = new Thread(this::performCountDown);
+    boolean timerIsGoingOff;
+    AdvancedPlayer musicPlayer;
+    PanelType panelType;
 
-    public TimerPanel(Clock clock)
-    {
+
+    TimerPanel(Clock clock) {
+        super();
         setClock(clock);
         setPanelType(PanelType.TIMER);
         setSize(Clock.panelSize);
@@ -71,21 +67,13 @@ public class TimerPanel extends JPanel implements IClockPanel
                     getTimerButton().setEnabled(true);
             }
             @Override
-            public void mousePressed(MouseEvent e) {
-
-            }
+            public void mousePressed(MouseEvent e) {}
             @Override
-            public void mouseReleased(MouseEvent e) {
-
-            }
+            public void mouseReleased(MouseEvent e) {}
             @Override
-            public void mouseEntered(MouseEvent e) {
-
-            }
+            public void mouseEntered(MouseEvent e) {}
             @Override
-            public void mouseExited(MouseEvent e) {
-
-            }
+            public void mouseExited(MouseEvent e) {}
         });
         logger.info("Finished creating the Timer Panel");
     }
@@ -93,9 +81,9 @@ public class TimerPanel extends JPanel implements IClockPanel
     public GridBagLayout getGridBagLayout() { return this.layout; }
     public GridBagConstraints getGridBagConstraints() { return this.constraints; }
     public Clock getClock() { return this.clock; }
-    public JTextField getJTextField1() { return this.jtextField1; }
-    public JTextField getJTextField2() { return this.jtextField2; }
-    public JTextField getJTextField3() { return this.jtextField3; }
+    public JTextField getJTextField1() { return this.textField1; }
+    public JTextField getJTextField2() { return this.textField2; }
+    public JTextField getJTextField3() { return this.textField3; }
     public JButton getTimerButton() { return this.timerButton; }
     public JButton getResetButton() { return this.resetButton; }
     public boolean isTimerGoingOff() { return timerIsGoingOff; }
@@ -103,18 +91,19 @@ public class TimerPanel extends JPanel implements IClockPanel
 
     protected void setGridBagLayout(GridBagLayout layout) { this.layout = layout; }
     protected void setGridBagConstraints(GridBagConstraints constraints) { this.constraints = constraints; }
-    protected void setClock(Clock clock) { this.clock = clock; }
-    protected void setJTextField1(JTextField jtextField1) { this.jtextField1 = jtextField1; }
-    protected void setJTextField2(JTextField jtextField2) { this.jtextField2 = jtextField2; }
-    protected void setJTextField3(JTextField jtextField3) { this.jtextField3 = jtextField3; }
+    protected void setJTextField1(JTextField textField1) { this.textField1 = textField1; }
+    protected void setJTextField2(JTextField textField2) { this.textField2 = textField2; }
+    protected void setJTextField3(JTextField textField3) { this.textField3 = textField3; }
     protected void setTimerButton(JButton timerButton) { this.timerButton = timerButton; }
     protected void setResetButton(JButton resetButton) { this.resetButton = resetButton; }
     protected void setIsTimerGoingOff(boolean timerIsGoingOff) { this.timerIsGoingOff = timerIsGoingOff; }
     protected void setMusicPlayer(AdvancedPlayer musicPlayer) { this.musicPlayer = musicPlayer; }
-    protected void setPanelType(PanelType panelType) { this.panelType = panelType; }
-
-    public void setupTimerPanel()
-    {
+    @Override
+    public void setClock(Clock clock) { this.clock = clock; }
+    @Override
+    public void setPanelType(PanelType panelType) { this.panelType = panelType; }
+    // Helper methods
+    public void setupTimerPanel() {
         logger.info("setupTimerPanel");
         setJTextField1(new JTextField("Hour", 4));
         setJTextField2(new JTextField("Min", 4));
@@ -296,95 +285,61 @@ public class TimerPanel extends JPanel implements IClockPanel
         getResetButton().setBorder(new LineBorder(Color.WHITE));
         setBackground(Color.BLACK);
     }
-    protected void setupTimerButton()
-    {
-        getTimerButton().addActionListener(this::run);
-    }
-    protected void setupResetButton()
-    {
-        getResetButton().addActionListener(this::resetTimerFields);
-    }
-    public boolean validateFirstTextField()
-    {
+    protected void setupTimerButton() { getTimerButton().addActionListener(this::run); }
+    protected void setupResetButton() { getResetButton().addActionListener(this::resetTimerFields); }
+    public boolean validateFirstTextField() {
         logger.info("validateFirstTextField");
-        if (StringUtils.equals(getJTextField1().getText(), "Hour"))
-        {
-            return true;
-        }
-        if (!NumberUtils.isNumber(getJTextField1().getText()))
-        {
-            return false;
-        }
+        if (StringUtils.equals(getJTextField1().getText(), "Hour")) { return true; }
+        if (!NumberUtils.isNumber(getJTextField1().getText())) { return false; }
         // cannot be more than 23 hours or less than 0
         return Integer.parseInt(getJTextField1().getText()) < 24 &&
                 Integer.parseInt(getJTextField1().getText()) >= 0;
     }
-    public boolean validateSecondTextField()
-    {
+    public boolean validateSecondTextField() {
         logger.info("validateSecondTextField");
-        if (StringUtils.equals(getJTextField2().getText(), "Min"))
-        {
-            return true;
-        }
-        if (!NumberUtils.isNumber(getJTextField2().getText()))
-        {
-            return false;
-        }
+        if (StringUtils.equals(getJTextField2().getText(), "Min")) { return true; }
+        if (!NumberUtils.isNumber(getJTextField2().getText())) { return false; }
         // 70 minutes given
         return Integer.parseInt(getJTextField2().getText()) < 60 &&
                 Integer.parseInt(getJTextField2().getText()) >= 0;
     }
-    public boolean validateThirdTextField()
-    {
+    public boolean validateThirdTextField() {
         logger.info("validateThirdTextField");
-        if (StringUtils.equals(getJTextField3().getText(), "Sec"))
-        {
-            return true;
-        }
-        if (!NumberUtils.isNumber(getJTextField3().getText()))
-        {
-            return false;
-        }
+        if (StringUtils.equals(getJTextField3().getText(), "Sec")) { return true;}
+        if (!NumberUtils.isNumber(getJTextField3().getText())) { return false; }
         // 70 seconds given
         return Integer.parseInt(getJTextField3().getText()) < 60 &&
                 Integer.parseInt(getJTextField3().getText()) >= 0;
     }
-    public void startTimer()
-    {
+    public void startTimer() {
         logger.info("startTimer");
         getTimerButton().setText(PAUSE_TIMER);
         getTimerButton().repaint();
         getTimerButton().updateUI();
         //logger.error(countdownThread.getName() + " is in state: " + countdownThread.getState());
-        if (countdownThread.getState() == Thread.State.NEW)
-        {
+        if (countdownThread.getState() == Thread.State.NEW) {
             countdownThread.start(); // calls the run method of this class
             //setTimerHasConcluded(false);
             getClock().setIsTimerGoingOff(false);
         }
-        else if (countdownThread.getState() == Thread.State.TERMINATED)
-        {
+        else if (countdownThread.getState() == Thread.State.TERMINATED) {
             countdownThread = new Thread(this::performCountDown);
             countdownThread.start();
         }
-        else if (countdownThread.getState() == Thread.State.TIMED_WAITING)
-        {
+        else if (countdownThread.getState() == Thread.State.TIMED_WAITING) {
             countdownThread.notify();
         }
     }
-    public void pauseTimer() throws InterruptedException
-    {
+    public void pauseTimer() throws InterruptedException {
         logger.info("pauseTimer");
         getTimerButton().setText(RESUME_TIMER);
         getTimerButton().repaint();
         getTimerButton().updateUI();
         countdownThread.interrupt();
     }
-    public void performCountDown()
-    {
+    public void performCountDown() {
         logger.info("performCountDown");
-        try
-        {
+        try {
             // get total number of seconds to count down
             //int totalSeconds = Integer.parseInt(getJTextField3().getText());
             //totalSeconds += (Integer.parseInt(getJTextField2().getText()) * 60);
@@ -396,27 +351,23 @@ public class TimerPanel extends JPanel implements IClockPanel
 
             while (Integer.parseInt(getJTextField3().getText()) > 0 ||
                     Integer.parseInt(getJTextField2().getText()) > 0 ||
-                    Integer.parseInt(getJTextField1().getText()) > 0 )
-            {
-                if (Integer.parseInt(getJTextField3().getText()) >= 0)
-                {
+                    Integer.parseInt(getJTextField1().getText()) > 0 ) {
+                if (Integer.parseInt(getJTextField3().getText()) >= 0) {
                     int seconds = Integer.parseInt(getJTextField3().getText()) - 1;
                     getJTextField3().setText(Integer.toString(seconds));
                     // check hours and minutes, to see if they now need to be decreased
-                    if (Integer.parseInt(getJTextField3().getText()) < 0 && Integer.parseInt(getJTextField2().getText()) >= 0)
-                    {
+                    if (Integer.parseInt(getJTextField3().getText()) < 0 && Integer.parseInt(getJTextField2().getText()) >= 0) {
                         getJTextField3().setText(Integer.toString(59));
                         int minutes = Integer.parseInt(getJTextField2().getText()) - 1;
                         getJTextField2().setText(Integer.toString(minutes));
-                        if (Integer.parseInt(getJTextField2().getText()) < 0 && Integer.parseInt(getJTextField1().getText()) > 0)
-                        {
+                        if (Integer.parseInt(getJTextField2().getText()) < 0 && Integer.parseInt(getJTextField1().getText()) > 0) {
                             getJTextField2().setText(Integer.toString(59));
                             int hours = Integer.parseInt(getJTextField1().getText()) - 1;
                             getJTextField1().setText(Integer.toString(hours));
                         }
                     }
                 }
-                Thread.sleep(1000);
+                sleep(1000);
             }
             // when done counting, change the Set button back to say Set
             getTimerButton().setText(SET);
@@ -424,13 +375,9 @@ public class TimerPanel extends JPanel implements IClockPanel
             //setTimerHasConcluded(true);
             getClock().setIsTimerGoingOff(true);
         }
-        catch (Exception e)
-        {
-            printStackTrace(e);
-        }
+        catch (Exception e) { printStackTrace(e, null); }
     }
-    public void resetTimerFields(ActionEvent action)
-    {
+    public void resetTimerFields(ActionEvent action) {
         logger.info("resetTimerFields");
         getJTextField1().setText("Hour");
         getJTextField2().setText("Min");
@@ -439,22 +386,15 @@ public class TimerPanel extends JPanel implements IClockPanel
         getTimerButton().setEnabled(false);
         //countdownThread = new Thread(this::performCountDown);
     }
-    public void printStackTrace(Exception e, String message)
-    {
+    public void printStackTrace(Exception e, String message) {
         if (null != message)
             logger.error(message);
         else
             logger.error(e.getMessage());
-        for(StackTraceElement ste : e.getStackTrace())
-        {
-            logger.error(ste.toString());
-        }
+        for(StackTraceElement ste : e.getStackTrace()) { logger.error(ste.toString()); }
     }
-    protected void printStackTrace(Exception e)
-    { printStackTrace(e, ""); }
-    public void addComponent(Component cpt, int gridy, int gridx, double gwidth, double gheight, int ipadx, int ipady, int fill)
-    {
-        logger.info("addComponent");
+    public void addComponent(Component cpt, int gridy, int gridx, double gwidth, double gheight, int ipadx, int ipady, int fill) {
+        logger.debug("addComponent");
         setGridBagConstraints(new GridBagConstraints());
         getGridBagConstraints().gridx = gridx;
         getGridBagConstraints().gridy = gridy;
@@ -470,8 +410,7 @@ public class TimerPanel extends JPanel implements IClockPanel
         getGridBagLayout().setConstraints(cpt, getGridBagConstraints());
         add(cpt);
     }
-    public void checkIfTimerHasConcluded()
-    {
+    public void checkIfTimerHasConcluded() {
         logger.info("checkIfTimerHasConcluded");
         ExecutorService executor = Executors.newCachedThreadPool();
         if (getClock().isTimerGoingOff()) {
@@ -479,24 +418,21 @@ public class TimerPanel extends JPanel implements IClockPanel
             getClock().setIsTimerGoingOff(false);
         }
     }
-    public void triggerSound(ExecutorService executor)
-    {
+    public void triggerSound(ExecutorService executor) {
         logger.info("triggering timer sound");
         setIsTimerGoingOff(true);
         // play sound
         Callable<String> c = () -> {
-            try
-            {
+            try {
                 setupMusicPlayer();
                 getMusicPlayer().play(50);
                 stopSound();
                 //logger.error("Alarm is going off.");
                 return "Timer triggered";
             }
-            catch (Exception e)
-            {
+            catch (Exception e) {
                 logger.error(e.getCause().getClass().getName() + ": " + e.getMessage());
-                printStackTrace(e);
+                printStackTrace(e, null);
                 setupMusicPlayer();
                 getMusicPlayer().play(50);
                 stopSound();
@@ -505,8 +441,7 @@ public class TimerPanel extends JPanel implements IClockPanel
         };
         executor.submit(c);
     }
-    public void stopSound()
-    {
+    public void stopSound() {
         logger.info("stopSound");
         setMusicPlayer(null);
         setIsTimerGoingOff(false);
@@ -514,8 +449,7 @@ public class TimerPanel extends JPanel implements IClockPanel
     }
 
     @Override
-    public void addComponentsToPanel()
-    {
+    public void addComponentsToPanel() {
         logger.info("addComponentsToPanel");
         setComponentOrientation(ComponentOrientation.LEFT_TO_RIGHT);
         addComponent(getJTextField1(), 0,0,1,1,0,0, GridBagConstraints.HORIZONTAL); // TextField 1
@@ -524,48 +458,38 @@ public class TimerPanel extends JPanel implements IClockPanel
         addComponent(getResetButton(), 1, 0, 3, 1, 0, 0, GridBagConstraints.HORIZONTAL); // Reset Button
         addComponent(getTimerButton(), 2,0,3,1,0,0, GridBagConstraints.HORIZONTAL); // Set Timer Button
     }
-    public void updateLabels()
-    {
+
+    public void updateLabels() {
         logger.info("updateLabels");
         getJTextField1().grabFocus();
         getClock().repaint();
     }
 
-    public void run(ActionEvent action) // called when we hit the Start Timer button
-    {
+    public void run(ActionEvent action) { // called when we hit the Start Timer button
         logger.info("run");
-        try
-        {
+        try {
             if (StringUtils.equals(getTimerButton().getText(), "Set") ||
-                StringUtils.equals(getTimerButton().getText(), "Resume Timer"))
-            {
+                StringUtils.equals(getTimerButton().getText(), "Resume Timer")) {
                 logger.info("starting timer");
                 startTimer();
             }
-            else
-            {
+            else {
                 logger.info("pausing timer");
                 pauseTimer();
             }
         }
-        catch (InterruptedException e)
-        {
-            printStackTrace(e);
-        }
+        catch (InterruptedException e) { printStackTrace(e, null); }
     }
 
-    public void setupMusicPlayer()
-    {
+    public void setupMusicPlayer() {
         logger.info("setupAlarmButton");
         InputStream inputStream;
-        try
-        {
+        try {
             inputStream = ClassLoader.getSystemResourceAsStream("sounds/alarmSound1.mp3");
             if (null != inputStream) { setMusicPlayer(new AdvancedPlayer(inputStream)); }
             else throw new NullPointerException();
         }
-        catch (NullPointerException | JavaLayerException e)
-        {
+        catch (NullPointerException | JavaLayerException e) {
             if (e instanceof NullPointerException)
                 printStackTrace(e, "An issue occurred while reading the alarm file.");
             else

@@ -1,8 +1,9 @@
-package Clock;
+package org.example.clock;
 
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.runner.RunWith;
 import org.mockito.junit.MockitoJUnitRunner;
 
@@ -13,33 +14,24 @@ import java.util.ArrayList;
 import static java.time.DayOfWeek.*;
 import static java.time.Month.*;
 import static org.junit.Assert.*;
-import static Clock.Time.*;
 
 @RunWith(MockitoJUnitRunner.class)
 public class ClockTest {
 
     private static Clock clock;
 
-    @BeforeClass
-    public static void setup() throws InvalidInputException
-    {
-        clock = new Clock();
-    }
-
-    @Before
-    public void beforeEachTest() throws InvalidInputException
-    {
+    @BeforeEach
+    public void beforeEach() throws InvalidInputException {
         clock = new Clock();
     }
 
     @Test
-    public void testBeginningDayLightSavingsTimeIsProperlySet() throws InvalidInputException
-    {
-        clock = new Clock(5, 42, 0, MARCH, THURSDAY, 2, 2021, PM);
+    public void testBeginningDayLightSavingsTimeIsProperlySet() throws InvalidInputException {
+        clock = new Clock(5, 42, 0, MARCH, THURSDAY, 2, 2021, Time.PM);
         assertEquals("For 2021, Beginning DST Day should be 14th", 14, clock.getBeginDaylightSavingsTimeDate().getDayOfMonth());
         assertEquals("For 2021, Ending DST Day should be 7th", 7, clock.getEndDaylightSavingsTimeDate().getDayOfMonth());
 
-        clock = new Clock(5, 42, 0, MARCH, THURSDAY, 3, 2022, PM);
+        clock = new Clock(5, 42, 0, MARCH, THURSDAY, 3, 2022, Time.PM);
         //clock.setDaylightSavingsTimeDates();
         assertEquals("For 2022, Beginning DST Day should be 13th", 13, clock.getBeginDaylightSavingsTimeDate().getDayOfMonth());
         assertEquals("For 2022, Ending DST Day should be 6th", 6, clock.getEndDaylightSavingsTimeDate().getDayOfMonth());
@@ -48,7 +40,7 @@ public class ClockTest {
     @Test
     public void testIsTodayDaylightSavingsDayReturnsFalseWhenNotBeginningDST() throws InvalidInputException
     {
-        clock = new Clock(5, 42, 0, MARCH, THURSDAY, 3, 2022, PM);
+        clock = new Clock(5, 42, 0, MARCH, THURSDAY, 3, 2022, Time.PM);
         assertFalse(clock.isTodayDaylightSavingsTime());
     }
 
@@ -65,21 +57,21 @@ public class ClockTest {
     @Test
     public void testIsDateDaylightSavingsDayReturnsFalseWhenNotEndingDST() throws InvalidInputException
     {
-        clock = new Clock(5, 42, 0, NOVEMBER, SATURDAY, 5, 2022, PM);
+        clock = new Clock(5, 42, 0, NOVEMBER, SATURDAY, 5, 2022, Time.PM);
         assertFalse(clock.isTodayDaylightSavingsTime());
     }
 
     @Test
     public void testIsTodayDaylightSavingsDayReturnsTrueWhenIsBeginningDST() throws InvalidInputException
     {
-        clock = new Clock(5, 42, 0, MARCH, SUNDAY, 13, 2022, PM);
+        clock = new Clock(5, 42, 0, MARCH, SUNDAY, 13, 2022, Time.PM);
         assertTrue(clock.isTodayDaylightSavingsTime());
     }
 
     @Test
     public void testIsTodayDaylightSavingsDayReturnsTrueWhenIsEndingDST() throws InvalidInputException
     {
-        clock = new Clock(5, 42, 0, NOVEMBER, SUNDAY, 6, 2022, PM);
+        clock = new Clock(5, 42, 0, NOVEMBER, SUNDAY, 6, 2022, Time.PM);
         assertTrue(clock.isTodayDaylightSavingsTime());
     }
 
@@ -87,7 +79,7 @@ public class ClockTest {
     public void testIsGenericDayDaylightSavingsDay() throws InvalidInputException
     {
         clock = new Clock(12,0,0, LocalDate.now().getMonth(), LocalDate.now().getDayOfWeek(),
-                LocalDate.now().getDayOfMonth(), LocalDate.now().getYear(), AM);
+                LocalDate.now().getDayOfMonth(), LocalDate.now().getYear(), Time.AM);
         boolean isDayDaylightSavingsDay = clock.isDaylightSavingsTime();
 
     }
@@ -96,9 +88,9 @@ public class ClockTest {
     public void testClockBecomesAMWhenMidnightStarts() throws InvalidInputException
     {
         //(int hours, int minutes, int seconds, Time.Month month, Time.Day day, int date, int year, Time.AMPM ampm)
-        clock = new Clock(11, 59, 50, FEBRUARY, SUNDAY, 21, 2021, PM);
-        for(int i = 10; i > 0; i--)
-        {
+        clock = new Clock(11, 59, 57, FEBRUARY, SUNDAY, 21, 2021, Time.PM);
+        clock.testingClock = true;
+        for(int i = 3; i > 0; i--) {
             clock.tick();
         }
         assertEquals("Hours should be 12", 12, clock.getHours());

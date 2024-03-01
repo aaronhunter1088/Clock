@@ -1,4 +1,4 @@
-package Clock;
+package org.example.clock;
 
 import org.junit.Test;
 import org.mockito.Mock;
@@ -9,8 +9,7 @@ import java.text.ParseException;
 import static org.junit.Assert.*;
 import static org.mockito.Mockito.mock;
 
-public class TimerPanelTest extends Object
-{
+public class TimerPanelTest {
     Clock clock = new Clock();
     TimerPanel timer = new TimerPanel(clock);
 

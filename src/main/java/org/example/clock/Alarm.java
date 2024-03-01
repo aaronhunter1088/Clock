@@ -1,6 +1,5 @@
-package Clock;
+package org.example.clock;
 
-import java.io.Serializable;
 import java.time.DayOfWeek;
 import java.util.ArrayList;
 import java.util.List;
@@ -18,40 +17,40 @@ import static java.time.DayOfWeek.*;
  * on Clocks time if alarm is going off.
  *
  * @author michael ball
- * @version 2.5
+ * @version 2.6
  */
-public class Alarm implements Serializable {
-    private static final long serialVersionUID = 1L;
+public class Alarm {
     private static final Logger logger = LogManager.getLogger(Alarm.class);
-    protected int minutes;
-    protected String minutesAsStr;
-    protected int hours;
-    protected String hoursAsStr;
-    protected Time ampm;
+    private int minutes;
+    String minutesAsStr;
+    private int hours;
+    String hoursAsStr;
+    private Time ampm;
     private ArrayList<DayOfWeek> days;
-    protected boolean alarmGoingOff;
-    protected boolean updatingAlarm;
+    boolean alarmGoingOff;
+    boolean updatingAlarm;
+    private Clock clock;
 
-    protected Clock clock;
-
-    public Alarm() throws InvalidInputException
-    {
-        super();
-        setHours(0);
-        setMinutes(0);
-        setIsAlarmUpdating(false);
+    public Alarm() throws InvalidInputException {
+        this(0, 0, Time.AM, false, new ArrayList<>(), null);
         logger.info("Finished creating an Alarm");
     }
-    public Alarm(Clock clock, int hours, boolean isUpdateAlarm)
-    {
-        setClock(clock);
-        setHours(hours);
-        setDays(new ArrayList<>(){{add(clock.getDayOfWeek());}});
-        setIsAlarmUpdating(isUpdateAlarm);
+    public Alarm(Clock clock, int hours, boolean isUpdateAlarm) throws InvalidInputException {
+        this(hours, 0, clock.getAMPM(), isUpdateAlarm, new ArrayList<>(){{add(clock.getDayOfWeek());}}, clock);
         logger.info("Finished creating an Alarm from [Clock, hours, isUpdateAlarm]");
     }
-    public Alarm(int hours, int minutes, Time time, boolean isUpdateAlarm, ArrayList<DayOfWeek> days, Clock clock) throws InvalidInputException
-    {
+    /**
+     * Main constructor for creating alarms
+     * @param hours the hour of the alarm
+     * @param minutes the minutes of the alarm
+     * @param time the AM or PM value
+     * @param isUpdateAlarm updating an alarm
+     * @param days the days to trigger alarm
+     * @param clock reference to the clock
+     * @throws InvalidInputException thrown when invalid input is given
+     */
+    public Alarm(int hours, int minutes, Time time, boolean isUpdateAlarm,
+                 ArrayList<DayOfWeek> days, Clock clock) throws InvalidInputException {
         setClock(clock);
         setHours(hours);
         setMinutes(minutes);
@@ -71,20 +70,20 @@ public class Alarm implements Serializable {
     public String getMinutesAsStr() { return this.minutesAsStr; }
     public Time getAMPM() { return this.ampm; }
 
-    protected void setClock(Clock clock) { this.clock = clock; }
+    private void setClock(Clock clock) { this.clock = clock; }
     protected void setIsAlarmGoingOff(boolean alarmGoingOff) { this.alarmGoingOff = alarmGoingOff; }
     protected void setIsAlarmUpdating(boolean updatingAlarm) { this.updatingAlarm = updatingAlarm; }
-    protected  void setAlarmGoingOff(boolean alarmGoingOff) { this.alarmGoingOff = alarmGoingOff; }
-    protected void setUpdatingAlarm(boolean updatingAlarm) { this.updatingAlarm = updatingAlarm; }
-    protected void setDays(ArrayList<DayOfWeek> days) { this.days = days; }
-    public void setHours(int hours) {
+    private void setAlarmGoingOff(boolean alarmGoingOff) { this.alarmGoingOff = alarmGoingOff; }
+    private void setUpdatingAlarm(boolean updatingAlarm) { this.updatingAlarm = updatingAlarm; }
+    private void setDays(ArrayList<DayOfWeek> days) { this.days = days; }
+    private void setHours(int hours) {
         this.hours = hours;
         if (hours < 10) {
             this.hoursAsStr = "0" + this.hours;
         } else
             this.hoursAsStr = String.valueOf(this.hours);
     }
-    public void setMinutes(int minutes) {
+    private void setMinutes(int minutes) {
         this.minutes = minutes;
         if (minutes < 10) {
             this.minutesAsStr = "0" + this.minutes;
@@ -92,9 +91,12 @@ public class Alarm implements Serializable {
             this.minutesAsStr = String.valueOf(this.minutes);
         }
     }
-    protected void setAMPM(Time ampm) {
+    private void setAMPM(Time ampm) {
         this.ampm = ampm;
     }
+
+    @Override
+    public String toString() { return getAlarmAsString(); }
 
     protected String getAlarmAsString() {
         return this.hoursAsStr + ":" + this.minutesAsStr + " " + this.ampm;
