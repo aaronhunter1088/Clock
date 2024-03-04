@@ -6,6 +6,8 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import static java.lang.Thread.sleep;
+import static java.time.DayOfWeek.*;
+import static java.time.Month.*;
 
 /**
  * Main application to start Clock
@@ -21,7 +23,7 @@ public class Main {
 
         logger.info("Starting Clock...");
         Clock clock = new Clock();
-                      //new Clock(11, 59, 50, FEBRUARY, SUNDAY, 21, 2021, PM);
+                      //new Clock(11, 59, 40, FEBRUARY, SUNDAY, 21, 2021, Time.PM);
         logger.info(clock.getDate());
         SwingUtilities.invokeLater(() -> SwingUtilities.updateComponentTreeUI(clock));
         try {
@@ -37,6 +39,7 @@ public class Main {
                     clock.setIsNewYear(false);
                     logger.info("Happy New Year. Here's wishing you a healthy, productive " + clock.getYear() + ".");
                 }
+                sleep(500);
             }
         }
         catch (Exception e)

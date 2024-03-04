@@ -662,7 +662,7 @@ public class Clock extends JFrame {
             logger.debug("time: " + getTimeAsStr());
             //Updates the clock daily to keep time current
             if ((("12:00:00 AM").equals(getTimeAsStr()) ||
-                ("0000 hours 00").equals(getMilitaryTimeAsStr())) && !isTestingClock()) {
+                ("2400 hours 00").equals(getMilitaryTimeAsStr())) && !isTestingClock()) {
                 logger.info("midnight daily clock update");
                 setSeconds(LocalTime.now().getSecond());
                 setMinutes(LocalTime.now().getMinute());
