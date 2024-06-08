@@ -98,8 +98,11 @@ public class AnalogueClockPanel extends JPanel implements ClockConstants, IClock
         logger.info("setupDefaultActions with Clock");
         setClock(clock);
         setClockText(clock.getTimeAsStr());
-        getClock().setShowDigitalTimeOnAnalogueClock(true);
-        getClock().getClockMenuBar().getShowDigitalTimeOnAnalogueClockSetting().setText(ClockConstants.HIDE + ClockConstants.SPACE + ClockConstants.DIGITAL_TIME);
+        clock.getClockMenuBar().getSettingsMenu().removeAll();
+        clock.getClockMenuBar().getSettingsMenu().add(clock.getClockMenuBar().getShowDigitalTimeOnAnalogueClockSetting());
+        clock.setShowDigitalTimeOnAnalogueClock(true);
+        clock.getClockMenuBar().getShowDigitalTimeOnAnalogueClockSetting().setText(ClockConstants.HIDE + ClockConstants.SPACE + ClockConstants.DIGITAL_TIME);
+
         setDefaults();
     }
 

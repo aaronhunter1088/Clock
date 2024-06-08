@@ -186,6 +186,11 @@ public class Clock extends JFrame {
         setAnalogueClockPanel(new AnalogueClockPanel(this));
         setAlarmPanel(new AlarmPanel(this));
         setTimerPanel(new TimerPanel(this));
+        getClockMenuBar().getSettingsMenu().remove(getClockMenuBar().getShowDigitalTimeOnAnalogueClockSetting());
+        getClockMenuBar().getSettingsMenu().add(getClockMenuBar().getMilitaryTimeSetting());
+        getClockMenuBar().getSettingsMenu().add(getClockMenuBar().getFullTimeSetting());
+        getClockMenuBar().getSettingsMenu().add(getClockMenuBar().getPartialTimeSetting());
+        getClockMenuBar().getSettingsMenu().add(getClockMenuBar().getChangeTimeZoneMenu());
         setLeapYear(getDate().isLeapYear());
         setIsDateChanged(false);
         setIsAlarmGoingOff(false);
@@ -628,6 +633,7 @@ public class Clock extends JFrame {
         logger.info("changeToDigitalClockPanel");
         removePanel();
         setPanel(getDigitalClockPanel(), this);
+        getDigitalClockPanel().setupClockPanel(this);
         this.setSize(getAnalogueClockPanel().getMaximumSize());
         this.setSize(Clock.defaultSize);
         this.repaint();
@@ -638,6 +644,7 @@ public class Clock extends JFrame {
         logger.info("changeToAnalogueClockPanel");
         removePanel();
         setPanel(getAnalogueClockPanel(), this);
+        getAnalogueClockPanel().setupDefaultActions(this);
         this.setSize(getAnalogueClockPanel().getMaximumSize());
         this.setBackground(Color.BLACK);
         this.repaint();
