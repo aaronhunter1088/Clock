@@ -2,10 +2,15 @@ package org.example.clock;
 
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.net.URL;
 import java.time.*;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -54,6 +59,8 @@ public class Clock extends JFrame {
             showMilitaryTime,showDigitalTimeOnAnalogueClock, testingClock;
     java.util.List<Alarm> listOfAlarms;
     ImageIcon icon;
+    private final ScheduledExecutorService timeUpdater;
+    private LocalDateTime currentTime;
 
     public PanelType getPanelType() { return this.currentPanel; }
     public ClockMenuBar getClockMenuBar() { return this.menuBar; }
@@ -101,6 +108,7 @@ public class Clock extends JFrame {
     public boolean isShowDigitalTimeOnAnalogueClock() { return this.showDigitalTimeOnAnalogueClock; }
     public boolean isTestingClock() { return this.testingClock; }
     public java.util.List<Alarm> getListOfAlarms() { return this.listOfAlarms; }
+    public ScheduledExecutorService getTimeUpdater() { return this.timeUpdater; }
 
     protected void setPanelType(PanelType currentPanel) { this.currentPanel = currentPanel; }
     protected void setClockMenuBar(ClockMenuBar menuBar) { this.menuBar = menuBar; }
@@ -170,7 +178,7 @@ public class Clock extends JFrame {
         setListOfAlarms(new ArrayList<>());
         setupMenuBar();
         setShowMilitaryTime(false);
-        setTheTime();
+        setTheTime(LocalDateTime.now());
         setDaylightSavingsTimeDates();
         setDate(LocalDate.of(getYear(), getMonth(), getDayOfMonth()));
         if (isTodayDaylightSavingsTime()) { setDaylightSavingsTime(true); }
@@ -194,6 +202,7 @@ public class Clock extends JFrame {
         getContentPane().setBackground(Color.BLACK);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         add(getDigitalClockPanel());
+        timeUpdater = Executors.newScheduledThreadPool(1);
     }
 
     /**
@@ -272,8 +281,8 @@ public class Clock extends JFrame {
             add(getTimerPanel());
         }
     }
-    public void setTheTime() {
-        LocalDateTime dateTime = LocalDateTime.now(); //2022-09-29T22:08:23.701434
+    public void setTheTime(LocalDateTime dateTime) {
+        //LocalDateTime dateTime = ; //2022-09-29T22:08:23.701434
         setSeconds(dateTime.getSecond()); // sets secsAsStr
         setMinutes(dateTime.getMinute()); // sets minutesAsStr
         if (dateTime.getHour() > 12 && !isShowMilitaryTime()) { setHours(dateTime.getHour()-12);}
@@ -283,7 +292,29 @@ public class Clock extends JFrame {
         setDayOfMonth(dateTime.getDayOfMonth());
         setYear(dateTime.getYear());
         setAMPM(LocalTime.from(dateTime));
+        setCurrentTime();
     }
+    public void updateTheTime(JMenuItem timezone) {
+        System.out.println("Timezone: " + timezone);
+        LocalDateTime ldt = determineNewTime(timezone.getText());
+        setTheTime(ldt);
+    }
+    public void setCurrentTime() {
+        currentTime = LocalDateTime.of(getYear(), getMonth(), getDayOfMonth(), getHours(), getMinutes(), getSeconds());
+    }
+    public LocalDateTime getCurrentTime() { return currentTime; }
+
+    public LocalDateTime determineNewTime(String timezone) {
+        switch (timezone) {
+            case "Hawaii" : return LocalDateTime.now(ZoneId.of("Pacific/Honolulu"));
+            case "Alaska" : return LocalDateTime.now(ZoneId.of("America/Anchorage"));
+            case "Pacific": return LocalDateTime.now(ZoneId.of("America/Los_Angeles"));
+            case "Central": return LocalDateTime.now(ZoneId.of("America/Chicago"));
+            case "Eastern": return LocalDateTime.now(ZoneId.of("America/New_York"));
+            default:        return LocalDateTime.now();
+        }
+    }
+
     public void updateHourValueAndHourString() {
         if (getAMPM() == Time.AM && isShowMilitaryTime()) { // Daytime and we show Military Time
             if (getHours() > 12) setHours(0);
@@ -668,6 +699,7 @@ public class Clock extends JFrame {
                 setMinutes(LocalTime.now().getMinute());
                 setHours(LocalTime.now().getHour());
             }
+            setCurrentTime();
         }
         catch (Exception e) { logger.error("Error! Clock had an exception when performing tick: " + e.getMessage()); }
     }

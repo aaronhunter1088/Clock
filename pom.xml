@@ -10,7 +10,7 @@
     <description>This is Clock GUI.</description>
     
     <properties>
-		<java.version>11</java.version>
+		<java.version>18</java.version>
 		<outputDirectory>${basedir}/dist/${project.name}</outputDirectory>
 		<finalName>${project.artifactId}-${project.version}</finalName>
 

@@ -72,8 +72,8 @@ public class AnalogueClockPanel extends JPanel implements ClockConstants, IClock
         g.drawString("4", xcenter + 110, ycenter + 60);
         g.drawString("5", xcenter + 60, ycenter + 110);
         g.drawString("6", xcenter - 10, ycenter + 145);
-        g.drawString("7", xcenter - 120, ycenter + 60);
-        g.drawString("8", xcenter - 80, ycenter + 110);
+        g.drawString("8", xcenter - 120, ycenter + 60);
+        g.drawString("7", xcenter - 80, ycenter + 110);
         g.drawString("9", xcenter - 145, ycenter);
         g.drawString("10", xcenter - 130, ycenter - 60);
         g.drawString("11", xcenter - 80, ycenter - 110);

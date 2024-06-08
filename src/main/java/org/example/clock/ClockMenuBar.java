@@ -7,6 +7,8 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
+import java.util.Arrays;
+
 import static org.example.clock.ClockConstants.*;
 
 /**
@@ -16,6 +18,7 @@ import static org.example.clock.ClockConstants.*;
  */
 public class ClockMenuBar extends JMenuBar {
     private static final Logger logger = LogManager.getLogger(ClockMenuBar.class);
+    Clock clock;
     // Two main menu options
     JMenu settingsMenu;
     JMenu featuresMenu;
@@ -24,6 +27,8 @@ public class ClockMenuBar extends JMenuBar {
     JMenuItem fullTimeSetting;
     JMenuItem partialTimeSetting;
     JMenuItem showDigitalTimeSettingOnAnalogueClockSetting;
+    JMenu changeTimeZone;
+    java.util.List<JMenuItem> timezones;
     // Options for Features
     JMenuItem digitalClockFeature;
     JMenuItem analogueClockFeature;
@@ -38,6 +43,7 @@ public class ClockMenuBar extends JMenuBar {
      * each with several items to choose from.
      */
     ClockMenuBar(Clock clock) {
+        this.clock = clock;
         setForeground(Color.WHITE);
         setBackground(Color.BLACK);
         // Menu options
@@ -55,10 +61,15 @@ public class ClockMenuBar extends JMenuBar {
         setPartialTimeSetting(new JMenuItem(SHOW + SPACE + PARTIAL_TIME_SETTING));
         getPartialTimeSetting().setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_P, InputEvent.CTRL_DOWN_MASK));
         getPartialTimeSetting().setForeground(Color.WHITE);
-        // analogue clock menu settings
+
         setShowDigitalTimeOnAnalogueClockSetting(new JMenuItem(HIDE + SPACE + DIGITAL_TIME));
         getShowDigitalTimeOnAnalogueClockSetting().setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_E, InputEvent.CTRL_DOWN_MASK));
         getShowDigitalTimeOnAnalogueClockSetting().setForeground(Color.WHITE);
+
+        setChangeTimeZoneMenu(new JMenu(SHOW + SPACE + TIME_ZONES));
+        setTimeZones(Arrays.asList(new JMenuItem("Hawaii"), new JMenuItem("Alaska"),
+                new JMenuItem("Pacific"), new JMenuItem("Central"), new JMenuItem("Eastern") ));
+        getTimezones().forEach(this::setupTimezone);
 
         // Features menu choices
         setDigitalClockFeature(new JMenuItem("View Digital Clock"));
@@ -78,6 +89,7 @@ public class ClockMenuBar extends JMenuBar {
         getSettingsMenu().add(getMilitaryTimeSetting());
         getSettingsMenu().add(getFullTimeSetting());
         getSettingsMenu().add(getPartialTimeSetting());
+        getSettingsMenu().add(getChangeTimeZoneMenu());
         // Add options to Features Menu
         getFeaturesMenu().add(getDigitalClockFeature());
         getFeaturesMenu().add(getAnalogueClockFeature());
@@ -87,6 +99,10 @@ public class ClockMenuBar extends JMenuBar {
         getSettingsMenu().setOpaque(false);
         getSettingsMenu().setForeground(Color.WHITE);
         getSettingsMenu().setBackground(Color.BLACK);
+        getChangeTimeZoneMenu().setForeground(Color.WHITE);
+        getChangeTimeZoneMenu().setBackground(Color.BLACK);
+        getSetAlarms().setForeground(Color.WHITE);
+        getSetAlarms().setBackground(Color.BLACK);
         getFeaturesMenu().setOpaque(false);
         getFeaturesMenu().setForeground(Color.WHITE);
         getFeaturesMenu().setBackground(Color.BLACK);
@@ -97,8 +113,8 @@ public class ClockMenuBar extends JMenuBar {
         getDigitalClockFeature().setForeground(Color.WHITE);
         getAnalogueClockFeature().setForeground(Color.WHITE);
         getTimerFeature().setForeground(Color.WHITE);
-        getSetAlarms().setForeground(Color.WHITE);
-        getSetAlarms().setBackground(Color.BLACK);
+        //getTimezones().forEach(timezone -> timezone.setForeground(Color.WHITE));
+        //getTimezones().forEach(timezone -> timezone.setBackground(Color.BLACK));
         // Set functionality for Settings menu
         getMilitaryTimeSetting().addActionListener(action -> {
             logger.info("clicked show military time setting");
@@ -167,6 +183,13 @@ public class ClockMenuBar extends JMenuBar {
         logger.info("Finished creating Clock menu bar");
     }
 
+    private void setupTimezone(JMenuItem timezone) {
+        timezone.addActionListener(l -> clock.updateTheTime(timezone));
+        timezone.setForeground(Color.WHITE);
+        timezone.setBackground(Color.BLACK);
+        getChangeTimeZoneMenu().add(timezone);
+    }
+
     // Getters
     public JMenu getSettingsMenu() { return this.settingsMenu; }
     public JMenu getFeaturesMenu() { return this.featuresMenu; }
@@ -175,6 +198,8 @@ public class ClockMenuBar extends JMenuBar {
     public JMenuItem getFullTimeSetting() { return this.fullTimeSetting; }
     public JMenuItem getPartialTimeSetting() { return this.partialTimeSetting; }
     public JMenuItem getShowDigitalTimeOnAnalogueClockSetting() { return this.showDigitalTimeSettingOnAnalogueClockSetting; }
+    public JMenu getChangeTimeZoneMenu() { return this.changeTimeZone; }
+    public java.util.List<JMenuItem> getTimezones() { return this.timezones; }
     public JMenuItem getDigitalClockFeature() { return this.digitalClockFeature; }
     public JMenuItem getAnalogueClockFeature() { return this.analogueClockFeature; }
     public JMenuItem getSetAlarms() { return this.setAlarms; }
@@ -188,8 +213,10 @@ public class ClockMenuBar extends JMenuBar {
     void setFullTimeSetting(JMenuItem fullTimeSetting) { this.fullTimeSetting = fullTimeSetting; }
     void setPartialTimeSetting(JMenuItem partialTimeSetting) { this.partialTimeSetting = partialTimeSetting; }
     void setShowDigitalTimeOnAnalogueClockSetting(JMenuItem showDigitalTimeSettingOnAnalogueClockSetting) { this.showDigitalTimeSettingOnAnalogueClockSetting = showDigitalTimeSettingOnAnalogueClockSetting; }
+    void setChangeTimeZoneMenu(JMenu changeTimeZone) { this.changeTimeZone = changeTimeZone; }
     void setDigitalClockFeature(JMenuItem digitalClockFeature) { this.digitalClockFeature = digitalClockFeature; }
     void setAnalogueClockFeature(JMenuItem analogueClockFeature) { this.analogueClockFeature = analogueClockFeature; }
+    void setTimeZones(java.util.List<JMenuItem> timezones) { this.timezones = timezones;}
     void setSetAlarms(JMenuItem setAlarms) { this.setAlarms = setAlarms; }
     void setTimerFeature(JMenuItem timerFeature) { this.timerFeature = timerFeature; }
 
