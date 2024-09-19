@@ -180,9 +180,9 @@ public class Clock extends JFrame {
         super();
         setBounds(200, 200, 700, 300);
         setListOfAlarms(new ArrayList<>());
-        setupMenuBar();
         setShowMilitaryTime(false);
         setTheTime(LocalDateTime.now());
+        setupMenuBar();
         setDaylightSavingsTimeDates();
         setDate(LocalDate.of(getYear(), getMonth(), getDayOfMonth()));
         if (isTodayDaylightSavingsTime()) { setDaylightSavingsTime(true); }
@@ -247,10 +247,6 @@ public class Clock extends JFrame {
             remove(getDigitalClockPanel());
         else if (getPanelType() == PanelType.ANALOGUE_CLOCK) {
             getAnalogueClockPanel().stop();
-            getAnalogueClockPanel().getClock().getClockMenuBar().getSettingsMenu().add(getAnalogueClockPanel().getClock().getClockMenuBar().getMilitaryTimeSetting());
-            getAnalogueClockPanel().getClock().getClockMenuBar().getSettingsMenu().add(getAnalogueClockPanel().getClock().getClockMenuBar().getFullTimeSetting());
-            getAnalogueClockPanel().getClock().getClockMenuBar().getSettingsMenu().add(getAnalogueClockPanel().getClock().getClockMenuBar().getPartialTimeSetting());
-            getAnalogueClockPanel().getClock().getClockMenuBar().getSettingsMenu().remove(getAnalogueClockPanel().getClock().getClockMenuBar().getShowDigitalTimeOnAnalogueClockSetting());
             remove(getAnalogueClockPanel());
         }
         else if (getPanelType() == PanelType.ALARM)
@@ -285,7 +281,7 @@ public class Clock extends JFrame {
         }
     }
     public void setTheTime(LocalDateTime dateTime) {
-        logger.info("setting the time");
+        logger.info("Setting the time");
         setSeconds(dateTime.getSecond()); // sets secsAsStr
         setMinutes(dateTime.getMinute()); // sets minutesAsStr
         if (dateTime.getHour() > 12 && !isShowMilitaryTime()) { setHours(dateTime.getHour()-12);}
@@ -303,6 +299,7 @@ public class Clock extends JFrame {
         LocalDateTime ldt = determineNewTimeFromSelectedTimeZone(timezone.getText());
         setTheTime(ldt);
         setTimeZone(getZoneIdOrTimeZone(timezone.getText()));
+        getClockMenuBar().setCurrentTimeZone();
     }
     public void setCurrentTime() {
         logger.debug("year: {}", year);
@@ -316,26 +313,38 @@ public class Clock extends JFrame {
     public LocalDateTime getCurrentTime() { return currentTime; }
 
     public LocalDateTime determineNewTimeFromSelectedTimeZone(String timezone) {
-        switch (timezone) {
-            case "Hawaii" : return LocalDateTime.now(ZoneId.of("Pacific/Honolulu"));
-            case "Alaska" : return LocalDateTime.now(ZoneId.of("America/Anchorage"));
-            case "Pacific": return LocalDateTime.now(ZoneId.of("America/Los_Angeles"));
-            case "Central": return LocalDateTime.now(ZoneId.of("America/Chicago"));
-            case "Eastern": return LocalDateTime.now(ZoneId.of("America/New_York"));
-            default:        return LocalDateTime.now();
-        }
+        return switch (timezone) {
+            case "Hawaii" -> LocalDateTime.now(ZoneId.of("Pacific/Honolulu"));
+            case "Alaska" -> LocalDateTime.now(ZoneId.of("America/Anchorage"));
+            case "Pacific" -> LocalDateTime.now(ZoneId.of("America/Los_Angeles"));
+            case "Central" -> LocalDateTime.now(ZoneId.of("America/Chicago"));
+            case "Eastern" -> LocalDateTime.now(ZoneId.of("America/New_York"));
+            default -> LocalDateTime.now();
+        };
     }
 
     public ZoneId getZoneIdOrTimeZone(String timezone) {
         logger.info("timezone: {}", timezone);
-        switch (timezone) {
-            case "Hawaii" : return ZoneId.of("Pacific/Honolulu");
-            case "Alaska" : return ZoneId.of("America/Anchorage");
-            case "Pacific": return ZoneId.of("America/Los_Angeles");
-            case "Central": return ZoneId.of("America/Chicago");
-            case "Eastern": return ZoneId.of("America/New_York");
-            default:        return ZoneId.systemDefault();
-        }
+        return switch (timezone) {
+            case "Hawaii" -> ZoneId.of("Pacific/Honolulu");
+            case "Alaska" -> ZoneId.of("America/Anchorage");
+            case "Pacific" -> ZoneId.of("America/Los_Angeles");
+            case "Central" -> ZoneId.of("America/Chicago");
+            case "Eastern" -> ZoneId.of("America/New_York");
+            default -> ZoneId.systemDefault();
+        };
+    }
+
+    public String getPlainTimezoneFromZoneId(ZoneId timezone) {
+        logger.info("timezone: {}", timezone.getId());
+        return switch (timezone.getId()) {
+            case "Pacific/Honolulu" -> "Hawaii";
+            case "America/Anchorage" -> "Alaska";
+            case "America/Los_Angeles" -> "Pacific";
+            case "America/Chicago" -> "Central";
+            case "America/New_York" -> "Eastern";
+            default -> "Central";
+        };
     }
 
     private Runnable updateOutdatedTime(Clock clock) {
@@ -350,6 +359,7 @@ public class Clock extends JFrame {
             if (secondsBetween > 10) {
                 logger.warn("Clock is off by more than 10 seconds. Resetting the time.");
                 clock.setTheTime(currentTime);
+                clock.getDigitalClockPanel().updateLabels();
             }
         };
     }
@@ -359,9 +369,9 @@ public class Clock extends JFrame {
         ZonedDateTime zonedDateTime = ZonedDateTime.now(zoneId);
         DateTimeFormatter ampmFormatter = DateTimeFormatter.ofPattern("a");
         String ampm = zonedDateTime.format(ampmFormatter);
-        if (Time.PM.getStrValue().equals(ampm) && !clock.isShowMilitaryTime()) {
+        if (Time.PM.getStrValue().equals(ampm) && !clock.isShowMilitaryTime() && zonedDateTime.getHour() > 12) {
             zonedDateTime = zonedDateTime.minusHours(12);
-        }
+        } else if (Time.AM.getStrValue().equals(ampm) && zonedDateTime.getHour() == 12) {}
         return zonedDateTime.toLocalDateTime();
     }
 
@@ -678,11 +688,9 @@ public class Clock extends JFrame {
         logger.info("changeToDigitalClockPanel");
         removePanel();
         setPanel(getDigitalClockPanel());
-        getDigitalClockPanel().setupClockPanel(this);
-        this.setSize(getAnalogueClockPanel().getMaximumSize());
         this.setSize(Clock.defaultSize);
+        getDigitalClockPanel().updateLabels();
         this.repaint();
-        this.setVisible(true);
     }
 
     public void changeToAnalogueClockPanel() {

@@ -61,11 +61,7 @@ public class DigitalClockPanel extends JPanel implements ClockConstants, IClockP
 
     public void setupClockPanel(Clock clock) {
         logger.info("setupClockPanel");
-        clock.getClockMenuBar().getSettingsMenu().removeAll();
-        clock.getClockMenuBar().getSettingsMenu().add(clock.getClockMenuBar().getMilitaryTimeSetting());
-        clock.getClockMenuBar().getSettingsMenu().add(clock.getClockMenuBar().getFullTimeSetting());
-        clock.getClockMenuBar().getSettingsMenu().add(clock.getClockMenuBar().getPartialTimeSetting());
-        clock.getClockMenuBar().getSettingsMenu().add(clock.getClockMenuBar().getChangeTimeZoneMenu());
+        setupSettingsMenu();
         clock.setIsDateChanged(false);
         clock.setShowFullDate(false);
         clock.setShowPartialDate(false);

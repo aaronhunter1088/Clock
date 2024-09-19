@@ -186,7 +186,6 @@ public class ClockMenuBar extends JMenuBar {
         timezone.addActionListener(l -> clock.updateTheTime(timezone));
         timezone.setForeground(Color.WHITE);
         timezone.setBackground(Color.BLACK);
-        // TODO: set a default time zone based on current user timezone
         getChangeTimeZoneMenu().add(timezone);
     }
 
@@ -202,8 +201,21 @@ public class ClockMenuBar extends JMenuBar {
      * Updates the text on the currently selected timezone
      * so that it's clear which timezone is currently selected.
      */
-    private void setCurrentTimeZone() {
-        ZoneId currentTimezone = clock.getZoneIdOrTimeZone("");
+    void setCurrentTimeZone() {
+        ZoneId currentTimezone = clock.getTimezone();
+        timezones.forEach(timezone -> {
+            if (timezone.getText().equals(clock.getPlainTimezoneFromZoneId(currentTimezone))) {
+                if (!timezone.getText().contains("*")) {
+                    timezone.setText(timezone.getText() + " *");
+                } else {
+                    logger.info("selected timezone already has *");
+                    logger.info("no change to timezone: {}", clock.getPlainTimezoneFromZoneId(currentTimezone));
+                }
+            } else {
+                var tzName = timezone.getText().replace("*","").trim();
+                timezone.setText(tzName);
+            }
+        });
     }
 
     // Getters
