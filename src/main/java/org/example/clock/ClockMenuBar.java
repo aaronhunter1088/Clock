@@ -48,44 +48,44 @@ public class ClockMenuBar extends JMenuBar {
         setForeground(Color.WHITE);
         setBackground(Color.BLACK);
         // Menu options
-        setSettingsMenu(new JMenu("Settings"));
-        setFeaturesMenu(new JMenu("Features"));
+        setSettingsMenu(new JMenu(SETTINGS));
+        setFeaturesMenu(new JMenu(FEATURES));
         // Settings menu choices
-        setMilitaryTimeSetting(new JMenuItem(SHOW + SPACE + MILITARY_TIME_SETTING));
+        setMilitaryTimeSetting(new JMenuItem(SHOW+SPACE+MILITARY_TIME_SETTING));
         getMilitaryTimeSetting().setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_M, InputEvent.CTRL_DOWN_MASK));
         getMilitaryTimeSetting().setForeground(Color.WHITE);
 
-        setFullTimeSetting(new JMenuItem(SHOW + SPACE + FULL_TIME_SETTING));
+        setFullTimeSetting(new JMenuItem(SHOW+SPACE+FULL_TIME_SETTING));
         getFullTimeSetting().setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_F, InputEvent.CTRL_DOWN_MASK));
         getFullTimeSetting().setForeground(Color.WHITE);
 
-        setPartialTimeSetting(new JMenuItem(SHOW + SPACE + PARTIAL_TIME_SETTING));
+        setPartialTimeSetting(new JMenuItem(SHOW+SPACE+PARTIAL_TIME_SETTING));
         getPartialTimeSetting().setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_P, InputEvent.CTRL_DOWN_MASK));
         getPartialTimeSetting().setForeground(Color.WHITE);
 
-        setShowDigitalTimeOnAnalogueClockSetting(new JMenuItem(HIDE + SPACE + DIGITAL_TIME));
+        setShowDigitalTimeOnAnalogueClockSetting(new JMenuItem(HIDE+SPACE+DIGITAL_TIME));
         getShowDigitalTimeOnAnalogueClockSetting().setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_E, InputEvent.CTRL_DOWN_MASK));
         getShowDigitalTimeOnAnalogueClockSetting().setForeground(Color.WHITE);
 
-        setChangeTimeZoneMenu(new JMenu(SHOW + SPACE + TIME_ZONES));
-        setTimeZones(Arrays.asList(new JMenuItem("Hawaii"), new JMenuItem("Alaska"),
-                new JMenuItem("Pacific"), new JMenuItem("Central"), new JMenuItem("Eastern") ));
+        setChangeTimeZoneMenu(new JMenu(SHOW+SPACE+TIME_ZONES));
+        setTimeZones(Arrays.asList(new JMenuItem(HAWAII), new JMenuItem(ALASKA),
+                new JMenuItem(PACIFIC), new JMenuItem(CENTRAL), new JMenuItem(EASTERN) ));
         getTimezones().forEach(this::setupTimezone);
         setCurrentTimeZone();
 
         // Features menu choices
-        setDigitalClockFeature(new JMenuItem("View Digital Clock"));
+        setDigitalClockFeature(new JMenuItem(VIEW_DIGITAL_CLOCK));
         getDigitalClockFeature().setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_D, InputEvent.CTRL_DOWN_MASK));
 
-        setAnalogueClockFeature(new JMenuItem("View Analogue Clock"));
+        setAnalogueClockFeature(new JMenuItem(VIEW_ANALOGUE_CLOCK));
         getAnalogueClockFeature().setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_C, InputEvent.CTRL_DOWN_MASK));
 
-        setAlarmFeature_Menu(new JMenu("View Alarms"));
-        setSetAlarms(new JMenuItem("Set Alarms"));
+        setAlarmFeature_Menu(new JMenu(VIEW_ALARMS));
+        setSetAlarms(new JMenuItem(SET_ALARMS));
         getAlarmFeature_Menu().add(getSetAlarms());
         getSetAlarms().setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_A, InputEvent.CTRL_DOWN_MASK));
 
-        setTimerFeature(new JMenuItem("View Timer"));
+        setTimerFeature(new JMenuItem(VIEW_TIMER));
         getTimerFeature().setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_T, InputEvent.CTRL_DOWN_MASK));
         setDigitalClockSettingsOnMenuBar();
         // Add options to Features Menu
@@ -111,18 +111,16 @@ public class ClockMenuBar extends JMenuBar {
         getDigitalClockFeature().setForeground(Color.WHITE);
         getAnalogueClockFeature().setForeground(Color.WHITE);
         getTimerFeature().setForeground(Color.WHITE);
-        //getTimezones().forEach(timezone -> timezone.setForeground(Color.WHITE));
-        //getTimezones().forEach(timezone -> timezone.setBackground(Color.BLACK));
         // Set functionality for Settings menu
         getMilitaryTimeSetting().addActionListener(action -> {
             logger.info("clicked show military time setting");
             if (clock.isShowMilitaryTime()) {
                 clock.setShowMilitaryTime(false);
-                getMilitaryTimeSetting().setText(SHOW + SPACE + MILITARY_TIME_SETTING);
+                getMilitaryTimeSetting().setText(SHOW+SPACE+MILITARY_TIME_SETTING);
             }
             else {
                 clock.setShowMilitaryTime(true);
-                getMilitaryTimeSetting().setText(SHOW + SPACE + STANDARD_TIME_SETTING);
+                getMilitaryTimeSetting().setText(SHOW+SPACE+STANDARD_TIME_SETTING);
             }
         });
         getFullTimeSetting().addActionListener(action -> {
@@ -130,44 +128,44 @@ public class ClockMenuBar extends JMenuBar {
             if (clock.isShowFullDate()) {
                 clock.setShowFullDate(false);
                 clock.setShowPartialDate(false);
-                getFullTimeSetting().setText(SHOW + SPACE + FULL_TIME_SETTING);
+                getFullTimeSetting().setText(SHOW+SPACE+FULL_TIME_SETTING);
             }
             else {
                 clock.setShowFullDate(true);
                 clock.setShowPartialDate(false);
-                getFullTimeSetting().setText(HIDE + SPACE + FULL_TIME_SETTING);
+                getFullTimeSetting().setText(HIDE+SPACE+FULL_TIME_SETTING);
             }
-            getPartialTimeSetting().setText(SHOW + SPACE + PARTIAL_TIME_SETTING);
+            getPartialTimeSetting().setText(SHOW+SPACE+PARTIAL_TIME_SETTING);
         });
         getPartialTimeSetting().addActionListener(action -> {
             logger.info("clicked show partial time setting");
             if (clock.isShowPartialDate()) {
                 clock.setShowPartialDate(false);
                 clock.setShowFullDate(false);
-                getPartialTimeSetting().setText(SHOW + SPACE + PARTIAL_TIME_SETTING);
+                getPartialTimeSetting().setText(SHOW+SPACE+PARTIAL_TIME_SETTING);
             }
             else {
                 clock.setShowPartialDate(true);
                 clock.setShowFullDate(false);
-                getPartialTimeSetting().setText(HIDE + SPACE + PARTIAL_TIME_SETTING);
+                getPartialTimeSetting().setText(HIDE+SPACE+PARTIAL_TIME_SETTING);
             }
-            getFullTimeSetting().setText(SHOW + SPACE + FULL_TIME_SETTING);
+            getFullTimeSetting().setText(SHOW+SPACE+FULL_TIME_SETTING);
         });
         getShowDigitalTimeOnAnalogueClockSetting().addActionListener(action -> {
             logger.info("clicked show digital time or hide on analogue clock");
-            logger.info("show digital time: " + clock.isShowDigitalTimeOnAnalogueClock());
+            logger.info("show digital time: {}", clock.isShowDigitalTimeOnAnalogueClock());
             if (clock.isShowDigitalTimeOnAnalogueClock())
             {
-                clock.getAnalogueClockPanel().setClockText("");
+                clock.getAnalogueClockPanel().setClockText(EMPTY);
                 clock.getAnalogueClockPanel().repaint();
                 clock.setShowDigitalTimeOnAnalogueClock(false);
-                getShowDigitalTimeOnAnalogueClockSetting().setText(SHOW + SPACE + DIGITAL_TIME);
+                getShowDigitalTimeOnAnalogueClockSetting().setText(SHOW+SPACE+DIGITAL_TIME);
             } else
             {
                 clock.getAnalogueClockPanel().setClockText(clock.getTimeAsStr());
                 clock.getAnalogueClockPanel().repaint();
                 clock.setShowDigitalTimeOnAnalogueClock(true);
-                getShowDigitalTimeOnAnalogueClockSetting().setText(HIDE + SPACE + DIGITAL_TIME);
+                getShowDigitalTimeOnAnalogueClockSetting().setText(HIDE+SPACE+DIGITAL_TIME);
             }
         });
         // Set functionality for Features menu
@@ -178,11 +176,11 @@ public class ClockMenuBar extends JMenuBar {
         // Add both menus to main menu
         add(getSettingsMenu());
         add(getFeaturesMenu());
-        logger.info("Finished creating Clock menu bar");
+        logger.info("Finished creating Clock menubar");
     }
 
     private void setupTimezone(JMenuItem timezone) {
-        logger.info("setup timezone for {}", timezone.getText());
+        logger.debug("setup timezone for {}", timezone.getText());
         timezone.addActionListener(l -> clock.updateTheTime(timezone));
         timezone.setForeground(Color.WHITE);
         timezone.setBackground(Color.BLACK);
@@ -190,7 +188,6 @@ public class ClockMenuBar extends JMenuBar {
     }
 
     private void setDigitalClockSettingsOnMenuBar() {
-        // Add digital clock settings to Menu
         settingsMenu.add(getMilitaryTimeSetting());
         settingsMenu.add(getFullTimeSetting());
         settingsMenu.add(getPartialTimeSetting());
@@ -205,14 +202,14 @@ public class ClockMenuBar extends JMenuBar {
         ZoneId currentTimezone = clock.getTimezone();
         timezones.forEach(timezone -> {
             if (timezone.getText().equals(clock.getPlainTimezoneFromZoneId(currentTimezone))) {
-                if (!timezone.getText().contains("*")) {
-                    timezone.setText(timezone.getText() + " *");
+                if (!timezone.getText().contains(STAR)) {
+                    timezone.setText(timezone.getText()+SPACE+STAR);
                 } else {
                     logger.info("selected timezone already has *");
                     logger.info("no change to timezone: {}", clock.getPlainTimezoneFromZoneId(currentTimezone));
                 }
             } else {
-                var tzName = timezone.getText().replace("*","").trim();
+                var tzName = timezone.getText().replace(STAR,EMPTY).trim();
                 timezone.setText(tzName);
             }
         });

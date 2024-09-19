@@ -2,11 +2,13 @@ package org.example.clock;
 
 import javax.swing.*;
 import java.awt.*;
+import java.io.Serial;
 import java.net.URL;
 import java.time.*;
 import java.time.format.DateTimeFormatter;
 import java.time.format.TextStyle;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Locale;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
@@ -17,6 +19,7 @@ import org.apache.logging.log4j.Logger;
 
 import static java.time.Month.*;
 import static java.time.DayOfWeek.*;
+import static org.example.clock.ClockConstants.*;
 
 /**
  * The clock object is capable of showing the date and time.
@@ -31,6 +34,7 @@ import static java.time.DayOfWeek.*;
  */
 public class Clock extends JFrame {
     private static final Logger logger = LogManager.getLogger(Clock.class);
+    @Serial
     private static final long serialVersionUID = 2L;
     final static Dimension defaultSize = new Dimension(700, 300);
     final static Dimension panelSize = new Dimension(400, 300);
@@ -49,20 +53,21 @@ public class Clock extends JFrame {
     TimerPanel timerPanel;
     LocalDate beginDaylightSavingsTimeDate;
     LocalDate endDaylightSavingsTimeDate;
+    private LocalDateTime currentTime;
+    private ZoneId timezone;
     LocalDate date;
+    LocalTime time;
     int seconds,minutes,hours,dayOfMonth,year;
     Time ampm;
     DayOfWeek dayOfWeek;
     Month month;
-    String hoursAsStr = "",minutesAsStr = "",secondsAsStr = "";
+    String hoursAsStr=EMPTY, minutesAsStr=EMPTY, secondsAsStr=EMPTY;
     boolean leapYear,isDaylightSavingsTime,isDateChanged,isNewYear,
             alarm,timer,updateAlarm,showFullDate,showPartialDate,
-            showMilitaryTime,showDigitalTimeOnAnalogueClock, testingClock;
-    java.util.List<Alarm> listOfAlarms;
+            showMilitaryTime,showDigitalTimeOnAnalogueClock,testingClock;
+    List listOfAlarms;
     ImageIcon icon;
     private final ScheduledExecutorService timeUpdater;
-    private LocalDateTime currentTime;
-    private ZoneId timezone;
 
     public PanelType getPanelType() { return this.currentPanel; }
     public ClockMenuBar getClockMenuBar() { return this.menuBar; }
@@ -71,6 +76,7 @@ public class Clock extends JFrame {
     public AlarmPanel getAlarmPanel() { return this.alarmPanel; }
     public TimerPanel getTimerPanel() { return this.timerPanel; }
     public LocalDate getDate() { return this.date; }
+    public LocalTime getTime() { return time; }
     public LocalDate getBeginDaylightSavingsTimeDate() { return this.beginDaylightSavingsTimeDate; }
     public LocalDate getEndDaylightSavingsTimeDate() { return this.endDaylightSavingsTimeDate; }
     public int getSeconds() { return seconds; }
@@ -94,10 +100,8 @@ public class Clock extends JFrame {
     public String getTimeAsStrAlarmRepresentation() { return getHoursAsStr()+":"+getMinutesAsStr()+" "+getAMPM(); }
     public String getDateAsStr() { return this.month+" "+this.dayOfMonth +", "+this.year; }
     public String getFullDateAsStr() { return this.dayOfWeek+" "+this.month+" "+this.dayOfMonth +", "+this.year; }
-    public String getMilitaryTimeAsStr() {
-        return this.hoursAsStr + this.minutesAsStr + " hours " + this.secondsAsStr;
-    }
-    public String getPartialDateAsStr() { return this.dayOfWeek.toString().substring(0,3)+" "+this.month.toString().substring(0,3)+" "+this.dayOfMonth +", "+this.year; }
+    public String getMilitaryTimeAsStr() { return hoursAsStr+minutesAsStr+SPACE+Hours.toLowerCase()+SPACE+secondsAsStr; }
+    public String getPartialDateAsStr() { return dayOfWeek.toString().substring(0,3)+SPACE+this.month.toString().substring(0,3)+SPACE+this.dayOfMonth +COMMA+SPACE+this.year; }
     public boolean isLeapYear() { return this.leapYear; }
     public boolean isDaylightSavingsTime() { return this.isDaylightSavingsTime; }
     public boolean isDateChanged() { return this.isDateChanged; }
@@ -121,16 +125,19 @@ public class Clock extends JFrame {
     protected void setTimerPanel(TimerPanel timerPanel) { this.timerPanel = timerPanel; }
     protected void setBeginDaylightSavingsTimeDate(LocalDate beginDaylightSavingsTimeDate) { this.beginDaylightSavingsTimeDate = beginDaylightSavingsTimeDate; }
     protected void setEndDaylightSavingsTimeDate(LocalDate endDaylightSavingsTimeDate) { this.endDaylightSavingsTimeDate = endDaylightSavingsTimeDate; }
-    protected void setDate(LocalDate theDate) { this.date = theDate; }
+    protected void setDate(LocalDate theDate) { date = theDate; logger.debug("date: {}", date); }
+    protected void setTime(LocalTime theTime) { time = theTime; logger.debug("time: {}", DateTimeFormatter.ofPattern("hh:mm:ss a").format(time)); }
     protected void setSeconds(int seconds) {
         this.seconds = seconds;
         if (this.seconds <= 9) setSecondsAsStr("0"+this.seconds);
         else setSecondsAsStr(Integer.toString(this.seconds));
+        logger.debug("seconds: {}", seconds);
     }
     protected void setMinutes(int minutes) {
         this.minutes = minutes;
         if (this.minutes <= 9) setMinutesAsStr("0"+this.minutes);
         else setMinutesAsStr(Integer.toString(this.minutes));
+        logger.debug("minutes: {}", minutes);
     }
     protected void setHours(int hours) {
         this.hours = hours;
@@ -141,16 +148,17 @@ public class Clock extends JFrame {
     protected void setAMPM(LocalTime time) {
         if (time.getHour() < 12) this.ampm = Time.AM;
         else this.ampm = Time.PM;
+        logger.debug("ampm: {}", this.ampm);
     }
-    protected void setTimeZone(ZoneId timezone) { this.timezone = timezone; }
+    protected void setTimeZone(ZoneId timezone) { this.timezone = timezone; logger.debug("timezone: {}", timezone.getId()); }
     protected void setDayOfWeek(DayOfWeek dayOfWeek) { this.dayOfWeek = dayOfWeek; }
-    protected void setDayOfMonth(int dayOfMonth) { this.dayOfMonth = dayOfMonth; }
-    protected void setMonth(Month month) { this.month = month; }
-    protected void setYear(int year) { this.year = year; }
+    protected void setDayOfMonth(int dayOfMonth) { this.dayOfMonth = dayOfMonth; logger.debug("dayOfMonth: {}", dayOfMonth); }
+    protected void setMonth(Month month) { this.month = month; logger.debug("month: {}", month); }
+    protected void setYear(int year) { this.year = year; logger.debug("year: {}", year); }
     protected void setHoursAsStr(String hoursAsStr) { this.hoursAsStr = hoursAsStr; }
     protected void setMinutesAsStr(String minutesAsStr) { this.minutesAsStr = minutesAsStr; }
     protected void setSecondsAsStr(String secondsAsStr) { this.secondsAsStr = secondsAsStr; }
-    protected void setListOfAlarms(java.util.List listOfAlarms) { this.listOfAlarms = listOfAlarms; }
+    protected void setListOfAlarms(List<Alarm> listOfAlarms) { this.listOfAlarms = listOfAlarms; }
     protected void setUpdateAlarm(boolean updateAlarm) { this.updateAlarm = updateAlarm;}
     protected void setLeapYear(boolean leapYear) { this.leapYear = leapYear; }
     /**
@@ -286,90 +294,93 @@ public class Clock extends JFrame {
         setMinutes(dateTime.getMinute()); // sets minutesAsStr
         if (dateTime.getHour() > 12 && !isShowMilitaryTime()) { setHours(dateTime.getHour()-12);}
         else { setHours(dateTime.getHour()); } // sets hoursAsStr
+        logger.debug("hours: {}", hours);
         setMonth(dateTime.getMonth());
         setDayOfWeek(dateTime.getDayOfWeek());
         setDayOfMonth(dateTime.getDayOfMonth());
         setYear(dateTime.getYear());
         setAMPM(LocalTime.from(dateTime));
-        setTimeZone(getZoneIdOrTimeZone(""));
+        setTimeZone(getZoneIdFromTimezoneButtonText(""));
         setCurrentTime();
     }
     public void updateTheTime(JMenuItem timezone) {
         logger.info("updateTheTime");
         LocalDateTime ldt = determineNewTimeFromSelectedTimeZone(timezone.getText());
         setTheTime(ldt);
-        setTimeZone(getZoneIdOrTimeZone(timezone.getText()));
+        setTimeZone(getZoneIdFromTimezoneButtonText(timezone.getText()));
         getClockMenuBar().setCurrentTimeZone();
     }
     public void setCurrentTime() {
-        logger.debug("year: {}", year);
-        logger.debug("month: {}", month);
-        logger.debug("dayOfMonth: {}", dayOfMonth);
-        logger.debug("hours: {}", hours);
-        logger.debug("minutes: {}", minutes);
-        logger.debug("seconds: {}", seconds);
-        currentTime = LocalDateTime.of(getYear(), getMonth(), getDayOfMonth(), getHours(), getMinutes(), getSeconds());
+        date = LocalDate.of(year, month, dayOfMonth);
+        time = LocalTime.of(hours, minutes, seconds);
+        currentTime = LocalDateTime.of(date, time);
     }
     public LocalDateTime getCurrentTime() { return currentTime; }
 
     public LocalDateTime determineNewTimeFromSelectedTimeZone(String timezone) {
         return switch (timezone) {
-            case "Hawaii" -> LocalDateTime.now(ZoneId.of("Pacific/Honolulu"));
-            case "Alaska" -> LocalDateTime.now(ZoneId.of("America/Anchorage"));
-            case "Pacific" -> LocalDateTime.now(ZoneId.of("America/Los_Angeles"));
-            case "Central" -> LocalDateTime.now(ZoneId.of("America/Chicago"));
-            case "Eastern" -> LocalDateTime.now(ZoneId.of("America/New_York"));
+            case HAWAII -> LocalDateTime.now(ZoneId.of(PACIFIC_HONOLULU));
+            case ALASKA -> LocalDateTime.now(ZoneId.of(AMERICA_ANCHORAGE));
+            case PACIFIC -> LocalDateTime.now(ZoneId.of(AMERICA_LOS_ANGELES));
+            case CENTRAL -> LocalDateTime.now(ZoneId.of(AMERICA_CHICAGO));
+            case EASTERN -> LocalDateTime.now(ZoneId.of(AMERICA_NEW_YORK));
             default -> LocalDateTime.now();
         };
     }
 
-    public ZoneId getZoneIdOrTimeZone(String timezone) {
-        logger.info("timezone: {}", timezone);
-        return switch (timezone) {
-            case "Hawaii" -> ZoneId.of("Pacific/Honolulu");
-            case "Alaska" -> ZoneId.of("America/Anchorage");
-            case "Pacific" -> ZoneId.of("America/Los_Angeles");
-            case "Central" -> ZoneId.of("America/Chicago");
-            case "Eastern" -> ZoneId.of("America/New_York");
+    public ZoneId getZoneIdFromTimezoneButtonText(String btnText) {
+        logger.debug("btnText: {}", btnText);
+        return switch (btnText) {
+            case HAWAII -> ZoneId.of(PACIFIC_HONOLULU);
+            case ALASKA -> ZoneId.of(AMERICA_ANCHORAGE);
+            case PACIFIC -> ZoneId.of(AMERICA_LOS_ANGELES);
+            case CENTRAL -> ZoneId.of(AMERICA_CHICAGO);
+            case EASTERN -> ZoneId.of(AMERICA_NEW_YORK);
             default -> ZoneId.systemDefault();
         };
     }
 
     public String getPlainTimezoneFromZoneId(ZoneId timezone) {
-        logger.info("timezone: {}", timezone.getId());
+        logger.debug("timezone: {}", timezone.getId());
         return switch (timezone.getId()) {
-            case "Pacific/Honolulu" -> "Hawaii";
-            case "America/Anchorage" -> "Alaska";
-            case "America/Los_Angeles" -> "Pacific";
-            case "America/Chicago" -> "Central";
-            case "America/New_York" -> "Eastern";
-            default -> "Central";
+            case PACIFIC_HONOLULU -> HAWAII;
+            case AMERICA_ANCHORAGE -> ALASKA;
+            case AMERICA_LOS_ANGELES -> PACIFIC;
+            case AMERICA_CHICAGO -> CENTRAL;
+            case AMERICA_NEW_YORK -> EASTERN;
+            default -> CENTRAL;
         };
     }
 
     private Runnable updateOutdatedTime(Clock clock) {
         return () -> {
-            LocalDateTime currentTime = formatCurrentTimeToNonMilitaryTime(clock);
+            LocalDateTime currentTime = formatCurrentTimeToNonMilitaryTime();
             LocalDateTime clockTime = clock.getCurrentTime();
-            logger.debug("current time: {}", currentTime);
             logger.debug("current timezone: {}", clock.getTimezone().getDisplayName(TextStyle.FULL, Locale.ENGLISH));
+            logger.debug("current time: {}", currentTime);
             logger.debug("clock time: {}", clockTime);
             long secondsBetween = Duration.between(currentTime, clockTime).getSeconds();
             logger.debug("seconds between: {}", secondsBetween);
-            if (secondsBetween > 10) {
-                logger.warn("Clock is off by more than 10 seconds. Resetting the time.");
-                clock.setTheTime(currentTime);
+            if (secondsBetween < -1) {
+                logger.warn("ClockTime is not correct. Resetting the time.");
+                clock.setTheTime(LocalDateTime.now());
                 clock.getDigitalClockPanel().updateLabels();
             }
         };
     }
 
-    private LocalDateTime formatCurrentTimeToNonMilitaryTime(Clock clock) {
-        ZoneId zoneId = clock.getTimezone();
-        ZonedDateTime zonedDateTime = ZonedDateTime.now(zoneId);
+    /**
+     * Creates a zoned datetime object and then subtracts 12
+     * hours from the result if we are in PM, we want standard
+     * time display versus military time, and the hour is greater
+     * than 12.
+     * @return LocalDateTime the current time in non-military time
+     */
+    protected LocalDateTime formatCurrentTimeToNonMilitaryTime() {
+        ZonedDateTime zonedDateTime = ZonedDateTime.now(timezone);
         DateTimeFormatter ampmFormatter = DateTimeFormatter.ofPattern("a");
         String ampm = zonedDateTime.format(ampmFormatter);
-        if (Time.PM.getStrValue().equals(ampm) && !clock.isShowMilitaryTime() && zonedDateTime.getHour() > 12) {
+        if (Time.PM.getStrValue().equals(ampm) && !showMilitaryTime && zonedDateTime.getHour() > 12) {
             zonedDateTime = zonedDateTime.minusHours(12);
         } else if (Time.AM.getStrValue().equals(ampm) && zonedDateTime.getHour() == 12) {}
         return zonedDateTime.toLocalDateTime();
@@ -498,7 +509,7 @@ public class Clock extends JFrame {
         }
         else { setIsDateChanged(false); }
         updateHourValueAndHourString();
-        if (!isShowMilitaryTime()) { logger.info(getHoursAsStr()+":"+getMinutesAsStr()+":"+getSecondsAsStr()); }
+        if (!isShowMilitaryTime()) { logger.info(getHoursAsStr()+COLON+getMinutesAsStr()+COLON+getSecondsAsStr()); }
         else { logger.info(getMilitaryTimeAsStr()); }
 
         if (isDateChanged()) {
@@ -649,31 +660,28 @@ public class Clock extends JFrame {
     } // performTick
 
     public String defaultText(int labelVersion) {
-        String defaultText = "";
+        String defaultText = EMPTY;
         if (labelVersion == 1) {
             if (isShowFullDate() && !isShowPartialDate()) defaultText = getFullDateAsStr();
             else if (isShowPartialDate() && !isShowFullDate()) defaultText = getPartialDateAsStr();
             else defaultText = getDateAsStr();
         }
         else if (labelVersion == 2) {
-            if (!isShowMilitaryTime()) {
+            if (!showMilitaryTime) {
                 if (getAMPM() == Time.PM && getHours() > 12) { setHours(getHours()-12); }
                 defaultText = getTimeAsStr();
-                // change alarms to reflect normal time
             }
             else {
                 defaultText = getMilitaryTimeAsStr();
-                // change alarms to reflect military time
-                //setShowMilitaryTime(false);
             }
         }
-        else if (labelVersion == 3) { defaultText = "Hours"; }
-        else if (labelVersion == 4) { defaultText = "Minutes"; }
-        else if (labelVersion == 5) { defaultText = Time.AM.getStrValue()+"/"+Time.PM.getStrValue(); }
-        else if (labelVersion == 6) { defaultText = "No Alarms"; }
-        else if (labelVersion == 7) { defaultText = "S"; }
+        else if (labelVersion == 3) { defaultText = Hours; }
+        else if (labelVersion == 4) { defaultText = Minutes; }
+        else if (labelVersion == 5) { defaultText = AM+SLASH+PM; }
+        else if (labelVersion == 6) { defaultText = No_Alarms; }
+        else if (labelVersion == 7) { defaultText = S; }
         else if (labelVersion == 8) { defaultText = getAlarmPanel().getCurrentAlarmGoingOff().getAlarmAsString(); }
-        else if (labelVersion == 9) { defaultText = "is going off!"; }
+        else if (labelVersion == 9) { defaultText = is_going_off; }
         return defaultText;
     }
 
@@ -753,12 +761,12 @@ public class Clock extends JFrame {
             logger.debug("date: " + getDateAsStr());
             logger.debug("time: " + (!isShowMilitaryTime() ? getTimeAsStr() : getMilitaryTimeAsStr()));
             //Updates the clock daily to keep time current
-            if ((("12:00:00 AM").equals(getTimeAsStr()) ||
-                ("2400 hours 00").equals(getMilitaryTimeAsStr())) && !isTestingClock()) {
+            if (((MIDNIGHT_STANDARD_TIME).equals(getTimeAsStr()) ||
+                (MIDNIGHT_MILITARY_TIME).equals(getMilitaryTimeAsStr())) && !isTestingClock()) {
                 logger.info("midnight daily clock update");
                 setSeconds(0);
                 setMinutes(0);
-                if (!isShowMilitaryTime()) setHours(12);
+                if (!showMilitaryTime) setHours(12);
                 else setHours(0);
 
             }

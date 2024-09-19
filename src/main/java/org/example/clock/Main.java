@@ -32,7 +32,8 @@ public class Main {
         logger.info("Starting Clock...");
         Clock clock = new Clock();
         //new Clock(1, 59, 50, MARCH, SUNDAY, 10, 2024, Time.AM);
-        logger.info(clock.getDate());
+        logger.info("Clock started. Date {}", clock.getDate());
+        logger.info("Clock started. Time {}", DateTimeFormatter.ofPattern("hh:mm:ss a").format(clock.getCurrentTime()));
         SwingUtilities.invokeLater(() -> SwingUtilities.updateComponentTreeUI(clock));
         try {
             while (true) {
@@ -55,33 +56,4 @@ public class Main {
         catch (Exception e)
         { logger.error("Exception in clock: {}", e.getMessage()); }
     }
-
-//    private static Runnable updateTheTime(Clock clock) {
-//        return () -> {
-//            LocalDateTime currentTime = formatCurrentTimeToNonMilitaryTime(clock);
-//            LocalDateTime clockTime = clock.getCurrentTime();
-//            logger.debug("time now: {}", currentTime);
-//            logger.debug("clock time: {}", clockTime);
-//            long secondsBetween = Duration.between(currentTime, clockTime).getSeconds();
-//            logger.debug("seconds between: {}", secondsBetween);
-//            //long secondsBetween2 = ChronoUnit.SECONDS.between(clockTime, currentTime);
-//            //logger.debug("seconds between2: {}", secondsBetween2);
-//            //if (secondsBetween != 0) {
-//            if (secondsBetween > 10) {
-//                logger.warn("Clock is off by more than 10 seconds. Resetting the time.");
-//                clock.setTheTime(currentTime);
-//            }
-//        };
-//    }
-//
-//    private static LocalDateTime formatCurrentTimeToNonMilitaryTime(Clock clock) {
-//        ZoneId zoneId = clock.getTimezone(); //ZoneId.of("America/Chicago");
-//        ZonedDateTime zonedDateTime = ZonedDateTime.now(zoneId);
-//        DateTimeFormatter ampmFormatter = DateTimeFormatter.ofPattern("a");
-//        String ampm = zonedDateTime.format(ampmFormatter);
-//        if (Time.PM.getStrValue().equals(ampm)) {
-//            zonedDateTime = zonedDateTime.minusHours(12);
-//        }
-//        return zonedDateTime.toLocalDateTime();
-//    }
 }
