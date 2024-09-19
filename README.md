@@ -1,15 +1,16 @@
-# Clock v2.6
+# Clock v2.7
 
 This is a simple GUI project which displays the time and allows the user to set alarms.
 
 The clock starts up in Digital Mode. You can switch to this mode at any time by clicking
-on Features --> View Digital Clock (or clicking Ctrl + D); This mode has 3 specific 
+on Features --> View Digital Clock (or clicking Ctrl + D); This mode has 4 specific 
 settings you can enable.
 You can show the time in military time, or not, and expand to show the full date, or not.
 You can also show the partial date, which displays less text on the screen while still
-allowing the user to tell the time and date. These features are also present when viewing
-the alarm and timer panels. Enabling a setting will still work but you must navigate back
-to the clock to see the results.
+allowing the user to tell the time and date. 
+v2.7 You can now set particular timezones which will update the clocks time.
+Specific panel's have their own settings and are now only visible when in that particular
+panel.
 
 You can set alarms. Click Features --> View Alarms --> Set Alarms (or click Ctrl + A).
 Here you can enter the Hour, Minutes, and Time (AM/PM) to set an alarm.
