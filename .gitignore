@@ -1,11 +1,10 @@
-target/*
+target/**
 src/.DS_Store
 src/main/.DS_Store
 .DS_Store
 .project
 .settings/
-.idea/*
-.idea/misc.xml
+.idea/**
 Clock.iml
-dist/*
-logs/*
+dist/**
+logs/**
