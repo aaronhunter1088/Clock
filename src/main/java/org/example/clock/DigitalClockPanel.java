@@ -39,6 +39,7 @@ public class DigitalClockPanel extends JPanel implements ClockConstants, IClockP
         setForeground(Color.WHITE);
         setupClockPanel(getClock());
         addComponentsToPanel();
+        setupSettingsMenu();
         logger.info("Finished creating DigitalClock Panel");
     }
 
@@ -109,6 +110,14 @@ public class DigitalClockPanel extends JPanel implements ClockConstants, IClockP
         logger.info("addComponentsToPanel");
         addComponent(getLabel1(), 0,0,1,1, 0,0);
         addComponent(getLabel2(), 1,0,1,1, 0,0);
+    }
+
+    protected void setupSettingsMenu() {
+        this.clock.getClockMenuBar().getSettingsMenu().removeAll(); // easier
+        this.clock.getClockMenuBar().getSettingsMenu().add(this.clock.getClockMenuBar().getMilitaryTimeSetting());
+        this.clock.getClockMenuBar().getSettingsMenu().add(this.clock.getClockMenuBar().getFullTimeSetting());
+        this.clock.getClockMenuBar().getSettingsMenu().add(this.clock.getClockMenuBar().getPartialTimeSetting());
+        this.clock.getClockMenuBar().getSettingsMenu().add(this.clock.getClockMenuBar().getChangeTimeZoneMenu());
     }
 
     public void updateLabels()

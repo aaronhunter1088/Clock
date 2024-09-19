@@ -2,7 +2,11 @@ package org.example.clock;
 
 import javax.swing.*;
 import java.text.ParseException;
+import java.time.Duration;
 import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
 import java.util.concurrent.TimeUnit;
 
@@ -45,23 +49,39 @@ public class Main {
                 }
                 sleep(250);
                 clock.setCurrentTime();
-                clock.getTimeUpdater().scheduleAtFixedRate(updateTheTime(clock), 1, 1, TimeUnit.SECONDS);
                 sleep(250);
             }
         }
         catch (Exception e)
-        { logger.error("Couldn't start Clock: " + e.getMessage()); }
+        { logger.error("Exception in clock: {}", e.getMessage()); }
     }
 
-    private static Runnable updateTheTime(Clock clock) {
-        return () -> {
-            LocalDateTime currentTime = LocalDateTime.now();
-            long secondsBetween = ChronoUnit.SECONDS.between(currentTime, clock.getCurrentTime());
-
-            if (secondsBetween != 0) {
-                logger.warn("System was asleep or delayed, adjusting time...");
-                clock.setTheTime(currentTime);
-            }
-        };
-    }
+//    private static Runnable updateTheTime(Clock clock) {
+//        return () -> {
+//            LocalDateTime currentTime = formatCurrentTimeToNonMilitaryTime(clock);
+//            LocalDateTime clockTime = clock.getCurrentTime();
+//            logger.debug("time now: {}", currentTime);
+//            logger.debug("clock time: {}", clockTime);
+//            long secondsBetween = Duration.between(currentTime, clockTime).getSeconds();
+//            logger.debug("seconds between: {}", secondsBetween);
+//            //long secondsBetween2 = ChronoUnit.SECONDS.between(clockTime, currentTime);
+//            //logger.debug("seconds between2: {}", secondsBetween2);
+//            //if (secondsBetween != 0) {
+//            if (secondsBetween > 10) {
+//                logger.warn("Clock is off by more than 10 seconds. Resetting the time.");
+//                clock.setTheTime(currentTime);
+//            }
+//        };
+//    }
+//
+//    private static LocalDateTime formatCurrentTimeToNonMilitaryTime(Clock clock) {
+//        ZoneId zoneId = clock.getTimezone(); //ZoneId.of("America/Chicago");
+//        ZonedDateTime zonedDateTime = ZonedDateTime.now(zoneId);
+//        DateTimeFormatter ampmFormatter = DateTimeFormatter.ofPattern("a");
+//        String ampm = zonedDateTime.format(ampmFormatter);
+//        if (Time.PM.getStrValue().equals(ampm)) {
+//            zonedDateTime = zonedDateTime.minusHours(12);
+//        }
+//        return zonedDateTime.toLocalDateTime();
+//    }
 }

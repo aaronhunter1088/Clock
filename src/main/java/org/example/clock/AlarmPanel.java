@@ -936,4 +936,9 @@ public class AlarmPanel extends JPanel implements ClockConstants, IClockPanel {
         getGridBagLayout().setConstraints(cpt, getGridBagConstraints());
         add(cpt);
     }
+
+    protected void setupSettingsMenu() {
+        clock.getClockMenuBar().getSettingsMenu().removeAll();
+        logger.info("No settings set up for Alarm Panel");
+    }
 }

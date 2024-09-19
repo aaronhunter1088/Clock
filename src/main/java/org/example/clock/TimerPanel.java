@@ -58,6 +58,7 @@ public class TimerPanel extends JPanel implements ClockConstants, IClockPanel {
         updateLabels();
         addComponentsToPanel();
         setupMusicPlayer();
+        setupSettingsMenu();
         // allows the user to click around the options and if timer values
         // are valid, enables the Set button
         addMouseListener(new MouseListener() {
@@ -496,5 +497,10 @@ public class TimerPanel extends JPanel implements ClockConstants, IClockPanel {
                 printStackTrace(e, "A JavaLayerException occurred: " + e.getMessage());
         }
         logger.info("Alarm button set!");
+    }
+
+    protected void setupSettingsMenu() {
+        clock.getClockMenuBar().getSettingsMenu().removeAll();
+        logger.info("No settings set for the Timer Panel");
     }
 }

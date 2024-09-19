@@ -7,6 +7,7 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
+import java.time.ZoneId;
 import java.util.Arrays;
 
 import static org.example.clock.ClockConstants.*;
@@ -49,7 +50,7 @@ public class ClockMenuBar extends JMenuBar {
         // Menu options
         setSettingsMenu(new JMenu("Settings"));
         setFeaturesMenu(new JMenu("Features"));
-        // digital clock menu choices
+        // Settings menu choices
         setMilitaryTimeSetting(new JMenuItem(SHOW + SPACE + MILITARY_TIME_SETTING));
         getMilitaryTimeSetting().setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_M, InputEvent.CTRL_DOWN_MASK));
         getMilitaryTimeSetting().setForeground(Color.WHITE);
@@ -70,6 +71,7 @@ public class ClockMenuBar extends JMenuBar {
         setTimeZones(Arrays.asList(new JMenuItem("Hawaii"), new JMenuItem("Alaska"),
                 new JMenuItem("Pacific"), new JMenuItem("Central"), new JMenuItem("Eastern") ));
         getTimezones().forEach(this::setupTimezone);
+        setCurrentTimeZone();
 
         // Features menu choices
         setDigitalClockFeature(new JMenuItem("View Digital Clock"));
@@ -85,11 +87,7 @@ public class ClockMenuBar extends JMenuBar {
 
         setTimerFeature(new JMenuItem("View Timer"));
         getTimerFeature().setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_T, InputEvent.CTRL_DOWN_MASK));
-        // Add digital clock settings to Menu
-        getSettingsMenu().add(getMilitaryTimeSetting());
-        getSettingsMenu().add(getFullTimeSetting());
-        getSettingsMenu().add(getPartialTimeSetting());
-        getSettingsMenu().add(getChangeTimeZoneMenu());
+        setDigitalClockSettingsOnMenuBar();
         // Add options to Features Menu
         getFeaturesMenu().add(getDigitalClockFeature());
         getFeaturesMenu().add(getAnalogueClockFeature());
@@ -184,10 +182,28 @@ public class ClockMenuBar extends JMenuBar {
     }
 
     private void setupTimezone(JMenuItem timezone) {
+        logger.info("setup timezone for {}", timezone.getText());
         timezone.addActionListener(l -> clock.updateTheTime(timezone));
         timezone.setForeground(Color.WHITE);
         timezone.setBackground(Color.BLACK);
+        // TODO: set a default time zone based on current user timezone
         getChangeTimeZoneMenu().add(timezone);
+    }
+
+    private void setDigitalClockSettingsOnMenuBar() {
+        // Add digital clock settings to Menu
+        settingsMenu.add(getMilitaryTimeSetting());
+        settingsMenu.add(getFullTimeSetting());
+        settingsMenu.add(getPartialTimeSetting());
+        settingsMenu.add(getChangeTimeZoneMenu());
+    }
+
+    /**
+     * Updates the text on the currently selected timezone
+     * so that it's clear which timezone is currently selected.
+     */
+    private void setCurrentTimeZone() {
+        ZoneId currentTimezone = clock.getZoneIdOrTimeZone("");
     }
 
     // Getters
