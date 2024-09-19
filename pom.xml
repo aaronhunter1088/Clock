@@ -7,7 +7,7 @@
   	<artifactId>clock</artifactId>
   	<version>2.6</version>
   	<name>Clock</name>
-    <description>This is Clock GUI.</description>
+    <description>This is a simple Clock GUI which displays the date and time, and can set alarms and timers.</description>
     
     <properties>
 		<java.version>18</java.version>
@@ -115,14 +115,15 @@
 			<artifactId>gson</artifactId>
 			<version>2.10.1</version>
 		</dependency>
-        <dependency>
-            <groupId>org.junit.jupiter</groupId>
-            <artifactId>junit-jupiter</artifactId>
-            <version>RELEASE</version>
-            <scope>test</scope>
-        </dependency>
+		<dependency>
+			<groupId>org.junit.jupiter</groupId>
+			<artifactId>junit-jupiter</artifactId>
+			<version>5.11.0</version>
+			<scope>test</scope>
+		</dependency>
 
-    </dependencies>
+
+	</dependencies>
     
     <build>
 		<sourceDirectory>src/main/java</sourceDirectory>
@@ -145,13 +146,15 @@
 				<artifactId>maven-compiler-plugin</artifactId>
 				<version>${maven.compiler.version}</version>
 				<configuration>
-					<release>11</release>
+					<release>18</release>
 					<compilerArgs>
 						<!--<arg>#doubledash#enable-preview</arg>-->
 						<arg>-verbose</arg>
 						<arg>-Xlint:all,-options,-path</arg>
 					</compilerArgs>
-					<!-- for surefire plugin -->
+                    <source>18</source>
+                    <target>18</target>
+                    <!-- for surefire plugin -->
 				</configuration>
 				<executions>
 					<execution>
@@ -225,28 +228,28 @@
             	</configuration>
             </plugin>
             
-            <plugin>
-            	<groupId>org.apache.maven.plugins</groupId>
-            	<artifactId>maven-antrun-plugin</artifactId>
-            	<executions>
-            		<execution>
-            			<phase>initialize</phase>
-            			<goals>
-            				<goal>run</goal>
-            			</goals>
-            			<configuration>
-            				<tasks>
-            					<mkdir dir="${project.build.directory}"/>
-            					<tstamp>
-									<format property="last.updated" pattern="yyyy-MM-dd HH:mm:ss"/>
-            					</tstamp>
-            					<!--suppress UnresolvedMavenProperty -->
-								<echo file="${basedir}/dist/build.properties" message="build.time=${last.updated}"/>
-            				</tasks>
-            			</configuration>
-            		</execution>
-            	</executions>
-            </plugin>
+<!--            <plugin>-->
+<!--            	<groupId>org.apache.maven.plugins</groupId>-->
+<!--            	<artifactId>maven-antrun-plugin</artifactId>-->
+<!--            	<executions>-->
+<!--            		<execution>-->
+<!--            			<phase>initialize</phase>-->
+<!--            			<goals>-->
+<!--            				<goal>run</goal>-->
+<!--            			</goals>-->
+<!--            			<configuration>-->
+<!--            				<tasks>-->
+<!--            					<mkdir dir="${project.build.directory}"/>-->
+<!--            					<tstamp>-->
+<!--									<format property="last.updated" pattern="yyyy-MM-dd HH:mm:ss"/>-->
+<!--            					</tstamp>-->
+<!--            					&lt;!&ndash;suppress UnresolvedMavenProperty &ndash;&gt;-->
+<!--								<echo file="${basedir}/dist/build.properties" message="build.time=${last.updated}"/>-->
+<!--            				</tasks>-->
+<!--            			</configuration>-->
+<!--            		</execution>-->
+<!--            	</executions>-->
+<!--            </plugin>-->
 
 			<!-- Package: creates runnable jar with dependencies -->
             <plugin>
