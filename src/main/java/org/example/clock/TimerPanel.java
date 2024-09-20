@@ -25,7 +25,7 @@ import static java.lang.Thread.sleep;
  * when the timer reaches '00:00:00'.
  *
  * @author michael ball
- * @version 2.6
+ * @version 2.7
  */
 public class TimerPanel extends JPanel implements ClockConstants, IClockPanel {
     private static final Logger logger = LogManager.getLogger(TimerPanel.class);

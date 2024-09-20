@@ -30,7 +30,7 @@ import static org.example.clock.ClockConstants.*;
  * (DAY_OF_WEEK MONTH DATE, YEAR).
  * 
  * @author Michael Ball 
- * @version 2.6
+ * @version 2.7
  */
 public class Clock extends JFrame {
     private static final Logger logger = LogManager.getLogger(Clock.class);
@@ -64,8 +64,9 @@ public class Clock extends JFrame {
     String hoursAsStr=EMPTY, minutesAsStr=EMPTY, secondsAsStr=EMPTY;
     boolean leapYear,isDaylightSavingsTime,isDateChanged,isNewYear,
             alarm,timer,updateAlarm,showFullDate,showPartialDate,
-            showMilitaryTime,showDigitalTimeOnAnalogueClock,testingClock;
-    List listOfAlarms;
+            showMilitaryTime,showDigitalTimeOnAnalogueClock,testingClock,
+            daylightSavingsTimeEnabled=true;
+    List<Alarm> listOfAlarms;
     ImageIcon icon;
     private final ScheduledExecutorService timeUpdater;
 
@@ -116,6 +117,7 @@ public class Clock extends JFrame {
     public boolean isTestingClock() { return this.testingClock; }
     public java.util.List<Alarm> getListOfAlarms() { return this.listOfAlarms; }
     public ScheduledExecutorService getTimeUpdater() { return this.timeUpdater; }
+    public boolean isDaylightSavingsTimeEnabled() { return daylightSavingsTimeEnabled; }
 
     protected void setPanelType(PanelType currentPanel) { this.currentPanel = currentPanel; }
     protected void setClockMenuBar(ClockMenuBar menuBar) { this.menuBar = menuBar; }
@@ -177,6 +179,7 @@ public class Clock extends JFrame {
     protected void setShowMilitaryTime(boolean showMilitaryTime) { this.showMilitaryTime = showMilitaryTime; }
     protected void setShowDigitalTimeOnAnalogueClock(boolean showDigitalTimeOnAnalogueClock) { this.showDigitalTimeOnAnalogueClock = showDigitalTimeOnAnalogueClock; }
     void setTestingClock(boolean testingClock) { this.testingClock = testingClock; }
+    void setDaylightSavingsTimeEnabled(boolean daylightSavingsTimeEnabled) { this.daylightSavingsTimeEnabled = daylightSavingsTimeEnabled; }
 
     /**
      * The main constructor.
@@ -434,23 +437,23 @@ public class Clock extends JFrame {
             endDate = LocalDate.of(year, 11, firstOfMonth++);
         }
         setEndDaylightSavingsTimeDate(endDate);
-        logger.info("begin date: " + beginDate.format(DateTimeFormatter.ofPattern("MM-dd-yyyy")));
-        logger.info("end date: " + endDate.format(DateTimeFormatter.ofPattern("MM-dd-yyyy")));
+        logger.info("begin date: {}", beginDate.format(DateTimeFormatter.ofPattern("MM-dd-yyyy")));
+        logger.info("end date: {}", endDate.format(DateTimeFormatter.ofPattern("MM-dd-yyyy")));
         logger.info("daylight savings dates set");
     }
 
     public boolean isTodayDaylightSavingsTime() {
-        if (getDate().isEqual(getBeginDaylightSavingsTimeDate())) {
+        if (date.isEqual(getBeginDaylightSavingsTimeDate())) {
             setDaylightSavingsTime(true);
             return isDaylightSavingsTime();
         }
-        else if (getDate().isEqual(getEndDaylightSavingsTimeDate())) {
+        else if (date.isEqual(getEndDaylightSavingsTimeDate())) {
             setDaylightSavingsTime(true);
             return isDaylightSavingsTime();
         }
         else {
             setDaylightSavingsTime(false);
-            return isDaylightSavingsTime();
+            return isDaylightSavingsTime;
         }
     }
 
@@ -641,21 +644,24 @@ public class Clock extends JFrame {
             setDate(LocalDate.of(getYear(), getMonth(), getDayOfMonth()));
             if (isTodayDaylightSavingsTime()) { setDaylightSavingsTime(true); }
         }
-        if (isDaylightSavingsTime() && getHours() == 2) {
+        if (daylightSavingsTimeEnabled && isDaylightSavingsTime && getHours() == 2) {
             logger.info("!! daylight savings time now !!");
-            if (getMonth() == MARCH && getAMPM() == Time.AM) {
+            if (month == MARCH && getAMPM() == Time.AM) {
                 logger.info("spring forward");
                 setHours(3);
                 setDaylightSavingsTime(false);
-                logger.info("hour set to " + getHours());
+                logger.info("hour set to {}", getHours());
             }
-            else if (getMonth() == NOVEMBER && getAMPM() == Time.AM) {
+            else if (month == NOVEMBER && getAMPM() == Time.AM) {
                 logger.info("fall back");
                 setHours(1);
                 setDaylightSavingsTime(false);
-                logger.info("hour set to " + getHours());
+                logger.info("hour set to {}", getHours());
             }
-            logger.info("setting isDaylightSavingsTime to " + isDaylightSavingsTime());
+            logger.info("setting isDaylightSavingsTime to {}", isDaylightSavingsTime);
+        } else {
+            logger.info("daylight savings time not enabled");
+            logger.info("not adjusting time");
         }
     } // performTick
 

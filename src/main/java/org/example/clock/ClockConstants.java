@@ -4,7 +4,7 @@ package org.example.clock;
  * Constants for Clock application
  *
  * @author Michael Ball
- * @version 2.6
+ * @version 2.7
  */
 public interface ClockConstants {
     String HIDE = "Hide";
@@ -16,6 +16,10 @@ public interface ClockConstants {
     String MILITARY_TIME_SETTING = "military time";
     String FULL_TIME_SETTING = "full date";
     String PARTIAL_TIME_SETTING = "partial date";
+    String DST_SETTING = "daylight savings time";
+    String Turn = "Turn";
+    String on = "on";
+    String off = "off";
     String STAR = "*";
     String SLASH = "/";
     String COLON = ":";

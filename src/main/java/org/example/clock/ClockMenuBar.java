@@ -15,7 +15,7 @@ import static org.example.clock.ClockConstants.*;
 /**
  * The menu bar for the Clock.
  * @author Michael Ball
- * @version 2.6
+ * @version 2.7
  */
 public class ClockMenuBar extends JMenuBar {
     private static final Logger logger = LogManager.getLogger(ClockMenuBar.class);
@@ -27,6 +27,7 @@ public class ClockMenuBar extends JMenuBar {
     JMenuItem militaryTimeSetting;
     JMenuItem fullTimeSetting;
     JMenuItem partialTimeSetting;
+    JMenuItem toggleDSTSetting;
     JMenuItem showDigitalTimeSettingOnAnalogueClockSetting;
     JMenu changeTimeZone;
     java.util.List<JMenuItem> timezones;
@@ -62,6 +63,10 @@ public class ClockMenuBar extends JMenuBar {
         setPartialTimeSetting(new JMenuItem(SHOW+SPACE+PARTIAL_TIME_SETTING));
         getPartialTimeSetting().setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_P, InputEvent.CTRL_DOWN_MASK));
         getPartialTimeSetting().setForeground(Color.WHITE);
+
+        setToggleDSTSetting(new JMenuItem(Turn+SPACE+(clock.daylightSavingsTimeEnabled?off:on)+SPACE+DST_SETTING));
+        getToggleDSTSetting().setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_T, InputEvent.CTRL_DOWN_MASK));
+        getToggleDSTSetting().setForeground(Color.WHITE);
 
         setShowDigitalTimeOnAnalogueClockSetting(new JMenuItem(HIDE+SPACE+DIGITAL_TIME));
         getShowDigitalTimeOnAnalogueClockSetting().setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_E, InputEvent.CTRL_DOWN_MASK));
@@ -151,6 +156,13 @@ public class ClockMenuBar extends JMenuBar {
             }
             getFullTimeSetting().setText(SHOW+SPACE+FULL_TIME_SETTING);
         });
+        getToggleDSTSetting().addActionListener(action -> {
+            var isEnabled = clock.isDaylightSavingsTimeEnabled();
+            logger.debug("toggling dst to be {}", !isEnabled);
+            clock.setDaylightSavingsTimeEnabled(!isEnabled);
+            getToggleDSTSetting().setText(Turn+SPACE+(clock.daylightSavingsTimeEnabled?off:on)+SPACE+DST_SETTING);
+            logger.debug("setting text: '{}'", getToggleDSTSetting().getText());
+        });
         getShowDigitalTimeOnAnalogueClockSetting().addActionListener(action -> {
             logger.info("clicked show digital time or hide on analogue clock");
             logger.info("show digital time: {}", clock.isShowDigitalTimeOnAnalogueClock());
@@ -222,6 +234,7 @@ public class ClockMenuBar extends JMenuBar {
     public JMenuItem getMilitaryTimeSetting() { return this.militaryTimeSetting; }
     public JMenuItem getFullTimeSetting() { return this.fullTimeSetting; }
     public JMenuItem getPartialTimeSetting() { return this.partialTimeSetting; }
+    public JMenuItem getToggleDSTSetting() { return toggleDSTSetting; }
     public JMenuItem getShowDigitalTimeOnAnalogueClockSetting() { return this.showDigitalTimeSettingOnAnalogueClockSetting; }
     public JMenu getChangeTimeZoneMenu() { return this.changeTimeZone; }
     public java.util.List<JMenuItem> getTimezones() { return this.timezones; }
@@ -237,6 +250,7 @@ public class ClockMenuBar extends JMenuBar {
     void setMilitaryTimeSetting(JMenuItem militaryTimeSetting) { this.militaryTimeSetting = militaryTimeSetting; }
     void setFullTimeSetting(JMenuItem fullTimeSetting) { this.fullTimeSetting = fullTimeSetting; }
     void setPartialTimeSetting(JMenuItem partialTimeSetting) { this.partialTimeSetting = partialTimeSetting; }
+    void setToggleDSTSetting(JMenuItem toggleDSTSetting) { this.toggleDSTSetting = toggleDSTSetting; }
     void setShowDigitalTimeOnAnalogueClockSetting(JMenuItem showDigitalTimeSettingOnAnalogueClockSetting) { this.showDigitalTimeSettingOnAnalogueClockSetting = showDigitalTimeSettingOnAnalogueClockSetting; }
     void setChangeTimeZoneMenu(JMenu changeTimeZone) { this.changeTimeZone = changeTimeZone; }
     void setDigitalClockFeature(JMenuItem digitalClockFeature) { this.digitalClockFeature = digitalClockFeature; }

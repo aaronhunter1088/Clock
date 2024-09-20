@@ -12,7 +12,7 @@ package org.example.clock;
  * exception is thrown.
  * It forces the programmer to deal with the exception."
  * @author michael ball
- * @version 2.6
+ * @version 2.7
  */
 public class InvalidInputException extends Exception {
 

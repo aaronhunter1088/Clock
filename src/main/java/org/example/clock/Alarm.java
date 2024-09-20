@@ -17,7 +17,7 @@ import static java.time.DayOfWeek.*;
  * on Clocks time if alarm is going off.
  *
  * @author michael ball
- * @version 2.6
+ * @version 2.7
  */
 public class Alarm {
     private static final Logger logger = LogManager.getLogger(Alarm.class);

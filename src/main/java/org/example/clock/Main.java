@@ -2,26 +2,18 @@ package org.example.clock;
 
 import javax.swing.*;
 import java.text.ParseException;
-import java.time.Duration;
-import java.time.LocalDateTime;
-import java.time.ZoneId;
-import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
-import java.time.temporal.ChronoUnit;
-import java.util.concurrent.TimeUnit;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import static java.lang.Thread.sleep;
-import static java.time.DayOfWeek.*;
-import static java.time.Month.*;
 
 /**
  * Main application to start Clock
  *
  * @author Michael Ball
- * @version 2.6
+ * @version 2.7
  */
 public class Main {
 
@@ -32,8 +24,8 @@ public class Main {
         logger.info("Starting Clock...");
         Clock clock = new Clock();
         //new Clock(1, 59, 50, MARCH, SUNDAY, 10, 2024, Time.AM);
-        logger.info("Clock started. Date {}", clock.getDate());
-        logger.info("Clock started. Time {}", DateTimeFormatter.ofPattern("hh:mm:ss a").format(clock.getCurrentTime()));
+        logger.info("Clock started. Date {}", clock.getDate().format(DateTimeFormatter.ofPattern("MM-dd-yyyy")));
+        logger.info("Clock started. Time {} {}", clock.getTime().format(DateTimeFormatter.ofPattern("hh:mm:ss")), clock.getAMPM());
         SwingUtilities.invokeLater(() -> SwingUtilities.updateComponentTreeUI(clock));
         try {
             while (true) {

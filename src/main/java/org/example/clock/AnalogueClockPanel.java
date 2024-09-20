@@ -18,7 +18,7 @@ import static java.lang.Thread.sleep;
  * to hide this, the settings allows for that.
  *
  * @author michael ball
- * @version 2.6
+ * @version 2.7
  */
 public class AnalogueClockPanel extends JPanel implements ClockConstants, IClockPanel, Runnable {
     private static final Logger logger = LogManager.getLogger(AnalogueClockPanel.class);
@@ -105,6 +105,7 @@ public class AnalogueClockPanel extends JPanel implements ClockConstants, IClock
     protected void setupSettingsMenu() {
         clock.getClockMenuBar().getSettingsMenu().removeAll();
         clock.getClockMenuBar().getSettingsMenu().add(clock.getClockMenuBar().getShowDigitalTimeOnAnalogueClockSetting());
+        clock.getClockMenuBar().getSettingsMenu().add(clock.getClockMenuBar().getToggleDSTSetting());
         clock.setShowDigitalTimeOnAnalogueClock(true);
         clock.getClockMenuBar().getShowDigitalTimeOnAnalogueClockSetting().setText(ClockConstants.HIDE + ClockConstants.SPACE + ClockConstants.DIGITAL_TIME);
     }

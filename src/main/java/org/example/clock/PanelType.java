@@ -6,7 +6,7 @@ package org.example.clock;
  * TimerFace....
  *
  * @author michael ball
- * @version 2.6
+ * @version 2.7
  */
 public enum PanelType {
 	ANALOGUE_CLOCK,

@@ -35,7 +35,7 @@ import static java.time.DayOfWeek.*;
  * and an alarm will be created.
  *
  * @author michael ball
- * @version 2.6
+ * @version 2.7
  */
 public class AlarmPanel extends JPanel implements ClockConstants, IClockPanel {
     private static final Logger logger = LogManager.getLogger(AlarmPanel.class);

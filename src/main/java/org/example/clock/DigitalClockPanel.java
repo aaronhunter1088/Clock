@@ -15,7 +15,7 @@ import java.awt.*;
  * look.
  *
  * @author michael ball
- * @version 2.6
+ * @version 2.7
  */
 public class DigitalClockPanel extends JPanel implements ClockConstants, IClockPanel {
     private static final Logger logger = LogManager.getLogger(DigitalClockPanel.class);
@@ -109,11 +109,12 @@ public class DigitalClockPanel extends JPanel implements ClockConstants, IClockP
     }
 
     protected void setupSettingsMenu() {
-        this.clock.getClockMenuBar().getSettingsMenu().removeAll(); // easier
-        this.clock.getClockMenuBar().getSettingsMenu().add(this.clock.getClockMenuBar().getMilitaryTimeSetting());
-        this.clock.getClockMenuBar().getSettingsMenu().add(this.clock.getClockMenuBar().getFullTimeSetting());
-        this.clock.getClockMenuBar().getSettingsMenu().add(this.clock.getClockMenuBar().getPartialTimeSetting());
-        this.clock.getClockMenuBar().getSettingsMenu().add(this.clock.getClockMenuBar().getChangeTimeZoneMenu());
+        clock.getClockMenuBar().getSettingsMenu().removeAll(); // easier
+        clock.getClockMenuBar().getSettingsMenu().add(clock.getClockMenuBar().getMilitaryTimeSetting());
+        clock.getClockMenuBar().getSettingsMenu().add(clock.getClockMenuBar().getFullTimeSetting());
+        clock.getClockMenuBar().getSettingsMenu().add(clock.getClockMenuBar().getPartialTimeSetting());
+        clock.getClockMenuBar().getSettingsMenu().add(clock.getClockMenuBar().getToggleDSTSetting());
+        clock.getClockMenuBar().getSettingsMenu().add(clock.getClockMenuBar().getChangeTimeZoneMenu());
     }
 
     public void updateLabels()

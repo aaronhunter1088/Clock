@@ -7,7 +7,7 @@ package org.example.clock;
  * sure it has updated itself accordingly.
  *
  * @author Michael Ball
- * @version 2.6
+ * @version 2.7
  */
 public interface IClockPanel {
     void addComponentsToPanel();

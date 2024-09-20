@@ -6,7 +6,7 @@ package org.example.clock;
  * before midday or after midday.
  * 
  * @author michael ball
- * @version 2.6
+ * @version 2.7
  */
 public enum Time {
     AM(1, "AM"),
