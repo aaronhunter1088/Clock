@@ -24,6 +24,7 @@ public interface ClockConstants {
     String SLASH = "/";
     String COLON = ":";
     String COMMA = ",";
+    String NEWLINE = "\n";
     String Hours = "Hours";
     String Minutes = "Minutes";
     String Seconds = "Seconds";

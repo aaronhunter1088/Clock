@@ -8,6 +8,9 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import static java.lang.Thread.sleep;
+import static org.example.clock.ClockConstants.*;
+import static java.time.DayOfWeek.*;
+import static java.time.Month.*;
 
 /**
  * Main application to start Clock
@@ -23,7 +26,7 @@ public class Main {
 
         logger.info("Starting Clock...");
         Clock clock = new Clock();
-        //new Clock(1, 59, 50, MARCH, SUNDAY, 10, 2024, Time.AM);
+        //new Clock(1, 59, 50, NOVEMBER, SUNDAY, 3, 2024, AM);
         logger.info("Clock started. Date {}", clock.getDate().format(DateTimeFormatter.ofPattern("MM-dd-yyyy")));
         logger.info("Clock started. Time {} {}", clock.getTime().format(DateTimeFormatter.ofPattern("hh:mm:ss")), clock.getAMPM());
         SwingUtilities.invokeLater(() -> SwingUtilities.updateComponentTreeUI(clock));

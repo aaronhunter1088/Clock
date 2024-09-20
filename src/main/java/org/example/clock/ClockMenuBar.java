@@ -64,7 +64,7 @@ public class ClockMenuBar extends JMenuBar {
         getPartialTimeSetting().setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_P, InputEvent.CTRL_DOWN_MASK));
         getPartialTimeSetting().setForeground(Color.WHITE);
 
-        setToggleDSTSetting(new JMenuItem(Turn+SPACE+(clock.daylightSavingsTimeEnabled?off:on)+SPACE+DST_SETTING));
+        setToggleDSTSetting(new JMenuItem(Turn+SPACE+(clock.isDaylightSavingsTimeEnabled()?off:on)+SPACE+DST_SETTING));
         getToggleDSTSetting().setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_T, InputEvent.CTRL_DOWN_MASK));
         getToggleDSTSetting().setForeground(Color.WHITE);
 
@@ -160,7 +160,7 @@ public class ClockMenuBar extends JMenuBar {
             var isEnabled = clock.isDaylightSavingsTimeEnabled();
             logger.debug("toggling dst to be {}", !isEnabled);
             clock.setDaylightSavingsTimeEnabled(!isEnabled);
-            getToggleDSTSetting().setText(Turn+SPACE+(clock.daylightSavingsTimeEnabled?off:on)+SPACE+DST_SETTING);
+            getToggleDSTSetting().setText(Turn+SPACE+(clock.isDaylightSavingsTimeEnabled()?off:on)+SPACE+DST_SETTING);
             logger.debug("setting text: '{}'", getToggleDSTSetting().getText());
         });
         getShowDigitalTimeOnAnalogueClockSetting().addActionListener(action -> {

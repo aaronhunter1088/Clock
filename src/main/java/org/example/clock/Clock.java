@@ -33,9 +33,10 @@ import static org.example.clock.ClockConstants.*;
  * @version 2.7
  */
 public class Clock extends JFrame {
-    private static final Logger logger = LogManager.getLogger(Clock.class);
     @Serial
     private static final long serialVersionUID = 2L;
+    private static final Logger logger = LogManager.getLogger(Clock.class);
+
     final static Dimension defaultSize = new Dimension(700, 300);
     final static Dimension panelSize = new Dimension(400, 300);
     final static Dimension alarmSize = new Dimension(200,100);
@@ -45,32 +46,33 @@ public class Clock extends JFrame {
     final static Font font20 = new Font("Courier New", Font.BOLD, 20);
     final static Font font10 = new Font("Courier New", Font.BOLD, 10);
 
-    PanelType currentPanel; // used to determine panel in use
-    ClockMenuBar menuBar;
-    DigitalClockPanel digitalClockPanel;
-    AnalogueClockPanel analogueClockPanel;
-    AlarmPanel alarmPanel;
-    TimerPanel timerPanel;
-    LocalDate beginDaylightSavingsTimeDate;
-    LocalDate endDaylightSavingsTimeDate;
+    private PanelType panelType; // used to determine panel in use
+    private IClockPanel currentPanel;
+    private ClockMenuBar menuBar;
+    private DigitalClockPanel digitalClockPanel;
+    private AnalogueClockPanel analogueClockPanel;
+    private AlarmPanel alarmPanel;
+    private TimerPanel timerPanel;
+    private LocalDate beginDaylightSavingsTimeDate;
+    private LocalDate endDaylightSavingsTimeDate;
     private LocalDateTime currentTime;
     private ZoneId timezone;
-    LocalDate date;
-    LocalTime time;
-    int seconds,minutes,hours,dayOfMonth,year;
-    Time ampm;
-    DayOfWeek dayOfWeek;
-    Month month;
-    String hoursAsStr=EMPTY, minutesAsStr=EMPTY, secondsAsStr=EMPTY;
-    boolean leapYear,isDaylightSavingsTime,isDateChanged,isNewYear,
+    private LocalDate date;
+    private LocalTime time;
+    private int seconds,minutes,hours,dayOfMonth,year;
+    private String ampm;
+    private DayOfWeek dayOfWeek;
+    private Month month;
+    private String hoursAsStr=EMPTY, minutesAsStr=EMPTY, secondsAsStr=EMPTY;
+    private boolean leapYear,isDaylightSavingsTime,isDateChanged,isNewYear,
             alarm,timer,updateAlarm,showFullDate,showPartialDate,
             showMilitaryTime,showDigitalTimeOnAnalogueClock,testingClock,
             daylightSavingsTimeEnabled=true;
-    List<Alarm> listOfAlarms;
-    ImageIcon icon;
+    private List<Alarm> listOfAlarms;
+    private ImageIcon icon;
     private final ScheduledExecutorService timeUpdater;
 
-    public PanelType getPanelType() { return this.currentPanel; }
+    public PanelType getPanelType() { return this.panelType; }
     public ClockMenuBar getClockMenuBar() { return this.menuBar; }
     public DigitalClockPanel getDigitalClockPanel() { return this.digitalClockPanel; }
     public AnalogueClockPanel getAnalogueClockPanel() { return this.analogueClockPanel; }
@@ -83,7 +85,7 @@ public class Clock extends JFrame {
     public int getSeconds() { return seconds; }
     public int getMinutes() { return minutes; }
     public int getHours() { return hours; }
-    public Time getAMPM() { return ampm; }
+    public String getAMPM() { return ampm; }
     public ZoneId getTimezone() { return timezone; }
     public DayOfWeek getDayOfWeek() { return dayOfWeek; }
     public int getDayOfMonth() { return dayOfMonth; }
@@ -119,7 +121,7 @@ public class Clock extends JFrame {
     public ScheduledExecutorService getTimeUpdater() { return this.timeUpdater; }
     public boolean isDaylightSavingsTimeEnabled() { return daylightSavingsTimeEnabled; }
 
-    protected void setPanelType(PanelType currentPanel) { this.currentPanel = currentPanel; }
+    protected void setPanelType(PanelType currentPanel) { this.panelType = currentPanel; }
     protected void setClockMenuBar(ClockMenuBar menuBar) { this.menuBar = menuBar; }
     protected void setDigitalClockPanel(DigitalClockPanel digitalClockPanel) { this.digitalClockPanel = digitalClockPanel; }
     protected void setAnalogueClockPanel(AnalogueClockPanel analogueClockPanel) { this.analogueClockPanel = analogueClockPanel; }
@@ -133,25 +135,25 @@ public class Clock extends JFrame {
         this.seconds = seconds;
         if (this.seconds <= 9) setSecondsAsStr("0"+this.seconds);
         else setSecondsAsStr(Integer.toString(this.seconds));
-        logger.debug("seconds: {}", seconds);
+        logger.debug("seconds: {} asStr: {}", seconds, secondsAsStr);
     }
     protected void setMinutes(int minutes) {
         this.minutes = minutes;
         if (this.minutes <= 9) setMinutesAsStr("0"+this.minutes);
         else setMinutesAsStr(Integer.toString(this.minutes));
-        logger.debug("minutes: {}", minutes);
+        logger.debug("minutes: {} asStr: {}", minutes, minutesAsStr);
     }
     protected void setHours(int hours) {
         this.hours = hours;
         if (this.hours < 10) this.hoursAsStr = "0"+hours;
         else this.hoursAsStr = Integer.toString(this.hours);
+        logger.debug("hours: {} asStr: {}", hours, hoursAsStr);
     }
-    protected void setAMPM(Time ampm) { this.ampm = ampm; }
     protected void setAMPM(LocalTime time) {
-        if (time.getHour() < 12) this.ampm = Time.AM;
-        else this.ampm = Time.PM;
-        logger.debug("ampm: {}", this.ampm);
+        if (time.getHour() < 12) setAMPM(AM);
+        else setAMPM(PM);
     }
+    protected void setAMPM(String ampm) { this.ampm = ampm; logger.debug("ampm: {}", this.ampm); }
     protected void setTimeZone(ZoneId timezone) { this.timezone = timezone; logger.debug("timezone: {}", timezone.getId()); }
     protected void setDayOfWeek(DayOfWeek dayOfWeek) { this.dayOfWeek = dayOfWeek; }
     protected void setDayOfMonth(int dayOfMonth) { this.dayOfMonth = dayOfMonth; logger.debug("dayOfMonth: {}", dayOfMonth); }
@@ -195,7 +197,6 @@ public class Clock extends JFrame {
         setTheTime(LocalDateTime.now());
         setupMenuBar();
         setDaylightSavingsTimeDates();
-        setDate(LocalDate.of(getYear(), getMonth(), getDayOfMonth()));
         if (isTodayDaylightSavingsTime()) { setDaylightSavingsTime(true); }
         setDigitalClockPanel(new DigitalClockPanel(this));
         setAnalogueClockPanel(new AnalogueClockPanel(this));
@@ -215,7 +216,6 @@ public class Clock extends JFrame {
         setResizable(false);
         getContentPane().setBackground(Color.BLACK);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        add(getDigitalClockPanel());
         timeUpdater = Executors.newScheduledThreadPool(1);
         timeUpdater.scheduleAtFixedRate(updateOutdatedTime(this), 1, 1, TimeUnit.SECONDS);
     }
@@ -234,7 +234,7 @@ public class Clock extends JFrame {
      * @param ampm Am or PM to set
      * @throws InvalidInputException when an InvalidInput has been given
      */
-    public Clock(int hours, int minutes, int seconds, Month month, DayOfWeek dayOfWeek, int dayOfMonth, int year, Time ampm) throws InvalidInputException {
+    public Clock(int hours, int minutes, int seconds, Month month, DayOfWeek dayOfWeek, int dayOfMonth, int year, String ampm) throws InvalidInputException {
         this();
         setSeconds(seconds);
         setMinutes(minutes);
@@ -314,8 +314,8 @@ public class Clock extends JFrame {
         getClockMenuBar().setCurrentTimeZone();
     }
     public void setCurrentTime() {
-        date = LocalDate.of(year, month, dayOfMonth);
-        time = LocalTime.of(hours, minutes, seconds);
+        setDate(LocalDate.of(year, month, dayOfMonth));
+        setTime(LocalTime.of(hours, minutes, seconds));
         currentTime = LocalDateTime.of(date, time);
     }
     public LocalDateTime getCurrentTime() { return currentTime; }
@@ -383,28 +383,28 @@ public class Clock extends JFrame {
         ZonedDateTime zonedDateTime = ZonedDateTime.now(timezone);
         DateTimeFormatter ampmFormatter = DateTimeFormatter.ofPattern("a");
         String ampm = zonedDateTime.format(ampmFormatter);
-        if (Time.PM.getStrValue().equals(ampm) && !showMilitaryTime && zonedDateTime.getHour() > 12) {
+        if (PM.equals(ampm) && !showMilitaryTime && zonedDateTime.getHour() > 12) {
             zonedDateTime = zonedDateTime.minusHours(12);
-        } else if (Time.AM.getStrValue().equals(ampm) && zonedDateTime.getHour() == 12) {}
+        } else if (AM.equals(ampm) && zonedDateTime.getHour() == 12) {}
         return zonedDateTime.toLocalDateTime();
     }
 
     public void updateHourValueAndHourString() {
-        if (getAMPM() == Time.AM && isShowMilitaryTime()) { // Daytime and we show Military Time
-            if (getHours() > 12) setHours(0);
+        if (AM.equals(ampm) && showMilitaryTime) { // Daytime and we show Military Time
+            if (hours > 12) setHours(0);
+            else setHours(hours);
+        }
+        else if (AM.equals(ampm)) { // DayTime and we do not show Military Time
+            if (hours == 0) setHours(12);
+            else setHours(hours);
+        }
+        else if (PM.equals(ampm) && showMilitaryTime) { // NightTime and we show Military v2.Time
+            if (hours == 24) setHours(0);
+            else if (hours < 12 && getHours() >= 0) setHours(hours+12);
             else setHours(getHours());
         }
-        else if (getAMPM() == Time.AM) { // DayTime and we do not show Military Time
-            if (getHours() == 0) setHours(12);
-            else setHours(getHours());
-        }
-        else if (getAMPM() == Time.PM && isShowMilitaryTime()) { // NightTime and we show Military v2.Time
-            if (getHours() == 24) setHours(0);
-            else if (getHours() < 12 && getHours() >= 0) setHours(getHours() + 12);
-            else setHours(getHours());
-        }
-        else if (getAMPM() == Time.PM) { // NightTime and we do not show Military Time
-            if (getHours() > 12) setHours(getHours() - 12);
+        else if (PM.equals(ampm)) { // NightTime and we do not show Military Time
+            if (hours > 12) setHours(hours - 12);
         }
     }
     /**
@@ -481,15 +481,15 @@ public class Clock extends JFrame {
                 if (getHours() == 12 && getMinutes() == 0 && getSeconds() == 0 && !isShowMilitaryTime()) {
                     setHours(12);
                     setHoursAsStr("12");
-                    if (getAMPM() == Time.PM) {
-                        logger.info("changing to AM");
-                        setAMPM(Time.AM);
+                    if (PM.equals(ampm)) {
+                        logger.debug("changing to AM");
+                        setAMPM(AM);
                         setIsDateChanged(true);
                     }
                     else {
-                        logger.info("changing to PM");
+                        logger.debug("changing to PM");
                         setIsDateChanged(false);
-                        setAMPM(Time.PM);
+                        setAMPM(PM);
                     }
                 }
                 else if (getHours() == 13 && !isShowMilitaryTime()) {
@@ -500,7 +500,7 @@ public class Clock extends JFrame {
                 else if (getHours() == 24 && getMinutes() == 0 && getSeconds() == 0 && isShowMilitaryTime()) {
                     setHours(0);
                     setHoursAsStr("00");
-                    setAMPM(Time.AM);
+                    setAMPM(AM);
                     setIsDateChanged(true);
                 }
                 else if (getHours() >= 13 && isShowMilitaryTime()) {
@@ -646,13 +646,13 @@ public class Clock extends JFrame {
         }
         if (daylightSavingsTimeEnabled && isDaylightSavingsTime && getHours() == 2) {
             logger.info("!! daylight savings time now !!");
-            if (month == MARCH && getAMPM() == Time.AM) {
+            if (month == MARCH && AM.equals(ampm)) {
                 logger.info("spring forward");
                 setHours(3);
                 setDaylightSavingsTime(false);
                 logger.info("hour set to {}", getHours());
             }
-            else if (month == NOVEMBER && getAMPM() == Time.AM) {
+            else if (month == NOVEMBER && AM.equals(ampm)) {
                 logger.info("fall back");
                 setHours(1);
                 setDaylightSavingsTime(false);
@@ -674,7 +674,7 @@ public class Clock extends JFrame {
         }
         else if (labelVersion == 2) {
             if (!showMilitaryTime) {
-                if (getAMPM() == Time.PM && getHours() > 12) { setHours(getHours()-12); }
+                if (PM.equals(ampm) && getHours() > 12) { setHours(getHours()-12); }
                 defaultText = getTimeAsStr();
             }
             else {
@@ -723,9 +723,9 @@ public class Clock extends JFrame {
         removePanel();
         setPanel(getAlarmPanel());
         if (resetValues) {
-            getAlarmPanel().getJTextField1().setText("");
-            getAlarmPanel().getJTextField2().setText("");
-            getAlarmPanel().getJTextField3().setText("");
+            getAlarmPanel().getJTextField1().setText(EMPTY);
+            getAlarmPanel().getJTextField2().setText(EMPTY);
+            getAlarmPanel().getJTextField3().setText(EMPTY);
             getAlarmPanel().resetJCheckBoxes();
             getAlarmPanel().resetJTextArea(); // so error alarms don't show up after navigating out and back in
             getAlarmPanel().getJAlarmLbl4().setText("Current Alarms");
@@ -766,15 +766,14 @@ public class Clock extends JFrame {
             getDigitalClockPanel().updateLabels();
             logger.debug("date: " + getDateAsStr());
             logger.debug("time: " + (!isShowMilitaryTime() ? getTimeAsStr() : getMilitaryTimeAsStr()));
-            //Updates the clock daily to keep time current
-            if (((MIDNIGHT_STANDARD_TIME).equals(getTimeAsStr()) ||
-                (MIDNIGHT_MILITARY_TIME).equals(getMilitaryTimeAsStr())) && !isTestingClock()) {
+            //Updates the clock daily to keep time current. may no longer be req'd now that we have our timeUpdater
+            if ((MIDNIGHT_STANDARD_TIME.equals(getTimeAsStr()) ||
+                MIDNIGHT_MILITARY_TIME.equals(getMilitaryTimeAsStr())) && !testingClock) {
                 logger.info("midnight daily clock update");
                 setSeconds(0);
                 setMinutes(0);
                 if (!showMilitaryTime) setHours(12);
                 else setHours(0);
-
             }
             setCurrentTime();
         }

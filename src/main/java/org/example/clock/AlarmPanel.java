@@ -229,7 +229,7 @@ public class AlarmPanel extends JPanel implements ClockConstants, IClockPanel {
             getJTextField1().grabFocus();
             throw new InvalidInputException("Hour cannot be blank");
         }
-        else if (Integer.parseInt(getJTextField1().getText()) <= 0 &&
+        else if (Integer.parseInt(getJTextField1().getText()) <= 0 ||
                  Integer.parseInt(getJTextField1().getText()) > 23 ) {
             getJTextField1().grabFocus();
             throw new InvalidInputException("Hour must be between 0 and 23");
@@ -243,7 +243,7 @@ public class AlarmPanel extends JPanel implements ClockConstants, IClockPanel {
             getJTextField2().grabFocus();
             throw new InvalidInputException("Minutes cannot be blank");
         }
-        else if (Integer.parseInt(getJTextField2().getText()) >= 0 &&
+        else if (Integer.parseInt(getJTextField2().getText()) < 0 ||
                  Integer.parseInt(getJTextField2().getText()) > 59 ) {
             getJTextField2().grabFocus();
             throw new InvalidInputException("Minutes must be between 0 and 59");
@@ -257,20 +257,19 @@ public class AlarmPanel extends JPanel implements ClockConstants, IClockPanel {
             getJTextField3().grabFocus();
             throw new InvalidInputException("Time cannot be blank");
         }
-        else if ((!StringUtils.equalsIgnoreCase(getJTextField3().getText(), Time.AM.getStrValue()) ||
-                  !StringUtils.equalsIgnoreCase(getJTextField3().getText(), Time.PM.getStrValue())) &&
-                 getJTextField3().getText().length() != 2) {
+        else if ((!AM.equalsIgnoreCase(getJTextField3().getText()) || !PM.equalsIgnoreCase(getJTextField3().getText()))
+                 && getJTextField3().getText().length() != 2) {
             getJTextField3().grabFocus();
             throw new InvalidInputException("Time must be AM or PM");
         }
         else if (Integer.parseInt(getJTextField1().getText()) > 12 &&
                  Integer.parseInt(getJTextField1().getText()) < 24 &&
-                StringUtils.equalsIgnoreCase(getJTextField3().getText(), Time.AM.getStrValue())) {
+                 AM.equalsIgnoreCase(getJTextField3().getText())) {
             getJTextField3().grabFocus();
             throw new InvalidInputException("Hours can't be " + getJTextField1().getText() + " when Time is " + getJTextField3().getText());
         }
         else if (Integer.parseInt(getJTextField1().getText()) == 0 &&
-                 StringUtils.equalsIgnoreCase(getJTextField3().getText(), Time.PM.getStrValue())) {
+                 StringUtils.equalsIgnoreCase(getJTextField3().getText(), PM)) {
             // basically setting militaryTime 00 hours, and saying PM
             // this makes no sense
             getJTextField3().grabFocus();
@@ -313,11 +312,11 @@ public class AlarmPanel extends JPanel implements ClockConstants, IClockPanel {
 
     protected void resetJTextArea() {
         logger.info("resetJTextArea");
-        getJTextArea().setText("");
-        for(Alarm alarm : (java.util.List<Alarm>)getClock().getListOfAlarms()) {
-            if (!StringUtils.isEmpty(getJTextArea().getText()))
-            { getJTextArea().append("\n"); }
-            getJTextArea().append(alarm.getAlarmAsString() + "\n");
+        getJTextArea().setText(EMPTY);
+        for(Alarm alarm : clock.getListOfAlarms()) {
+            if (!getJTextArea().getText().isEmpty())
+            { getJTextArea().append(NEWLINE); }
+            getJTextArea().append(alarm.getAlarmAsString()+NEWLINE);
             alarm.getDaysShortened().forEach(day -> getJTextArea().append(day));
         }
     }
@@ -434,7 +433,7 @@ public class AlarmPanel extends JPanel implements ClockConstants, IClockPanel {
         logger.info("createAlarm");
         int hour = Integer.parseInt(getJTextField1().getText());
         int minutes = Integer.parseInt(getJTextField2().getText());
-        Time ampm = convertStringToTimeAMPM(getJTextField3().getText());
+        String ampm = getJTextField3().getText(); //convertStringToTimeAMPM(getJTextField3().getText());
         boolean valid;
         valid = validateFirstTextField() && validateSecondTextField()
                 && validateThirdTextField() && validateACheckboxWasSelected();
@@ -476,7 +475,7 @@ public class AlarmPanel extends JPanel implements ClockConstants, IClockPanel {
             } else {
                 getJTextField2().setText(alarmToUpdate.getMinutesAsStr());
             }
-            getJTextField3().setText(alarmToUpdate.getAMPM().getStrValue());
+            getJTextField3().setText(alarmToUpdate.getAMPM());
             setCheckBoxesIfWasSelected(alarmToUpdate);
         }
         setUpdatingAlarm(true);
@@ -619,7 +618,7 @@ public class AlarmPanel extends JPanel implements ClockConstants, IClockPanel {
                         resetJTextArea();
                         getClock().getAlarmPanel().getJTextField1().setText(getAlarm().getHoursAsStr());
                         getClock().getAlarmPanel().getJTextField2().setText(getAlarm().getMinutesAsStr());
-                        getClock().getAlarmPanel().getJTextField3().setText(getAlarm().getAMPM().getStrValue());
+                        getClock().getAlarmPanel().getJTextField3().setText(getAlarm().getAMPM());
                         getJAlarmLbl4().setText("Alarm off.");
                     }
                     // we are updating an alarm by clicking on it in the menuBar
@@ -628,7 +627,7 @@ public class AlarmPanel extends JPanel implements ClockConstants, IClockPanel {
                         updateTheAlarm(getAlarm());
                         getJTextField1().setText(getAlarm().getHoursAsStr());
                         getJTextField2().setText(getAlarm().getMinutesAsStr());
-                        getJTextField3().setText(getAlarm().getAMPM().getStrValue());
+                        getJTextField3().setText(getAlarm().getAMPM());
                     }
                     getClock().changeToAlarmPanel(false);
                 });
@@ -872,14 +871,14 @@ public class AlarmPanel extends JPanel implements ClockConstants, IClockPanel {
         });
     }
 
-    public Time convertStringToTimeAMPM(String ampm) throws InvalidInputException {
-        logger.info("convertStringToTimeAMPM");
-        if (StringUtils.equals("AM", ampm.toUpperCase()))
-        { return Time.AM; }
-        else if (StringUtils.equals("PM", ampm.toUpperCase()))
-        { return Time.PM; }
-        else throw new InvalidInputException("Invalid time input");
-    }
+//    public Time convertStringToTimeAMPM(String ampm) throws InvalidInputException {
+//        logger.info("convertStringToTimeAMPM");
+//        if (StringUtils.equals("AM", ampm.toUpperCase()))
+//        { return Time.AM; }
+//        else if (StringUtils.equals("PM", ampm.toUpperCase()))
+//        { return Time.PM; }
+//        else throw new InvalidInputException("Invalid time input");
+//    }
 
     @Override
     public void printStackTrace(Exception e, String message) {
