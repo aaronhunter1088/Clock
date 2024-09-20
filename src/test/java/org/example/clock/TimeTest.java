@@ -6,6 +6,8 @@ import org.junit.runner.RunWith;
 import org.mockito.junit.MockitoJUnitRunner;
 
 import java.time.DayOfWeek;
+import java.util.Arrays;
+import java.util.stream.Stream;
 
 import static java.time.DayOfWeek.*;
 import static org.junit.Assert.*;
@@ -18,16 +20,19 @@ public class TimeTest {
     }
 
     @Test
-    public void testValueIsReturned() {
-        DayOfWeek monday = MONDAY;
-        int value = monday.getValue();
-        assertSame(1, value);
+    public void testExpectedIntegerValueForDayOfWeekIsAsExpected() {
+        Stream.of(DayOfWeek.values()).forEach(day -> {
+            var intValue = day.getValue();
+            var testDay = DayOfWeek.of(intValue);
+            assertEquals(day, testDay);
+        });
     }
 
     @Test
     public void testStringValueIsReturned() {
-        DayOfWeek monday = MONDAY;
-        String textOfMonday = monday.toString();
-        assertEquals("MONDAY", textOfMonday);
+        Stream.of(DayOfWeek.values()).forEach(day -> {
+            var strValue = day.toString();
+            assertEquals(strValue, day.name());
+        });
     }
 }

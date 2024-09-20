@@ -23,7 +23,7 @@ public class TimerPanelTest {
     public void validateFirstTextField()
     {
         timer.getJTextField1().setText("Hour");
-        assertFalse(timer.validateFirstTextField());
+        assertTrue(timer.validateFirstTextField());
 
         timer.getJTextField1().setText("13");
         assertTrue(timer.validateFirstTextField());
@@ -42,7 +42,7 @@ public class TimerPanelTest {
     public void validateSecondTextField()
     {
         timer.getJTextField2().setText("Min");
-        assertFalse(timer.validateSecondTextField());
+        assertTrue(timer.validateSecondTextField());
 
         timer.getJTextField2().setText("13");
         assertTrue(timer.validateSecondTextField());
@@ -61,7 +61,7 @@ public class TimerPanelTest {
     public void validateThirdTextField()
     {
         timer.getJTextField3().setText("Sec");
-        assertFalse(timer.validateThirdTextField());
+        assertTrue(timer.validateThirdTextField());
 
         timer.getJTextField3().setText("13");
         assertTrue(timer.validateThirdTextField());

@@ -528,9 +528,9 @@ public class AlarmPanel extends JPanel implements ClockConstants, IClockPanel {
         // alarm has reference to time
         // check all alarms
         // if any alarm matches clock's time, an alarm should be going off
-        getClock().getListOfAlarms().forEach((alarm) -> {
+        clock.getListOfAlarms().forEach((alarm) -> {
             for(DayOfWeek day : alarm.getDays()) {
-                if (alarm.getAlarmAsString().equals(getClock().getTimeAsStrAlarmRepresentation())
+                if (alarm.getAlarmAsString().equals(clock.getTimeAsStrAlarmRepresentation())
                         &&
                         day == getClock().getDayOfWeek()) {
                     // time for alarm to be triggered

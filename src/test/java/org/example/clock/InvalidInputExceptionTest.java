@@ -12,62 +12,63 @@ import static java.time.Month.*;
 import static org.junit.Assert.*;
 
 @RunWith(MockitoJUnitRunner.class)
-public class InvalidInputExceptionTest extends Exception {
+public class InvalidInputExceptionTest {
 
-	private Month goodMonth, badMonth;
-	private final String INVALID_MONTH = "Invalid month";
+    private Month goodMonth;
+    private final String INVALID_MONTH = "Invalid month";
 
-	@BeforeClass
-	public static void setUpBeforeClass() throws Exception {
-	}
+    @BeforeClass
+    public static void beforeClass() {
+    }
 
-	@Before
-	public void setUp() {
-		goodMonth = AUGUST;
-	}
+    @Before
+    public void beforeEach() {
+        goodMonth = AUGUST;
+    }
 
-	@Test
-	public void whenAValidMonthIsGivenReturnAValidInteger() {
-		int month = 0;
+    @Test
+    public void whenAValidMonthIsGivenReturnAValidInteger() {
+        int month = 0;
         try {
-        	switch (goodMonth) {
-	            case JANUARY: month = 1; break;
-	            case FEBRUARY: month = 2; break;
-	            case MARCH: month = 3; break;
-	            case APRIL: month = 4; break;
-	            case MAY: month = 5; break;
-	            case JUNE: month = 6; break;
-	            case JULY: month = 7; break;
-	            case AUGUST: month = 8; break;
-	            case SEPTEMBER: month = 9; break;
-	            case OCTOBER: month = 10; break;
-	            case NOVEMBER: month = 11; break;
-	            case DECEMBER: month = 12; break;
-	            default: throw new InvalidInputException("Unknown month");
-	        }
+            month = switch (goodMonth) {
+                case JANUARY -> 1;
+                case FEBRUARY -> 2;
+                case MARCH -> 3;
+                case APRIL -> 4;
+                case MAY -> 5;
+                case JUNE -> 6;
+                case JULY -> 7;
+                case AUGUST -> 8;
+                case SEPTEMBER -> 9;
+                case OCTOBER -> 10;
+                case NOVEMBER -> 11;
+                case DECEMBER -> 12;
+                default -> throw new InvalidInputException("Unknown month");
+            };
         } catch (InvalidInputException iie) {
-        	fail("No exception should have been thrown");
+            fail("No exception should have been thrown");
         }
-        assertTrue(month == 8);
-	}
+        assertEquals(8, month);
+    }
 
-	@Test
-	public void testIIEIsCreated() {
-		InvalidInputException iie = new InvalidInputException();
-		assertNotNull(iie);
-	}
+    @Test
+    public void testIIEIsCreated() {
+        InvalidInputException iie = new InvalidInputException();
+        assertNotNull(iie);
+    }
 
-	@Test
-	public void test() {
-		InvalidInputException iie = new InvalidInputException(new IllegalArgumentException(INVALID_MONTH, new IllegalArgumentException().getCause()));
-		assertNotNull(iie.getCause());
-	}
+    @Test
+    public void testIIEIsCreatedFromThrowable() {
+        InvalidInputException iie = new InvalidInputException(new IllegalArgumentException(INVALID_MONTH, new IllegalArgumentException().getCause()));
+        assertNotNull(iie.getCause());
+    }
 
-	@Test
-	public void testIIEIsCreatedWithMessageAndCause() {
-		InvalidInputException iie = new InvalidInputException(INVALID_MONTH, new IllegalArgumentException());
-		assertNotNull(iie.getMessage());
-		assertNotNull(iie.getCause());
-	}
+    @Test
+    public void testIIEIsCreatedFromThrowableWithMessage() {
+        InvalidInputException iie = new InvalidInputException(INVALID_MONTH, new IllegalArgumentException());
+        assertNotNull(iie.getMessage());
+        assertNotNull(iie.getCause());
+    }
 
 }
+

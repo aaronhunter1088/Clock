@@ -1,5 +1,8 @@
 package org.example.clock;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -7,7 +10,6 @@ import org.mockito.junit.MockitoJUnitRunner;
 
 import javax.swing.*;
 import java.awt.*;
-import java.util.List;
 import java.text.ParseException;
 import java.time.DayOfWeek;
 import java.util.ArrayList;
@@ -15,18 +17,26 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.function.Predicate;
 
+import static java.time.Month.MARCH;
+import static org.example.clock.ClockConstants.*;
 import static org.junit.Assert.*;
 import static java.time.DayOfWeek.*;
 
 @RunWith(MockitoJUnitRunner.class)
 public class AlarmPanelTest {
 
-    private static Clock clock;
-    private static Alarm alarm;
+    static { System.setProperty("appName", AlarmPanelTest.class.getSimpleName()); }
+    private static Logger logger = LogManager.getLogger(AlarmPanelTest.class);
+    private Clock clock;
+    private Alarm alarm;
 
     @BeforeClass
-    public static void setupBeforeClass() throws InterruptedException, ParseException, InvalidInputException
+    public static void beforeClass() throws InvalidInputException
     {
+    }
+
+    @Before
+    public void beforeEach() throws InvalidInputException {
         clock = new Clock();
         clock.setVisible(true);
         clock.getContentPane().setBackground(Color.BLACK);
@@ -72,8 +82,10 @@ public class AlarmPanelTest {
     }
 
     @Test
-    public void alarmWorksAsExpected() {
-        clock.setListOfAlarms(new ArrayList<Alarm>(){{add(alarm);}});
+    public void alarmWorksAsExpected() throws InvalidInputException {
+        clock = new Clock(12, 0, 0, MARCH, FRIDAY, 3, 2021, AM);
+        alarm = new Alarm(clock, clock.getHours(), true);
+        clock.setListOfAlarms(new ArrayList<>(){{add(alarm);}});
         clock.getAlarmPanel().checkIfAnyAlarmsAreGoingOff();
         assertTrue("Alarm should be going off!", alarm.isAlarmGoingOff());
         assertEquals("This 'alarm' is set as the current alarm going off", alarm, clock.getAlarmPanel().getCurrentAlarmGoingOff());

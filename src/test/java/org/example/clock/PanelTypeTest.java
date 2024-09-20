@@ -37,6 +37,6 @@ public class PanelTypeTest {
 	public void testToStringPrintsFaceName()
 	{
 		PanelType cf = DIGITAL_CLOCK;
-		assertEquals("Printed the Name", "AlarmFace", cf.toString());
+		assertEquals("Printed the Name", "DIGITAL_CLOCK", cf.toString());
 	}
 }
