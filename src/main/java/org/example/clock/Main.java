@@ -7,9 +7,6 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import static java.lang.Thread.sleep;
-import static org.example.clock.ClockConstants.*;
-import static java.time.DayOfWeek.*;
-import static java.time.Month.*;
 
 /**
  * Main application to start Clock
@@ -41,7 +38,7 @@ public class Main
                     logger.info("Happy New Year. Here's wishing you a healthy, productive " + clock.getYear() + ".");
                 }
                 sleep(250);
-                clock.setCurrentTime();
+                clock.setTheCurrentTime();
                 sleep(250);
             }
         }

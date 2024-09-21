@@ -1,8 +1,7 @@
 package org.example.clock;
 
 /**
- * This enum is used to distinguish
- * which panel the Clock is using
+ * Used to distinguish which panel the Clock is using
  *
  * @author michael ball
  * @version 2.7

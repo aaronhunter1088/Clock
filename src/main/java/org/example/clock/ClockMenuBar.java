@@ -9,6 +9,7 @@ import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
 import java.time.ZoneId;
 import java.util.Arrays;
+import java.util.List;
 
 import static org.example.clock.ClockConstants.*;
 import static org.example.clock.ClockPanel.*;
@@ -18,34 +19,36 @@ import static org.example.clock.ClockPanel.*;
  * @author Michael Ball
  * @version 2.7
  */
-public class ClockMenuBar extends JMenuBar {
+public class ClockMenuBar extends JMenuBar
+{
     private static final Logger logger = LogManager.getLogger(ClockMenuBar.class);
-    Clock clock;
+    private final Clock clock;
     // Two main menu options
-    JMenu settingsMenu;
-    JMenu featuresMenu;
+    private JMenu settingsMenu;
+    private JMenu featuresMenu;
     // Options for Settings
-    JMenuItem militaryTimeSetting;
-    JMenuItem fullTimeSetting;
-    JMenuItem partialTimeSetting;
-    JMenuItem toggleDSTSetting;
-    JMenuItem showDigitalTimeSettingOnAnalogueClockSetting;
-    JMenu changeTimeZone;
-    java.util.List<JMenuItem> timezones;
+    private JMenuItem militaryTimeSetting;
+    private JMenuItem fullTimeSetting;
+    private JMenuItem partialTimeSetting;
+    private JMenuItem toggleDSTSetting;
+    private JMenuItem showDigitalTimeSettingOnAnalogueClockSetting;
+    private JMenu changeTimeZone;
+    private List<JMenuItem> timezones;
     // Options for Features
-    JMenuItem digitalClockFeature;
-    JMenuItem analogueClockFeature;
-    JMenu alarmFeature_Menu;
-    JMenuItem timerFeature;
+    private JMenuItem digitalClockFeature;
+    private JMenuItem analogueClockFeature;
+    private JMenu alarmFeature_Menu;
+    private JMenuItem timerFeature;
     // Options for alarmFeature_Menu
-    JMenuItem setAlarms;
+    private JMenuItem setAlarms;
 
     /**
      * The main constructor for the clock menu bar.
      * It creates a Settings and Features menu options,
      * each with several items to choose from.
      */
-    ClockMenuBar(Clock clock) {
+    ClockMenuBar(Clock clock)
+    {
         this.clock = clock;
         setForeground(Color.WHITE);
         setBackground(Color.BLACK);
@@ -182,10 +185,10 @@ public class ClockMenuBar extends JMenuBar {
             }
         });
         // Set functionality for Features menu
-        getDigitalClockFeature().addActionListener(action -> clock.changePanels(PANEL_DIGITAL_CLOCK));
-        getAnalogueClockFeature().addActionListener(action -> clock.changePanels(PANEL_ANALOGUE_CLOCK));
-        getSetAlarms().addActionListener(action -> clock.changePanels(PANEL_ALARM));
-        getTimerFeature().addActionListener(action -> clock.changePanels(PANEL_TIMER));
+        getDigitalClockFeature().addActionListener(action -> clock.changePanels(PANEL_DIGITAL_CLOCK, false));
+        getAnalogueClockFeature().addActionListener(action -> clock.changePanels(PANEL_ANALOGUE_CLOCK, false));
+        getSetAlarms().addActionListener(action -> clock.changePanels(PANEL_ALARM, true));
+        getTimerFeature().addActionListener(action -> clock.changePanels(PANEL_TIMER, false));
         // Add both menus to main menu
         add(getSettingsMenu());
         add(getFeaturesMenu());
@@ -205,18 +208,12 @@ public class ClockMenuBar extends JMenuBar {
         getChangeTimeZoneMenu().add(timezone);
     }
 
-    private void setDigitalClockSettingsOnMenuBar() {
-        settingsMenu.add(getMilitaryTimeSetting());
-        settingsMenu.add(getFullTimeSetting());
-        settingsMenu.add(getPartialTimeSetting());
-        settingsMenu.add(getChangeTimeZoneMenu());
-    }
-
     /**
      * Updates the text on the currently selected timezone
      * so that it's clear which timezone is currently selected.
      */
-    void setCurrentTimeZone() {
+    void setCurrentTimeZone()
+    {
         ZoneId currentTimezone = clock.getTimezone();
         timezones.forEach(timezone -> {
             if (timezone.getText().equals(clock.getPlainTimezoneFromZoneId(currentTimezone))) {
@@ -233,7 +230,21 @@ public class ClockMenuBar extends JMenuBar {
         });
     }
 
-    // Getters
+    /**
+     * Paints the background of the menu bar black.
+     * @param g the graphics object
+     */
+    @Override
+    protected void paintComponent(Graphics g)
+    {
+        logger.info("paint component");
+        super.paintComponent(g);
+        Graphics2D g2d = (Graphics2D) g;
+        g2d.setColor(Color.BLACK);
+        g2d.fillRect(0, 0, getWidth()-1, getHeight()-1);
+    }
+
+    /* Getters */
     public JMenu getSettingsMenu() { return this.settingsMenu; }
     public JMenu getFeaturesMenu() { return this.featuresMenu; }
     public JMenu getAlarmFeature_Menu() { return this.alarmFeature_Menu; }
@@ -249,7 +260,7 @@ public class ClockMenuBar extends JMenuBar {
     public JMenuItem getSetAlarms() { return this.setAlarms; }
     public JMenuItem getTimerFeature() { return this.timerFeature; }
 
-    // Setters
+    /* Setters */
     void setSettingsMenu(JMenu settingsMenu) { this.settingsMenu = settingsMenu; }
     void setFeaturesMenu(JMenu featuresMenu) { this.featuresMenu = featuresMenu; }
     void setAlarmFeature_Menu(JMenu alarmsMenu) { this.alarmFeature_Menu = alarmsMenu; }
@@ -264,13 +275,4 @@ public class ClockMenuBar extends JMenuBar {
     void setTimeZones(java.util.List<JMenuItem> timezones) { this.timezones = timezones;}
     void setSetAlarms(JMenuItem setAlarms) { this.setAlarms = setAlarms; }
     void setTimerFeature(JMenuItem timerFeature) { this.timerFeature = timerFeature; }
-
-    @Override
-    protected void paintComponent(Graphics g) {
-        logger.info("paintComponent");
-        super.paintComponent(g);
-        Graphics2D g2d = (Graphics2D) g;
-        g2d.setColor(Color.BLACK);
-        g2d.fillRect(0, 0, getWidth() - 1, getHeight() - 1);
-    }
 }

@@ -8,10 +8,9 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.junit.MockitoJUnitRunner;
 
-import javax.swing.*;
-import java.awt.*;
 import java.time.DayOfWeek;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.function.Predicate;
@@ -39,7 +38,7 @@ public class AlarmPanelTest {
     public void beforeEach() throws InvalidInputException
     {
         clock = new Clock(true);
-        alarm = new Alarm(clock, clock.getHours(), true);
+        alarm = new Alarm(clock, true);
     }
 
     @Test
@@ -68,7 +67,7 @@ public class AlarmPanelTest {
     {
         clock.getAlarmPanel().getMondayCheckBox().doClick();
         clock.getAlarmPanel().getTuesdayCheckBox().doClick();
-        ArrayList<DayOfWeek> daysChecked = clock.getAlarmPanel().checkWhichCheckBoxesWereChecked();
+        List<DayOfWeek> daysChecked = clock.getAlarmPanel().getDaysChecked();
 
         Predicate<DayOfWeek> predicate = p -> daysChecked.contains(MONDAY) && daysChecked.contains(TUESDAY);
         assertTrue("DaysChecked list size should be 2", daysChecked.size() == 2);
@@ -76,10 +75,12 @@ public class AlarmPanelTest {
     }
 
     @Test
-    public void alarmWorksAsExpected() throws InvalidInputException {
+    public void alarmWorksAsExpected() throws InvalidInputException
+    {
         clock = new Clock(12, 0, 0, MARCH, FRIDAY, 3, 2021, AM);
-        alarm = new Alarm(clock, clock.getHours(), true);
-        clock.setListOfAlarms(new ArrayList<>(){{add(alarm);}});
+        alarm.setIsAlarmGoingOff(true);
+        clock.setListOfAlarms(List.of(alarm));
+        clock.getAlarmPanel().setActiveAlarm(alarm);
         clock.getAlarmPanel().checkIfAnyAlarmsAreGoingOff();
         assertTrue("Alarm should be going off!", alarm.isAlarmGoingOff());
         assertEquals("This 'alarm' is set as the current alarm going off", alarm, clock.getAlarmPanel().getActiveAlarm());

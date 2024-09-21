@@ -9,13 +9,10 @@ package org.example.clock;
  * @author Michael Ball
  * @version 2.7
  */
-public interface IClockPanel extends ClockConstants {
+public interface IClockPanel extends ClockConstants
+{
     void addComponentsToPanel();
     void setClock(Clock clock);
     void setupSettingsMenu();
-    default void printStackTrace(Exception e, String message) {
-        System.err.println("Exception: " + e.getClass());
-        System.err.println("Message: " + message);
-        System.err.println("Cause: " + e.getCause());
-    }
+    void printStackTrace(Exception e, String message);
 }

@@ -10,99 +10,73 @@ import static java.time.DayOfWeek.*;
 import static org.example.clock.ClockConstants.*;
 
 /**
- * An Alarm is similar to a Clock.
- * The differences may continue to grow but
- * as for now, an Alarm knows all the days
- * it should go off, the time at which to
- * go off, and can set the current day based
- * on Clocks time if alarm is going off.
+ * An Alarm object that can be set to go off
+ * at a specific time, on specific days.
  *
  * @author michael ball
  * @version 2.7
  */
-public class Alarm {
+public class Alarm
+{
     private static final Logger logger = LogManager.getLogger(Alarm.class);
-    private int minutes;
-    private String minutesAsStr;
-    private int hours;
-    private String hoursAsStr;
-    private String ampm;
+    private int minutes,hours;
+    private String minutesAsStr,hoursAsStr,ampm;
     private List<DayOfWeek> days;
-    boolean alarmGoingOff;
-    boolean updatingAlarm;
+    boolean alarmGoingOff,updatingAlarm;
     private Clock clock;
 
-    public Alarm() throws InvalidInputException {
-        this(0, 0, AM, false, new ArrayList<>(), null);
-        logger.info("Finished creating an Alarm");
-    }
-    public Alarm(Clock clock, int hours, boolean isUpdateAlarm) throws InvalidInputException {
-        this(hours, 0, clock.getAMPM(), isUpdateAlarm, new ArrayList<>(){{add(clock.getDayOfWeek());}}, clock);
-        logger.info("Finished creating an Alarm from [Clock, hours, isUpdateAlarm]");
-    }
     /**
-     * Main constructor for creating alarms
-     * @param hours the hour of the alarm
-     * @param minutes the minutes of the alarm
-     * @param time the AM or PM value
-     * @param isUpdateAlarm updating an alarm
-     * @param days the days to trigger alarm
-     * @param clock reference to the clock
+     * Creates a new Alarm object with default values
      * @throws InvalidInputException thrown when invalid input is given
      */
-    public Alarm(int hours, int minutes, String time, boolean isUpdateAlarm,
-                 List<DayOfWeek> days, Clock clock) throws InvalidInputException {
-        setClock(clock);
-        setHours(hours);
-        setMinutes(minutes);
-        setAMPM(time);
-        setDays(days);
-        setIsAlarmUpdating(isUpdateAlarm);
-        logger.info("Finished creating an Alarm with specific times");
+    public Alarm() throws InvalidInputException
+    {
+        this(0, 0, AM, false, new ArrayList<>(), null);
+        logger.debug("Alarm created");
     }
 
-    public Clock getClock() { return this.clock; }
-    public boolean isAlarmGoingOff() { return alarmGoingOff; }
-    public boolean isUpdatingAlarm() { return updatingAlarm; }
-    public List<DayOfWeek> getDays() { return this.days; }
-    public int getHours() { return this.hours; }
-    public String getHoursAsStr() { return this.hoursAsStr; }
-    public int getMinutes() { return this.minutes; }
-    public String getMinutesAsStr() { return this.minutesAsStr; }
-    public String getAMPM() { return this.ampm; }
+    /**
+     * @param clock the clock object
+     * @param isUpdateAlarm if the alarm is being updated
+     * @throws InvalidInputException thrown when invalid input is given
+     */
+    public Alarm(Clock clock, boolean isUpdateAlarm) throws InvalidInputException
+    {
+        this(clock.getHours(), 0, clock.getAMPM(), isUpdateAlarm, List.of(clock.getDayOfWeek()), clock);
+        logger.debug("Alarm created from clock values");
+    }
 
-    private void setClock(Clock clock) { this.clock = clock; }
-    protected void setIsAlarmGoingOff(boolean alarmGoingOff) { this.alarmGoingOff = alarmGoingOff; }
-    protected void setIsAlarmUpdating(boolean updatingAlarm) { this.updatingAlarm = updatingAlarm; }
-    private void setAlarmGoingOff(boolean alarmGoingOff) { this.alarmGoingOff = alarmGoingOff; }
-    private void setUpdatingAlarm(boolean updatingAlarm) { this.updatingAlarm = updatingAlarm; }
-    private void setDays(List<DayOfWeek> days) { this.days = days; }
-    private void setHours(int hours) {
-        this.hours = hours;
-        if (hours < 10) {
-            this.hoursAsStr = "0" + this.hours;
-        } else
-            this.hoursAsStr = String.valueOf(this.hours);
-    }
-    private void setMinutes(int minutes) {
-        this.minutes = minutes;
-        if (minutes < 10) {
-            this.minutesAsStr = "0" + this.minutes;
-        } else {
-            this.minutesAsStr = String.valueOf(this.minutes);
-        }
-    }
-    private void setAMPM(String ampm) {
-        this.ampm = ampm;
+    /**
+     * Main constructor for creating alarms
+     * @param hours         the hour of the alarm
+     * @param minutes       the minutes of the alarm
+     * @param ampm          the AM or PM value
+     * @param updatingAlarm updating an alarm
+     * @param days          the days to trigger alarm
+     * @param clock         reference to the clock that created this alarm
+     * @throws InvalidInputException thrown when invalid input is given
+     * @see InvalidInputException
+     */
+    public Alarm(int hours, int minutes, String ampm, boolean updatingAlarm,
+                 List<DayOfWeek> days, Clock clock) throws InvalidInputException
+    {
+        this.clock = clock;
+        if (hours < 0 || hours > 12) throw new IllegalArgumentException("Hours must be between 0 and 12");
+        else setHours(hours);
+        if (minutes < 0 || minutes > 59) throw new IllegalArgumentException("Minutes must be between 0 and 59");
+        else setMinutes(minutes);
+        if (List.of(AM,PM,AM.toLowerCase(),PM.toLowerCase()).contains(ampm)) setAMPM(ampm.toUpperCase());
+        else throw new IllegalArgumentException("AMPM must be 'AM' or 'PM'");
+        this.days = days;
+        this.updatingAlarm = updatingAlarm;
+        logger.info("Alarm created with specific times");
     }
 
     @Override
-    public String toString() { return hoursAsStr+COLON+minutesAsStr+SPACE+ampm; }
+    public String toString()
+    { return hoursAsStr+COLON+minutesAsStr+SPACE+ampm; }
 
-    @Deprecated(since = "use toString")
-    protected String getAlarmAsString() { return hoursAsStr+COLON+minutesAsStr+SPACE+ampm; }
-
-    public List<String> getDaysShortened()
+    List<String> getDaysShortened()
     {
         logger.info("getDaysShortened");
         List<String> shortenedDays = new ArrayList<>();
@@ -132,4 +106,32 @@ public class Alarm {
         shortenedDays.add("\n------");
         return shortenedDays;
     }
+
+    /* Getters */
+    Clock getClock() { return this.clock; }
+    boolean isAlarmGoingOff() { return alarmGoingOff; }
+    boolean isUpdatingAlarm() { return updatingAlarm; }
+    List<DayOfWeek> getDays() { return this.days; }
+    int getHours() { return this.hours; }
+    String getHoursAsStr() { return this.hoursAsStr; }
+    int getMinutes() { return this.minutes; }
+    String getMinutesAsStr() { return this.minutesAsStr; }
+    String getAMPM() { return this.ampm; }
+
+    /* Setters */
+    protected void setClock(Clock clock) { this.clock = clock; }
+    protected void setIsAlarmGoingOff(boolean alarmGoingOff) { this.alarmGoingOff = alarmGoingOff; }
+    protected void setIsAlarmUpdating(boolean updatingAlarm) { this.updatingAlarm = updatingAlarm; }
+    protected void setAlarmGoingOff(boolean alarmGoingOff) { this.alarmGoingOff = alarmGoingOff; }
+    protected void setUpdatingAlarm(boolean updatingAlarm) { this.updatingAlarm = updatingAlarm; }
+    protected void setDays(List<DayOfWeek> days) { this.days = days; }
+    protected void setHours(int hours) {
+        this.hours = hours;
+        this.hoursAsStr = (hours < 10) ? "0"+this.hours : String.valueOf(this.hours);
+    }
+    protected void setMinutes(int minutes) {
+        this.minutes = minutes;
+        this.minutesAsStr = (minutes < 10) ? "0"+this.minutes : String.valueOf(this.minutes);
+    }
+    protected void setAMPM(String ampm) { this.ampm = ampm; }
 }

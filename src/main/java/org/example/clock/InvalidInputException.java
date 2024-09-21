@@ -22,12 +22,43 @@ package org.example.clock;
  * @author michael ball
  * @version 2.7
  */
-public class InvalidInputException extends Exception {
-
+public class InvalidInputException extends Exception
+{
 	private String message;
 	private Throwable cause;
 
-	@Override
+	/**
+	 * Default constructor for InvalidInputException
+	 */
+	InvalidInputException()
+	{ this(null, null); }
+
+	/**
+	 * Constructor for InvalidInputException with a message
+	 * @param message the message provided
+	 */
+	InvalidInputException(String message)
+	{ this(message, null); }
+
+	/**
+	 * Constructor for InvalidInputException with a cause
+	 * @param cause the reason why
+	 */
+	InvalidInputException(Throwable cause)
+	{ this(null, cause); }
+
+	/**
+	 * Main constructor for InvalidInputException
+	 * @param message the message provided
+	 * @param cause the reason why
+	 */
+	public InvalidInputException(String message, Throwable cause)
+	{
+		super(message, cause);
+		setMessage(message);
+		setCause(cause);
+	}
+
 	public String getMessage() {
 		return message;
 	}
@@ -40,19 +71,5 @@ public class InvalidInputException extends Exception {
 	}
 	public void setCause(Throwable cause) {
 		this.cause = cause;
-	}
-
-	public InvalidInputException() { this(null, null); }
-	public InvalidInputException(String message) { this(message, null); }
-	public InvalidInputException(Throwable cause) { this(null, cause); }
-	/**
-	 * Main constructor for InvalidInputException
-	 * @param message the message provided
-	 * @param cause the reason why
-	 */
-	public InvalidInputException(String message, Throwable cause) {
-		super(message, cause);
-		setMessage(message);
-		setCause(cause);
 	}
 }

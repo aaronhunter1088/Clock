@@ -33,7 +33,7 @@ import static org.example.clock.ClockPanel.*;
  * @author Michael Ball 
  * @version 2.7
  */
-public class Clock extends JFrame
+class Clock extends JFrame
 {
     @Serial
     private static final long serialVersionUID = 2L;
@@ -71,15 +71,13 @@ public class Clock extends JFrame
             showMilitaryTime,showDigitalTimeOnAnalogueClock,testingClock,
             daylightSavingsTimeEnabled=true;
     private List<Alarm> listOfAlarms;
-    private ImageIcon icon;
     private ScheduledExecutorService timeUpdater;
 
     /**
      * Default constructor for the Clock class.
      */
-    public Clock() {
-        super();
-    }
+    Clock()
+    { super(); }
 
     /**
      * Main constructor for the Clock class.
@@ -87,7 +85,7 @@ public class Clock extends JFrame
      * configuring the menu bar, setting up daylight savings time dates, and creating
      * various clock panels. It also sets the clock's size, location, and icon.
      */
-    public Clock(boolean initialize)
+    Clock(boolean initialize)
     {
         super();
         if (initialize) { initialize(); }
@@ -109,7 +107,7 @@ public class Clock extends JFrame
      * @throws InvalidInputException when an InvalidInput has been given
      * @see InvalidInputException
      */
-    public Clock(int hours, int minutes, int seconds, Month month, DayOfWeek dayOfWeek, int dayOfMonth, int year, String ampm) throws InvalidInputException
+    Clock(int hours, int minutes, int seconds, Month month, DayOfWeek dayOfWeek, int dayOfMonth, int year, String ampm) throws InvalidInputException
     {
         this();
         testingClock = true;
@@ -136,7 +134,7 @@ public class Clock extends JFrame
         if (year < 1000) throw new IllegalArgumentException("Year must be greater than 1000");
         else setYear(year);
         setTheTime(LocalDateTime.of(LocalDate.of(year,month,dayOfMonth), LocalTime.of(hours,minutes,seconds)));
-        if (List.of(AM,PM).contains(ampm)) setAMPM(ampm);
+        if (List.of(AM,PM,AM.toLowerCase(),PM.toLowerCase()).contains(ampm)) setAMPM(ampm.toUpperCase());
         else throw new IllegalArgumentException("AMPM must be 'AM' or 'PM'");
         showMilitaryTime = false;
         setDaylightSavingsTimeDates();
@@ -150,7 +148,7 @@ public class Clock extends JFrame
         dateChanged = false;
         alarmActive = false;
         timerActive = false;
-        updatePanel(PANEL_DIGITAL_CLOCK);
+        updatePanel(PANEL_DIGITAL_CLOCK, false);
     }
 
     /**
@@ -158,13 +156,13 @@ public class Clock extends JFrame
      * configuring the menu bar, setting up daylight savings time dates, and creating
      * various clock panels. It also sets the clock's size, location, and icon.
      */
-    public void initialize()
+    void initialize()
     {
         getContentPane().setBackground(Color.BLACK);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setBounds(200, 200, 700, 300);
         setSize(Clock.defaultSize);
-        setImageIcon(createImageIcon("src/main/resources/images/clockImageIcon.png"));
+        ImageIcon icon = createImageIcon("src/main/resources/images/clockImageIcon.png");
         final Taskbar taskbar = Taskbar.getTaskbar();
         taskbar.setIconImage(icon.getImage());
         setIconImage(icon.getImage());
@@ -185,22 +183,9 @@ public class Clock extends JFrame
             dateChanged = false;
             alarmActive = false;
             timerActive = false;
-            updatePanel(PANEL_DIGITAL_CLOCK);
+            updatePanel(PANEL_DIGITAL_CLOCK, false);
             timeUpdater = Executors.newScheduledThreadPool(1);
             timeUpdater.scheduleAtFixedRate(updateOutdatedTime(), 10, 1, TimeUnit.SECONDS);
-        }
-    }
-
-    void removePanel() {
-        logger.debug("removing panel {}", getPanelType());
-        switch (clockPanel) {
-            case PANEL_DIGITAL_CLOCK -> remove(digitalClockPanel);
-            case PANEL_ANALOGUE_CLOCK -> {
-                getAnalogueClockPanel().stop();
-                remove(analogueClockPanel);
-            }
-            case PANEL_ALARM -> remove(alarmPanel);
-            case PANEL_TIMER -> remove(timerPanel);
         }
     }
 
@@ -209,12 +194,14 @@ public class Clock extends JFrame
      * based on the provided clockPanel value.
      * @param clockPanel the panel to update to
      */
-    void updatePanel(ClockPanel clockPanel) {
+    void updatePanel(ClockPanel clockPanel, boolean resetValues)
+    {
         logger.debug("updating to {}", clockPanel);
-        switch (clockPanel) {
+        switch (clockPanel)
+        {
             case PANEL_DIGITAL_CLOCK -> changeToDigitalClockPanel();
             case PANEL_ANALOGUE_CLOCK -> changeToAnalogueClockPanel();
-            case PANEL_ALARM -> changeToAlarmPanel(true);
+            case PANEL_ALARM -> changeToAlarmPanel(resetValues);
             case PANEL_TIMER -> changeToTimerPanel();
         }
     }
@@ -227,7 +214,8 @@ public class Clock extends JFrame
      * methods logs the setting of each value.
      * @param dateTime the dateTime values to use
      */
-    void setTheTime(LocalDateTime dateTime) {
+    void setTheTime(LocalDateTime dateTime)
+    {
         logger.info("Setting the time");
         setSeconds(dateTime.getSecond());
         setMinutes(dateTime.getMinute());
@@ -237,7 +225,7 @@ public class Clock extends JFrame
         setDayOfMonth(dateTime.getDayOfMonth());
         setYear(dateTime.getYear());
         setTimeZone(getZoneIdFromTimezoneButtonText(EMPTY));
-        setCurrentTime();
+        setTheCurrentTime();
         setAMPM(dateTime.getHour()<12?AM:PM);
     }
 
@@ -245,7 +233,8 @@ public class Clock extends JFrame
      * Updates the current time based on the selected timezone
      * @param timezone the timezone to update the time to
      */
-    void updateTheTime(JMenuItem timezone) {
+    void updateTheTime(JMenuItem timezone)
+    {
         logger.info("clicked on {} timezone. updating the time", timezone.getText());
         LocalDateTime ldt = determineNewTimeFromSelectedTimeZone(timezone.getText());
         setTheTime(ldt);
@@ -258,24 +247,27 @@ public class Clock extends JFrame
      * Sets and logs the new time value from the hours, minutes, and seconds
      * Sets the currentTime value from the LocalDate and LocalTime
      */
-    void setCurrentTime() {
+    void setTheCurrentTime()
+    {
         setDate(LocalDate.of(year, month, dayOfMonth));
         setTime(LocalTime.of(hours, minutes, seconds));
-        currentTime = LocalDateTime.of(date, time);
+        setCurrentTime(LocalDateTime.of(date, time));
     }
 
     /**
      * Returns the current time in the selected timezone
      * @return LocalDateTime the currentTime in the selected timezone
      */
-    public LocalDateTime getCurrentTime() { return currentTime; }
+    LocalDateTime getCurrentTime()
+    { return currentTime; }
 
     /**
      * Returns a new LocalDateTime from the selected timezone
      * @param timezone the timezone to determine the new time from
      * @return LocalDateTime the new currentTime in the selected timezone
      */
-    public LocalDateTime determineNewTimeFromSelectedTimeZone(String timezone) {
+    LocalDateTime determineNewTimeFromSelectedTimeZone(String timezone)
+    {
         return switch (timezone) {
             case HAWAII -> LocalDateTime.now(ZoneId.of(PACIFIC_HONOLULU));
             case ALASKA -> LocalDateTime.now(ZoneId.of(AMERICA_ANCHORAGE));
@@ -291,7 +283,8 @@ public class Clock extends JFrame
      * @param btnText the text from the timezone button
      * @return ZoneId the timezone from the selected timezone button text
      */
-    public ZoneId getZoneIdFromTimezoneButtonText(String btnText) {
+    ZoneId getZoneIdFromTimezoneButtonText(String btnText)
+    {
         logger.debug("btnText: {}", btnText);
         return switch (btnText) {
             case HAWAII -> ZoneId.of(PACIFIC_HONOLULU);
@@ -309,7 +302,7 @@ public class Clock extends JFrame
      * @param timezone the selected ZoneId
      * @return String the plain timezone from the selected ZoneId
      */
-    public String getPlainTimezoneFromZoneId(ZoneId timezone)
+    String getPlainTimezoneFromZoneId(ZoneId timezone)
     {
         logger.debug("timezone: {} or {}", timezone, timezone.getDisplayName(TextStyle.FULL, Locale.ENGLISH));
         return switch (timezone.getId()) {
@@ -327,7 +320,7 @@ public class Clock extends JFrame
      * does not match the clock time. This is executed once a second.
      * @return Runnable the runnable to update the time
      */
-    protected Runnable updateOutdatedTime()
+    Runnable updateOutdatedTime()
     { return () -> shouldUpdateTime(null); }
 
     /**
@@ -474,7 +467,7 @@ public class Clock extends JFrame
      * of the predetermined daylight savings time
      * @return boolean if today is daylight savings time
      */
-    public boolean isTodayDaylightSavingsTime()
+    boolean isTodayDaylightSavingsTime()
     {
         return date.isEqual(beginDaylightSavingsTimeDate) ||
                date.isEqual(endDaylightSavingsTimeDate);
@@ -696,7 +689,8 @@ public class Clock extends JFrame
      * @param labelVersion the value of the label to sue
      * @return String the default text for a label
      */
-    public String defaultText(int labelVersion) {
+    String defaultText(int labelVersion)
+    {
         String defaultText = EMPTY;
         if (labelVersion == 1) {
             if (showFullDate && !showPartialDate) defaultText = getFullDateAsStr();
@@ -766,7 +760,8 @@ public class Clock extends JFrame
      * Changes the panel to the alarm panel
      * @param resetValues if the values should be reset
      */
-    void changeToAlarmPanel(boolean resetValues) {
+    void changeToAlarmPanel(boolean resetValues)
+    {
         logger.info("change to alarm panel. reset values: {}", resetValues);
         add(alarmPanel);
         currentPanel = alarmPanel;
@@ -787,7 +782,8 @@ public class Clock extends JFrame
     /**
      * Changes the panel to the timer panel
      */
-    void changeToTimerPanel() {
+    void changeToTimerPanel()
+    {
         logger.info("change to timer panel");
         add(timerPanel);
         currentPanel = timerPanel;
@@ -800,11 +796,13 @@ public class Clock extends JFrame
      * Changes the panels based on the provided clockPanel value
      * @param clockPanel the panel to change to
      */
-    void changePanels(ClockPanel clockPanel)
+    void changePanels(ClockPanel clockPanel, boolean resetValues)
     {
         logger.info("change panels");
         remove(currentPanel);
-        updatePanel(clockPanel);
+        if (currentPanel instanceof AnalogueClockPanel acp)
+            acp.stop();
+        updatePanel(clockPanel, resetValues);
         repaint();
         setVisible(true);
     }
@@ -832,7 +830,7 @@ public class Clock extends JFrame
             performTick(seconds, minutes, hours);
             if (PANEL_DIGITAL_CLOCK == clockPanel) { digitalClockPanel.updateLabels(); }
             updateTimeIfMidnight();
-            setCurrentTime();
+            setTheCurrentTime();
         }
         catch (Exception e)
         { logger.error("Error! Clock had an exception when performing tick: " + e.getMessage()); }
@@ -859,7 +857,8 @@ public class Clock extends JFrame
      * Returns an ImageIcon, or null if the path was invalid.
      * @param path the path of the image
      */
-    public ImageIcon createImageIcon(String path) {
+    ImageIcon createImageIcon(String path)
+    {
         logger.info("createImageIcon");
         ImageIcon retImageIcon = null;
         ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
@@ -877,11 +876,12 @@ public class Clock extends JFrame
      * Quickly clears all options from the
      * settings menu.
      */
-    public void clearSettingsMenu()
+    void clearSettingsMenu()
     { menuBar.getSettingsMenu().removeAll(); }
 
     /* Getters */
-    ClockPanel getPanelType() { return clockPanel; }
+    ClockPanel getClockPanel() { return clockPanel; }
+    Component getCurrentPanel() { return currentPanel; }
     ClockMenuBar getClockMenuBar() { return menuBar; }
     DigitalClockPanel getDigitalClockPanel() { return digitalClockPanel; }
     AnalogueClockPanel getAnalogueClockPanel() { return analogueClockPanel; }
@@ -935,41 +935,6 @@ public class Clock extends JFrame
     boolean isDaylightSavingsTimeEnabled() { return daylightSavingsTimeEnabled; }
 
     /* Setters */
-    protected void setPanelType(ClockPanel clockPanel) { this.clockPanel = clockPanel; }
-    /**
-     * Sets the icon seen on the applications bar of a computer
-     * @param icon the icon to set
-     */
-    protected void setImageIcon(ImageIcon icon) { this.icon = icon; }
-    /**
-     * Sets the menu bar for the clock
-     * @param menuBar the menu bar for the clock
-     */
-    protected void setClockMenuBar(ClockMenuBar menuBar) { this.menuBar = menuBar; }
-    protected void setDigitalClockPanel(DigitalClockPanel digitalClockPanel) { this.digitalClockPanel = digitalClockPanel; }
-    protected void setAnalogueClockPanel(AnalogueClockPanel analogueClockPanel) { this.analogueClockPanel = analogueClockPanel; }
-    protected void setAlarmPanel(AlarmPanel alarmPanel) { this.alarmPanel = alarmPanel; }
-    protected void setTimerPanel(TimerPanel timerPanel) { this.timerPanel = timerPanel; }
-    /**
-     * Sets and logs the new begin dst date value
-     * @param beginDaylightSavingsTimeDate the new begin dst date value
-     */
-    protected void setBeginDaylightSavingsTimeDate(LocalDate beginDaylightSavingsTimeDate) { this.beginDaylightSavingsTimeDate = beginDaylightSavingsTimeDate; logger.debug("begin dst: {} {} {}, {}",beginDaylightSavingsTimeDate.getDayOfWeek(), beginDaylightSavingsTimeDate.getMonth(), beginDaylightSavingsTimeDate.getDayOfMonth(), beginDaylightSavingsTimeDate.getYear()); }
-    /**
-     * Sets and logs the new end dst date value
-     * @param endDaylightSavingsTimeDate the new end dst date value
-     */
-    protected void setEndDaylightSavingsTimeDate(LocalDate endDaylightSavingsTimeDate) { this.endDaylightSavingsTimeDate = endDaylightSavingsTimeDate; logger.debug("end dst: {} {} {}, {}", endDaylightSavingsTimeDate.getDayOfWeek(), endDaylightSavingsTimeDate.getMonth(), endDaylightSavingsTimeDate.getDayOfMonth(), endDaylightSavingsTimeDate.getYear()); }
-    /**
-     * Sets and logs the new date value
-     * Example log: FRIDAY MAY 4, 2000
-     * @param date the new date value
-     */
-    protected void setDate(LocalDate date) { this.date = date; logger.debug("date: {} {}", dayOfWeek!=null?dayOfWeek.toString():"DayOfWeekUnset", getDateAsStr()); }
-    /** Sets and logs the new time value
-     * @param time the new time value
-     */
-    protected void setTime(LocalTime time) { this.time = time; logger.debug("time: {}", getTimeAsStr()); }
     /**
      * Sets and logs the new second value
      * Also sets secondsAsStr
@@ -1014,6 +979,10 @@ public class Clock extends JFrame
      * @param timezone the new timezone value
      */
     protected void setTimeZone(ZoneId timezone) { this.timezone = timezone; logger.debug("timezone: {}", getPlainTimezoneFromZoneId(timezone)); }
+    /** Sets and logs the new time value
+     * @param time the new time value
+     */
+    protected void setTime(LocalTime time) { this.time = time; logger.debug("time: {}", getTimeAsStr()); }
     /**
      * Sets and logs the new dayOfWeek value
      * @param dayOfWeek the new dayOfWeek value
@@ -1034,9 +1003,27 @@ public class Clock extends JFrame
      * @param year the new year value
      */
     protected void setYear(int year) { this.year = year; logger.debug("year: {}", year); }
-    protected void setHoursAsStr(String hoursAsStr) { this.hoursAsStr = hoursAsStr; }
-    protected void setMinutesAsStr(String minutesAsStr) { this.minutesAsStr = minutesAsStr; }
-    protected void setSecondsAsStr(String secondsAsStr) { this.secondsAsStr = secondsAsStr; }
+    /**
+     * Sets and logs the new date value
+     * Example log: FRIDAY MAY 4, 2000
+     * @param date the new date value
+     */
+    protected void setDate(LocalDate date) { this.date = date; logger.debug("date: {} {}", dayOfWeek!=null?dayOfWeek.toString():"DayOfWeekUnset", getDateAsStr()); }
+    /**
+     * Sets and logs the new current time
+     * @param currentTime the new current time
+     */
+    protected void setCurrentTime(LocalDateTime currentTime) { this.currentTime = currentTime; logger.debug("currentTime: {}", currentTime); }
+    /**
+     * Sets and logs the new begin dst date value
+     * @param beginDaylightSavingsTimeDate the new begin dst date value
+     */
+    protected void setBeginDaylightSavingsTimeDate(LocalDate beginDaylightSavingsTimeDate) { this.beginDaylightSavingsTimeDate = beginDaylightSavingsTimeDate; logger.debug("begin dst: {} {} {}, {}",beginDaylightSavingsTimeDate.getDayOfWeek(), beginDaylightSavingsTimeDate.getMonth(), beginDaylightSavingsTimeDate.getDayOfMonth(), beginDaylightSavingsTimeDate.getYear()); }
+    /**
+     * Sets and logs the new end dst date value
+     * @param endDaylightSavingsTimeDate the new end dst date value
+     */
+    protected void setEndDaylightSavingsTimeDate(LocalDate endDaylightSavingsTimeDate) { this.endDaylightSavingsTimeDate = endDaylightSavingsTimeDate; logger.debug("end dst: {} {} {}, {}", endDaylightSavingsTimeDate.getDayOfWeek(), endDaylightSavingsTimeDate.getMonth(), endDaylightSavingsTimeDate.getDayOfMonth(), endDaylightSavingsTimeDate.getYear()); }
     protected void setListOfAlarms(List<Alarm> listOfAlarms) { this.listOfAlarms = listOfAlarms; }
     protected void setUpdateAlarm(boolean updateAlarm) { this.updateAlarm = updateAlarm;}
     protected void setLeapYear(boolean leapYear) { this.leapYear = leapYear; }
@@ -1065,5 +1052,5 @@ public class Clock extends JFrame
     protected void setShowDigitalTimeOnAnalogueClock(boolean showDigitalTimeOnAnalogueClock) { this.showDigitalTimeOnAnalogueClock = showDigitalTimeOnAnalogueClock; }
     protected void setTestingClock(boolean testingClock) { this.testingClock = testingClock; }
     protected void setDaylightSavingsTimeEnabled(boolean daylightSavingsTimeEnabled) { this.daylightSavingsTimeEnabled = daylightSavingsTimeEnabled; }
-
+    protected void setClockPanel(ClockPanel clockPanel) { this.clockPanel = clockPanel; }
 }

@@ -6,7 +6,8 @@ package org.example.clock;
  * @author Michael Ball
  * @version 2.7
  */
-public interface ClockConstants {
+public interface ClockConstants
+{
     String HIDE = "Hide";
     String SHOW = "Show";
     String SPACE = " ";
@@ -61,6 +62,9 @@ public interface ClockConstants {
     String RESUME_TIMER = "Resume Timer";
     String PAUSE_TIMER = "Pause Timer";
     String RESET = "Reset";
+    String HOUR = "Hour";
+    String MIN = "Min";
+    String SEC = "Sec";
 
     // Alarm
     String SET_ALARMS = "Set Alarms";

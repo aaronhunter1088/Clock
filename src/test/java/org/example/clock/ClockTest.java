@@ -46,7 +46,6 @@ public class ClockTest
     public void testIsTodayDaylightSavingsDayReturnsFalseWhenNotBeginningDST() throws InvalidInputException
     {
         clock = new Clock(5, 42, 0, MARCH, THURSDAY, 3, 2022, PM);
-        clock.setTestingClock(true);
         assertFalse(clock.isTodayDaylightSavingsTime());
     }
 
