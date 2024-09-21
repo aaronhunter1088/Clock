@@ -10,7 +10,7 @@ import static org.junit.Assert.*;
 import static org.mockito.Mockito.mock;
 
 public class TimerPanelTest {
-    Clock clock = new Clock();
+    Clock clock = new Clock().initialize();
     TimerPanel timer = new TimerPanel(clock);
 
     @Mock

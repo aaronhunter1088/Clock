@@ -11,6 +11,7 @@ import java.time.ZoneId;
 import java.util.Arrays;
 
 import static org.example.clock.ClockConstants.*;
+import static org.example.clock.PanelType.*;
 
 /**
  * The menu bar for the Clock.
@@ -181,10 +182,14 @@ public class ClockMenuBar extends JMenuBar {
             }
         });
         // Set functionality for Features menu
-        getDigitalClockFeature().addActionListener(action -> clock.changeToDigitalClockPanel());
-        getAnalogueClockFeature().addActionListener(action -> clock.changeToAnalogueClockPanel());
-        getSetAlarms().addActionListener(action -> clock.changeToAlarmPanel(true));
-        getTimerFeature().addActionListener(action -> clock.changeToTimerPanel());
+        getDigitalClockFeature().addActionListener(action -> clock.changePanels(DIGITAL_CLOCK));
+        getAnalogueClockFeature().addActionListener(action -> clock.changePanels(ANALOGUE_CLOCK));
+        getSetAlarms().addActionListener(action -> clock.changePanels(ALARM));
+        getTimerFeature().addActionListener(action -> clock.changePanels(TIMER));
+//        getDigitalClockFeature().addActionListener(action -> clock.changeToDigitalClockPanel());
+//        getAnalogueClockFeature().addActionListener(action -> clock.changeToAnalogueClockPanel());
+//        getSetAlarms().addActionListener(action -> clock.changeToAlarmPanel(true));
+//        getTimerFeature().addActionListener(action -> clock.changeToTimerPanel());
         // Add both menus to main menu
         add(getSettingsMenu());
         add(getFeaturesMenu());

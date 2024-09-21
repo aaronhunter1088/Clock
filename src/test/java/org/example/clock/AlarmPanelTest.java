@@ -27,17 +27,18 @@ public class AlarmPanelTest {
 
     static { System.setProperty("appName", AlarmPanelTest.class.getSimpleName()); }
     private static Logger logger = LogManager.getLogger(AlarmPanelTest.class);
-    private Clock clock;
+    private Clock clock = new Clock().initialize();
     private Alarm alarm;
 
     @BeforeClass
     public static void beforeClass() throws InvalidInputException
     {
+
     }
 
     @Before
     public void beforeEach() throws InvalidInputException {
-        clock = new Clock();
+        clock = new Clock().initialize();
         clock.setVisible(true);
         clock.getContentPane().setBackground(Color.BLACK);
         clock.setSize(Clock.defaultSize);
@@ -57,7 +58,8 @@ public class AlarmPanelTest {
     }
 
     @Test
-    public void testMusicPlayerCanSoundAlarm() throws InterruptedException {
+    public void testMusicPlayerCanSoundAlarm() throws InterruptedException
+    {
         AlarmPanel testAlarmPanel = createAndSetupAlarmPanel();
         ExecutorService executor = Executors.newCachedThreadPool();
         testAlarmPanel.setCurrentAlarmGoingOff(alarm);

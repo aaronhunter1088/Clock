@@ -100,7 +100,7 @@ public class Alarm {
     public String toString() { return getAlarmAsString(); }
 
     protected String getAlarmAsString() {
-        return this.hoursAsStr + ":" + this.minutesAsStr + " " + this.ampm;
+        return hoursAsStr+COLON+minutesAsStr+SPACE+ampm;
     }
     public List<String> getDaysShortened()
     {

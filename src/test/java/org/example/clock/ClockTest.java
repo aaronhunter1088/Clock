@@ -10,6 +10,7 @@ import org.junit.runner.RunWith;
 import org.mockito.junit.MockitoJUnitRunner;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.stream.IntStream;
@@ -28,12 +29,14 @@ public class ClockTest {
     private Clock clock;
 
     @Before
-    public void beforeEach() throws InvalidInputException {
+    public void beforeEach() {
         clock = new Clock();
+        clock.setTestingClock(true);
     }
 
     @Test
-    public void testBeginningDayLightSavingsTimeIsProperlySet() throws InvalidInputException {
+    public void testBeginningDayLightSavingsTimeIsProperlySet() throws InvalidInputException
+    {
         clock = new Clock(5, 42, 0, MARCH, THURSDAY, 2, 2021, PM);
         assertEquals("For 2021, Beginning DST Day should be 14th", 14, clock.getBeginDaylightSavingsTimeDate().getDayOfMonth());
         assertEquals("For 2021, Ending DST Day should be 7th", 7, clock.getEndDaylightSavingsTimeDate().getDayOfMonth());
@@ -53,6 +56,7 @@ public class ClockTest {
     @Test
     public void testLocalDatesAreCompared()
     {
+        clock.initialize();
         LocalDate today = LocalDate.now();
         assertEquals("Dates should be equal", clock.getDate(), today);
 
@@ -105,9 +109,7 @@ public class ClockTest {
     @Test
     public void testClockBecomesAMWhenMidnightStarts() throws InvalidInputException
     {
-        //      new Clock(int hours, int minutes, int seconds, Month month, Day day, int date, int year, AMPM ampm)
         clock = new Clock(11, 59, 57, FEBRUARY, SUNDAY, 21, 2021, PM);
-        clock.setTestingClock(true);
         tick(3);
         assertEquals("Hours should be 12", 12, clock.getHours());
         assertEquals("Minutes should be 0", 0, clock.getMinutes());
@@ -135,7 +137,9 @@ public class ClockTest {
     }
 
     @Test
-    public void testTurnOffDSTSetting() throws InvalidInputException {
+    public void testTurnOffDSTSetting() throws InvalidInputException
+    {
+        clock.initialize();
         LocalDate endDSTDate = clock.getEndDaylightSavingsTimeDate();
         clock = new Clock(1, 59, 50, endDSTDate.getMonth(), endDSTDate.getDayOfWeek(), endDSTDate.getDayOfMonth(), endDSTDate.getYear(), AM);
         clock.getClockMenuBar().getToggleDSTSetting().doClick(); // DST turned off; enabled:false
@@ -148,7 +152,9 @@ public class ClockTest {
     }
 
     @Test
-    public void testKeepDSTSettingOn() throws InvalidInputException {
+    public void testKeepDSTSettingOn() throws InvalidInputException
+    {
+        clock.initialize();
         LocalDate endDSTDate = clock.getEndDaylightSavingsTimeDate();
         clock = new Clock(1, 59, 50, endDSTDate.getMonth(), endDSTDate.getDayOfWeek(), endDSTDate.getDayOfMonth(), endDSTDate.getYear(), AM);
         var expectedValue = Turn+SPACE+off+SPACE+DST_SETTING;
@@ -159,6 +165,46 @@ public class ClockTest {
         assertEquals("Expected hours to be 1", 1, clock.getHours());
     }
 
+    @Test
+    public void testUpdateClockTimeSyncsClockTime() throws InvalidInputException
+    {
+        clock = new Clock(7, 0, 6, SEPTEMBER, FRIDAY, 20, 2024, PM);
+        LocalDateTime testNow = LocalDateTime.of(LocalDate.of(2024, AUGUST, 20), clock.getTime());
+        assertTrue(clock.shouldUpdateTime(testNow));
+    }
+
+    @Test
+    public void testUpdateClockTimeDoesNotSyncClockTime() throws InvalidInputException
+    {
+        clock = new Clock(7, 0, 6, SEPTEMBER, FRIDAY, 20, 2024, PM);
+        LocalDateTime testNow = LocalDateTime.of(clock.getDate(), clock.getTime());
+        assertFalse(clock.shouldUpdateTime(testNow));
+    }
+
+    @Test
+    public void testTickClockTwiceAsFast() throws InvalidInputException
+    {
+        clock = new Clock(7, 0, 6, SEPTEMBER, FRIDAY, 20, 2024, PM);
+        clock.setTestingClock(true);
+        clock.tick(2,1,1);
+        assertEquals("Expected hours to be 7", 7, clock.getHours());
+        assertEquals("Expected minutes to be 0", 0, clock.getMinutes());
+        assertEquals("Expected seconds to be 8", 8, clock.getSeconds());
+    }
+
+    @Test
+    public void testTickClockFaster() throws InvalidInputException
+    {
+        clock = new Clock(7, 59, 58, SEPTEMBER, FRIDAY, 20, 2024, PM);
+        clock.setTestingClock(true);
+        clock.tick(2,3,4);
+        assertEquals("Expected seconds to be 0", 0, clock.getSeconds());
+        assertEquals("Expected minutes to be 2", 2, clock.getMinutes());
+        assertEquals("Expected hours to be 11", 11, clock.getHours());
+    }
+
+
+    // Helper methods
     private void tick(int times) {
         for (int i=0; i<times; i++) {
             clock.tick();
