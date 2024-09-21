@@ -3,9 +3,7 @@ package org.example.clock;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.junit.Before;
-import org.junit.BeforeClass;
 import org.junit.Test;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.runner.RunWith;
 import org.mockito.junit.MockitoJUnitRunner;
 
@@ -13,7 +11,6 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
-import java.util.stream.IntStream;
 
 
 import static java.time.DayOfWeek.*;
@@ -91,7 +88,7 @@ public class ClockTest {
         LocalDate today = LocalDate.now();
         clock = new Clock(12,0,0, today.getMonth(), today.getDayOfWeek(),
                 today.getDayOfMonth(), today.getYear(), AM);
-        boolean actual = clock.isDaylightSavingsTime();
+        boolean actual = clock.isDoesTodayMatchDSTDate();
         boolean expected = clock.getBeginDaylightSavingsTimeDate().format(DateTimeFormatter.ofPattern("MM-dd-yyyy")).equals(today.format(DateTimeFormatter.ofPattern("MM-dd-yyyy"))) ||
                 clock.getEndDaylightSavingsTimeDate().format(DateTimeFormatter.ofPattern("MM-dd-yyyy")).equals(today.format(DateTimeFormatter.ofPattern("MM-dd-yyyy")));
         if (actual) {

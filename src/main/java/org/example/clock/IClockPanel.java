@@ -9,7 +9,7 @@ package org.example.clock;
  * @author Michael Ball
  * @version 2.7
  */
-public interface IClockPanel {
+public interface IClockPanel extends ClockConstants {
     void addComponentsToPanel();
     void setClock(Clock clock);
     void setPanelType(PanelType panelType);

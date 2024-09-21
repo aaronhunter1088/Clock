@@ -37,7 +37,7 @@ import static java.time.DayOfWeek.*;
  * @author michael ball
  * @version 2.7
  */
-public class AlarmPanel extends JPanel implements ClockConstants, IClockPanel
+public class AlarmPanel extends JPanel implements IClockPanel
 {
     private static final Logger logger = LogManager.getLogger(AlarmPanel.class);
     GridBagLayout layout;
@@ -135,7 +135,7 @@ public class AlarmPanel extends JPanel implements ClockConstants, IClockPanel
     // Helper methods
     public void setupAlarmPanel(Clock clock) {
         logger.info("setupAlarmPanel");
-        clock.setIsDateChanged(false);
+        clock.setDateChanged(false);
         clock.setShowFullDate(false);
         clock.setShowPartialDate(false);
         clock.setShowMilitaryTime(false);

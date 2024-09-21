@@ -19,7 +19,8 @@ import static org.example.clock.PanelType.DIGITAL_CLOCK;
  * @author michael ball
  * @version 2.7
  */
-public class DigitalClockPanel extends JPanel implements ClockConstants, IClockPanel {
+public class DigitalClockPanel extends JPanel implements IClockPanel
+{
     private static final Logger logger = LogManager.getLogger(DigitalClockPanel.class);
     GridBagLayout layout;
     GridBagConstraints constraints;
@@ -64,7 +65,7 @@ public class DigitalClockPanel extends JPanel implements ClockConstants, IClockP
     public void setupClockPanel() {
         logger.info("setup digital clock panel");
         setupSettingsMenu();
-        clock.setIsDateChanged(false);
+        clock.setDateChanged(false);
         clock.setShowFullDate(false);
         clock.setShowPartialDate(false);
         clock.setShowMilitaryTime(false);

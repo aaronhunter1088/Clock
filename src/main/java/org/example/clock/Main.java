@@ -26,8 +26,6 @@ public class Main {
         logger.info("Starting Clock...");
         Clock clock = new Clock(true);
         //new Clock(1, 59, 50, NOVEMBER, SUNDAY, 3, 2024, AM);
-        logger.info("Clock started. Date {}", clock.getDate().format(DateTimeFormatter.ofPattern("MM-dd-yyyy")));
-        logger.info("Clock started. Time {} {}", clock.getTime().format(DateTimeFormatter.ofPattern("hh:mm:ss")), clock.getAMPM());
         SwingUtilities.invokeLater(() -> SwingUtilities.updateComponentTreeUI(clock));
         try {
             while (true) {

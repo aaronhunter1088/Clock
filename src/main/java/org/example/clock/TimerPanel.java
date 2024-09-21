@@ -27,7 +27,8 @@ import static java.lang.Thread.sleep;
  * @author michael ball
  * @version 2.7
  */
-public class TimerPanel extends JPanel implements ClockConstants, IClockPanel {
+public class TimerPanel extends JPanel implements IClockPanel
+{
     private static final Logger logger = LogManager.getLogger(TimerPanel.class);
     GridBagLayout layout;
     GridBagConstraints constraints;
@@ -321,7 +322,7 @@ public class TimerPanel extends JPanel implements ClockConstants, IClockPanel {
         if (countdownThread.getState() == Thread.State.NEW) {
             countdownThread.start(); // calls the run method of this class
             //setTimerHasConcluded(false);
-            getClock().setIsTimerGoingOff(false);
+            getClock().setTimerActive(false);
         }
         else if (countdownThread.getState() == Thread.State.TERMINATED) {
             countdownThread = new Thread(this::performCountDown);
@@ -374,7 +375,7 @@ public class TimerPanel extends JPanel implements ClockConstants, IClockPanel {
             getTimerButton().setText(SET);
             getTimerButton().setEnabled(false);
             //setTimerHasConcluded(true);
-            getClock().setIsTimerGoingOff(true);
+            getClock().setTimerActive(true);
         }
         catch (Exception e) { printStackTrace(e, null); }
     }
@@ -414,9 +415,9 @@ public class TimerPanel extends JPanel implements ClockConstants, IClockPanel {
     public void checkIfTimerHasConcluded() {
         logger.info("checkIfTimerHasConcluded");
         ExecutorService executor = Executors.newCachedThreadPool();
-        if (getClock().isTimerGoingOff()) {
+        if (getClock().isTimerActive()) {
             triggerSound(executor);
-            getClock().setIsTimerGoingOff(false);
+            getClock().setTimerActive(false);
         }
     }
     public void triggerSound(ExecutorService executor) {

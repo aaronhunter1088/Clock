@@ -21,7 +21,7 @@ import static java.lang.Thread.sleep;
  * @author michael ball
  * @version 2.7
  */
-public class AnalogueClockPanel extends JPanel implements ClockConstants, IClockPanel, Runnable
+public class AnalogueClockPanel extends JPanel implements IClockPanel, Runnable
 {
     private static final Logger logger = LogManager.getLogger(AnalogueClockPanel.class);
     private GridBagLayout layout;
@@ -60,7 +60,7 @@ public class AnalogueClockPanel extends JPanel implements ClockConstants, IClock
     public String getClockText() { return this.clockText; }
 
     void drawStructure(Graphics g) {
-        logger.info("drawStructure");
+        logger.info("drawing structure");
         g.setFont(new Font("TimesRoman", Font.BOLD, 20));
         g.setColor(Color.BLACK);
         g.fillOval(xcenter - 150, ycenter - 150, 300, 300);
@@ -85,7 +85,7 @@ public class AnalogueClockPanel extends JPanel implements ClockConstants, IClock
     }
 
     void start(AnalogueClockPanel panel) {
-        logger.info("start analogue clock");
+        logger.info("starting analogue clock");
         if (thread == null) {
             thread = new Thread(panel);
             thread.start();
@@ -98,7 +98,7 @@ public class AnalogueClockPanel extends JPanel implements ClockConstants, IClock
     }
 
     void setupDefaultActions(Clock clock) {
-        logger.info("setupDefaultActions with Clock");
+        logger.info("setup default actions with clock");
         this.clock = clock;
         clockText = clock.getTimeAsStr();
         setupSettingsMenu();
@@ -122,7 +122,7 @@ public class AnalogueClockPanel extends JPanel implements ClockConstants, IClock
         logger.info("painting analogue clock panel");
         int xhour, yhour, xminute, yminute, xsecond, ysecond, second, minute, hour;
         currentDate = java.util.Date.from(getClock().getDate().atTime(getClock().getHours(), getClock().getMinutes(), getClock().getSeconds())
-                .atZone(ZoneId.systemDefault())
+                .atZone(getClock().getTimezone())
                 .toInstant());
         if (clock.isShowDigitalTimeOnAnalogueClock()) {
             setClockText(clock.getTimeAsStr());
@@ -191,6 +191,7 @@ public class AnalogueClockPanel extends JPanel implements ClockConstants, IClock
         clock.getClockMenuBar().getSettingsMenu().removeAll();
         clock.getClockMenuBar().getSettingsMenu().add(clock.getClockMenuBar().getShowDigitalTimeOnAnalogueClockSetting());
         clock.getClockMenuBar().getSettingsMenu().add(clock.getClockMenuBar().getToggleDSTSetting());
+        clock.getClockMenuBar().getSettingsMenu().add(clock.getClockMenuBar().getChangeTimeZoneMenu());
         clock.setShowDigitalTimeOnAnalogueClock(true);
         clock.getClockMenuBar().getShowDigitalTimeOnAnalogueClockSetting().setText(ClockConstants.HIDE + ClockConstants.SPACE + ClockConstants.DIGITAL_TIME);
     }
