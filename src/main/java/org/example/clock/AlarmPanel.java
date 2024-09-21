@@ -37,7 +37,8 @@ import static java.time.DayOfWeek.*;
  * @author michael ball
  * @version 2.7
  */
-public class AlarmPanel extends JPanel implements ClockConstants, IClockPanel {
+public class AlarmPanel extends JPanel implements ClockConstants, IClockPanel
+{
     private static final Logger logger = LogManager.getLogger(AlarmPanel.class);
     GridBagLayout layout;
     GridBagConstraints constraints;
@@ -871,16 +872,6 @@ public class AlarmPanel extends JPanel implements ClockConstants, IClockPanel {
         });
     }
 
-//    public Time convertStringToTimeAMPM(String ampm) throws InvalidInputException {
-//        logger.info("convertStringToTimeAMPM");
-//        if (StringUtils.equals("AM", ampm.toUpperCase()))
-//        { return Time.AM; }
-//        else if (StringUtils.equals("PM", ampm.toUpperCase()))
-//        { return Time.PM; }
-//        else throw new InvalidInputException("Invalid time input");
-//    }
-
-    @Override
     public void printStackTrace(Exception e, String message) {
         if (null != message)
             logger.error(message);
@@ -936,8 +927,8 @@ public class AlarmPanel extends JPanel implements ClockConstants, IClockPanel {
         add(cpt);
     }
 
-    protected void setupSettingsMenu() {
-        clock.getClockMenuBar().getSettingsMenu().removeAll();
+    public void setupSettingsMenu() {
+        clock.clearSettingsMenu();
         logger.info("No settings set up for Alarm Panel");
     }
 }

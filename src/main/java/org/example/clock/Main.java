@@ -24,7 +24,7 @@ public class Main {
     @SuppressWarnings({"BusyWait", "InfiniteLoopStatement"})
     public static void main(String[] args) throws ParseException, InvalidInputException {
         logger.info("Starting Clock...");
-        Clock clock = new Clock().initialize();
+        Clock clock = new Clock(true);
         //new Clock(1, 59, 50, NOVEMBER, SUNDAY, 3, 2024, AM);
         logger.info("Clock started. Date {}", clock.getDate().format(DateTimeFormatter.ofPattern("MM-dd-yyyy")));
         logger.info("Clock started. Time {} {}", clock.getTime().format(DateTimeFormatter.ofPattern("hh:mm:ss")), clock.getAMPM());

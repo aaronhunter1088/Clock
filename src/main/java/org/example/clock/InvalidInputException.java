@@ -2,7 +2,7 @@ package org.example.clock;
 
 /**
  * This class is used to determine that an error
- * can occurred while the Clock was running. It is
+ * has occurred while initializing Clock. It is
  * a checked exception, meaning the clock will always
  * break, and this exception must be dealt with.
  * "extends Exception says that this exception is a
@@ -11,6 +11,14 @@ package org.example.clock;
  * generate this exception must declare that this
  * exception is thrown.
  * It forces the programmer to deal with the exception."
+ *
+ * Example: Supplying a negative minutes value or a value
+ * greater than 59 will throw this exception. The rule of
+ * thumb being that a proper minute value is between 0 and 59,
+ * and once it becomes 60, it rolls back to 0, and increases
+ * the hour by 1. During initialization, none of the logic
+ * which determines whether or not to increase any hour
+ * value (in this example) executes.
  * @author michael ball
  * @version 2.7
  */

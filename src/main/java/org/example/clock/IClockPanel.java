@@ -12,7 +12,8 @@ package org.example.clock;
 public interface IClockPanel {
     void addComponentsToPanel();
     void setClock(Clock clock);
-    void setPanelType(PanelType typeOfPanel);
+    void setPanelType(PanelType panelType);
+    void setupSettingsMenu();
     default void printStackTrace(Exception e, String message) {
         System.err.println("Exception: " + e.getClass());
         System.err.println("Message: " + message);

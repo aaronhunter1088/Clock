@@ -2,6 +2,7 @@ package org.example.clock;
 
 import java.awt.*;
 import java.text.SimpleDateFormat;
+import java.time.LocalDate;
 import java.time.ZoneId;
 import java.util.Date;
 import java.util.Locale;
@@ -20,17 +21,18 @@ import static java.lang.Thread.sleep;
  * @author michael ball
  * @version 2.7
  */
-public class AnalogueClockPanel extends JPanel implements ClockConstants, IClockPanel, Runnable {
+public class AnalogueClockPanel extends JPanel implements ClockConstants, IClockPanel, Runnable
+{
     private static final Logger logger = LogManager.getLogger(AnalogueClockPanel.class);
     private GridBagLayout layout;
     private GridBagConstraints constraints;
-    Thread thread = null;
-    SimpleDateFormat formatter = new SimpleDateFormat("s", Locale.getDefault());
+    private Thread thread = null;
+    private SimpleDateFormat formatter;
     Date currentDate;
     int xcenter = 175, ycenter = 175, lastxs = 0, lastys = 0, lastxm = 0, lastym = 0, lastxh = 0, lastyh = 0;
     Clock clock;
     PanelType panelType;
-    private String clockText = "";
+    private String clockText = EMPTY;
 
     /**
      * Default constructor
@@ -38,6 +40,7 @@ public class AnalogueClockPanel extends JPanel implements ClockConstants, IClock
      */
     public AnalogueClockPanel(Clock clock) {
         super();
+        formatter = new SimpleDateFormat("s", Locale.getDefault());
         setupDefaultActions(clock);
         logger.info("Finished creating AnalogueClock Panel");
     }
@@ -96,18 +99,10 @@ public class AnalogueClockPanel extends JPanel implements ClockConstants, IClock
 
     void setupDefaultActions(Clock clock) {
         logger.info("setupDefaultActions with Clock");
-        setClock(clock);
-        setClockText(clock.getTimeAsStr());
+        this.clock = clock;
+        clockText = clock.getTimeAsStr();
         setupSettingsMenu();
         setDefaults();
-    }
-
-    protected void setupSettingsMenu() {
-        clock.getClockMenuBar().getSettingsMenu().removeAll();
-        clock.getClockMenuBar().getSettingsMenu().add(clock.getClockMenuBar().getShowDigitalTimeOnAnalogueClockSetting());
-        clock.getClockMenuBar().getSettingsMenu().add(clock.getClockMenuBar().getToggleDSTSetting());
-        clock.setShowDigitalTimeOnAnalogueClock(true);
-        clock.getClockMenuBar().getShowDigitalTimeOnAnalogueClockSetting().setText(ClockConstants.HIDE + ClockConstants.SPACE + ClockConstants.DIGITAL_TIME);
     }
 
     void setDefaults() {
@@ -123,16 +118,6 @@ public class AnalogueClockPanel extends JPanel implements ClockConstants, IClock
     }
 
     @Override
-    public void run() {
-        logger.info("starting analogue clock");
-        while (thread != null) {
-            try { sleep(1000); }
-            catch (InterruptedException e) { printStackTrace(e, e.getMessage());}
-            repaint();
-        }
-    }
-
-    @Override
     public void paint(Graphics g) {
         logger.info("painting analogue clock panel");
         int xhour, yhour, xminute, yminute, xsecond, ysecond, second, minute, hour;
@@ -143,9 +128,8 @@ public class AnalogueClockPanel extends JPanel implements ClockConstants, IClock
             setClockText(clock.getTimeAsStr());
         }
         drawStructure(g);
-
         formatter.applyPattern("s");
-        second = Integer.parseInt(formatter.format(currentDate));
+        second = Integer.parseInt(formatter.format(new Date()));
         formatter.applyPattern("m");
         minute = Integer.parseInt(formatter.format(currentDate));
         formatter.applyPattern("h");
@@ -194,7 +178,23 @@ public class AnalogueClockPanel extends JPanel implements ClockConstants, IClock
         paint(g);
     }
 
-    @Override
+    public void run() {
+        logger.info("starting analogue clock");
+        while (thread != null) {
+            try { sleep(1000); }
+            catch (InterruptedException e) { printStackTrace(e, e.getMessage());}
+            repaint();
+        }
+    }
+
+    public void setupSettingsMenu() {
+        clock.getClockMenuBar().getSettingsMenu().removeAll();
+        clock.getClockMenuBar().getSettingsMenu().add(clock.getClockMenuBar().getShowDigitalTimeOnAnalogueClockSetting());
+        clock.getClockMenuBar().getSettingsMenu().add(clock.getClockMenuBar().getToggleDSTSetting());
+        clock.setShowDigitalTimeOnAnalogueClock(true);
+        clock.getClockMenuBar().getShowDigitalTimeOnAnalogueClockSetting().setText(ClockConstants.HIDE + ClockConstants.SPACE + ClockConstants.DIGITAL_TIME);
+    }
+
     public void addComponentsToPanel() { /* no operation */ }
 
 }

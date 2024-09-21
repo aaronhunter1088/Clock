@@ -30,8 +30,7 @@ public class ClockTest {
 
     @Before
     public void beforeEach() {
-        clock = new Clock();
-        clock.setTestingClock(true);
+        clock = new Clock(false);
     }
 
     @Test
@@ -50,6 +49,7 @@ public class ClockTest {
     public void testIsTodayDaylightSavingsDayReturnsFalseWhenNotBeginningDST() throws InvalidInputException
     {
         clock = new Clock(5, 42, 0, MARCH, THURSDAY, 3, 2022, PM);
+        clock.setTestingClock(true);
         assertFalse(clock.isTodayDaylightSavingsTime());
     }
 
@@ -185,8 +185,10 @@ public class ClockTest {
     public void testTickClockTwiceAsFast() throws InvalidInputException
     {
         clock = new Clock(7, 0, 6, SEPTEMBER, FRIDAY, 20, 2024, PM);
-        clock.setTestingClock(true);
         clock.tick(2,1,1);
+        assertEquals("Expected hoursAsStr to be 07", "07", clock.getHoursAsStr());
+        assertEquals("Expected minutesAsStr to be 00", "00", clock.getMinutesAsStr());
+        assertEquals("Expected secondsAsStr to be 08", "08", clock.getSecondsAsStr());
         assertEquals("Expected hours to be 7", 7, clock.getHours());
         assertEquals("Expected minutes to be 0", 0, clock.getMinutes());
         assertEquals("Expected seconds to be 8", 8, clock.getSeconds());
@@ -196,11 +198,13 @@ public class ClockTest {
     public void testTickClockFaster() throws InvalidInputException
     {
         clock = new Clock(7, 59, 58, SEPTEMBER, FRIDAY, 20, 2024, PM);
-        clock.setTestingClock(true);
         clock.tick(2,3,4);
-        assertEquals("Expected seconds to be 0", 0, clock.getSeconds());
-        assertEquals("Expected minutes to be 2", 2, clock.getMinutes());
+        assertEquals("Expected hoursAsStr to be 11", "11", clock.getHoursAsStr());
+        assertEquals("Expected minutesAsStr to be 02", "02", clock.getMinutesAsStr());
+        assertEquals("Expected secondsAsStr to be 00", "00", clock.getSecondsAsStr());
         assertEquals("Expected hours to be 11", 11, clock.getHours());
+        assertEquals("Expected minutes to be 2", 2, clock.getMinutes());
+        assertEquals("Expected seconds to be 0", 0, clock.getSeconds());
     }
 
 

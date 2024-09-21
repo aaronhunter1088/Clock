@@ -6,6 +6,8 @@ import org.apache.logging.log4j.Logger;
 import javax.swing.*;
 import java.awt.*;
 
+import static org.example.clock.PanelType.DIGITAL_CLOCK;
+
 /**
  * The DigitalClockPanel is the main panel and is
  * visible first to the user. Here you can
@@ -29,15 +31,15 @@ public class DigitalClockPanel extends JPanel implements ClockConstants, IClockP
     DigitalClockPanel(Clock clock) {
         super();
         setClock(clock);
-        setPanelType(PanelType.DIGITAL_CLOCK);
+        setPanelType(DIGITAL_CLOCK);
         setMaximumSize(Clock.defaultSize);
-        setGridBagLayout(new GridBagLayout());
-        setLayout(getGridBagLayout());
-        setGridBagConstraints(new GridBagConstraints());
+        layout = new GridBagLayout();
+        setLayout(layout);
+        constraints = new GridBagConstraints();
         constraints.fill = GridBagConstraints.HORIZONTAL;
         setBackground(Color.BLACK);
         setForeground(Color.WHITE);
-        setupClockPanel(getClock());
+        setupClockPanel();
         addComponentsToPanel();
         setupSettingsMenu();
         logger.info("Finished creating DigitalClock Panel");
@@ -59,15 +61,15 @@ public class DigitalClockPanel extends JPanel implements ClockConstants, IClockP
     @Override
     public void setPanelType(PanelType panelType) { this.panelType = panelType; }
 
-    public void setupClockPanel(Clock clock) {
-        logger.info("setupClockPanel");
+    public void setupClockPanel() {
+        logger.info("setup digital clock panel");
         setupSettingsMenu();
         clock.setIsDateChanged(false);
         clock.setShowFullDate(false);
         clock.setShowPartialDate(false);
         clock.setShowMilitaryTime(false);
-        setLabel1(new JLabel("", SwingConstants.CENTER));
-        setLabel2(new JLabel("", SwingConstants.CENTER));
+        setLabel1(new JLabel(EMPTY, SwingConstants.CENTER));
+        setLabel2(new JLabel(EMPTY, SwingConstants.CENTER));
     }
 
     public void printStackTrace(Exception e, String message)
@@ -108,8 +110,8 @@ public class DigitalClockPanel extends JPanel implements ClockConstants, IClockP
         addComponent(getLabel2(), 1,0,1,1, 0,0);
     }
 
-    protected void setupSettingsMenu() {
-        clock.getClockMenuBar().getSettingsMenu().removeAll(); // easier
+    public void setupSettingsMenu() {
+        clock.clearSettingsMenu();
         clock.getClockMenuBar().getSettingsMenu().add(clock.getClockMenuBar().getMilitaryTimeSetting());
         clock.getClockMenuBar().getSettingsMenu().add(clock.getClockMenuBar().getFullTimeSetting());
         clock.getClockMenuBar().getSettingsMenu().add(clock.getClockMenuBar().getPartialTimeSetting());

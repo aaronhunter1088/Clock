@@ -7,6 +7,7 @@ import java.net.URL;
 import java.time.*;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
@@ -117,7 +118,7 @@ public class Clock extends JFrame
     public boolean isShowMilitaryTime() { return showMilitaryTime; }
     public boolean isShowDigitalTimeOnAnalogueClock() { return showDigitalTimeOnAnalogueClock; }
     public boolean isTestingClock() { return testingClock; }
-    public java.util.List<Alarm> getListOfAlarms() { return listOfAlarms; }
+    public List<Alarm> getListOfAlarms() { return listOfAlarms; }
     public ScheduledExecutorService getTimeUpdater() { return timeUpdater; }
     public boolean isDaylightSavingsTimeEnabled() { return daylightSavingsTimeEnabled; }
 
@@ -129,35 +130,64 @@ public class Clock extends JFrame
     protected void setTimerPanel(TimerPanel timerPanel) { this.timerPanel = timerPanel; }
     protected void setBeginDaylightSavingsTimeDate(LocalDate beginDaylightSavingsTimeDate) { this.beginDaylightSavingsTimeDate = beginDaylightSavingsTimeDate; }
     protected void setEndDaylightSavingsTimeDate(LocalDate endDaylightSavingsTimeDate) { this.endDaylightSavingsTimeDate = endDaylightSavingsTimeDate; }
-    protected void setDate(LocalDate date) { this.date = date; logger.debug("date: {}", date); }
+    protected void setDate(LocalDate date) { this.date = date; logger.debug("date: {} {}", date, dayOfWeek!=null?dayOfWeek.toString():"DayOfWeekUnset"); }
     protected void setTime(LocalTime time) { this.time = time; logger.debug("time: {} {}", DateTimeFormatter.ofPattern("hh:mm:ss").format(time), ampm); }
+    /**
+     * Sets and logs the new second value
+     * Also sets secondsAsStr
+     * @param seconds the new seconds value
+     */
     protected void setSeconds(int seconds) {
         this.seconds = seconds;
         if (this.seconds <= 9) setSecondsAsStr("0"+this.seconds);
         else setSecondsAsStr(Integer.toString(this.seconds));
         logger.debug("seconds: {} asStr: {}", this.seconds, secondsAsStr);
     }
+    /**
+     * Sets and logs the new minute value
+     * Also sets minutesAsStr
+     * @param minutes the new minutes value
+     */
     protected void setMinutes(int minutes) {
         this.minutes = minutes;
         if (this.minutes <= 9) setMinutesAsStr("0"+this.minutes);
         else setMinutesAsStr(Integer.toString(this.minutes));
         logger.debug("minutes: {} asStr: {}", this.minutes, minutesAsStr);
     }
+    /**
+     * Sets and logs the new hour value
+     * Also sets hoursAsStr
+     * @param hours the new hours value
+     */
     protected void setHours(int hours) {
         this.hours = hours;
         if (this.hours < 10) this.hoursAsStr = "0"+hours;
         else this.hoursAsStr = Integer.toString(this.hours);
         logger.debug("hours: {} asStr: {}", this.hours, hoursAsStr);
     }
-    protected void setAMPM(LocalTime ampm) {
-        if (ampm.getHour() < 12) this.ampm = AM;
-        else this.ampm = PM;
-        logger.debug("ampm: {}", this.ampm);
+    protected void setAMPM(String ampm) {
+        if (!List.of(AM,PM).contains(ampm)) throw new IllegalArgumentException("AMPM must be 'AM' or 'PM'");
+        this.ampm = ampm; logger.debug("ampm: {}", this.ampm);
     }
-    protected void setAMPM(String ampm) { this.ampm = ampm; logger.debug("ampm: {}", this.ampm); }
+    /**
+     * Sets and logs the new timezone value
+     * @param timezone the new timezone value
+     */
     protected void setTimeZone(ZoneId timezone) { this.timezone = timezone; logger.debug("timezone: {}", timezone.getId()); }
+    /**
+     * Sets and logs the new dayOfWeek value
+     * @param dayOfWeek the new dayOfWeek value
+     */
     protected void setDayOfWeek(DayOfWeek dayOfWeek) { this.dayOfWeek = dayOfWeek; }
+    /**
+     * Sets and logs the new dayOfMonth value
+     * @param dayOfMonth the new dayOfMonth value
+     */
     protected void setDayOfMonth(int dayOfMonth) { this.dayOfMonth = dayOfMonth; logger.debug("dayOfMonth: {}", dayOfMonth); }
+    /**
+     * Sets and logs the new month value
+     * @param month the new month value
+     */
     protected void setMonth(Month month) { this.month = month; logger.debug("month: {}", month); }
     protected void setYear(int year) { this.year = year; logger.debug("year: {}", year); }
     protected void setHoursAsStr(String hoursAsStr) { this.hoursAsStr = hoursAsStr; }
@@ -185,20 +215,79 @@ public class Clock extends JFrame
     protected void setDaylightSavingsTimeEnabled(boolean daylightSavingsTimeEnabled) { this.daylightSavingsTimeEnabled = daylightSavingsTimeEnabled; }
 
     /**
+     * Default constructor for the Clock class.
+     */
+    public Clock() {
+        super();
+    }
+
+    /**
      * Main constructor for the Clock class.
      * Initializes the clock with default settings, including setting the initial time,
      * configuring the menu bar, setting up daylight savings time dates, and creating
      * various clock panels. It also sets the clock's size, location, and icon.
      */
-    public Clock() {super();}
+    public Clock(boolean initialize) {
+        super();
+        if (initialize) { initialize(); }
+    }
+
+    /**
+     * Custom constructor which takes in values for all Clock
+     * parameters and sets them based on those inputs. Expects
+     * non-military time values. Also is the default constructor
+     * for a test clock.
+     * @param hours      the hours to set
+     * @param minutes    the minutes to set
+     * @param seconds    the seconds to set
+     * @param month      the month to set
+     * @param dayOfWeek  the day of the week to set
+     * @param dayOfMonth the date of the month to set
+     * @param year       the year to set
+     * @param ampm       the AM or PM to set
+     * @throws InvalidInputException when an InvalidInput has been given
+     * @see InvalidInputException
+     */
+    public Clock(int hours, int minutes, int seconds, Month month, DayOfWeek dayOfWeek, int dayOfMonth, int year, String ampm) throws InvalidInputException {
+        this();
+        testingClock = true;
+        initialize();
+        if (seconds < 0 || seconds > 59 && seconds != 60) throw new IllegalArgumentException("Seconds must be between 0 and 59");
+        else setSeconds(seconds);
+        if (minutes < 0 || minutes > 59 && minutes != 60) throw new IllegalArgumentException("Minutes must be between 0 and 59");
+        else setMinutes(minutes);
+        if (!showMilitaryTime) {
+            if (hours < 0 || hours > 12) throw new IllegalArgumentException("Hours must be between 0 and 12");
+            else setHours(hours);
+        } else {
+            if (hours < 0 || hours > 23) throw new IllegalArgumentException("Hours must be between 0 and 23");
+            else setHours(hours);
+        }
+        if (List.of(Month.values()).contains(month)) setMonth(month);
+        else throw new InvalidInputException("Invalid month '"+month+"'");
+        if (List.of(DayOfWeek.values()).contains(dayOfWeek)) setDayOfWeek(dayOfWeek);
+        else throw new InvalidInputException("Invalid day of week '"+dayOfWeek+"'");
+        // TODO: Enhance by first checking what month it is. Then determine exactly what values are acceptable for that month and display proper IllegalArgumentException message. Ex: Feb would say between 1 and 28 or even 29 if it is a leap year
+        if (dayOfMonth < 1 || dayOfMonth > 31) throw new IllegalArgumentException("The day of month must be between 1 and 31");
+        else setDayOfMonth(dayOfMonth);
+        // TODO: May want to think about but for now, the year must be 4 digits and at least 1000 or more
+        if (year < 1000) throw new IllegalArgumentException("Year must be greater than 1000");
+        else setYear(year);
+        setTheTime(LocalDateTime.of(LocalDate.of(year,month,dayOfMonth), LocalTime.of(hours,minutes,seconds)));
+        if (List.of(AM,PM).contains(ampm)) setAMPM(ampm);
+        else throw new InvalidInputException("Invalid AM/PM value '"+ampm+"'");
+        setDaylightSavingsTimeDates();
+        setDaylightSavingsTime(isTodayDaylightSavingsTime());
+        setLeapYear(getDate().isLeapYear());
+    }
 
     public Clock initialize() {
         setBounds(200, 200, 700, 300);
         setListOfAlarms(new ArrayList<>());
         setShowMilitaryTime(false);
         setTheTime(LocalDateTime.now());
-        setupMenuBar();
         setDaylightSavingsTimeDates();
+        setupMenuBar();
         if (isTodayDaylightSavingsTime()) { setDaylightSavingsTime(true); }
         setDigitalClockPanel(new DigitalClockPanel(this));
         setAnalogueClockPanel(new AnalogueClockPanel(this));
@@ -225,50 +314,18 @@ public class Clock extends JFrame
         return this;
     }
 
-    /**
-     * This constructor takes in values for all Clock parameters
-     * and sets them based on those inputs. Expects non-military
-     * time values.
-     * @param hours the hours to set
-     * @param minutes the minutes to set
-     * @param seconds the seconds to set
-     * @param month the month to set
-     * @param dayOfWeek the day of the week to set
-     * @param dayOfMonth the date of the month to set
-     * @param year the year to set
-     * @param ampm Am or PM to set
-     * @throws InvalidInputException when an InvalidInput has been given
-     */
-    public Clock(int hours, int minutes, int seconds, Month month, DayOfWeek dayOfWeek, int dayOfMonth, int year, String ampm) throws InvalidInputException {
-        this();
-        testingClock = true;
-        initialize();
-        setSeconds(seconds);
-        setMinutes(minutes);
-        setHours(hours);
-        setMonth(month);
-        setDayOfWeek(dayOfWeek);
-        setDayOfMonth(dayOfMonth);
-        setYear(year);
-        setAMPM(ampm);
-        setTheTime(LocalDateTime.of(LocalDate.of(year,month,dayOfMonth), LocalTime.of(hours,minutes,seconds)));
-        setDaylightSavingsTimeDates();
-        setDaylightSavingsTime(isTodayDaylightSavingsTime());
-        setLeapYear(getDate().isLeapYear());
-    }
-
     void setImageIcon(ImageIcon icon) { this.icon = icon; }
 
     void removePanel() {
         logger.debug("removing panel {}", getPanelType());
         switch (panelType) {
-            case DIGITAL_CLOCK -> remove(getDigitalClockPanel());
+            case DIGITAL_CLOCK -> remove(digitalClockPanel);
             case ANALOGUE_CLOCK -> {
                 getAnalogueClockPanel().stop();
-                remove(getAnalogueClockPanel());
+                remove(analogueClockPanel);
             }
-            case ALARM -> remove(getAlarmPanel());
-            case TIMER -> remove(getTimerPanel());
+            case ALARM -> remove(alarmPanel);
+            case TIMER -> remove(timerPanel);
         }
     }
 
@@ -308,9 +365,9 @@ public class Clock extends JFrame
         setDayOfWeek(dateTime.getDayOfWeek());
         setDayOfMonth(dateTime.getDayOfMonth());
         setYear(dateTime.getYear());
-        //setAMPM(LocalTime.from(dateTime));
         setTimeZone(getZoneIdFromTimezoneButtonText(EMPTY));
         setCurrentTime();
+        setAMPM(dateTime.getHour()<12?AM:PM);
     }
 
     void updateTheTime(JMenuItem timezone) {
@@ -458,8 +515,8 @@ public class Clock extends JFrame
 
     public boolean isTodayDaylightSavingsTime() {
         if (date.isEqual(getBeginDaylightSavingsTimeDate())) {
-            setDaylightSavingsTime(true);
-            return isDaylightSavingsTime();
+            isDaylightSavingsTime = true;
+            return true;
         }
         else if (date.isEqual(getEndDaylightSavingsTimeDate())) {
             setDaylightSavingsTime(true);
@@ -532,7 +589,7 @@ public class Clock extends JFrame
             logger.info("date has changed");
             setDayOfMonth(getDayOfMonth()+1);
             setDaylightSavingsTime(isTodayDaylightSavingsTime());
-            switch(getDayOfWeek()) {
+            switch(dayOfWeek) {
                 case SUNDAY: setDayOfWeek(MONDAY); break;
                 case MONDAY: setDayOfWeek(TUESDAY); break;
                 case TUESDAY: setDayOfWeek(WEDNESDAY); break;
@@ -542,7 +599,7 @@ public class Clock extends JFrame
                 case SATURDAY: setDayOfWeek(SUNDAY); break;
                 default: throw new InvalidInputException("Unknown DayOfWeek: " + getDayOfWeek());
             }
-            switch (getMonth()) {
+            switch (month) {
                 case JANUARY: {
                     if (getDayOfMonth() == 31) {
                         setDayOfMonth(1);
@@ -673,8 +730,12 @@ public class Clock extends JFrame
             }
             logger.info("setting isDaylightSavingsTime to {}", isDaylightSavingsTime);
         } else {
-            logger.info("daylight savings time not enabled");
-            logger.info("not adjusting time");
+            if (!daylightSavingsTimeEnabled) {
+                logger.info("daylight savings time not enabled");
+                logger.info("not adjusting time");
+            } else {
+                logger.info("!! not daylight savings time !!");
+            }
         }
     } // performTick
 
@@ -747,7 +808,7 @@ public class Clock extends JFrame
     }
 
     void changePanels(PanelType panelType) {
-        logger.info("changePanels");
+        logger.info("change panels");
         removePanel();
         updatePanel(panelType);
         this.repaint();
@@ -809,4 +870,7 @@ public class Clock extends JFrame
         return retImageIcon;
     }
 
+    public void clearSettingsMenu() {
+        menuBar.getSettingsMenu().removeAll(); // easier
+    }
 }

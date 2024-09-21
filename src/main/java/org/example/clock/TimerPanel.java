@@ -499,7 +499,7 @@ public class TimerPanel extends JPanel implements ClockConstants, IClockPanel {
         logger.info("Alarm button set!");
     }
 
-    protected void setupSettingsMenu() {
+    public void setupSettingsMenu() {
         clock.getClockMenuBar().getSettingsMenu().removeAll();
         logger.info("No settings set for the Timer Panel");
     }
