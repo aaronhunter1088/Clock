@@ -7,7 +7,7 @@ import org.mockito.junit.MockitoJUnitRunner;
 import java.util.ArrayList;
 import java.util.List;
 
-import static org.example.clock.PanelType.*;
+import static org.example.clock.ClockPanel.*;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
@@ -18,25 +18,25 @@ public class PanelTypeTest {
 	@Test
 	public void testClockFacesAreDifferent()
 	{
-		PanelType c1 = DIGITAL_CLOCK;
-		PanelType c2 = ALARM;
+		ClockPanel c1 = PANEL_DIGITAL_CLOCK;
+		ClockPanel c2 = PANEL_ALARM;
 		assertTrue(c1 != c2);
 	}
 
 	@Test
 	public void testThatWeGetAllValues() {
-		List<PanelType> panelTypes = new ArrayList<>();
-		for (PanelType cf : PanelType.values()) {
-			panelTypes.add(cf);
+		List<ClockPanel> clockPanels = new ArrayList<>();
+		for (ClockPanel cf : ClockPanel.values()) {
+			clockPanels.add(cf);
 		}
 		// x should be hard coded for future tests
-		assertTrue(PanelType.values().length == panelTypes.size());
+		assertTrue(ClockPanel.values().length == clockPanels.size());
 	}
 
 	@Test
 	public void testToStringPrintsFaceName()
 	{
-		PanelType cf = DIGITAL_CLOCK;
-		assertEquals("Printed the Name", "DIGITAL_CLOCK", cf.toString());
+		ClockPanel cf = PANEL_DIGITAL_CLOCK;
+		assertEquals("Printed the Name", "PANEL_DIGITAL_CLOCK", cf.toString());
 	}
 }

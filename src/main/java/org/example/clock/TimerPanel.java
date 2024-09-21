@@ -30,22 +30,22 @@ import static java.lang.Thread.sleep;
 public class TimerPanel extends JPanel implements IClockPanel
 {
     private static final Logger logger = LogManager.getLogger(TimerPanel.class);
-    GridBagLayout layout;
-    GridBagConstraints constraints;
-    JTextField textField1, /*Hour textField*/ textField2, /*Min textField*/ textField3; /*Second textField*/
-    JButton timerButton;   // Set Timer button
-    JButton resetButton;   // Reset Timer button
-    Clock clock;           // Reference to the clock
-    Thread countdownThread = new Thread(this::performCountDown);
-    boolean timerIsGoingOff;
-    AdvancedPlayer musicPlayer;
-    PanelType panelType;
-
+    private GridBagLayout layout;
+    private GridBagConstraints constraints;
+    private JTextField textField1, // Hour
+                       textField2, // Min
+                       textField3; // Second
+    private JButton timerButton;   // Set Timer button
+    private JButton resetButton;   // Reset Timer button
+    private Clock clock;           // Reference to the clock
+    private Thread countdownThread = new Thread(this::performCountDown);
+    private boolean timerIsGoingOff;
+    private AdvancedPlayer musicPlayer;
+    private ClockPanel clockPanel = ClockPanel.PANEL_TIMER;
 
     TimerPanel(Clock clock) {
         super();
         setClock(clock);
-        setPanelType(PanelType.TIMER);
         setSize(Clock.panelSize);
         setGridBagLayout(new GridBagLayout());
         setLayout(getGridBagLayout());
@@ -100,10 +100,8 @@ public class TimerPanel extends JPanel implements IClockPanel
     protected void setResetButton(JButton resetButton) { this.resetButton = resetButton; }
     protected void setIsTimerGoingOff(boolean timerIsGoingOff) { this.timerIsGoingOff = timerIsGoingOff; }
     protected void setMusicPlayer(AdvancedPlayer musicPlayer) { this.musicPlayer = musicPlayer; }
-    @Override
     public void setClock(Clock clock) { this.clock = clock; }
-    @Override
-    public void setPanelType(PanelType panelType) { this.panelType = panelType; }
+    public void setClockPanel(ClockPanel clockPanel) { this.clockPanel = clockPanel; }
     // Helper methods
     public void setupTimerPanel() {
         logger.info("setupTimerPanel");

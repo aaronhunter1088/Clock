@@ -11,7 +11,7 @@ import java.time.ZoneId;
 import java.util.Arrays;
 
 import static org.example.clock.ClockConstants.*;
-import static org.example.clock.PanelType.*;
+import static org.example.clock.ClockPanel.*;
 
 /**
  * The menu bar for the Clock.
@@ -50,8 +50,8 @@ public class ClockMenuBar extends JMenuBar {
         setForeground(Color.WHITE);
         setBackground(Color.BLACK);
         // Menu options
-        setSettingsMenu(new JMenu(SETTINGS));
-        setFeaturesMenu(new JMenu(FEATURES));
+        settingsMenu = new JMenu(SETTINGS);
+        featuresMenu = new JMenu(FEATURES) ;
         // Settings menu choices
         setMilitaryTimeSetting(new JMenuItem(SHOW+SPACE+MILITARY_TIME_SETTING));
         getMilitaryTimeSetting().setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_M, InputEvent.CTRL_DOWN_MASK));
@@ -93,7 +93,7 @@ public class ClockMenuBar extends JMenuBar {
 
         setTimerFeature(new JMenuItem(VIEW_TIMER));
         getTimerFeature().setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_T, InputEvent.CTRL_DOWN_MASK));
-        setDigitalClockSettingsOnMenuBar();
+
         // Add options to Features Menu
         getFeaturesMenu().add(getDigitalClockFeature());
         getFeaturesMenu().add(getAnalogueClockFeature());
@@ -182,21 +182,22 @@ public class ClockMenuBar extends JMenuBar {
             }
         });
         // Set functionality for Features menu
-        getDigitalClockFeature().addActionListener(action -> clock.changePanels(DIGITAL_CLOCK));
-        getAnalogueClockFeature().addActionListener(action -> clock.changePanels(ANALOGUE_CLOCK));
-        getSetAlarms().addActionListener(action -> clock.changePanels(ALARM));
-        getTimerFeature().addActionListener(action -> clock.changePanels(TIMER));
-//        getDigitalClockFeature().addActionListener(action -> clock.changeToDigitalClockPanel());
-//        getAnalogueClockFeature().addActionListener(action -> clock.changeToAnalogueClockPanel());
-//        getSetAlarms().addActionListener(action -> clock.changeToAlarmPanel(true));
-//        getTimerFeature().addActionListener(action -> clock.changeToTimerPanel());
+        getDigitalClockFeature().addActionListener(action -> clock.changePanels(PANEL_DIGITAL_CLOCK));
+        getAnalogueClockFeature().addActionListener(action -> clock.changePanels(PANEL_ANALOGUE_CLOCK));
+        getSetAlarms().addActionListener(action -> clock.changePanels(PANEL_ALARM));
+        getTimerFeature().addActionListener(action -> clock.changePanels(PANEL_TIMER));
         // Add both menus to main menu
         add(getSettingsMenu());
         add(getFeaturesMenu());
         logger.info("Finished creating Clock menubar");
     }
 
-    private void setupTimezone(JMenuItem timezone) {
+    /**
+     * Sets up the timezone menu item
+     * @param timezone the timezone menu item to set up
+     */
+    private void setupTimezone(JMenuItem timezone)
+    {
         logger.debug("setup timezone for {}", timezone.getText());
         timezone.addActionListener(l -> clock.updateTheTime(timezone));
         timezone.setForeground(Color.WHITE);

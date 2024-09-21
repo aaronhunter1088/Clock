@@ -6,7 +6,7 @@ import org.apache.logging.log4j.Logger;
 import javax.swing.*;
 import java.awt.*;
 
-import static org.example.clock.PanelType.DIGITAL_CLOCK;
+import static org.example.clock.ClockPanel.PANEL_DIGITAL_CLOCK;
 
 /**
  * The DigitalClockPanel is the main panel and is
@@ -22,17 +22,17 @@ import static org.example.clock.PanelType.DIGITAL_CLOCK;
 public class DigitalClockPanel extends JPanel implements IClockPanel
 {
     private static final Logger logger = LogManager.getLogger(DigitalClockPanel.class);
-    GridBagLayout layout;
-    GridBagConstraints constraints;
-    JLabel label1;
-    JLabel label2;
-    Clock clock;
-    PanelType panelType;
+    private GridBagLayout layout;
+    private GridBagConstraints constraints;
+    private JLabel label1;
+    private JLabel label2;
+    private Clock clock;
+    private ClockPanel clockPanel;
 
     DigitalClockPanel(Clock clock) {
         super();
         setClock(clock);
-        setPanelType(DIGITAL_CLOCK);
+        setClockPanel(PANEL_DIGITAL_CLOCK);
         setMaximumSize(Clock.defaultSize);
         layout = new GridBagLayout();
         setLayout(layout);
@@ -51,17 +51,18 @@ public class DigitalClockPanel extends JPanel implements IClockPanel
     public Clock getClock() { return this.clock; }
     public JLabel getLabel1() { return this.label1; }
     public JLabel getLabel2() { return this.label2; }
-    public PanelType getPanelType() { return this.panelType; }
+    public ClockPanel getPanelType() { return this.clockPanel; }
 
     private void setGridBagLayout(GridBagLayout layout) { this.layout = layout; }
     private void setGridBagConstraints(GridBagConstraints constraints) { this.constraints = constraints; }
     public void setLabel1(JLabel label1) { this.label1 = label1; }
     public void setLabel2(JLabel label2) { this.label2 = label2; }
-    @Override
     public void setClock(Clock clock) { this.clock = clock; }
-    @Override
-    public void setPanelType(PanelType panelType) { this.panelType = panelType; }
+    public void setClockPanel(ClockPanel clockPanel) { this.clockPanel = clockPanel; }
 
+    /**
+     * This method sets up the digital clock panel.
+     */
     public void setupClockPanel() {
         logger.info("setup digital clock panel");
         setupSettingsMenu();
@@ -69,24 +70,31 @@ public class DigitalClockPanel extends JPanel implements IClockPanel
         clock.setShowFullDate(false);
         clock.setShowPartialDate(false);
         clock.setShowMilitaryTime(false);
-        setLabel1(new JLabel(EMPTY, SwingConstants.CENTER));
-        setLabel2(new JLabel(EMPTY, SwingConstants.CENTER));
+        label1 = new JLabel(EMPTY, SwingConstants.CENTER);
+        label2 = new JLabel(EMPTY, SwingConstants.CENTER);
     }
 
+    /**
+     * This method prints the stack trace of an exception
+     * that may occur when the digital panel is in use.
+     * @param e the exception
+     * @param message the message to print
+     */
     public void printStackTrace(Exception e, String message)
     {
-        if (null != message)
-            logger.error(message);
-        else
-            logger.error(e.getMessage());
+        if (null != message) logger.error(message);
+        else logger.error(e.getMessage());
         for(StackTraceElement ste : e.getStackTrace())
-        {
-            logger.info(ste.toString());
-        }
+        { logger.error(ste.toString()); }
     }
 
+    /**
+     * This method prints the stack trace of an exception
+     * that may occur when the digital panel is in use.
+     * @param e the exception
+     */
     protected void printStackTrace(Exception e)
-    { printStackTrace(e, ""); }
+    { printStackTrace(e, EMPTY); }
 
     public void addComponent(Component cpt, int gridy, int gridx, double gwidth, double gheight, int ipadx, int ipady)
     {
@@ -111,6 +119,10 @@ public class DigitalClockPanel extends JPanel implements IClockPanel
         addComponent(getLabel2(), 1,0,1,1, 0,0);
     }
 
+    /**
+     * This method sets up the settings menu for the
+     * digital clock panel.
+     */
     public void setupSettingsMenu() {
         clock.clearSettingsMenu();
         clock.getClockMenuBar().getSettingsMenu().add(clock.getClockMenuBar().getMilitaryTimeSetting());
@@ -120,22 +132,30 @@ public class DigitalClockPanel extends JPanel implements IClockPanel
         clock.getClockMenuBar().getSettingsMenu().add(clock.getClockMenuBar().getChangeTimeZoneMenu());
     }
 
+    /**
+     * This method updates the labels on the digital
+     * clock panel.
+     */
     public void updateLabels()
     {
         logger.info("updateLabels");
-        if (getClock().getAlarmPanel().getCurrentAlarmGoingOff() != null) {
-            getLabel1().setText(getClock().defaultText(8));
-            getLabel2().setText(getClock().defaultText(9));
-        } else { // default date and time
-            getLabel1().setText(getClock().defaultText(1));
-            getLabel2().setText(getClock().defaultText(2));
+        label1.setForeground(Color.WHITE);
+        label2.setForeground(Color.WHITE);
+        if (clock.getAlarmPanel().getActiveAlarm() != null)
+        {
+            label1.setText(clock.defaultText(8));
+            label2.setText(clock.defaultText(9));
         }
-        if (getClock().isShowFullDate()) getLabel1().setFont(Clock.font40);
-        else if (getClock().isShowPartialDate()) getLabel1().setFont(Clock.font50);
-        else getLabel1().setFont(Clock.font60);
-        getLabel2().setFont(Clock.font50);
-        getLabel1().setForeground(Color.WHITE);
-        getLabel2().setForeground(Color.WHITE);
-        getClock().repaint();
+        // default date and time
+        else
+        {
+            label1.setText(clock.defaultText(1));
+            label2.setText(clock.defaultText(2));
+        }
+        if (clock.isShowFullDate()) label1.setFont(Clock.font40);
+        else if (clock.isShowPartialDate()) label1.setFont(Clock.font50);
+        else label1.setFont(Clock.font60);
+        label2.setFont(Clock.font50);
+        clock.repaint();
     }
 }

@@ -10,7 +10,6 @@ import org.mockito.junit.MockitoJUnitRunner;
 
 import javax.swing.*;
 import java.awt.*;
-import java.text.ParseException;
 import java.time.DayOfWeek;
 import java.util.ArrayList;
 import java.util.concurrent.ExecutorService;
@@ -27,25 +26,19 @@ public class AlarmPanelTest {
 
     static { System.setProperty("appName", AlarmPanelTest.class.getSimpleName()); }
     private static Logger logger = LogManager.getLogger(AlarmPanelTest.class);
-    private Clock clock = new Clock().initialize();
+    private Clock clock = new Clock(true);
     private Alarm alarm;
 
     @BeforeClass
-    public static void beforeClass() throws InvalidInputException
+    public static void beforeClass()
     {
-
+        logger.info("Starting AlarmPanelTest...");
     }
 
     @Before
-    public void beforeEach() throws InvalidInputException {
-        clock = new Clock().initialize();
-        clock.setVisible(true);
-        clock.getContentPane().setBackground(Color.BLACK);
-        clock.setSize(Clock.defaultSize);
-        clock.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        clock.setBounds(200, 200, 700, 300);
-        clock.tick();
-
+    public void beforeEach() throws InvalidInputException
+    {
+        clock = new Clock(true);
         alarm = new Alarm(clock, clock.getHours(), true);
     }
 
@@ -53,8 +46,7 @@ public class AlarmPanelTest {
     public void testSettingAudioStreamWorks()
     {
         AlarmPanel testAlarmPanel = createAndSetupAlarmPanel();
-
-        assertTrue("Music player should be set", null != testAlarmPanel.getMusicPlayer());
+        assertNotNull("Music player should be set", testAlarmPanel.getMusicPlayer());
     }
 
     @Test
@@ -62,7 +54,7 @@ public class AlarmPanelTest {
     {
         AlarmPanel testAlarmPanel = createAndSetupAlarmPanel();
         ExecutorService executor = Executors.newCachedThreadPool();
-        testAlarmPanel.setCurrentAlarmGoingOff(alarm);
+        testAlarmPanel.setActiveAlarm(alarm);
         testAlarmPanel.triggerAlarm(executor);
         assertTrue("Alarm is going off", testAlarmPanel.isAlarmIsGoingOff());
         Thread.sleep(1000);
@@ -90,7 +82,7 @@ public class AlarmPanelTest {
         clock.setListOfAlarms(new ArrayList<>(){{add(alarm);}});
         clock.getAlarmPanel().checkIfAnyAlarmsAreGoingOff();
         assertTrue("Alarm should be going off!", alarm.isAlarmGoingOff());
-        assertEquals("This 'alarm' is set as the current alarm going off", alarm, clock.getAlarmPanel().getCurrentAlarmGoingOff());
+        assertEquals("This 'alarm' is set as the current alarm going off", alarm, clock.getAlarmPanel().getActiveAlarm());
         assertTrue("Alarm should not be triggered to go off!", alarm.isAlarmGoingOff());
     }
 
@@ -105,7 +97,7 @@ public class AlarmPanelTest {
     {
         AlarmPanel testAlarmPanel = clock.getAlarmPanel();
         testAlarmPanel.setAlarm(alarm);
-        testAlarmPanel.setupMusicPlayer();
+        //testAlarmPanel.setupMusicPlayer();
         return testAlarmPanel;
     }
 }

@@ -97,31 +97,36 @@ public class Alarm {
     }
 
     @Override
-    public String toString() { return getAlarmAsString(); }
+    public String toString() { return hoursAsStr+COLON+minutesAsStr+SPACE+ampm; }
 
-    protected String getAlarmAsString() {
-        return hoursAsStr+COLON+minutesAsStr+SPACE+ampm;
-    }
+    @Deprecated(since = "use toString")
+    protected String getAlarmAsString() { return hoursAsStr+COLON+minutesAsStr+SPACE+ampm; }
+
     public List<String> getDaysShortened()
     {
         logger.info("getDaysShortened");
         List<String> shortenedDays = new ArrayList<>();
         shortenedDays.add("Days: ");
-        if (getDays().contains(MONDAY) && getDays().contains(TUESDAY) &&
-                getDays().contains(WEDNESDAY) && getDays().contains(THURSDAY) &&
-                getDays().contains(FRIDAY))
+        if (days.contains(MONDAY) && days.contains(TUESDAY) &&
+            days.contains(WEDNESDAY) && days.contains(THURSDAY) && days.contains(FRIDAY))
         { shortenedDays.add("Weekdays "); }
-        else if (getDays().contains(SATURDAY) && getDays().contains(SUNDAY)) { shortenedDays.add("Weekend"); }
-        else {
-            for(DayOfWeek day : getDays())
+        else if (days.contains(SATURDAY) && days.contains(SUNDAY))
+        { shortenedDays.add("Weekend"); }
+        else
+        {
+
+            for(DayOfWeek day : days)
             {
-                if (day == MONDAY) { shortenedDays.add("M "); }
-                if (day == TUESDAY) { shortenedDays.add("T "); }
-                if (day == WEDNESDAY) { shortenedDays.add("W "); }
-                if (day == THURSDAY) { shortenedDays.add("Th "); }
-                if (day == FRIDAY) { shortenedDays.add("F "); }
-                if (day == SATURDAY) { shortenedDays.add("S "); }
-                if (day == SUNDAY) { shortenedDays.add("Su "); }
+                switch (day)
+                {
+                    case MONDAY -> shortenedDays.add("M ");
+                    case TUESDAY -> shortenedDays.add("T ");
+                    case WEDNESDAY -> shortenedDays.add("W ");
+                    case THURSDAY -> shortenedDays.add("Th ");
+                    case FRIDAY -> shortenedDays.add("F ");
+                    case SATURDAY -> shortenedDays.add("S ");
+                    case SUNDAY -> shortenedDays.add("Su ");
+                }
             }
         }
         shortenedDays.add("\n------");

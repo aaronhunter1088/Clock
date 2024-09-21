@@ -19,8 +19,8 @@ import static org.example.clock.ClockConstants.*;
 import static org.junit.Assert.*;
 
 @RunWith(MockitoJUnitRunner.class)
-public class ClockTest {
-
+public class ClockTest
+{
     static { System.setProperty("appName", "ClockTest"); }
     private static final Logger logger = LogManager.getLogger(ClockTest.class);
     private Clock clock;
@@ -192,10 +192,12 @@ public class ClockTest {
     }
 
     @Test
-    public void testTickClockFaster() throws InvalidInputException
+    public void testTickClockFaster() throws InvalidInputException, InterruptedException
     {
         clock = new Clock(7, 59, 58, SEPTEMBER, FRIDAY, 20, 2024, PM);
+        Thread.sleep(2000); // needed because it wasn't displaying immediately
         clock.tick(2,3,4);
+        Thread.sleep(2000); // needed because it needed a second to refresh
         assertEquals("Expected hoursAsStr to be 11", "11", clock.getHoursAsStr());
         assertEquals("Expected minutesAsStr to be 02", "02", clock.getMinutesAsStr());
         assertEquals("Expected secondsAsStr to be 00", "00", clock.getSecondsAsStr());

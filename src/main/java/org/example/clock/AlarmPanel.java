@@ -40,26 +40,25 @@ import static java.time.DayOfWeek.*;
 public class AlarmPanel extends JPanel implements IClockPanel
 {
     private static final Logger logger = LogManager.getLogger(AlarmPanel.class);
-    GridBagLayout layout;
-    GridBagConstraints constraints;
-    JLabel alarmLabel1,alarmLabel2,
+    private GridBagLayout layout;
+    private GridBagConstraints constraints;
+    private JLabel alarmLabel1,alarmLabel2,
             alarmLabel3,alarmLabel4;
-    JCheckBox mondayCheckBox,tuesdayCheckBox,wednesdayCheckBox,thursdayCheckBox,
-    fridayCheckBox,saturdayCheckBox,sundayCheckBox,weekCheckBox,weekendCheckBox;
-    JTextField textField1,textField2,textField3;
-    JButton setAlarmButton;
-    JTextArea textArea;
-    JScrollPane scrollPane;
-    Clock clock;
-    Alarm alarm,currentAlarmGoingOff;
-    boolean updatingAlarm,alarmIsGoingOff;
-    AdvancedPlayer musicPlayer;
-    PanelType panelType;
+    private JCheckBox mondayCheckBox,tuesdayCheckBox,wednesdayCheckBox,thursdayCheckBox,
+                      fridayCheckBox,saturdayCheckBox,sundayCheckBox,weekCheckBox,weekendCheckBox;
+    private JTextField textField1,textField2,textField3;
+    private JButton setAlarmButton;
+    private JTextArea textArea;
+    private JScrollPane scrollPane;
+    private Clock clock;
+    private Alarm alarm, activeAlarm;
+    private boolean updatingAlarm,alarmIsGoingOff;
+    private AdvancedPlayer musicPlayer;
+    private ClockPanel clockPanel = ClockPanel.PANEL_ALARM;
 
     AlarmPanel(Clock clock) {
         super();
         setClock(clock);
-        setPanelType(PanelType.ALARM);
         setMaximumSize(Clock.alarmSize);
         setGridBagLayout(new GridBagLayout());
         setLayout(layout);
@@ -90,7 +89,7 @@ public class AlarmPanel extends JPanel implements IClockPanel
     public JTextArea getJTextArea() { return this.textArea; }
     public boolean isUpdatingAlarm() { return updatingAlarm; }
     public AdvancedPlayer getMusicPlayer() { return musicPlayer; }
-    public Alarm getCurrentAlarmGoingOff() { return this.currentAlarmGoingOff; }
+    public Alarm getActiveAlarm() { return this.activeAlarm; }
     public JCheckBox getMondayCheckBox() { return mondayCheckBox; }
     public JCheckBox getTuesdayCheckBox() { return tuesdayCheckBox; }
     public JCheckBox getWednesdayCheckBox() { return wednesdayCheckBox; }
@@ -117,7 +116,7 @@ public class AlarmPanel extends JPanel implements IClockPanel
     void setJTextArea(final JTextArea textArea) { this.textArea = textArea; }
     void setUpdatingAlarm(boolean updatingAlarm) { this.updatingAlarm = updatingAlarm; }
     void setMusicPlayer(AdvancedPlayer musicPlayer) { this.musicPlayer = musicPlayer; }
-    void setCurrentAlarmGoingOff(Alarm currentAlarmGoingOff) { this.currentAlarmGoingOff = currentAlarmGoingOff; }
+    void setActiveAlarm(Alarm activeAlarm) { this.activeAlarm = activeAlarm; }
     void setMondayCheckBox(JCheckBox mondayCheckBox) { this.mondayCheckBox = mondayCheckBox; }
     void setTuesdayCheckBox(JCheckBox tuesdayCheckBox) { this.tuesdayCheckBox = tuesdayCheckBox; }
     void setWednesdayCheckBox(JCheckBox wednesdayCheckBox) { this.wednesdayCheckBox = wednesdayCheckBox; }
@@ -128,10 +127,7 @@ public class AlarmPanel extends JPanel implements IClockPanel
     void setWeekCheckBox(JCheckBox weekCheckBox) { this.weekCheckBox = weekCheckBox; }
     void setWeekendCheckBox(JCheckBox weekendCheckBox) { this.weekendCheckBox = weekendCheckBox; }
     void setAlarmIsGoingOff(boolean alarmIsGoingOff) { this.alarmIsGoingOff = alarmIsGoingOff; }
-    @Override
     public void setClock(Clock clock) { this.clock = clock; }
-    @Override
-    public void setPanelType(PanelType panelType) { this.panelType = panelType; }
     // Helper methods
     public void setupAlarmPanel(Clock clock) {
         logger.info("setupAlarmPanel");
@@ -492,14 +488,14 @@ public class AlarmPanel extends JPanel implements IClockPanel
     public void triggerAlarm(ExecutorService executor) {
         logger.info("triggerAlarm");
         setAlarmIsGoingOff(true);
-        getClock().getDigitalClockPanel().getLabel1().setText(getCurrentAlarmGoingOff().getAlarmAsString());
+        getClock().getDigitalClockPanel().getLabel1().setText(getActiveAlarm().getAlarmAsString());
         getClock().getDigitalClockPanel().getLabel2().setText("is going off!");
         // play sound
         Callable<String> c = () -> {
             try {
                 setupMusicPlayer();
                 logger.debug("while alarm is going off, play sound");
-                while (getCurrentAlarmGoingOff().alarmGoingOff) {
+                while (getActiveAlarm().alarmGoingOff) {
                     getMusicPlayer().play(50);
                 }
                 logger.debug("alarm has stopped");
@@ -536,9 +532,9 @@ public class AlarmPanel extends JPanel implements IClockPanel
                         day == getClock().getDayOfWeek()) {
                     // time for alarm to be triggered
                     alarm.setIsAlarmGoingOff(true);
-                    setCurrentAlarmGoingOff(alarm);
+                    setActiveAlarm(alarm);
                     setAlarmIsGoingOff(true);
-                    logger.info("Alarm " + getCurrentAlarmGoingOff().getAlarmAsString() + " matches clock's time. ");
+                    logger.info("Alarm " + getActiveAlarm().getAlarmAsString() + " matches clock's time. ");
                     logger.info("Sounding alarm...");
                 }
                 else if (getClock().isShowMilitaryTime()) { // if in military time, change clocks hours back temporarily
@@ -549,10 +545,10 @@ public class AlarmPanel extends JPanel implements IClockPanel
                                 &&
                                 day == getClock().getDayOfWeek()) {
                             // time for alarm to be triggered on
-                            setCurrentAlarmGoingOff(alarm);
+                            setActiveAlarm(alarm);
                             alarm.setIsAlarmGoingOff(true);
                             setAlarmIsGoingOff(true);
-                            logger.info("Alarm " + getCurrentAlarmGoingOff().getAlarmAsString() + " matches clock's time. ");
+                            logger.info("Alarm " + getActiveAlarm().getAlarmAsString() + " matches clock's time. ");
                             logger.info("Sounding alarm...");
                         }
                     }
@@ -561,10 +557,10 @@ public class AlarmPanel extends JPanel implements IClockPanel
                                 &&
                                 day == getClock().getDayOfWeek()) {
                             // time for alarm to be triggered on
-                            setCurrentAlarmGoingOff(alarm);
+                            setActiveAlarm(alarm);
                             alarm.setIsAlarmGoingOff(true);
                             setAlarmIsGoingOff(true);
-                            logger.info("Alarm " + getCurrentAlarmGoingOff().getAlarmAsString() + " matches clock's time. ");
+                            logger.info("Alarm " + getActiveAlarm().getAlarmAsString() + " matches clock's time. ");
                             logger.info("Sounding alarm...");
                         }
                     }
@@ -573,7 +569,7 @@ public class AlarmPanel extends JPanel implements IClockPanel
         });
         // update lbl1 and lbl2 to display alarm
         // user must "view that alarm" to turn it off
-        Alarm currentAlarm = getCurrentAlarmGoingOff();
+        Alarm currentAlarm = getActiveAlarm();
         ExecutorService executor = Executors.newCachedThreadPool();
         if (null != currentAlarm && currentAlarm.isAlarmGoingOff()) {
             triggerAlarm(executor);
@@ -602,15 +598,15 @@ public class AlarmPanel extends JPanel implements IClockPanel
                     });
                     if (getMusicPlayer() == null) { setupMusicPlayer(); }
                     // if an alarm is going off and we clicked on it in the menuBar
-                    if (getCurrentAlarmGoingOff() != null) {
-                        setAlarm(getCurrentAlarmGoingOff());
+                    if (getActiveAlarm() != null) {
+                        setAlarm(getActiveAlarm());
                         if (getMusicPlayer() != null) { stopAlarm(); }
                         else { logger.info("Music player is null!"); }
                         setCheckBoxesIfWasSelected(getAlarm());
                         getAlarm().setIsAlarmGoingOff(false);
                         getAlarm().setIsAlarmUpdating(true); // this and the boolean below we want true
                         setUpdatingAlarm(true); // we want to continue with the logic that's done in the next if
-                        setCurrentAlarmGoingOff(null);
+                        setActiveAlarm(null);
                         logger.info("Size of listOfAlarms before removing " + getClock().getListOfAlarms().size());
                         // remove alarm from list of alarms
                         getClock().getListOfAlarms().remove(getAlarm());

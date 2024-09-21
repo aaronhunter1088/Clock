@@ -2,8 +2,6 @@ package org.example.clock;
 
 import java.awt.*;
 import java.text.SimpleDateFormat;
-import java.time.LocalDate;
-import java.time.ZoneId;
 import java.util.Date;
 import java.util.Locale;
 import javax.swing.JPanel;
@@ -28,10 +26,10 @@ public class AnalogueClockPanel extends JPanel implements IClockPanel, Runnable
     private GridBagConstraints constraints;
     private Thread thread = null;
     private SimpleDateFormat formatter;
-    Date currentDate;
-    int xcenter = 175, ycenter = 175, lastxs = 0, lastys = 0, lastxm = 0, lastym = 0, lastxh = 0, lastyh = 0;
-    Clock clock;
-    PanelType panelType;
+    private Date currentDate;
+    private int xcenter = 175, ycenter = 175, lastxs = 0, lastys = 0, lastxm = 0, lastym = 0, lastxh = 0, lastyh = 0;
+    private Clock clock;
+    private ClockPanel clockPanel = ClockPanel.PANEL_ANALOGUE_CLOCK;
     private String clockText = EMPTY;
 
     /**
@@ -45,19 +43,17 @@ public class AnalogueClockPanel extends JPanel implements IClockPanel, Runnable
         logger.info("Finished creating AnalogueClock Panel");
     }
 
-    @Override
-    public void setClock(Clock clock) { this.clock = clock ;}
-    @Override
-    public void setPanelType(PanelType panelType) { this.panelType = panelType; }
-    protected void setGridBagLayout(GridBagLayout layout) { this.layout = layout; }
-    protected void setGridBagConstraints(GridBagConstraints constraints) { this.constraints = constraints; }
-    protected void setClockText(String clockText) { this.clockText = clockText; }
-
     public Clock getClock() { return this.clock; }
-    public PanelType getPanelType() { return this.panelType; }
+    public ClockPanel getPanelType() { return this.clockPanel; }
     public GridBagLayout getGridBagLayout() { return this.layout; }
     public GridBagConstraints getGridBagConstraints() { return this.constraints; }
     public String getClockText() { return this.clockText; }
+
+    protected void setGridBagLayout(GridBagLayout layout) { this.layout = layout; }
+    protected void setGridBagConstraints(GridBagConstraints constraints) { this.constraints = constraints; }
+    protected void setClockText(String clockText) { this.clockText = clockText; }
+    public void setClock(Clock clock) { this.clock = clock; }
+
 
     void drawStructure(Graphics g) {
         logger.info("drawing structure");
@@ -107,7 +103,6 @@ public class AnalogueClockPanel extends JPanel implements IClockPanel, Runnable
 
     void setDefaults() {
         logger.info("setupDefaultActions");
-        setPanelType(PanelType.ANALOGUE_CLOCK);
         setMaximumSize(new Dimension(350, 400));
         setGridBagLayout(new GridBagLayout());
         setLayout(layout);
@@ -197,5 +192,11 @@ public class AnalogueClockPanel extends JPanel implements IClockPanel, Runnable
     }
 
     public void addComponentsToPanel() { /* no operation */ }
+
+    public void printStackTrace(Exception e, String message) {
+        System.err.println("Exception: " + e.getClass());
+        System.err.println("Message: " + message);
+        System.err.println("Cause: " + e.getCause());
+    }
 
 }

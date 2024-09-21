@@ -2,7 +2,6 @@ package org.example.clock;
 
 import javax.swing.*;
 import java.text.ParseException;
-import java.time.format.DateTimeFormatter;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -18,13 +17,14 @@ import static java.time.Month.*;
  * @author Michael Ball
  * @version 2.7
  */
-public class Main {
-
+public class Main
+{
     private final static Logger logger = LogManager.getLogger(Main.class);
     @SuppressWarnings({"BusyWait", "InfiniteLoopStatement"})
     public static void main(String[] args) throws ParseException, InvalidInputException {
         logger.info("Starting Clock...");
         Clock clock = new Clock(true);
+        //new Clock(7, 59, 58, SEPTEMBER, FRIDAY, 20, 2024, PM);
         //new Clock(1, 59, 50, NOVEMBER, SUNDAY, 3, 2024, AM);
         SwingUtilities.invokeLater(() -> SwingUtilities.updateComponentTreeUI(clock));
         try {
