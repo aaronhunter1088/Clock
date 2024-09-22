@@ -17,7 +17,7 @@ import static org.example.clock.ClockPanel.PANEL_DIGITAL_CLOCK;
  * look.
  *
  * @author michael ball
- * @version 2.7
+*  @version 2.8
  */
 public class DigitalClockPanel extends JPanel implements IClockPanel
 {

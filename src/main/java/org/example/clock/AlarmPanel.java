@@ -37,7 +37,7 @@ import static org.example.clock.ClockPanel.PANEL_ALARM;
  * and an alarm will be created.
  *
  * @author michael ball
- * @version 2.7
+*  @version 2.8
  */
 public class AlarmPanel extends JPanel implements IClockPanel
 {

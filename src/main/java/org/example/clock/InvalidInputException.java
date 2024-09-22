@@ -20,7 +20,7 @@ package org.example.clock;
  * which determines whether or not to increase any hour
  * value (in this example) executes.
  * @author michael ball
- * @version 2.7
+*  @version 2.8
  */
 public class InvalidInputException extends Exception
 {

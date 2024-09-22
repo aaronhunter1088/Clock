@@ -1,7 +1,12 @@
 package org.example.clock;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.MockitoAnnotations;
 import org.mockito.junit.MockitoJUnitRunner;
 
 import java.util.ArrayList;
@@ -13,7 +18,19 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
 @RunWith(MockitoJUnitRunner.class)
-public class PanelTypeTest {
+public class PanelTypeTest
+{
+	static { System.setProperty("appName", PanelTypeTest.class.getSimpleName()); }
+	private static final Logger logger = LogManager.getLogger(PanelTypeTest.class);
+
+	@BeforeClass
+	public static void beforeClass()
+	{
+		logger.info("Starting PanelTypeTest...");
+	}
+
+	@Before
+	public void beforeEach() {}
 
 	@Test
 	public void testClockFacesAreDifferent()
@@ -24,7 +41,8 @@ public class PanelTypeTest {
 	}
 
 	@Test
-	public void testThatWeGetAllValues() {
+	public void testThatWeGetAllValues()
+	{
 		List<ClockPanel> clockPanels = new ArrayList<>();
 		for (ClockPanel cf : ClockPanel.values()) {
 			clockPanels.add(cf);

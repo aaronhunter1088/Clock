@@ -12,7 +12,7 @@ import static java.lang.Thread.sleep;
  * Main application to start Clock
  *
  * @author Michael Ball
- * @version 2.7
+*  @version 2.8
  */
 public class Main
 {

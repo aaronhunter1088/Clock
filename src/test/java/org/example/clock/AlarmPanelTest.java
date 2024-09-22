@@ -9,7 +9,6 @@ import org.junit.runner.RunWith;
 import org.mockito.junit.MockitoJUnitRunner;
 
 import java.time.DayOfWeek;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -21,8 +20,8 @@ import static org.junit.Assert.*;
 import static java.time.DayOfWeek.*;
 
 @RunWith(MockitoJUnitRunner.class)
-public class AlarmPanelTest {
-
+public class AlarmPanelTest
+{
     static { System.setProperty("appName", AlarmPanelTest.class.getSimpleName()); }
     private static Logger logger = LogManager.getLogger(AlarmPanelTest.class);
     private Clock clock = new Clock(true);

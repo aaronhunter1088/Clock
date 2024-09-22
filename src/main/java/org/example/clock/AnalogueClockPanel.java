@@ -18,7 +18,7 @@ import static org.example.clock.ClockPanel.PANEL_ANALOGUE_CLOCK;
  * to hide this, the settings allows for that.
  *
  * @author michael ball
- * @version 2.7
+*  @version 2.8
  */
 public class AnalogueClockPanel extends JPanel implements IClockPanel, Runnable
 {

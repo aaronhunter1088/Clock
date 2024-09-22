@@ -4,7 +4,7 @@ package org.example.clock;
  * Constants for Clock application
  *
  * @author Michael Ball
- * @version 2.7
+*  @version 2.8
  */
 public interface ClockConstants
 {

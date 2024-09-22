@@ -4,18 +4,23 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonParser;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 
-public class WorldClockExample {
+import static org.example.clock.ClockConstants.AMERICA_CHICAGO;
 
+public class WorldClockExample 
+{
+    private static Logger logger = LogManager.getLogger(WorldClockExample.class);
     public static void main(String[] args) {
         try
         {
-            HttpRequest request = HttpRequest.newBuilder().uri(new URI("http://worldtimeapi.org/api/timezone/america/chicago"))
+            HttpRequest request = HttpRequest.newBuilder().uri(new URI("http://worldtimeapi.org/api/timezone/"+AMERICA_CHICAGO))
                     .version(HttpClient.Version.HTTP_2)
                     .headers("Content-Type","application/json")
                     .GET()
@@ -23,15 +28,13 @@ public class WorldClockExample {
             HttpResponse<String> response = HttpClient.newBuilder()
                     .build()
                     .send(request, HttpResponse.BodyHandlers.ofString());
-            System.out.println(response);
+            logger.info(response);
             Gson gson = new GsonBuilder().setPrettyPrinting().create();
             JsonElement jsonElement = new JsonParser().parse(response.body());
             String json = gson.toJson(jsonElement);
-            System.out.println(json);
+            logger.info("body -> {}", json);
         }
         catch (Exception e)
-        {
-            System.err.println("Could not connect to worldtimeapi.org/api/");
-        }
+        { logger.error("Something happened when connecting to worldtimeapi.org"); }
     }
 }

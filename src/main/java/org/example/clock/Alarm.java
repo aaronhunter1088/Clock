@@ -14,7 +14,7 @@ import static org.example.clock.ClockConstants.*;
  * at a specific time, on specific days.
  *
  * @author michael ball
- * @version 2.7
+*  @version 2.8
  */
 public class Alarm
 {

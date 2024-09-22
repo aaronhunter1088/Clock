@@ -26,7 +26,7 @@ import static org.example.clock.ClockPanel.PANEL_TIMER;
  * it will make a short alarm sound, then turn off.
  *
  * @author michael ball
- * @version 2.7
+*  @version 2.8
  */
 public class TimerPanel extends JPanel implements IClockPanel
 {

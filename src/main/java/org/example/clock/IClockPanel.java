@@ -7,7 +7,7 @@ package org.example.clock;
  * sure it has updated itself accordingly.
  *
  * @author Michael Ball
- * @version 2.7
+*  @version 2.8
  */
 public interface IClockPanel extends ClockConstants
 {

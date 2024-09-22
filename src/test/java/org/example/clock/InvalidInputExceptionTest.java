@@ -1,5 +1,7 @@
 package org.example.clock;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -12,14 +14,16 @@ import static java.time.Month.*;
 import static org.junit.Assert.*;
 
 @RunWith(MockitoJUnitRunner.class)
-public class InvalidInputExceptionTest {
+public class InvalidInputExceptionTest
+{
+    static { System.setProperty("appName", InvalidInputExceptionTest.class.getSimpleName()); }
+    private static final Logger logger = LogManager.getLogger(InvalidInputExceptionTest.class);
 
     private Month goodMonth;
     private final String INVALID_MONTH = "Invalid month";
 
     @BeforeClass
-    public static void beforeClass() {
-    }
+    public static void beforeClass() { logger.info("Starting InvalidInputExceptionTest..."); }
 
     @Before
     public void beforeEach() {
@@ -27,7 +31,8 @@ public class InvalidInputExceptionTest {
     }
 
     @Test
-    public void whenAValidMonthIsGivenReturnAValidInteger() {
+    public void whenAValidMonthIsGivenReturnAValidInteger()
+    {
         int month = 0;
         try {
             month = switch (goodMonth) {
@@ -52,19 +57,22 @@ public class InvalidInputExceptionTest {
     }
 
     @Test
-    public void testIIEIsCreated() {
+    public void testIIEIsCreated()
+    {
         InvalidInputException iie = new InvalidInputException();
         assertNotNull(iie);
     }
 
     @Test
-    public void testIIEIsCreatedFromThrowable() {
+    public void testIIEIsCreatedFromThrowable()
+    {
         InvalidInputException iie = new InvalidInputException(new IllegalArgumentException(INVALID_MONTH, new IllegalArgumentException().getCause()));
         assertNotNull(iie.getCause());
     }
 
     @Test
-    public void testIIEIsCreatedFromThrowableWithMessage() {
+    public void testIIEIsCreatedFromThrowableWithMessage()
+    {
         InvalidInputException iie = new InvalidInputException(INVALID_MONTH, new IllegalArgumentException());
         assertNotNull(iie.getMessage());
         assertNotNull(iie.getCause());

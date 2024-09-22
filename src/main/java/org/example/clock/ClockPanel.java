@@ -4,7 +4,7 @@ package org.example.clock;
  * Used to distinguish which panel the Clock is using
  *
  * @author michael ball
- * @version 2.7
+*  @version 2.8
  */
 public enum ClockPanel
 {

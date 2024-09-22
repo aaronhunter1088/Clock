@@ -31,7 +31,7 @@ import static org.example.clock.ClockPanel.*;
  * (DAY_OF_WEEK MONTH DATE, YEAR).
  * 
  * @author Michael Ball 
- * @version 2.7
+*  @version 2.8
  */
 class Clock extends JFrame
 {

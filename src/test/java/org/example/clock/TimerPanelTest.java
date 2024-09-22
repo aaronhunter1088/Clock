@@ -1,7 +1,12 @@
 package org.example.clock;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.Test;
 import org.mockito.Mock;
+import org.mockito.MockitoAnnotations;
 
 import java.awt.event.ActionEvent;
 import java.text.ParseException;
@@ -9,15 +14,29 @@ import java.text.ParseException;
 import static org.junit.Assert.*;
 import static org.mockito.Mockito.mock;
 
-public class TimerPanelTest {
-    Clock clock = new Clock(true);
-    TimerPanel timer = new TimerPanel(clock);
+public class TimerPanelTest
+{
+    static { System.setProperty("appName", TimerPanelTest.class.getSimpleName()); }
+    private static final Logger logger = LogManager.getLogger(TimerPanelTest.class);
+    Clock clock;
+    TimerPanel timer;
+
+    @BeforeClass
+    public static void beforeClass()
+    {
+        logger.info("Starting TimerPanelTest...");
+    }
+
+    @Before
+    public void beforeEach()
+    {
+        clock = new Clock(true);
+        timer = new TimerPanel(clock);
+        MockitoAnnotations.initMocks(this);
+    }
 
     @Mock
     ActionEvent action;
-
-    public TimerPanelTest() throws ParseException, InvalidInputException {
-    }
 
     @Test
     public void validateFirstTextField()

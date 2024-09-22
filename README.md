@@ -1,6 +1,8 @@
-# Clock v2.7
+# Clock v2.8
 
 This is a simple GUI project which displays the time and allows the user to set alarms.
+
+v2.8 Added Javadocs and cleaned up the code quite a bit. 
 
 The clock starts up in Digital Mode. You can switch to this mode at any time by clicking
 on Features --> View Digital Clock (or clicking Ctrl + D); This mode has 4 specific 
