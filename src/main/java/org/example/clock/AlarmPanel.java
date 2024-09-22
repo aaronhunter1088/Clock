@@ -166,14 +166,18 @@ public class AlarmPanel extends JPanel implements IClockPanel
         }
     }
 
-    void resetJAlarmLabel4() {
-        logger.info("resetJAlarmLabel4");
-        if (getClock().getListOfAlarms().isEmpty()) { getJAlarmLbl4().setText(getClock().defaultText(6)); }// All Alarms label...
+    /**
+     * Resets alarm label 4
+     */
+    void resetJAlarmLabel4()
+    {
+        logger.info("reset alarm label 4");
+        if (clock.getListOfAlarms().isEmpty()) { alarmLabel4.setText(clock.defaultText(6)); }// All Alarms label...
         else {
-            getJAlarmLbl4().setText(
-                getClock().getListOfAlarms().size() == 1 ?
-                    getClock().getListOfAlarms().size() + " Alarm Added"
-                :   getClock().getListOfAlarms().size() + " Alarms Added"
+            alarmLabel4.setText(
+                clock.getListOfAlarms().size() == 1
+                    ? clock.getListOfAlarms().size() + " Alarm Added"
+                    : clock.getListOfAlarms().size() + " Alarms Added"
             );
         }
     }
@@ -270,16 +274,26 @@ public class AlarmPanel extends JPanel implements IClockPanel
         return true;
     }
 
-    boolean validateACheckboxWasSelected() { return !getDaysChecked().isEmpty(); }
+    /**
+     * Validates that at least one checkbox is selected
+     * @return boolean true if at least one checkbox is selected
+     */
+    boolean validateACheckboxWasSelected()
+    { return !getDaysChecked().isEmpty(); }
 
-    void addAlarmMenuItemFromAlarm(Alarm alarm) {
+    /**
+     * Adds the alarm to the menu
+     * @param alarm the alarm to set
+     */
+    void addAlarmMenuItemFromAlarm(Alarm alarm)
+    {
         logger.info("addAlarmMenuItemFromAlarm");
         JMenuItem alarmItem = new JMenuItem(alarm.toString());
         alarmItem.setForeground(Color.WHITE);
         alarmItem.setBackground(Color.BLACK);
-        logger.info("Size of viewAlarms before adding " + getClock().getClockMenuBar().getAlarmFeature_Menu().getItemCount());
-        getClock().getClockMenuBar().getAlarmFeature_Menu().add(alarmItem);
-        logger.info("Size of viewAlarms after adding " + getClock().getClockMenuBar().getAlarmFeature_Menu().getItemCount());
+        logger.info("Size of viewAlarms before adding " + clock.getClockMenuBar().getAlarmFeature_Menu().getItemCount());
+        clock.getClockMenuBar().getAlarmFeature_Menu().add(alarmItem);
+        logger.info("Size of viewAlarms after adding " + clock.getClockMenuBar().getAlarmFeature_Menu().getItemCount());
     }
 
     /**
@@ -497,7 +511,7 @@ public class AlarmPanel extends JPanel implements IClockPanel
 
     /**
      * Sets an alarm to go off
-     * @param executor
+     * @param executor the executor service
      */
     void triggerAlarm(ExecutorService executor)
     {
@@ -781,7 +795,7 @@ public class AlarmPanel extends JPanel implements IClockPanel
             logger.info("wednesdayCheckBox: {}", wednesdayCheckBox.isSelected());
         });
 
-        setThursdayCheckBox(new JCheckBox(THURSDAY.toString().substring(0,1)+THURSDAY.toString().substring(1,2).toLowerCase(Locale.ROOT), false));
+        setThursdayCheckBox(new JCheckBox(THURSDAY.toString().charAt(0)+THURSDAY.toString().substring(1,2).toLowerCase(Locale.ROOT), false));
         thursdayCheckBox.setFont(Clock.font20);
         thursdayCheckBox.setBackground(Color.BLACK);
         thursdayCheckBox.setForeground(Color.WHITE);

@@ -33,7 +33,7 @@ import static org.example.clock.ClockPanel.*;
  * @author Michael Ball 
 *  @version 2.8
  */
-class Clock extends JFrame
+public class Clock extends JFrame
 {
     @Serial
     private static final long serialVersionUID = 2L;
@@ -841,7 +841,7 @@ class Clock extends JFrame
      * to ensure that the clock is always up to date and accurate
      * by chance that it has gotten out of sync.
      */
-    protected void updateTimeIfMidnight()
+    void updateTimeIfMidnight()
     {
         if ((MIDNIGHT_STANDARD_TIME.equals(getTimeAsStr()) || MIDNIGHT_MILITARY_TIME.equals(getMilitaryTimeAsStr()))
             && !testingClock) {

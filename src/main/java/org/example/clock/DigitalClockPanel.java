@@ -19,7 +19,7 @@ import static org.example.clock.ClockPanel.PANEL_DIGITAL_CLOCK;
  * @author michael ball
 *  @version 2.8
  */
-public class DigitalClockPanel extends JPanel implements IClockPanel
+class DigitalClockPanel extends JPanel implements IClockPanel
 {
     private static final Logger logger = LogManager.getLogger(DigitalClockPanel.class);
     private GridBagLayout layout;
@@ -54,7 +54,7 @@ public class DigitalClockPanel extends JPanel implements IClockPanel
     /**
      * This method sets up the digital clock panel.
      */
-    public void setupClockPanel()
+    void setupClockPanel()
     {
         logger.info("setup digital clock panel");
         setupSettingsMenu();
@@ -85,7 +85,7 @@ public class DigitalClockPanel extends JPanel implements IClockPanel
      * that may occur when the digital panel is in use.
      * @param e the exception
      */
-    protected void printStackTrace(Exception e)
+    void printStackTrace(Exception e)
     { printStackTrace(e, EMPTY); }
 
     /**
@@ -99,7 +99,7 @@ public class DigitalClockPanel extends JPanel implements IClockPanel
      * @param ipadx     the x padding
      * @param ipady     the y padding
      */
-    public void addComponent(Component cpt, int gridy, int gridx, double gwidth, double gheight, int ipadx, int ipady)
+    void addComponent(Component cpt, int gridy, int gridx, double gwidth, double gheight, int ipadx, int ipady)
     {
         logger.info("addComponent");
         getGridBagConstraints().gridx = gridx;
@@ -142,7 +142,7 @@ public class DigitalClockPanel extends JPanel implements IClockPanel
      * This method updates the labels on the digital
      * clock panel.
      */
-    public void updateLabels()
+    void updateLabels()
     {
         logger.info("updateLabels");
         label1.setForeground(Color.WHITE);
@@ -166,18 +166,18 @@ public class DigitalClockPanel extends JPanel implements IClockPanel
     }
 
     /* Getters */
-    public GridBagLayout getGridBagLayout() { return this.layout; }
-    public GridBagConstraints getGridBagConstraints() { return this.constraints; }
-    public Clock getClock() { return this.clock; }
-    public JLabel getLabel1() { return this.label1; }
-    public JLabel getLabel2() { return this.label2; }
-    public ClockPanel getPanelType() { return this.clockPanel; }
+    GridBagLayout getGridBagLayout() { return this.layout; }
+    GridBagConstraints getGridBagConstraints() { return this.constraints; }
+    Clock getClock() { return this.clock; }
+    JLabel getLabel1() { return this.label1; }
+    JLabel getLabel2() { return this.label2; }
+    ClockPanel getPanelType() { return this.clockPanel; }
 
     /* Setters */
-    private void setGridBagLayout(GridBagLayout layout) { this.layout = layout; }
-    private void setGridBagConstraints(GridBagConstraints constraints) { this.constraints = constraints; }
-    public void setLabel1(JLabel label1) { this.label1 = label1; }
-    public void setLabel2(JLabel label2) { this.label2 = label2; }
+    protected void setGridBagLayout(GridBagLayout layout) { this.layout = layout; }
+    protected void setGridBagConstraints(GridBagConstraints constraints) { this.constraints = constraints; }
+    protected void setLabel1(JLabel label1) { this.label1 = label1; }
+    protected void setLabel2(JLabel label2) { this.label2 = label2; }
     public void setClock(Clock clock) { this.clock = clock; }
-    public void setClockPanel(ClockPanel clockPanel) { this.clockPanel = clockPanel; }
+    protected void setClockPanel(ClockPanel clockPanel) { this.clockPanel = clockPanel; }
 }

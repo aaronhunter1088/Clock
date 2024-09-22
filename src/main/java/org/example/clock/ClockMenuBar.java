@@ -199,7 +199,7 @@ public class ClockMenuBar extends JMenuBar
      * Sets up the timezone menu item
      * @param timezone the timezone menu item to set up
      */
-    private void setupTimezone(JMenuItem timezone)
+    void setupTimezone(JMenuItem timezone)
     {
         logger.debug("setup timezone for {}", timezone.getText());
         timezone.addActionListener(l -> clock.updateTheTime(timezone));
@@ -245,34 +245,34 @@ public class ClockMenuBar extends JMenuBar
     }
 
     /* Getters */
-    public JMenu getSettingsMenu() { return this.settingsMenu; }
-    public JMenu getFeaturesMenu() { return this.featuresMenu; }
-    public JMenu getAlarmFeature_Menu() { return this.alarmFeature_Menu; }
-    public JMenuItem getMilitaryTimeSetting() { return this.militaryTimeSetting; }
-    public JMenuItem getFullTimeSetting() { return this.fullTimeSetting; }
-    public JMenuItem getPartialTimeSetting() { return this.partialTimeSetting; }
-    public JMenuItem getToggleDSTSetting() { return toggleDSTSetting; }
-    public JMenuItem getShowDigitalTimeOnAnalogueClockSetting() { return this.showDigitalTimeSettingOnAnalogueClockSetting; }
-    public JMenu getChangeTimeZoneMenu() { return this.changeTimeZone; }
-    public java.util.List<JMenuItem> getTimezones() { return this.timezones; }
-    public JMenuItem getDigitalClockFeature() { return this.digitalClockFeature; }
-    public JMenuItem getAnalogueClockFeature() { return this.analogueClockFeature; }
-    public JMenuItem getSetAlarms() { return this.setAlarms; }
-    public JMenuItem getTimerFeature() { return this.timerFeature; }
+    JMenu getSettingsMenu() { return this.settingsMenu; }
+    JMenu getFeaturesMenu() { return this.featuresMenu; }
+    JMenu getAlarmFeature_Menu() { return this.alarmFeature_Menu; }
+    JMenuItem getMilitaryTimeSetting() { return this.militaryTimeSetting; }
+    JMenuItem getFullTimeSetting() { return this.fullTimeSetting; }
+    JMenuItem getPartialTimeSetting() { return this.partialTimeSetting; }
+    JMenuItem getToggleDSTSetting() { return toggleDSTSetting; }
+    JMenuItem getShowDigitalTimeOnAnalogueClockSetting() { return this.showDigitalTimeSettingOnAnalogueClockSetting; }
+    JMenu getChangeTimeZoneMenu() { return this.changeTimeZone; }
+    java.util.List<JMenuItem> getTimezones() { return this.timezones; }
+    JMenuItem getDigitalClockFeature() { return this.digitalClockFeature; }
+    JMenuItem getAnalogueClockFeature() { return this.analogueClockFeature; }
+    JMenuItem getSetAlarms() { return this.setAlarms; }
+    JMenuItem getTimerFeature() { return this.timerFeature; }
 
     /* Setters */
-    void setSettingsMenu(JMenu settingsMenu) { this.settingsMenu = settingsMenu; }
-    void setFeaturesMenu(JMenu featuresMenu) { this.featuresMenu = featuresMenu; }
-    void setAlarmFeature_Menu(JMenu alarmsMenu) { this.alarmFeature_Menu = alarmsMenu; }
-    void setMilitaryTimeSetting(JMenuItem militaryTimeSetting) { this.militaryTimeSetting = militaryTimeSetting; }
-    void setFullTimeSetting(JMenuItem fullTimeSetting) { this.fullTimeSetting = fullTimeSetting; }
-    void setPartialTimeSetting(JMenuItem partialTimeSetting) { this.partialTimeSetting = partialTimeSetting; }
-    void setToggleDSTSetting(JMenuItem toggleDSTSetting) { this.toggleDSTSetting = toggleDSTSetting; }
-    void setShowDigitalTimeOnAnalogueClockSetting(JMenuItem showDigitalTimeSettingOnAnalogueClockSetting) { this.showDigitalTimeSettingOnAnalogueClockSetting = showDigitalTimeSettingOnAnalogueClockSetting; }
-    void setChangeTimeZoneMenu(JMenu changeTimeZone) { this.changeTimeZone = changeTimeZone; }
-    void setDigitalClockFeature(JMenuItem digitalClockFeature) { this.digitalClockFeature = digitalClockFeature; }
-    void setAnalogueClockFeature(JMenuItem analogueClockFeature) { this.analogueClockFeature = analogueClockFeature; }
-    void setTimeZones(java.util.List<JMenuItem> timezones) { this.timezones = timezones;}
-    void setSetAlarms(JMenuItem setAlarms) { this.setAlarms = setAlarms; }
-    void setTimerFeature(JMenuItem timerFeature) { this.timerFeature = timerFeature; }
+    protected void setSettingsMenu(JMenu settingsMenu) { this.settingsMenu = settingsMenu; }
+    protected void setFeaturesMenu(JMenu featuresMenu) { this.featuresMenu = featuresMenu; }
+    protected void setAlarmFeature_Menu(JMenu alarmsMenu) { this.alarmFeature_Menu = alarmsMenu; }
+    protected void setMilitaryTimeSetting(JMenuItem militaryTimeSetting) { this.militaryTimeSetting = militaryTimeSetting; }
+    protected void setFullTimeSetting(JMenuItem fullTimeSetting) { this.fullTimeSetting = fullTimeSetting; }
+    protected void setPartialTimeSetting(JMenuItem partialTimeSetting) { this.partialTimeSetting = partialTimeSetting; }
+    protected void setToggleDSTSetting(JMenuItem toggleDSTSetting) { this.toggleDSTSetting = toggleDSTSetting; }
+    protected void setShowDigitalTimeOnAnalogueClockSetting(JMenuItem showDigitalTimeSettingOnAnalogueClockSetting) { this.showDigitalTimeSettingOnAnalogueClockSetting = showDigitalTimeSettingOnAnalogueClockSetting; }
+    protected void setChangeTimeZoneMenu(JMenu changeTimeZone) { this.changeTimeZone = changeTimeZone; }
+    protected void setDigitalClockFeature(JMenuItem digitalClockFeature) { this.digitalClockFeature = digitalClockFeature; }
+    protected void setAnalogueClockFeature(JMenuItem analogueClockFeature) { this.analogueClockFeature = analogueClockFeature; }
+    protected void setTimeZones(java.util.List<JMenuItem> timezones) { this.timezones = timezones;}
+    protected void setSetAlarms(JMenuItem setAlarms) { this.setAlarms = setAlarms; }
+    protected void setTimerFeature(JMenuItem timerFeature) { this.timerFeature = timerFeature; }
 }

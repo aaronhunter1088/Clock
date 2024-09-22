@@ -52,7 +52,7 @@ public class InvalidInputException extends Exception
 	 * @param message the message provided
 	 * @param cause the reason why
 	 */
-	public InvalidInputException(String message, Throwable cause)
+	InvalidInputException(String message, Throwable cause)
 	{
 		super(message, cause);
 		setMessage(message);

@@ -16,16 +16,20 @@ import static java.lang.Thread.sleep;
  */
 public class Main
 {
+    static { System.setProperty("appName", Main.class.getSimpleName()); }
     private final static Logger logger = LogManager.getLogger(Main.class);
+
     @SuppressWarnings({"BusyWait", "InfiniteLoopStatement"})
-    public static void main(String[] args) throws ParseException, InvalidInputException {
+    public static void main(String[] args) throws ParseException, InvalidInputException
+    {
         logger.info("Starting Clock...");
         Clock clock = new Clock(true);
-        //new Clock(7, 59, 58, SEPTEMBER, FRIDAY, 20, 2024, PM);
-        //new Clock(1, 59, 50, NOVEMBER, SUNDAY, 3, 2024, AM);
+        //new Clock(1, 59, 50, NOVEMBER, SUNDAY, 3, 2024, AM); // for testing DST
         SwingUtilities.invokeLater(() -> SwingUtilities.updateComponentTreeUI(clock));
-        try {
-            while (true) {
+        try
+        {
+            while (true)
+            {
                 clock.tick();
                 sleep(250);
                 // check alarms
@@ -33,7 +37,8 @@ public class Main
                 // check timers
                 clock.getTimerPanel().checkIfTimerHasConcluded();
                 sleep(250);
-                if (clock.isNewYear()) {
+                if (clock.isNewYear())
+                {
                     clock.setIsNewYear(false);
                     logger.info("Happy New Year. Here's wishing you a healthy, productive " + clock.getYear() + ".");
                 }

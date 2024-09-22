@@ -16,6 +16,7 @@ import static org.example.clock.ClockConstants.AMERICA_CHICAGO;
 
 public class WorldClockExample 
 {
+    static { System.setProperty("appName", WorldClockExample.class.getSimpleName()); }
     private static Logger logger = LogManager.getLogger(WorldClockExample.class);
     public static void main(String[] args) {
         try

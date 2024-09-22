@@ -2,7 +2,8 @@
 
 This is a simple GUI project which displays the time and allows the user to set alarms.
 
-v2.8 Added Javadocs and cleaned up the code quite a bit. 
+v2.8 Added Javadocs and cleaned up the code quite a bit. When running the application, you
+can set this envVar: logLevel to be DEBUG, or INFO depending on how much info you want. 
 
 The clock starts up in Digital Mode. You can switch to this mode at any time by clicking
 on Features --> View Digital Clock (or clicking Ctrl + D); This mode has 4 specific 
@@ -12,7 +13,7 @@ You can also show the partial date, which displays less text on the screen while
 allowing the user to tell the time and date. 
 v2.7 You can now set particular timezones which will update the clocks time.
 Specific panel's have their own settings and are now only visible when in that particular
-panel.
+panel. We also upgraded Java from 11 to 18.
 
 You can set alarms. Click Features --> View Alarms --> Set Alarms (or click Ctrl + A).
 Here you can enter the Hour, Minutes, and Time (AM/PM) to set an alarm.
