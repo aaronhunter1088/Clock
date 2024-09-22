@@ -23,7 +23,7 @@ import static java.time.DayOfWeek.*;
 public class AlarmPanelTest
 {
     static { System.setProperty("appName", AlarmPanelTest.class.getSimpleName()); }
-    private static Logger logger = LogManager.getLogger(AlarmPanelTest.class);
+    private static final Logger logger = LogManager.getLogger(AlarmPanelTest.class);
     private Clock clock = new Clock(true);
     private Alarm alarm;
 

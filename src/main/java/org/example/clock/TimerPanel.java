@@ -33,14 +33,14 @@ public class TimerPanel extends JPanel implements IClockPanel
     private static final Logger logger = LogManager.getLogger(TimerPanel.class);
     private final GridBagLayout layout;
     private final GridBagConstraints constraints;
-    private JTextField hourField,   // Hour
-                       minuteField, // Min
-                       secondField; // Second
-    private JButton timerButton;    // Set Timer button
-    private JButton resetButton;    // Reset Timer button
-    private Clock clock;            // Reference to the clock
-    private boolean timerIsGoingOff;
-    private volatile boolean isPaused = false;
+    private JTextField hourField,
+                       minuteField,
+                       secondField;
+    private JButton timerButton;
+    private JButton resetButton;
+    private Clock clock;
+    private boolean timerGoingOff;
+    private volatile boolean paused;
     private AdvancedPlayer musicPlayer;
     private ScheduledExecutorService scheduler;
     private ScheduledFuture<?> countdownFuture;
@@ -113,16 +113,15 @@ public class TimerPanel extends JPanel implements IClockPanel
                 if (NumberUtils.isNumber(hourField.getText()))
                 {
                     var hour = Integer.parseInt(hourField.getText());
-                    if (hour < 24 && hour >= 0
-                        && !ZERO.equals(minuteField.getText()) && !ZERO.equals(secondField.getText()))
+                    if (hour < 24 && hour >= 0)
                     {
                         timerButton.setText(SET);
                         timerButton.repaint();
                         timerButton.updateUI();
                     }
-                    else if (hour >= 24 || hour < 0)
+                    else
                     {
-                        timerButton.setText("0 < Hour > 24");
+                        timerButton.setText(TIMER_HOUR_ERROR);
                         timerButton.repaint();
                         timerButton.updateUI();
                         hourField.grabFocus();
@@ -130,7 +129,7 @@ public class TimerPanel extends JPanel implements IClockPanel
                 }
                 if (!validateSecondTextField())
                 {
-                    minuteField.grabFocus();
+                    SwingUtilities.invokeLater(() -> minuteField.grabFocus());
                     timerButton.setEnabled(false);
                 }
                 else if (!validateThirdTextField())
@@ -164,7 +163,7 @@ public class TimerPanel extends JPanel implements IClockPanel
                     }
                     if (minute >= 60 || minute < 0)
                     {
-                        timerButton.setText("0 < Min > 60");
+                        timerButton.setText(TIMER_MIN_ERROR);
                         timerButton.repaint();
                         timerButton.updateUI();
                         minuteField.grabFocus();
@@ -201,7 +200,7 @@ public class TimerPanel extends JPanel implements IClockPanel
                     }
                     else if (second >= 60 || second < 0)
                     {
-                        timerButton.setText("0 < Sec > 60");
+                        timerButton.setText(TIMER_SEC_ERROR);
                         timerButton.repaint();
                         timerButton.updateUI();
                         secondField.grabFocus();
@@ -247,10 +246,10 @@ public class TimerPanel extends JPanel implements IClockPanel
     void enableTimerButton()
     {
         logger.debug("enable timer button");
-        var b1 = validateFirstTextField() && validateSecondTextField() && validateThirdTextField();
-        var b2 = !ZERO.equals(hourField.getText()) && !ZERO.equals(minuteField.getText()) && !ZERO.equals(secondField.getText());
-        logger.debug("enabled: {}", b1 && b2);
-        timerButton.setEnabled(b1 && b2);
+        var allValid = validateFirstTextField() && validateSecondTextField() && validateThirdTextField();
+        var allNotZeroes = !ZERO.equals(hourField.getText()) && !ZERO.equals(minuteField.getText()) && !ZERO.equals(secondField.getText());
+        logger.debug("enabled?: {}", allValid && allNotZeroes);
+        timerButton.setEnabled(allValid && allNotZeroes);
     }
 
     /**
@@ -259,12 +258,16 @@ public class TimerPanel extends JPanel implements IClockPanel
      */
     boolean validateFirstTextField()
     {
-        logger.info("validate first text field");
-        if (HOUR.equals(hourField.getText())) { return true; }
-        if (!NumberUtils.isNumber(hourField.getText())) { return false; }
+        boolean result;
+        if (HOUR.equals(hourField.getText())) { result = true; }
+        else if (!NumberUtils.isNumber(hourField.getText())) { result = false; }
         // by default, cannot be more than 23 hours or less than 0
-        return Integer.parseInt(hourField.getText()) < 24 &&
-               Integer.parseInt(hourField.getText()) >= 0;
+        else {
+            result = Integer.parseInt(hourField.getText()) < 24 &&
+                     Integer.parseInt(hourField.getText()) >= 0;
+        }
+        logger.info("validate first text field result: {}", result);
+        return result;
     }
 
     /**
@@ -273,11 +276,15 @@ public class TimerPanel extends JPanel implements IClockPanel
      */
     boolean validateSecondTextField()
     {
-        logger.info("validate second text field");
-        if (MIN.equals(minuteField.getText())) { return true; }
-        if (!NumberUtils.isNumber(minuteField.getText())) { return false; }
-        return Integer.parseInt(minuteField.getText()) < 60 &&
-               Integer.parseInt(minuteField.getText()) >= 0;
+        boolean result;
+        if (MIN.equals(minuteField.getText())) { result = true; }
+        else if (!NumberUtils.isNumber(minuteField.getText())) { result = false; }
+        else {
+            result = Integer.parseInt(minuteField.getText()) < 60 &&
+                     Integer.parseInt(minuteField.getText()) >= 0;
+        }
+        logger.info("validate second text field result: {}", result);
+        return result;
     }
 
     /**
@@ -286,11 +293,15 @@ public class TimerPanel extends JPanel implements IClockPanel
      */
     boolean validateThirdTextField()
     {
-        logger.info("validate third text field");
-        if (SEC.equals(secondField.getText())) { return true; }
-        if (!NumberUtils.isNumber(secondField.getText())) { return false; }
-        return Integer.parseInt(secondField.getText()) < 60 &&
-               Integer.parseInt(secondField.getText()) >= 0;
+        boolean result;
+        if (SEC.equals(secondField.getText())) { result = true; }
+        else if (!NumberUtils.isNumber(secondField.getText())) { result = false; }
+        else {
+            result = Integer.parseInt(secondField.getText()) < 60 &&
+                     Integer.parseInt(secondField.getText()) >= 0;
+        }
+        logger.info("validate third text field result: {}", result);
+        return result;
     }
 
     /**
@@ -303,7 +314,7 @@ public class TimerPanel extends JPanel implements IClockPanel
         timerButton.repaint();
         timerButton.updateUI();
         resetButton.setEnabled(true);
-        isPaused = false;
+        paused = false;
         if (scheduler == null || scheduler.isShutdown())
         { scheduler = Executors.newScheduledThreadPool(1); }
         if (countdownFuture == null || countdownFuture.isCancelled())
@@ -332,7 +343,7 @@ public class TimerPanel extends JPanel implements IClockPanel
         timerButton.setText(RESUME_TIMER);
         timerButton.repaint();
         timerButton.updateUI();
-        isPaused = true;
+        paused = true;
     }
 
     /**
@@ -344,7 +355,7 @@ public class TimerPanel extends JPanel implements IClockPanel
         timerButton.setText(PAUSE_TIMER);
         timerButton.repaint();
         timerButton.updateUI();
-        isPaused = false;
+        paused = false;
     }
 
     /**
@@ -352,7 +363,7 @@ public class TimerPanel extends JPanel implements IClockPanel
      */
     void performCountDown()
     {
-        if (isPaused) return;
+        if (paused) return;
         else
         {
             logger.info("performing countdown");
@@ -390,7 +401,7 @@ public class TimerPanel extends JPanel implements IClockPanel
                 }
                 else if (ZERO.equals(secondField.getText()) &&
                          ZERO.equals(minuteField.getText()) &&
-                         ZERO.equals(hourField.getText()) )
+                         ZERO.equals(hourField.getText()) && !paused )
                 {
                     timerButton.setText(COMPLETE);
                     timerButton.setEnabled(false);
@@ -483,7 +494,8 @@ public class TimerPanel extends JPanel implements IClockPanel
     void triggerSound(ExecutorService executor)
     {
         logger.info("triggering timer sound");
-        timerIsGoingOff = true;
+        timerGoingOff = true;
+        CountDownLatch latch = new CountDownLatch(1);
         // play sound
         Callable<String> c = () -> {
             try
@@ -498,8 +510,20 @@ public class TimerPanel extends JPanel implements IClockPanel
                 logger.error(e.getCause().getClass().getName()+COLON+SPACE+e.getMessage());
                 return "Reset music player required";
             }
+            finally
+            {
+                latch.countDown();
+            }
         };
         executor.submit(c);
+        try
+        {
+            latch.await();
+        }
+        catch (InterruptedException e)
+        {
+            Thread.currentThread().interrupt();
+        }
     }
 
     /**
@@ -508,8 +532,8 @@ public class TimerPanel extends JPanel implements IClockPanel
     void stopSound()
     {
         logger.info("stop sound");
-        setMusicPlayer(null);
-        setTimerIsGoingOff(false);
+        musicPlayer = null;
+        timerGoingOff = false;
         stopTimer();
         logger.info("timer turned off");
     }
@@ -587,17 +611,19 @@ public class TimerPanel extends JPanel implements IClockPanel
     }
 
     /* Getters */
-    Clock getClock() { return this.clock; }
     JTextField getHourField() { return this.hourField; }
     JTextField getMinuteField() { return this.minuteField; }
     JTextField getSecondField() { return this.secondField; }
     JButton getTimerButton() { return this.timerButton; }
     JButton getResetButton() { return this.resetButton; }
-    boolean isTimerGoingOff() { return timerIsGoingOff; }
+    boolean isTimerGoingOff() { return timerGoingOff; }
     AdvancedPlayer getMusicPlayer() { return musicPlayer; }
+    boolean isPaused() { return paused; }
+    ScheduledExecutorService getScheduler() { return scheduler; }
+    ScheduledFuture<?> getCountdownFuture() { return countdownFuture; }
 
     /* Setters */
-    protected void setTimerIsGoingOff(boolean timerIsGoingOff) { this.timerIsGoingOff = timerIsGoingOff; }
+    protected void setTimerGoingOff(boolean timerGoingOff) { this.timerGoingOff = timerGoingOff; }
     protected void setMusicPlayer(AdvancedPlayer musicPlayer) { this.musicPlayer = musicPlayer; }
     public void setClock(Clock clock) { this.clock = clock; }
 }

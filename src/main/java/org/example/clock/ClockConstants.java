@@ -67,6 +67,9 @@ public interface ClockConstants
     String MIN = "Min";
     String SEC = "Sec";
     String ZERO = "0";
+    String TIMER_HOUR_ERROR = "0 <= "+HOUR+" > 24";
+    String TIMER_MIN_ERROR = "0 <= "+MIN+" > 60";
+    String TIMER_SEC_ERROR = "0 <= "+SEC+" > 60";
 
     // Alarm
     String SET_ALARMS = "Set Alarms";

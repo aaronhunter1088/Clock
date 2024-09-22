@@ -790,6 +790,7 @@ public class Clock extends JFrame
         setSize(Clock.defaultSize);
         clockPanel = PANEL_TIMER;
         timerPanel.setupSettingsMenu();
+        timerPanel.updateLabels();
     }
 
     /**
