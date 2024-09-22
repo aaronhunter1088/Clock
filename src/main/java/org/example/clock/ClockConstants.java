@@ -62,6 +62,7 @@ public interface ClockConstants
     String RESUME_TIMER = "Resume Timer";
     String PAUSE_TIMER = "Pause Timer";
     String RESET = "Reset";
+    String COMPLETE = "Complete";
     String HOUR = "Hour";
     String MIN = "Min";
     String SEC = "Sec";
