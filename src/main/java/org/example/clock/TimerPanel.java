@@ -2,7 +2,6 @@ package org.example.clock;
 
 import javazoom.jl.decoder.JavaLayerException;
 import javazoom.jl.player.advanced.AdvancedPlayer;
-import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.math.NumberUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -59,7 +58,7 @@ public class TimerPanel extends JPanel implements IClockPanel
         layout = new GridBagLayout();
         setLayout(layout);
         constraints = new GridBagConstraints();
-        setBackground(Color.BLACK); // Color.BLACK
+        setBackground(Color.BLACK);
         setForeground(Color.WHITE);
         setBorder(new LineBorder(Color.BLACK));
         setupTimerPanel();
@@ -104,9 +103,6 @@ public class TimerPanel extends JPanel implements IClockPanel
         textField1 = new JTextField(HOUR, 4);
         textField2 = new JTextField(MIN, 4);
         textField3 = new JTextField(SEC, 4);
-        textField1.setSize(new Dimension(50, 50));
-        textField2.setSize(new Dimension(50, 50));
-        textField3.setSize(new Dimension(50, 50));
         textField1.addFocusListener(new FocusListener(){
             @Override
             public void focusGained(FocusEvent e)
@@ -135,19 +131,18 @@ public class TimerPanel extends JPanel implements IClockPanel
                         textField1.grabFocus();
                     }
                 }
-                if (validateFirstTextField() && validateSecondTextField() && validateThirdTextField()
-                    && !ZERO.equals(textField1.getText()) && !ZERO.equals(textField2.getText()) && !ZERO.equals(textField3.getText()))
-                { timerButton.setEnabled(true); }
-                else if (validateFirstTextField() && !validateSecondTextField())
+                if (!validateSecondTextField())
                 {
                     textField2.grabFocus();
                     timerButton.setEnabled(false);
                 }
-                else if (validateFirstTextField() && validateSecondTextField() && !validateThirdTextField())
+                else if (!validateThirdTextField())
                 {
                     textField3.grabFocus();
                     timerButton.setEnabled(false);
                 }
+                else
+                { enableTimerButton(); }
             }
         });
         textField2.addFocusListener(new FocusListener(){
@@ -158,21 +153,19 @@ public class TimerPanel extends JPanel implements IClockPanel
             @Override
             public void focusLost(FocusEvent e)
             {
-                if (textField2.getText().isBlank() ||
-                    textField2.getText().isEmpty())
+                if (textField2.getText().isBlank() || textField2.getText().isEmpty())
                 { textField2.setText(MIN); }
                 if (NumberUtils.isNumber(textField2.getText()))
                 {
-                    if (Integer.parseInt(textField2.getText()) < 60 &&
-                        Integer.parseInt(textField2.getText()) >= 0 &&
-                        !ZERO.equals(textField2.getText()) && !ZERO.equals(textField3.getText()))
+                    var minute = Integer.parseInt(textField2.getText());
+                    if (minute < 60 && minute >= 0
+                        && !ZERO.equals(textField2.getText()) && !ZERO.equals(textField3.getText()))
                     {
                         timerButton.setText(SET);
                         timerButton.repaint();
                         timerButton.updateUI();
                     }
-                    if (Integer.parseInt(textField2.getText()) >= 60 ||
-                        Integer.parseInt(textField2.getText()) < 0)
+                    if (minute >= 60 || minute < 0)
                     {
                         timerButton.setText("0 < Min > 60");
                         timerButton.repaint();
@@ -180,13 +173,12 @@ public class TimerPanel extends JPanel implements IClockPanel
                         textField2.grabFocus();
                     }
                 }
-                if (validateFirstTextField() && validateSecondTextField() && validateThirdTextField()
-                    && !ZERO.equals(textField1.getText()) && !ZERO.equals(textField2.getText()) && !ZERO.equals(textField3.getText()))
-                { timerButton.setEnabled(true); }
-                else if (!validateFirstTextField())
+                if (!validateFirstTextField())
                 {
                     textField1.grabFocus();
                     timerButton.setEnabled(false);
+                } else {
+                    enableTimerButton();
                 }
             }
         });
@@ -218,10 +210,7 @@ public class TimerPanel extends JPanel implements IClockPanel
                         textField3.grabFocus();
                     }
                 }
-                if (validateFirstTextField() && validateSecondTextField() && validateThirdTextField()
-                    && !ZERO.equals(textField1.getText()) && !ZERO.equals(textField2.getText()) && !ZERO.equals(textField3.getText()))
-                { timerButton.setEnabled(true); }
-                else if (!validateFirstTextField())
+                if (!validateFirstTextField())
                 {
                     textField1.grabFocus();
                     timerButton.setEnabled(false);
@@ -231,27 +220,25 @@ public class TimerPanel extends JPanel implements IClockPanel
                     textField2.grabFocus();
                     timerButton.setEnabled(false);
                 }
+                else
+                { enableTimerButton(); }
             }
         });
-        textField1.setBorder(new LineBorder(Color.WHITE));
-        textField2.setBorder(new LineBorder(Color.WHITE));
-        textField3.setBorder(new LineBorder(Color.WHITE));
-        textField1.setHorizontalAlignment(JTextField.CENTER);
-        textField2.setHorizontalAlignment(JTextField.CENTER);
-        textField3.setHorizontalAlignment(JTextField.CENTER);
+        java.util.List.of(textField1, textField2, textField3).forEach(textField -> {
+            textField.setSize(new Dimension(50, 50));
+            textField.setBorder(new LineBorder(Color.WHITE));
+            textField.setHorizontalAlignment(JTextField.CENTER);
+        });
         timerButton = new JButton(SET);
-        timerButton.setFont(Clock.font20);
-        timerButton.setOpaque(true);
-        timerButton.setBackground(Color.BLACK);
-        timerButton.setForeground(Color.WHITE);
-        timerButton.setBorder(new LineBorder(Color.WHITE));
+        resetButton = new JButton(RESET);
+        java.util.List.of(timerButton, resetButton).forEach(button -> {
+            button.setFont(Clock.font20);
+            button.setOpaque(true);
+            button.setBackground(Color.BLACK);
+            button.setForeground(Color.WHITE);
+            button.setBorder(new LineBorder(Color.WHITE));
+        });
         timerButton.setEnabled(false);
-        resetButton = new JButton(RESET) ;
-        resetButton.setFont(Clock.font20);
-        resetButton.setOpaque(true);
-        resetButton.setBackground(Color.BLACK);
-        resetButton.setForeground(Color.WHITE);
-        resetButton.setBorder(new LineBorder(Color.WHITE));
         setBackground(Color.BLACK);
     }
 
@@ -299,7 +286,7 @@ public class TimerPanel extends JPanel implements IClockPanel
      */
     boolean validateSecondTextField()
     {
-        logger.info("validateSecondTextField");
+        logger.info("validate second text field");
         if (MIN.equals(textField2.getText())) { return true; }
         if (!NumberUtils.isNumber(textField2.getText())) { return false; }
         return Integer.parseInt(textField2.getText()) < 60 &&
@@ -312,7 +299,7 @@ public class TimerPanel extends JPanel implements IClockPanel
      */
     boolean validateThirdTextField()
     {
-        logger.info("validateThirdTextField");
+        logger.info("validate third text field");
         if (SEC.equals(textField3.getText())) { return true; }
         if (!NumberUtils.isNumber(textField3.getText())) { return false; }
         return Integer.parseInt(textField3.getText()) < 60 &&
@@ -342,27 +329,23 @@ public class TimerPanel extends JPanel implements IClockPanel
     public void stopTimer()
     {
         logger.info("stopping timer");
-        if (countdownFuture != null && !countdownFuture.isCancelled()) {
-            countdownFuture.cancel(true);
-        }
-        if (scheduler != null && !scheduler.isShutdown()) {
-            scheduler.shutdown();
-        }
+        if (countdownFuture != null && !countdownFuture.isCancelled())
+        { countdownFuture.cancel(true); }
+        if (scheduler != null && !scheduler.isShutdown())
+        { scheduler.shutdown(); }
         enableTimerButton();
     }
 
     /**
      * Pauses the timer
-     * @throws InterruptedException if the thread is interrupted
      */
-    void pauseTimer() throws InterruptedException
+    void pauseTimer()
     {
         logger.info("pausing timer");
         timerButton.setText(RESUME_TIMER);
         timerButton.repaint();
         timerButton.updateUI();
         isPaused = true;
-//        countdownThread.interrupt();
     }
 
     /**
@@ -575,17 +558,12 @@ public class TimerPanel extends JPanel implements IClockPanel
     void run(ActionEvent action)
     {
         logger.info("run");
-        try
-        {
-            if (SET.equals(timerButton.getText()))
-            { startTimer(); }
-            else if (RESUME_TIMER.equals(timerButton.getText()))
-            { resumeTimer(); }
-            else
-            { pauseTimer(); }
-        }
-        catch (InterruptedException e)
-        { printStackTrace(e, null); }
+        if (SET.equals(timerButton.getText()))
+        { startTimer(); }
+        else if (RESUME_TIMER.equals(timerButton.getText()))
+        { resumeTimer(); }
+        else
+        { pauseTimer(); }
     }
 
     /**
