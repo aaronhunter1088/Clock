@@ -65,6 +65,7 @@ public interface ClockConstants
     String HOUR = "Hour";
     String MIN = "Min";
     String SEC = "Sec";
+    String ZERO = "0";
 
     // Alarm
     String SET_ALARMS = "Set Alarms";

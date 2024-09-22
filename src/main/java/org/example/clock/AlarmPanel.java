@@ -964,7 +964,7 @@ public class AlarmPanel extends JPanel implements IClockPanel
     public void setupSettingsMenu()
     {
         clock.clearSettingsMenu();
-        logger.info("No settings set up for Alarm Panel");
+        logger.info("No settings defined up for Alarm Panel");
     }
 
     /* Getters */
