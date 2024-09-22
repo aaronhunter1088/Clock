@@ -1,7 +1,6 @@
 package org.example.clock;
 
 import javax.swing.*;
-import java.text.ParseException;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -19,8 +18,13 @@ public class Main
     static { System.setProperty("appName", Main.class.getSimpleName()); }
     private final static Logger logger = LogManager.getLogger(Main.class);
 
+    /**
+     * Main method to start the Clock
+     * @param args command line arguments
+     * @throws InvalidInputException if there is an invalid input
+     */
     @SuppressWarnings({"BusyWait", "InfiniteLoopStatement"})
-    public static void main(String[] args) throws ParseException, InvalidInputException
+    public static void main(String[] args) throws InvalidInputException
     {
         logger.info("Starting Clock...");
         Clock clock = new Clock(true);
