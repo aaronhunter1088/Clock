@@ -13,7 +13,6 @@ import java.text.ParseException;
 import java.time.DayOfWeek;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Locale;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -71,7 +70,7 @@ public class AlarmPanel extends JPanel implements IClockPanel
         this.constraints = new GridBagConstraints();
         setBackground(Color.BLACK);
         setForeground(Color.BLACK);
-        setupAlarmPanel(this.clock);
+        setupAlarmPanel();
         setupAlarmButton();
         setupMusicPlayer();
         addComponentsToPanel();
@@ -81,66 +80,61 @@ public class AlarmPanel extends JPanel implements IClockPanel
 
     /**
      * Adds all the components to the AlarmPanel
-     * @param clock the clock object reference
      */
-    void setupAlarmPanel(Clock clock)
+    void setupAlarmPanel()
     {
-        logger.info("setupAlarmPanel");
-        clock.setDateChanged(false);
-        clock.setShowFullDate(false);
-        clock.setShowPartialDate(false);
-        clock.setShowMilitaryTime(false);
-        setJAlarmLbl1(new JLabel("Hours", SwingConstants.CENTER)); // H
+        logger.info("setup AlarmPanel");
+        alarmLabel1 = new JLabel(Hours, SwingConstants.CENTER); // H
         //getJAlarmLbl1().setBorder(BorderFactory.createLineBorder(Color.RED));
-        setJAlarmLbl2(new JLabel("Minutes", SwingConstants.CENTER)); // M
+        alarmLabel2 = new JLabel(Minutes, SwingConstants.CENTER); // M
         //getJAlarmLbl2().setBorder(BorderFactory.createLineBorder(Color.RED));
-        setJAlarmLbl3(new JLabel("AM/PM", SwingConstants.CENTER)); // Time (AM/PM)
+        alarmLabel3 = new JLabel(AMPM, SwingConstants.CENTER); // Time (AM/PM)
         //getJAlarmLbl3().setBorder(BorderFactory.createLineBorder(Color.RED));
-        setJTextField1(new JTextField(2)); // Hour textField
-        getJTextField1().setSize(new Dimension(50,50));
-        setJTextField2(new JTextField(2)); // Min textField
-        getJTextField2().setSize(new Dimension(50,50));
-        getJTextField2().setMaximumSize(getJTextField2().getSize());
-        setJTextField3(new JTextField(2)); // Time textField
-        getJTextField3().setSize(new Dimension(50,50));
-        setJAlarmLbl4(new JLabel("Current Alarms", SwingConstants.CENTER)); // Current Alarms
-        getJTextField1().requestFocusInWindow();
-        getJTextField1().setText("");
+        textField1 = new JTextField(2); // Hour textField
+        textField1.setSize(new Dimension(50,50));
+        textField2 = new JTextField(2); // Min textField
+        textField2.setSize(new Dimension(50,50));
+        textField2.setMaximumSize(textField2.getSize());
+        textField3 = new JTextField(2); // Time textField
+        textField3.setSize(new Dimension(50,50));
+        alarmLabel4 = new JLabel(CURRENT_ALARMS, SwingConstants.CENTER); // Current Alarms
+        textField1.requestFocusInWindow();
+        textField1.setText(EMPTY);
         //getJTextField1().setBorder(BorderFactory.createLineBorder(Color.RED));
-        getJTextField1().setText("");
+        textField1.setText(EMPTY);
         //getJTextField2().setBorder(BorderFactory.createLineBorder(Color.RED));
-        getJTextField1().setText("");
+        textField1.setText(EMPTY);
         //getJTextField3().setBorder(BorderFactory.createLineBorder(Color.RED));
-        getJAlarmLbl1().setFont(Clock.font20); // H
-        getJAlarmLbl2().setFont(Clock.font20); // M
-        getJAlarmLbl3().setFont(Clock.font20); // T
-        getJAlarmLbl4().setFont(Clock.font20); // All Alarms
-        getJAlarmLbl1().setForeground(Color.WHITE);
-        getJAlarmLbl2().setForeground(Color.WHITE);
-        getJAlarmLbl3().setForeground(Color.WHITE);
-        getJAlarmLbl4().setForeground(Color.WHITE);
+        alarmLabel1.setFont(Clock.font20); // H
+        alarmLabel2.setFont(Clock.font20); // M
+        alarmLabel3.setFont(Clock.font20); // T
+        alarmLabel4.setFont(Clock.font20); // All Alarms
+        alarmLabel1.setForeground(Color.WHITE);
+        alarmLabel2.setForeground(Color.WHITE);
+        alarmLabel3.setForeground(Color.WHITE);
+        alarmLabel4.setForeground(Color.WHITE);
         // setup textarea
-        setJTextArea(new JTextArea(2, 2));
-        getJTextArea().setSize(new Dimension(100, 100));
-        getJTextArea().setFont(Clock.font10); // message
-        getJTextArea().setVisible(true);
-        getJTextArea().setEditable(false);
-        getJTextArea().setLineWrap(false);
-        getJTextArea().setWrapStyleWord(false);
-        getJTextArea().setBackground(Color.BLACK);
-        getJTextArea().setForeground(Color.WHITE);
+        textArea = new JTextArea(2, 2);
+        textArea.setSize(new Dimension(100, 100));
+        textArea.setFont(Clock.font10); // message
+        textArea.setVisible(true);
+        textArea.setEditable(false);
+        textArea.setLineWrap(false);
+        textArea.setWrapStyleWord(false);
+        textArea.setBackground(Color.BLACK);
+        textArea.setForeground(Color.WHITE);
         // setup scrollPane
-        setJScrollPane(new JScrollPane(getJTextArea()));
-        getJScrollPane().setHorizontalScrollBar(null);
-        getJScrollPane().setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
-        getJScrollPane().setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED);
-        getJScrollPane().setSize(getJTextArea().getSize());
+        scrollPane = new JScrollPane(textArea);
+        scrollPane.setHorizontalScrollBar(null);
+        scrollPane.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
+        scrollPane.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED);
+        scrollPane.setSize(textArea.getSize());
         // setup Set button
-        setSetAlarmButton(new JButton("Set"));
-        getSetAlarmButton().setFont(Clock.font20);
-        getSetAlarmButton().setOpaque(true);
-        getSetAlarmButton().setBackground(Color.BLACK);
-        getSetAlarmButton().setForeground(Color.BLACK);
+        setAlarmButton = new JButton(SET);
+        setAlarmButton.setFont(Clock.font20);
+        setAlarmButton.setOpaque(true);
+        setAlarmButton.setBackground(Color.BLACK);
+        setAlarmButton.setForeground(Color.BLACK);
         // setup checkboxes
         setupCheckBoxes();
     }
@@ -150,7 +144,7 @@ public class AlarmPanel extends JPanel implements IClockPanel
      */
     void setupMusicPlayer()
     {
-        logger.info("setupMusicPlayer");
+        logger.info("setup music player");
         InputStream inputStream = null;
         try
         {
@@ -172,12 +166,14 @@ public class AlarmPanel extends JPanel implements IClockPanel
     void resetJAlarmLabel4()
     {
         logger.info("reset alarm label 4");
-        if (clock.getListOfAlarms().isEmpty()) { alarmLabel4.setText(clock.defaultText(6)); }// All Alarms label...
-        else {
+        if (clock.getListOfAlarms().isEmpty())
+        { alarmLabel4.setText(clock.defaultText(6)); }// All Alarms label...
+        else
+        {
             alarmLabel4.setText(
                 clock.getListOfAlarms().size() == 1
-                    ? clock.getListOfAlarms().size() + " Alarm Added"
-                    : clock.getListOfAlarms().size() + " Alarms Added"
+                    ? clock.getListOfAlarms().size() + SPACE+ALARM+SPACE+ADDED
+                    : clock.getListOfAlarms().size() + SPACE+ALARM+S+SPACE+ADDED
             );
         }
     }
@@ -285,9 +281,9 @@ public class AlarmPanel extends JPanel implements IClockPanel
      * Adds the alarm to the menu
      * @param alarm the alarm to set
      */
-    void addAlarmMenuItemFromAlarm(Alarm alarm)
+    void addAlarmToAlarmMenu(Alarm alarm)
     {
-        logger.info("addAlarmMenuItemFromAlarm");
+        logger.info("adding alarm to alarm menu");
         JMenuItem alarmItem = new JMenuItem(alarm.toString());
         alarmItem.setForeground(Color.WHITE);
         alarmItem.setBackground(Color.BLACK);
@@ -350,7 +346,8 @@ public class AlarmPanel extends JPanel implements IClockPanel
                 }
                 else
                 {
-                    if (updatingAlarm) {
+                    if (updatingAlarm)
+                    {
                         logger.info("updating alarm");
                         logger.info("clock.alarmsList size {}", clock.getListOfAlarms().size());
                         alarm = createAlarm();
@@ -359,21 +356,23 @@ public class AlarmPanel extends JPanel implements IClockPanel
                         // add clock to list of alarms
                         if (clock.getListOfAlarms().isEmpty())
                         {
-                            addAlarmMenuItemFromAlarm(alarm);
+                            addAlarmToAlarmMenu(alarm);
                             clock.getListOfAlarms().add(alarm);
                         }
                         else
                         {
                             boolean addToList = false;
-                            for(int i=0; i<clock.getListOfAlarms().size(); i++) {
+                            for(int i=0; i<clock.getListOfAlarms().size(); i++)
+                            {
                                 if (!clock.getListOfAlarms().get(i).toString().equals(alarm.toString())
                                     && clock.getListOfAlarms().get(i).getDays() != alarm.getDays())
                                 { addToList = true; }
                                 else
                                 { logger.error("Tried updating an alarm but it already exists! Cannot create duplicate alarm."); }
                             }
-                            if (addToList) {
-                                addAlarmMenuItemFromAlarm(alarm);
+                            if (addToList)
+                            {
+                                addAlarmToAlarmMenu(alarm);
                                 clock.getListOfAlarms().add(alarm);
                             }
                         }
@@ -384,31 +383,33 @@ public class AlarmPanel extends JPanel implements IClockPanel
                         resetJTextArea();
                         resetJCheckBoxes();
                         resetJAlarmLabel4();
-                        // determine how to update alarm (update/delete)
                     }
-                    else { // creating a new alarm
+                    else
+                    {
                         logger.info("creating new alarm");
                         alarm = createAlarm();
                         setAlarm(alarm);
                         setUpdatingAlarm(false);
-                        if (getClock().getListOfAlarms().isEmpty())
+                        if (clock.getListOfAlarms().isEmpty())
                         {
-                            addAlarmMenuItemFromAlarm(alarm);
-                            getClock().getListOfAlarms().add(alarm);
+                            addAlarmToAlarmMenu(alarm);
+                            clock.getListOfAlarms().add(alarm);
                         }
                         else
                         {
                             boolean addToList = false;
-                            for(int i = 0; i < getClock().getListOfAlarms().size(); i++) {
-                                if (!getClock().getListOfAlarms().get(i).toString().equals(alarm.toString()) ||
-                                        getClock().getListOfAlarms().get(i).getDays() != alarm.getDays())
+                            for(int i=0; i<clock.getListOfAlarms().size(); i++)
+                            {
+                                if (!clock.getListOfAlarms().get(i).toString().equals(alarm.toString()) ||
+                                    clock.getListOfAlarms().get(i).getDays() != alarm.getDays())
                                 { addToList = true; }
                                 else
                                 { logger.error("Tried adding an alarm but it already exists! Cannot create duplicate alarm."); }
                             }
-                            if (addToList) {
-                                addAlarmMenuItemFromAlarm(alarm);
-                                getClock().getListOfAlarms().add(alarm);
+                            if (addToList)
+                            {
+                                addAlarmToAlarmMenu(alarm);
+                                clock.getListOfAlarms().add(alarm);
                             }
                         }
                         logger.info("clock.alarmsList size {}", clock.getListOfAlarms().size());
@@ -417,18 +418,18 @@ public class AlarmPanel extends JPanel implements IClockPanel
                         resetJCheckBoxes();
                         setupAlarmsInMenuFunctionality();
                         // erase input in textFields
-                        getJTextField1().setText("");
-                        getJTextField2().setText("");
-                        getJTextField3().setText("");
+                        textField1.setText(EMPTY);
+                        textField2.setText(EMPTY);
+                        textField3.setText(EMPTY);
                         resetJAlarmLabel4();
                     }
                 }
             }
             catch (InvalidInputException | ParseException e)
             {
-                getJTextArea().setLineWrap(true);
-                getJTextArea().setWrapStyleWord(true);
-                getJTextArea().setText(e.getMessage());
+                textArea.setLineWrap(true);
+                textArea.setWrapStyleWord(true);
+                textArea.setText(e.getMessage());
                 logger.error("Couldn't create a new alarm");
             }
         });
@@ -758,74 +759,51 @@ public class AlarmPanel extends JPanel implements IClockPanel
      */
     void setupCheckBoxes()
     {
-        logger.info("setupCheckBoxes");
-        setSundayCheckBox(new JCheckBox(SUNDAY.toString().substring(0,2), false));
-        sundayCheckBox.setFont(Clock.font20);
-        sundayCheckBox.setBackground(Color.BLACK);
-        sundayCheckBox.setForeground(Color.WHITE);
+        logger.info("setup checkboxes");
+        sundayCheckBox = new JCheckBox(SUNDAY.toString().substring(0,2), false);
+        mondayCheckBox = new JCheckBox(MONDAY.toString().substring(0,1), false);
+        tuesdayCheckBox = new JCheckBox(TUESDAY.toString().substring(0,1), false);
+        wednesdayCheckBox = new JCheckBox(WEDNESDAY.toString().substring(0,1), false);
+        thursdayCheckBox = new JCheckBox(THURSDAY.toString().substring(0,1), false);
+        fridayCheckBox = new JCheckBox(FRIDAY.toString().substring(0,1), false);
+        saturdayCheckBox = new JCheckBox(SATURDAY.toString().substring(0,1), false);
+        weekCheckBox = new JCheckBox(WEEK, false);
+        weekendCheckBox = new JCheckBox(WEEKEND, false);
+        List.of(sundayCheckBox, mondayCheckBox, tuesdayCheckBox, wednesdayCheckBox, thursdayCheckBox, fridayCheckBox, saturdayCheckBox, weekCheckBox, weekendCheckBox)
+            .forEach(checkBox -> {
+                checkBox.setFont(Clock.font20);
+                checkBox.setBackground(Color.BLACK);
+                checkBox.setForeground(Color.WHITE);
+            }
+        );
         sundayCheckBox.addActionListener(action -> {
             sundayCheckBox.setSelected(sundayCheckBox.isSelected());
             logger.info("sundayCheckBox: {}", sundayCheckBox.isSelected());
         });
-
-        setMondayCheckBox(new JCheckBox(MONDAY.toString().substring(0,1), false));
-        mondayCheckBox.setFont(Clock.font20);
-        mondayCheckBox.setBackground(Color.BLACK);
-        mondayCheckBox.setForeground(Color.WHITE);
         mondayCheckBox.addActionListener(action -> {
             mondayCheckBox.setSelected(mondayCheckBox.isSelected());
             logger.info("mondayCheckBox: {}", mondayCheckBox.isSelected());
         });
-
-        setTuesdayCheckBox(new JCheckBox(TUESDAY.toString().substring(0,1), false));
-        tuesdayCheckBox.setFont(Clock.font20);
-        tuesdayCheckBox.setBackground(Color.BLACK);
-        tuesdayCheckBox.setForeground(Color.WHITE);
         tuesdayCheckBox.addActionListener(action -> {
             tuesdayCheckBox.setSelected(tuesdayCheckBox.isSelected());
             logger.info("tuesdayCheckBox: {}", tuesdayCheckBox.isSelected());
         });
-
-        setWednesdayCheckBox(new JCheckBox(WEDNESDAY.toString().substring(0,1), false));
-        wednesdayCheckBox.setFont(Clock.font20);
-        wednesdayCheckBox.setBackground(Color.BLACK);
-        wednesdayCheckBox.setForeground(Color.WHITE);
         wednesdayCheckBox.addActionListener(action -> {
             wednesdayCheckBox.setSelected(wednesdayCheckBox.isSelected());
             logger.info("wednesdayCheckBox: {}", wednesdayCheckBox.isSelected());
         });
-
-        setThursdayCheckBox(new JCheckBox(THURSDAY.toString().charAt(0)+THURSDAY.toString().substring(1,2).toLowerCase(Locale.ROOT), false));
-        thursdayCheckBox.setFont(Clock.font20);
-        thursdayCheckBox.setBackground(Color.BLACK);
-        thursdayCheckBox.setForeground(Color.WHITE);
         thursdayCheckBox.addActionListener(action -> {
             thursdayCheckBox.setSelected(thursdayCheckBox.isSelected());
             logger.info("thursdayCheckBox: {}", thursdayCheckBox.isSelected());
         });
-
-        setFridayCheckBox(new JCheckBox(FRIDAY.toString().substring(0,1), false));
-        fridayCheckBox.setFont(Clock.font20);
-        fridayCheckBox.setBackground(Color.BLACK);
-        fridayCheckBox.setForeground(Color.WHITE);
         fridayCheckBox.addActionListener(action -> {
             fridayCheckBox.setSelected(fridayCheckBox.isSelected());
             logger.info("fridayCheckBox: {}", fridayCheckBox.isSelected());
         });
-
-        setSaturdayCheckBox(new JCheckBox(SATURDAY.toString().substring(0,1), false));
-        saturdayCheckBox.setFont(Clock.font20);
-        saturdayCheckBox.setBackground(Color.BLACK);
-        saturdayCheckBox.setForeground(Color.WHITE);
         saturdayCheckBox.addActionListener(action -> {
             saturdayCheckBox.setSelected(saturdayCheckBox.isSelected());
             logger.info("saturdayCheckBox: {}", saturdayCheckBox.isSelected());
         });
-        // setup WEEK
-        setWeekCheckBox(new JCheckBox("WK", false));
-        weekCheckBox.setFont(Clock.font20);
-        weekCheckBox.setBackground(Color.BLACK);
-        weekCheckBox.setForeground(Color.WHITE);
         weekCheckBox.addActionListener(action -> {
             if (!weekCheckBox.isSelected())
             {
@@ -848,11 +826,6 @@ public class AlarmPanel extends JPanel implements IClockPanel
                 fridayCheckBox.setSelected(true);
             }
         });
-        // setup WEEKEND
-        setWeekendCheckBox(new JCheckBox("WKD", false));
-        weekendCheckBox.setFont(Clock.font20);
-        weekendCheckBox.setBackground(Color.BLACK);
-        weekendCheckBox.setForeground(Color.WHITE);
         weekendCheckBox.addActionListener(action -> {
             if (!weekendCheckBox.isSelected())
             {
@@ -908,9 +881,6 @@ public class AlarmPanel extends JPanel implements IClockPanel
         addComponent(alarmLabel3,0,4,1,1, 0,0, GridBagConstraints.BOTH, new Insets(0,0,0,0)); // Time (AM/PM)
         addComponent(textField3,0,5,1,1, 0,0, GridBagConstraints.BOTH, new Insets(0,0,0,0)); // textField
         addComponent(alarmLabel4, 0, 6, 2, 1, 2, 2, GridBagConstraints.BOTH, new Insets(0,0,0,0));
-        constraints.weighty = 4;
-        constraints.weightx = 2;
-        addComponent(scrollPane,1,6,2,4, 0,0, GridBagConstraints.BOTH, new Insets(1,1,1,1)); // textArea
         constraints.weighty = 1;
         constraints.weightx = 1;
         // new column, first row
@@ -925,6 +895,9 @@ public class AlarmPanel extends JPanel implements IClockPanel
         addComponent(sundayCheckBox, 1, 4, 2, 1, 0, 0, GridBagConstraints.NONE, new Insets(0,0,0,0)); // Sqr Sunday
         addComponent(weekCheckBox, 2, 4, 2, 1, 1, 0, GridBagConstraints.NONE, new Insets(0,0,0,0)); // Sqr Weekend
         addComponent(weekendCheckBox, 3, 4, 2, 1, 1, 0, GridBagConstraints.NONE, new Insets(0,0,0,0)); // Sqr Weekend
+        constraints.weighty = 4;
+        constraints.weightx = 2;
+        addComponent(scrollPane,1,6,2,4, 0,0, GridBagConstraints.BOTH, new Insets(1,1,1,1)); // textArea
         // set-alarm button
         addComponent(setAlarmButton, 4, 2, 2, 1, 1, 1, GridBagConstraints.CENTER, new Insets(0,0,0,0)); // Set button
         // header and alarms

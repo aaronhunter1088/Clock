@@ -74,6 +74,12 @@ public interface ClockConstants
     // Alarm
     String SET_ALARMS = "Set Alarms";
     String VIEW_ALARMS = "View Alarms";
+    String ALARM = "Alarm";
+    String ADDED = "Added";
+    String AMPM = "AM/PM";
+    String CURRENT_ALARMS = "Current Alarms";
+    String WEEK = "WK";
+    String WEEKEND = "WKD";
 
     String VIEW_DIGITAL_CLOCK = "View Digital Clock";
     String VIEW_ANALOGUE_CLOCK = "View Analogue Clock";
