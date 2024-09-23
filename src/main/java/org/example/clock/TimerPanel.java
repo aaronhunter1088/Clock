@@ -445,6 +445,20 @@ public class TimerPanel extends JPanel implements IClockPanel
     }
 
     /**
+     * This method adds the components to the timer panel
+     */
+    public void addComponentsToPanel()
+    {
+        logger.info("add components to panel");
+        setComponentOrientation(ComponentOrientation.LEFT_TO_RIGHT);
+        addComponent(hourField, 0,0,1,1,0,0, GridBagConstraints.HORIZONTAL); // TextField 1
+        addComponent(minuteField, 0,1,1,1,0,0, GridBagConstraints.HORIZONTAL); // TextField 2
+        addComponent(secondField, 0,2,1,1,0,0, GridBagConstraints.HORIZONTAL); // TextField 3
+        addComponent(resetButton, 1, 0, 3, 1, 0, 0, GridBagConstraints.HORIZONTAL); // Reset Button
+        addComponent(timerButton, 2,0,3,1,0,0, GridBagConstraints.HORIZONTAL); // Set Timer Button
+    }
+
+    /**
      * The main method used for adding components
      * to the timer panel
      * @param cpt       the component to add
@@ -536,20 +550,6 @@ public class TimerPanel extends JPanel implements IClockPanel
         timerGoingOff = false;
         stopTimer();
         logger.info("timer turned off");
-    }
-
-    /**
-     * This method adds the components to the timer panel
-     */
-    public void addComponentsToPanel()
-    {
-        logger.info("add components to panel");
-        setComponentOrientation(ComponentOrientation.LEFT_TO_RIGHT);
-        addComponent(hourField, 0,0,1,1,0,0, GridBagConstraints.HORIZONTAL); // TextField 1
-        addComponent(minuteField, 0,1,1,1,0,0, GridBagConstraints.HORIZONTAL); // TextField 2
-        addComponent(secondField, 0,2,1,1,0,0, GridBagConstraints.HORIZONTAL); // TextField 3
-        addComponent(resetButton, 1, 0, 3, 1, 0, 0, GridBagConstraints.HORIZONTAL); // Reset Button
-        addComponent(timerButton, 2,0,3,1,0,0, GridBagConstraints.HORIZONTAL); // Set Timer Button
     }
 
     /**

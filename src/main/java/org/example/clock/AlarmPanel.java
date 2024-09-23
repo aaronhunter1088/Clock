@@ -444,10 +444,10 @@ public class AlarmPanel extends JPanel implements IClockPanel
      */
     Alarm createAlarm() throws ParseException, InvalidInputException
     {
-        logger.info("createAlarm");
-        int hour = Integer.parseInt(getJTextField1().getText());
-        int minutes = Integer.parseInt(getJTextField2().getText());
-        String ampm = getJTextField3().getText(); //convertStringToTimeAMPM(getJTextField3().getText());
+        logger.info("create alarm");
+        int hour = Integer.parseInt(textField1.getText());
+        int minutes = Integer.parseInt(textField2.getText());
+        String ampm = textField3.getText(); //convertStringToTimeAMPM(getJTextField3().getText());
         boolean valid;
         valid = validateFirstTextField() && validateSecondTextField()
                 && validateThirdTextField() && validateACheckboxWasSelected();
@@ -516,23 +516,24 @@ public class AlarmPanel extends JPanel implements IClockPanel
      */
     void triggerAlarm(ExecutorService executor)
     {
-        logger.info("triggerAlarm");
+        logger.info("trigger alarm");
         setAlarmIsGoingOff(true);
         clock.getDigitalClockPanel().updateLabels();
         //clock.getDigitalClockPanel().getLabel1().setText(activeAlarm.toString());
         //clock.getDigitalClockPanel().getLabel2().setText("is going off!");
         // play sound
         Callable<String> c = () -> {
-            try {
+            try
+            {
                 setupMusicPlayer();
                 logger.debug("while alarm is going off, play sound");
-                while (getActiveAlarm().alarmGoingOff) {
-                    getMusicPlayer().play(50);
-                }
+                while (getActiveAlarm().alarmGoingOff)
+                { getMusicPlayer().play(50); }
                 logger.debug("alarm has stopped");
                 return "Alarm triggered";
             }
-            catch (Exception e) {
+            catch (Exception e)
+            {
                 logger.error(e.getCause().getClass().getName() + " - " + e.getMessage());
                 printStackTrace(e);
                 setupMusicPlayer();
@@ -548,10 +549,10 @@ public class AlarmPanel extends JPanel implements IClockPanel
      */
     void stopAlarm()
     {
-        logger.info("stopAlarm");
+        logger.info("stop alarm");
         musicPlayer = null;
         alarmIsGoingOff = false;
-        logger.info(alarm.toString()+" alarm turned off.");
+        logger.info("{} alarm turned off", alarm.toString());
     }
 
     void checkIfAnyAlarmsAreGoingOff()
@@ -629,7 +630,7 @@ public class AlarmPanel extends JPanel implements IClockPanel
         logger.info("setup alarms in menu functionality");
         for(int i=0; i<getClock().getClockMenuBar().getAlarmFeature_Menu().getItemCount(); i++)
         {
-            if (!"Set Alarms".equals(clock.getClockMenuBar().getAlarmFeature_Menu().getItem(i).getText()))
+            if (!SET_ALARMS.equals(clock.getClockMenuBar().getAlarmFeature_Menu().getItem(i).getText()))
             {
                 JMenuItem menuItem = clock.getClockMenuBar().getAlarmFeature_Menu().getItem(i);
                 menuItem.addActionListener(action -> {
@@ -639,7 +640,8 @@ public class AlarmPanel extends JPanel implements IClockPanel
                     });
                     if (musicPlayer == null) { setupMusicPlayer(); }
                     // if an alarm is going off and we clicked on it in the menuBar
-                    if (activeAlarm != null) {
+                    if (activeAlarm != null)
+                    {
                         alarm = activeAlarm;
                         if (musicPlayer != null) { stopAlarm(); }
                         else { logger.warn("Music player is null!"); }
@@ -660,13 +662,13 @@ public class AlarmPanel extends JPanel implements IClockPanel
                         alarmLabel4.setText("Alarm off.");
                     }
                     // we are updating an alarm by clicking on it in the menuBar
-                    else if (alarm != null) { // && getAlarm().isUpdatingAlarm())
+                    else if (alarm != null)
+                    {
                         updateTheAlarm(alarm);
                         textField1.setText(alarm.getHoursAsStr());
                         textField2.setText(alarm.getMinutesAsStr());
                         textField3.setText(alarm.getAMPM());
                     }
-                    //clock.changeToAlarmPanel(false);
                     clock.changePanels(PANEL_ALARM, false);
                 });
             }
@@ -900,7 +902,6 @@ public class AlarmPanel extends JPanel implements IClockPanel
         addComponent(scrollPane,1,6,2,4, 0,0, GridBagConstraints.BOTH, new Insets(1,1,1,1)); // textArea
         // set-alarm button
         addComponent(setAlarmButton, 4, 2, 2, 1, 1, 1, GridBagConstraints.CENTER, new Insets(0,0,0,0)); // Set button
-        // header and alarms
     }
 
     /**

@@ -55,6 +55,7 @@ public class Clock extends JFrame
     private AnalogueClockPanel analogueClockPanel;
     private AlarmPanel alarmPanel;
     private TimerPanel timerPanel;
+    private TimerPanel2 timerPanel2;
     private LocalDate beginDaylightSavingsTimeDate;
     private LocalDate endDaylightSavingsTimeDate;
     private LocalDateTime currentTime;
@@ -179,6 +180,7 @@ public class Clock extends JFrame
             analogueClockPanel = new AnalogueClockPanel(this);
             alarmPanel = new AlarmPanel(this);
             timerPanel = new TimerPanel(this);
+            timerPanel2 = new TimerPanel2(this);
             leapYear = date.isLeapYear();
             dateChanged = false;
             alarmActive = false;
@@ -203,6 +205,7 @@ public class Clock extends JFrame
             case PANEL_ANALOGUE_CLOCK -> changeToAnalogueClockPanel();
             case PANEL_ALARM -> changeToAlarmPanel(resetValues);
             case PANEL_TIMER -> changeToTimerPanel();
+            case PANEL_TIMER2 -> changeToTimerPanel();
         }
     }
 
@@ -787,6 +790,20 @@ public class Clock extends JFrame
         logger.info("change to timer panel");
         add(timerPanel);
         currentPanel = timerPanel;
+        setSize(Clock.defaultSize);
+        clockPanel = PANEL_TIMER;
+        timerPanel.setupSettingsMenu();
+        timerPanel.updateLabels();
+    }
+
+    /**
+     * Changes the panel to the timer panel
+     */
+    void changeToTimerPanel2()
+    {
+        logger.info("change to timer panel");
+        add(timerPanel2);
+        currentPanel = timerPanel2;
         setSize(Clock.defaultSize);
         clockPanel = PANEL_TIMER;
         timerPanel.setupSettingsMenu();
