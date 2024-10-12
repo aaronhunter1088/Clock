@@ -10,8 +10,9 @@
     <description>This is a simple Clock GUI which displays the date and time, and can set alarms and timers.</description>
     
     <properties>
-		<java.version>18</java.version>
-		<outputDirectory>${basedir}/dist/${project.name}</outputDirectory>
+		<maven.compiler.source>18</maven.compiler.source>
+		<maven.compiler.target>18</maven.compiler.target>
+		<outputDirectory>${basedir}/dist</outputDirectory>
 		<finalName>${project.artifactId}-${project.version}</finalName>
 
     	<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -24,8 +25,9 @@
     </properties>
 
 	<!-- NOTES -->
-	<!-- Assembly:single creates Clock-v#.jar -->
-	<!-- Mvn:package creates Clock-v#-jar-with-dependencies.jar -->
+	<!-- Assembly:single creates Clock-#.jar -->
+	<!-- Mvn:package creates Clock-#-jar-with-dependencies.jar -->
+	<!-- Mvn:install adds Clock-#-jar-with-dependencies.jar to local repo -->
     
     <dependencies>
 
@@ -132,156 +134,132 @@
 		</resources>
 
 		<plugins>
-
 			<!-- Compile -->
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-compiler-plugin</artifactId>
 				<version>${maven.compiler.version}</version>
 				<configuration>
+					<source>${maven.compiler.source}</source>
+					<target>${maven.compiler.target}</target>
 					<release>18</release>
 					<compilerArgs>
 						<!--<arg>#doubledash#enable-preview</arg>-->
 						<arg>-verbose</arg>
 						<arg>-Xlint:all,-options,-path</arg>
 					</compilerArgs>
-                    <source>18</source>
-                    <target>18</target>
-                    <!-- for surefire plugin -->
+					<!-- for surefire plugin -->
 				</configuration>
 				<executions>
 					<execution>
 						<id>default-testCompile</id>
 						<phase>test-compile</phase>
-						<configuration>
-							<testExcludes>
-								<exclude>**/**.java</exclude>
-							</testExcludes>
-						</configuration>
 						<goals>
 							<goal>testCompile</goal>
 						</goals>
 					</execution>
 				</executions>
 			</plugin>
-
 			<!-- Test-compile -->
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-surefire-plugin</artifactId>
 				<version>${maven.surefire.version}</version>
-				<configuration>
-					<excludes>
-						<exclude>**/**.java</exclude>
-					</excludes>
-				</configuration>
 			</plugin>
-
+			<!-- Generate resources -->
+			<plugin>
+				<groupId>org.codehaus.mojo</groupId>
+				<artifactId>properties-maven-plugin</artifactId>
+				<version>1.0-alpha-2</version>
+				<executions>
+					<execution>
+						<phase>generate-resources</phase>
+						<goals>
+							<goal>write-project-properties</goal>
+						</goals>
+						<configuration>
+							<outputFile>${basedir}/src/main/resources/pom.properties</outputFile>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
 			<!-- Binds to Package phase, but will not run... -->
-            <!-- When creating a jar, update MANIFEST.MF file and place JAR in specified outputDirectory -->
-            <plugin>
-            	<groupId>org.apache.maven.plugins</groupId>
-            	<artifactId>maven-jar-plugin</artifactId>
-            	<version>${maven.jar.version}</version>
-            	<executions>
-            		<execution>
-            			<id>default-jar</id>
-            			<phase>compile</phase>
-            			<goals>
-            				<goal>jar</goal>
-            			</goals>
-            		</execution>
-            	</executions>
-            	<configuration>
-					<finalName>Clock-v${project.version}</finalName>
-					<outputDirectory>${basedir}/dist</outputDirectory>
+			<!-- When creating a jar, update MANIFEST.MF file and place JAR in specified outputDirectory
+			     Run Command: mvn install -DskipTests -DskipITs -->
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-jar-plugin</artifactId>
+				<version>${maven.jar.version}</version>
+				<executions>
+					<execution>
+						<id>default-jar</id>
+						<phase>compile</phase>
+						<goals>
+							<goal>jar</goal>
+						</goals>
+					</execution>
+				</executions>
+				<configuration>
+					<finalName>${finalName}</finalName>
+					<outputDirectory>${outputDirectory}</outputDirectory>
 					<archive>
 						<index>true</index>
 						<manifest>
 							<addDefaultImplementationEntries>true</addDefaultImplementationEntries>
 							<addClasspath>true</addClasspath>
-							<mainClass>org.example.clock.Main</mainClass>
+							<mainClass>com.example.clock.Main</mainClass>
 						</manifest>
 						<manifestEntries>
 							<Implementation-Version>${project.version}</Implementation-Version>
 							<Creation-Time-Format>yyyy-MM-dd HH:mm:ss</Creation-Time-Format>
 							<!--suppress UnresolvedMavenProperty -->
 							<Creation-Time>${build.time}</Creation-Time>
-							<mainClass>org.example.clock.Main</mainClass>
+							<mainClass>com.example.clock.Main</mainClass>
 						</manifestEntries>
 					</archive>
 					<includes>
-						<include>**/Clock/*</include>
-						<include>**/sounds/*</include>
-						<include>**/logging/*</include>
+						<include>**/*</include>
 					</includes>
-					<excludes>
-						<exclude>**/**.java</exclude>
-					</excludes>
-            	</configuration>
-            </plugin>
-            
-<!--            <plugin>-->
-<!--            	<groupId>org.apache.maven.plugins</groupId>-->
-<!--            	<artifactId>maven-antrun-plugin</artifactId>-->
-<!--            	<executions>-->
-<!--            		<execution>-->
-<!--            			<phase>initialize</phase>-->
-<!--            			<goals>-->
-<!--            				<goal>run</goal>-->
-<!--            			</goals>-->
-<!--            			<configuration>-->
-<!--            				<tasks>-->
-<!--            					<mkdir dir="${project.build.directory}"/>-->
-<!--            					<tstamp>-->
-<!--									<format property="last.updated" pattern="yyyy-MM-dd HH:mm:ss"/>-->
-<!--            					</tstamp>-->
-<!--            					&lt;!&ndash;suppress UnresolvedMavenProperty &ndash;&gt;-->
-<!--								<echo file="${basedir}/dist/build.properties" message="build.time=${last.updated}"/>-->
-<!--            				</tasks>-->
-<!--            			</configuration>-->
-<!--            		</execution>-->
-<!--            	</executions>-->
-<!--            </plugin>-->
-
-			<!-- Package: creates runnable jar with dependencies -->
-            <plugin>
-				 <groupId>org.apache.maven.plugins</groupId>
-				 <artifactId>maven-assembly-plugin</artifactId>
-				 <version>${maven.assembly.version}</version>
-                 <executions>
-                     <execution>
-						 <phase>package</phase>
-						 <goals>
-							 <goal>single</goal>
-						 </goals>
-					 </execution>
-				 </executions>
-				 <configuration>
-					 <finalName>Clock-v${project.version}</finalName>
-					 <outputDirectory>${basedir}/dist</outputDirectory>
-					 <descriptorRefs>
-						 <descriptorRef>jar-with-dependencies</descriptorRef>
-					 </descriptorRefs>
-					 <archive>
-						 <index>true</index>
-						 <manifest>
-							 <addDefaultImplementationEntries>true</addDefaultImplementationEntries>
-							 <addClasspath>true</addClasspath>
-							 <mainClass>org.example.clock.Main</mainClass>
-						 </manifest>
-						 <manifestEntries>
-							 <Implementation-Version>${project.version}</Implementation-Version>
-							 <Creation-Time-Format>yyyy-MM-dd HH:mm:ss</Creation-Time-Format>
-							 <!--suppress UnresolvedMavenProperty -->
-							 <Creation-Time>${build.time}</Creation-Time>
-							 <mainClass>org.example.clock.Main</mainClass>
-						 </manifestEntries>
-					 </archive>
-				 </configuration>
+				</configuration>
 			</plugin>
-		    
-        </plugins>
+			<!-- Assembly:Single creates runnable jar with dependencies
+			     Run Command: mvn clean package (-Dmaven.test.skip=true) -->
+			<plugin>
+				<!-- don't need group id since org.apache.maven.plugins is assumed -->
+				<artifactId>maven-assembly-plugin</artifactId>
+				<version>${maven.assembly.version}</version>
+				<executions>
+					<execution>
+						<id>build-beeper</id>
+						<phase>package</phase>
+						<goals>
+							<goal>single</goal>
+						</goals>
+						<configuration>
+							<descriptorRefs>
+								<descriptorRef>jar-with-dependencies</descriptorRef>
+							</descriptorRefs>
+							<appendAssemblyId>true</appendAssemblyId> <!-- If false, jar-with-dependencies is not appended to jar name -->
+							<!-- archive required to create executable jar -->
+							<archive>
+								<index>true</index>
+								<manifest>
+									<addDefaultImplementationEntries>true</addDefaultImplementationEntries>
+									<addClasspath>true</addClasspath>
+									<mainClass>com.example.clock.Main</mainClass>
+								</manifest>
+								<manifestEntries>
+									<Creation-Time>${maven.build.timestamp}</Creation-Time>
+									<Creation-Time-Format>yyyy-MM-dd HH:mm:ss</Creation-Time-Format>
+								</manifestEntries>
+							</archive>
+							<finalName>${finalName}</finalName>
+							<outputDirectory>${outputDirectory}</outputDirectory>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
+		</plugins>
         
     </build>
     
