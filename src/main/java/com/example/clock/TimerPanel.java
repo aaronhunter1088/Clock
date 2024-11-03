@@ -1,4 +1,4 @@
-package org.example.clock;
+package com.example.clock;
 
 import javazoom.jl.decoder.JavaLayerException;
 import javazoom.jl.player.advanced.AdvancedPlayer;
@@ -15,7 +15,7 @@ import java.io.InputStream;
 import java.util.concurrent.*;
 
 import static java.lang.Thread.sleep;
-import static org.example.clock.ClockPanel.PANEL_TIMER;
+import static com.example.clock.ClockPanel.PANEL_TIMER;
 
 /**
  * This is the Timer panel.

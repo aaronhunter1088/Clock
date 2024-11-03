@@ -1,4 +1,4 @@
-package org.example.clock;
+package com.example.clock;
 
 /**
  * An interface for the clock's panels. Each panel must

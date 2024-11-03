@@ -1,4 +1,4 @@
-package org.example.clock;
+package com.example.clock;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -9,13 +9,12 @@ import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 
-import javax.swing.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.FocusEvent;
 import java.awt.event.MouseEvent;
 import java.util.Arrays;
 
-import static org.example.clock.ClockConstants.*;
+import static com.example.clock.ClockConstants.*;
 import static org.junit.Assert.*;
 import static org.mockito.Mockito.mock;
 
@@ -223,7 +222,7 @@ public class TimerPanelTest
         Arrays.stream(timerPanel.getHourField().getFocusListeners())
             .forEach(listener -> {
                 // anonymous inner class defined in TimerPanel
-                if ("org.example.clock.TimerPanel$2".equals(listener.getClass().getName()))
+                if ("com.example.clock.TimerPanel$2".equals(listener.getClass().getName()))
                 { listener.focusGained(focusEvent); }
             }
         );
@@ -247,7 +246,7 @@ public class TimerPanelTest
         Arrays.stream(timerPanel.getMinuteField().getFocusListeners())
             .forEach(listener -> {
                 // anonymous inner class defined in TimerPanel
-                if ("org.example.clock.TimerPanel$3".equals(listener.getClass().getName()))
+                if ("com.example.clock.TimerPanel$3".equals(listener.getClass().getName()))
                 { listener.focusGained(focusEvent); }
             }
         );
@@ -271,7 +270,7 @@ public class TimerPanelTest
         Arrays.stream(timerPanel.getSecondField().getFocusListeners())
             .forEach(listener -> {
                 // anonymous inner class defined in TimerPanel
-                if ("org.example.clock.TimerPanel$4".equals(listener.getClass().getName()))
+                if ("com.example.clock.TimerPanel$4".equals(listener.getClass().getName()))
                 { listener.focusGained(focusEvent); }
             }
         );
@@ -296,7 +295,7 @@ public class TimerPanelTest
         Arrays.stream(timerPanel.getHourField().getFocusListeners())
             .forEach(listener -> {
                 // anonymous inner class defined in TimerPanel
-                if ("org.example.clock.TimerPanel$2".equals(listener.getClass().getName()))
+                if ("com.example.clock.TimerPanel$2".equals(listener.getClass().getName()))
                 { listener.focusLost(focusEvent); }
             }
         );
@@ -321,7 +320,7 @@ public class TimerPanelTest
         Arrays.stream(timerPanel.getHourField().getFocusListeners())
             .forEach(listener -> {
                 // anonymous inner class defined in TimerPanel
-                if ("org.example.clock.TimerPanel$2".equals(listener.getClass().getName()))
+                if ("com.example.clock.TimerPanel$2".equals(listener.getClass().getName()))
                 { listener.focusLost(focusEvent); }
             }
         );
@@ -346,7 +345,7 @@ public class TimerPanelTest
         Arrays.stream(timerPanel.getHourField().getFocusListeners())
             .forEach(listener -> {
                 // anonymous inner class defined in TimerPanel
-                if ("org.example.clock.TimerPanel$2".equals(listener.getClass().getName()))
+                if ("com.example.clock.TimerPanel$2".equals(listener.getClass().getName()))
                 { listener.focusLost(focusEvent); }
             }
         );
@@ -373,7 +372,7 @@ public class TimerPanelTest
         Arrays.stream(timerPanel.getHourField().getFocusListeners())
             .forEach(listener -> {
                 // anonymous inner class defined in TimerPanel
-                if ("org.example.clock.TimerPanel$2".equals(listener.getClass().getName()))
+                if ("com.example.clock.TimerPanel$2".equals(listener.getClass().getName()))
                 { listener.focusLost(focusEvent); }
             }
         );
@@ -400,7 +399,7 @@ public class TimerPanelTest
         Arrays.stream(timerPanel.getHourField().getFocusListeners())
                 .forEach(listener -> {
                             // anonymous inner class defined in TimerPanel
-                            if ("org.example.clock.TimerPanel$2".equals(listener.getClass().getName()))
+                            if ("com.example.clock.TimerPanel$2".equals(listener.getClass().getName()))
                             { listener.focusLost(focusEvent); }
                         }
                 );
@@ -427,7 +426,7 @@ public class TimerPanelTest
         Arrays.stream(timerPanel.getHourField().getFocusListeners())
             .forEach(listener -> {
                 // anonymous inner class defined in TimerPanel
-                if ("org.example.clock.TimerPanel$2".equals(listener.getClass().getName()))
+                if ("com.example.clock.TimerPanel$2".equals(listener.getClass().getName()))
                 { listener.focusLost(focusEvent); }
             }
         );

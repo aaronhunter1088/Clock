@@ -1,4 +1,4 @@
-package org.example.clock;
+package com.example.clock;
 
 import javax.swing.*;
 import java.awt.*;
@@ -19,8 +19,8 @@ import org.apache.logging.log4j.Logger;
 
 import static java.time.Month.*;
 import static java.time.DayOfWeek.*;
-import static org.example.clock.ClockConstants.*;
-import static org.example.clock.ClockPanel.*;
+import static com.example.clock.ClockConstants.*;
+import static com.example.clock.ClockPanel.*;
 
 /**
  * The clock object is capable of showing the date and time.

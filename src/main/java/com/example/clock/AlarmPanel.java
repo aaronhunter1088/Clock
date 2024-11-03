@@ -1,4 +1,4 @@
-package org.example.clock;
+package com.example.clock;
 
 import javazoom.jl.decoder.JavaLayerException;
 import javazoom.jl.player.advanced.AdvancedPlayer;
@@ -18,7 +18,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 import static java.time.DayOfWeek.*;
-import static org.example.clock.ClockPanel.PANEL_ALARM;
+import static com.example.clock.ClockPanel.PANEL_ALARM;
 
 /**
  * The AlarmPanel is used to set and view alarms. The

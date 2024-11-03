@@ -1,4 +1,4 @@
-package org.example.clock;
+package com.example.clock;
 
 /**
  * Constants for Clock application

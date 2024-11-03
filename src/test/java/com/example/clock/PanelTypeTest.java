@@ -1,4 +1,4 @@
-package org.example.clock;
+package com.example.clock;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -6,13 +6,12 @@ import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.mockito.MockitoAnnotations;
 import org.mockito.junit.MockitoJUnitRunner;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import static org.example.clock.ClockPanel.*;
+import static com.example.clock.ClockPanel.*;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;

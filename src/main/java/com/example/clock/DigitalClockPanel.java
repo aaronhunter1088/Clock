@@ -1,4 +1,4 @@
-package org.example.clock;
+package com.example.clock;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -6,7 +6,7 @@ import org.apache.logging.log4j.Logger;
 import javax.swing.*;
 import java.awt.*;
 
-import static org.example.clock.ClockPanel.PANEL_DIGITAL_CLOCK;
+import static com.example.clock.ClockPanel.PANEL_DIGITAL_CLOCK;
 
 /**
  * The DigitalClockPanel is the main panel and is

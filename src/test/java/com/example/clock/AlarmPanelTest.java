@@ -1,4 +1,4 @@
-package org.example.clock;
+package com.example.clock;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -15,7 +15,7 @@ import java.util.concurrent.Executors;
 import java.util.function.Predicate;
 
 import static java.time.Month.MARCH;
-import static org.example.clock.ClockConstants.*;
+import static com.example.clock.ClockConstants.*;
 import static org.junit.Assert.*;
 import static java.time.DayOfWeek.*;
 

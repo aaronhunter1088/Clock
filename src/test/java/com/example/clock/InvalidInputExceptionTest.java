@@ -1,4 +1,4 @@
-package org.example.clock;
+package com.example.clock;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;

@@ -1,4 +1,4 @@
-package org.example.clock;
+package com.example.clock;
 
 import java.awt.*;
 import java.text.SimpleDateFormat;
@@ -9,7 +9,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import static java.lang.Thread.sleep;
-import static org.example.clock.ClockPanel.PANEL_ANALOGUE_CLOCK;
+import static com.example.clock.ClockPanel.PANEL_ANALOGUE_CLOCK;
 
 /**
  * The AnalogueClockPanel is used to view the time

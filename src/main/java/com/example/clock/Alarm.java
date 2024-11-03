@@ -1,4 +1,4 @@
-package org.example.clock;
+package com.example.clock;
 
 import java.time.DayOfWeek;
 import java.util.ArrayList;
@@ -7,7 +7,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import static java.time.DayOfWeek.*;
-import static org.example.clock.ClockConstants.*;
+import static com.example.clock.ClockConstants.*;
 
 /**
  * An Alarm object that can be set to go off

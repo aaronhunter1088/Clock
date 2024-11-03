@@ -1,4 +1,4 @@
-package org.example.clock;
+package com.example.clock;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -11,8 +11,8 @@ import java.time.ZoneId;
 import java.util.Arrays;
 import java.util.List;
 
-import static org.example.clock.ClockConstants.*;
-import static org.example.clock.ClockPanel.*;
+import static com.example.clock.ClockConstants.*;
+import static com.example.clock.ClockPanel.*;
 
 /**
  * The menu bar for the Clock.

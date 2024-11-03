@@ -1,4 +1,4 @@
-package org.example.clock;
+package com.example.clock;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -16,7 +16,7 @@ import java.util.ArrayList;
 
 import static java.time.DayOfWeek.*;
 import static java.time.Month.*;
-import static org.example.clock.ClockConstants.*;
+import static com.example.clock.ClockConstants.*;
 import static org.junit.Assert.*;
 
 @RunWith(MockitoJUnitRunner.class)

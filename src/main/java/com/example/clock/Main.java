@@ -1,11 +1,14 @@
-package org.example.clock;
+package com.example.clock;
 
 import javax.swing.*;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import static com.example.clock.ClockConstants.AM;
 import static java.lang.Thread.sleep;
+import static java.time.DayOfWeek.SUNDAY;
+import static java.time.Month.NOVEMBER;
 
 /**
  * Main application to start Clock
@@ -27,8 +30,8 @@ public class Main
     public static void main(String[] args) throws InvalidInputException
     {
         logger.info("Starting Clock...");
-        Clock clock = new Clock(true);
-        //new Clock(1, 59, 50, NOVEMBER, SUNDAY, 3, 2024, AM); // for testing DST
+        Clock clock = //new Clock(true);
+        new Clock(1, 59, 50, NOVEMBER, SUNDAY, 3, 2024, AM); // for testing DST
         SwingUtilities.invokeLater(() -> SwingUtilities.updateComponentTreeUI(clock));
         try
         {
@@ -44,7 +47,7 @@ public class Main
                 if (clock.isNewYear())
                 {
                     clock.setIsNewYear(false);
-                    logger.info("Happy New Year. Here's wishing you a healthy, productive " + clock.getYear() + ".");
+                    logger.info("Happy New Year. Here's wishing you a healthy, productive {}.", clock.getYear());
                 }
                 sleep(250);
                 clock.setTheCurrentTime();

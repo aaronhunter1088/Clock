@@ -1,4 +1,4 @@
-package org.example.clock;
+package com.example.clock;
 
 /**
  * This class is used to determine that an error

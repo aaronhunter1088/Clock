@@ -1,8 +1,7 @@
-package org.example.clock;
+package com.example.clock;
 
 import javazoom.jl.decoder.JavaLayerException;
 import javazoom.jl.player.advanced.AdvancedPlayer;
-import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.math.NumberUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -16,15 +15,12 @@ import java.awt.event.FocusListener;
 import java.io.InputStream;
 import java.text.ParseException;
 import java.time.DayOfWeek;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.*;
 
 import static java.lang.Thread.sleep;
-import static java.time.DayOfWeek.*;
-import static java.time.DayOfWeek.SATURDAY;
-import static org.example.clock.ClockPanel.PANEL_ALARM;
-import static org.example.clock.ClockPanel.PANEL_TIMER;
+import static com.example.clock.ClockPanel.PANEL_ALARM;
+import static com.example.clock.ClockPanel.PANEL_TIMER;
 
 /**
  * The New Timer Panel
