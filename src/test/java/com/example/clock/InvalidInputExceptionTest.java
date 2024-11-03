@@ -2,6 +2,7 @@ package com.example.clock;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.junit.After;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -13,7 +14,6 @@ import java.time.Month;
 import static java.time.Month.*;
 import static org.junit.Assert.*;
 
-@RunWith(MockitoJUnitRunner.class)
 public class InvalidInputExceptionTest
 {
     static { System.setProperty("appName", InvalidInputExceptionTest.class.getSimpleName()); }
@@ -29,6 +29,9 @@ public class InvalidInputExceptionTest
     public void beforeEach() {
         goodMonth = AUGUST;
     }
+
+    @After
+    public void afterEach() {}
 
     @Test
     public void whenAValidMonthIsGivenReturnAValidInteger()

@@ -2,12 +2,11 @@ package com.example.clock;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.junit.Before;
-import org.junit.BeforeClass;
-import org.junit.Test;
+import org.junit.*;
 import org.junit.runner.RunWith;
 import org.mockito.junit.MockitoJUnitRunner;
 
+import java.awt.event.WindowEvent;
 import java.time.DayOfWeek;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
@@ -16,15 +15,15 @@ import java.util.function.Predicate;
 
 import static java.time.Month.MARCH;
 import static com.example.clock.ClockConstants.*;
+import static javax.swing.WindowConstants.DISPOSE_ON_CLOSE;
 import static org.junit.Assert.*;
 import static java.time.DayOfWeek.*;
 
-@RunWith(MockitoJUnitRunner.class)
 public class AlarmPanelTest
 {
     static { System.setProperty("appName", AlarmPanelTest.class.getSimpleName()); }
     private static final Logger logger = LogManager.getLogger(AlarmPanelTest.class);
-    private Clock clock = new Clock(true);
+    private Clock clock;
     private Alarm alarm;
 
     @BeforeClass
@@ -36,8 +35,27 @@ public class AlarmPanelTest
     @Before
     public void beforeEach() throws InvalidInputException
     {
-        clock = new Clock(true);
+        clock = new Clock();
+        clock.setDefaultCloseOperation(DISPOSE_ON_CLOSE);
         alarm = new Alarm(clock, true);
+    }
+
+    @After
+    public void afterEach() {
+        if (clock != null) {
+            logger.info("Test complete. Closing the clock...");
+            // Create a WindowEvent with WINDOW_CLOSING event type
+            WindowEvent windowClosing = new WindowEvent(clock, WindowEvent.WINDOW_CLOSING);
+
+            // Dispatch the event to the JFrame instance
+            clock.dispatchEvent(windowClosing);
+
+            // Ensure the clock is no longer visible
+            assertFalse(clock.isVisible());
+
+            // Dispose of the JFrame to release resources
+            clock.dispose();
+        }
     }
 
     @Test
@@ -76,7 +94,14 @@ public class AlarmPanelTest
     @Test
     public void alarmWorksAsExpected() throws InvalidInputException
     {
-        clock = new Clock(12, 0, 0, MARCH, FRIDAY, 3, 2021, AM);
+        clock.setHours(12);
+        clock.setMinutes(0);
+        clock.setSeconds(0);
+        clock.setMonth(MARCH);
+        clock.setDayOfWeek(FRIDAY);
+        clock.setDayOfMonth(3);
+        clock.setYear(2021);
+        clock.setAMPM(AM);
         alarm.setIsAlarmGoingOff(true);
         clock.setListOfAlarms(List.of(alarm));
         clock.getAlarmPanel().setActiveAlarm(alarm);

@@ -2,6 +2,7 @@ package com.example.clock;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.junit.After;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -16,7 +17,6 @@ import static com.example.clock.ClockPanel.*;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
-@RunWith(MockitoJUnitRunner.class)
 public class PanelTypeTest
 {
 	static { System.setProperty("appName", PanelTypeTest.class.getSimpleName()); }
@@ -30,6 +30,9 @@ public class PanelTypeTest
 
 	@Before
 	public void beforeEach() {}
+
+	@After
+	public void afterEach() {}
 
 	@Test
 	public void testClockFacesAreDifferent()

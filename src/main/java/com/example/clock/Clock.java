@@ -78,18 +78,9 @@ public class Clock extends JFrame
      * Default constructor for the Clock class.
      */
     Clock()
-    { super(); }
-
-    /**
-     * Main constructor for the Clock class.
-     * Initializes the clock with default settings, including setting the initial time,
-     * configuring the menu bar, setting up daylight savings time dates, and creating
-     * various clock panels. It also sets the clock's size, location, and icon.
-     */
-    Clock(boolean initialize)
     {
         super();
-        if (initialize) { initialize(); }
+        initialize();
     }
 
     /**
@@ -110,7 +101,7 @@ public class Clock extends JFrame
      */
     Clock(int hours, int minutes, int seconds, Month month, DayOfWeek dayOfWeek, int dayOfMonth, int year, String ampm) throws InvalidInputException
     {
-        this();
+        super();
         testingClock = true;
         initialize();
         if (seconds < 0 || seconds > 59 && seconds != 60) throw new IllegalArgumentException("Seconds must be between 0 and 59");
@@ -324,7 +315,7 @@ public class Clock extends JFrame
      * @return Runnable the runnable to update the time
      */
     Runnable updateOutdatedTime()
-    { return () -> shouldUpdateTime(null); }
+    { return () -> shouldUpdateTime(LocalDateTime.now()); }
 
     /**
      * Determines if the expected currentTime now is

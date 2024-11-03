@@ -2,9 +2,7 @@ package com.example.clock;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.junit.Before;
-import org.junit.BeforeClass;
-import org.junit.Test;
+import org.junit.*;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
@@ -12,13 +10,14 @@ import org.mockito.junit.MockitoJUnitRunner;
 import java.awt.event.ActionEvent;
 import java.awt.event.FocusEvent;
 import java.awt.event.MouseEvent;
+import java.awt.event.WindowEvent;
 import java.util.Arrays;
 
 import static com.example.clock.ClockConstants.*;
+import static javax.swing.WindowConstants.DISPOSE_ON_CLOSE;
 import static org.junit.Assert.*;
 import static org.mockito.Mockito.mock;
 
-@RunWith(MockitoJUnitRunner.class)
 public class TimerPanelTest
 {
     static { System.setProperty("appName", TimerPanelTest.class.getSimpleName()); }
@@ -37,9 +36,28 @@ public class TimerPanelTest
     @Before
     public void beforeEach()
     {
-        clock = new Clock(true);
+        clock = new Clock();
+        clock.setDefaultCloseOperation(DISPOSE_ON_CLOSE);
         timerPanel = clock.getTimerPanel();
         //MockitoAnnotations.initMocks(this);
+    }
+
+    @After
+    public void afterEach() {
+        if (clock != null) {
+            logger.info("Test complete. Closing the clock...");
+            // Create a WindowEvent with WINDOW_CLOSING event type
+            WindowEvent windowClosing = new WindowEvent(clock, WindowEvent.WINDOW_CLOSING);
+
+            // Dispatch the event to the JFrame instance
+            clock.dispatchEvent(windowClosing);
+
+            // Ensure the clock is no longer visible
+            assertFalse(clock.isVisible());
+
+            // Dispose of the JFrame to release resources
+            clock.dispose();
+        }
     }
 
     @Test
