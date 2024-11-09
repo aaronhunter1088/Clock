@@ -2,6 +2,10 @@ package com.example.clock;
 
 import java.awt.*;
 import java.text.SimpleDateFormat;
+import java.time.LocalDateTime;
+import java.time.ZoneOffset;
+import java.time.ZonedDateTime;
+import java.time.temporal.TemporalAccessor;
 import java.util.Date;
 import java.util.Locale;
 import javax.swing.JPanel;
@@ -135,18 +139,16 @@ public class AnalogueClockPanel extends JPanel implements IClockPanel, Runnable
     {
         logger.info("painting analogue clock panel");
         int xhour, yhour, xminute, yminute, xsecond, ysecond, second, minute, hour;
-        currentDate = java.util.Date.from(getClock().getDate().atTime(getClock().getHours(), getClock().getMinutes(), getClock().getSeconds())
-                .atZone(getClock().getTimezone())
-                .toInstant());
+
         if (clock.isShowDigitalTimeOnAnalogueClock())
         { setClockText(clock.getTimeAsStr()); }
         drawStructure(g);
         formatter.applyPattern("s");
-        second = Integer.parseInt(formatter.format(new Date()));
+        second = clock.getTime().getSecond();
         formatter.applyPattern("m");
-        minute = Integer.parseInt(formatter.format(currentDate));
+        minute = clock.getTime().getMinute();
         formatter.applyPattern("h");
-        hour = Integer.parseInt(formatter.format(currentDate));
+        hour = clock.getTime().getHour();
         xsecond = (int)(Math.cos(second * 3.14f / 30 - 3.14f / 2) * 120 + xcenter);
         ysecond = (int)(Math.sin(second * 3.14f / 30 - 3.14f / 2) * 120 + ycenter);
         xminute = (int)(Math.cos(minute * 3.14f / 30 - 3.14f / 2) * 100 + xcenter);
