@@ -30,8 +30,6 @@ public class AnalogueClockPanel extends JPanel implements IClockPanel, Runnable
     private GridBagLayout layout;
     private GridBagConstraints constraints;
     private Thread thread = null;
-    private SimpleDateFormat formatter;
-    private Date currentDate;
     private int xcenter = 175, ycenter = 175, lastxs = 0, lastys = 0, lastxm = 0, lastym = 0, lastxh = 0, lastyh = 0;
     private Clock clock;
     private String clockText = EMPTY;
@@ -43,7 +41,6 @@ public class AnalogueClockPanel extends JPanel implements IClockPanel, Runnable
     AnalogueClockPanel(Clock clock)
     {
         super();
-        formatter = new SimpleDateFormat("s", Locale.getDefault());
         setupDefaultActions(clock);
         logger.info("Finished creating AnalogueClock Panel");
     }
@@ -143,11 +140,8 @@ public class AnalogueClockPanel extends JPanel implements IClockPanel, Runnable
         if (clock.isShowDigitalTimeOnAnalogueClock())
         { setClockText(clock.getTimeAsStr()); }
         drawStructure(g);
-        formatter.applyPattern("s");
         second = clock.getTime().getSecond();
-        formatter.applyPattern("m");
         minute = clock.getTime().getMinute();
-        formatter.applyPattern("h");
         hour = clock.getTime().getHour();
         xsecond = (int)(Math.cos(second * 3.14f / 30 - 3.14f / 2) * 120 + xcenter);
         ysecond = (int)(Math.sin(second * 3.14f / 30 - 3.14f / 2) * 120 + ycenter);

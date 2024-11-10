@@ -18,10 +18,10 @@ import java.time.DayOfWeek;
 import java.util.List;
 import java.util.concurrent.*;
 
+import static com.example.clock.ClockPanel.*;
 import static java.lang.Thread.sleep;
-import static com.example.clock.ClockPanel.PANEL_ALARM;
-import static com.example.clock.ClockPanel.PANEL_TIMER;
 
+// TODO: Replace TimerPanel2 with TimerPanel when done
 /**
  * The New Timer Panel
  *
@@ -50,6 +50,7 @@ public class TimerPanel2 extends JPanel implements IClockPanel
     private JScrollPane scrollPane;
     private Clock clock;
     private JPanel setupTimerPanel;
+    private List<Timer> activeTimers;
 
     /**
      * Main constructor for creating the TimerPanel2
@@ -59,7 +60,7 @@ public class TimerPanel2 extends JPanel implements IClockPanel
     {
         super();
         this.clock = clock;
-        this.clock.setClockPanel(PANEL_ALARM);
+        this.clock.setClockPanel(PANEL_TIMER2);
         setSize(Clock.panelSize);
         this.layout = new GridBagLayout();
         setLayout(layout);
@@ -229,6 +230,7 @@ public class TimerPanel2 extends JPanel implements IClockPanel
 
         // setup textarea
         textArea = new JTextArea(2, 2);
+        textArea.setText("TextArea");
         textArea.setSize(new Dimension(100, 100));
         textArea.setFont(Clock.font10); // message
         textArea.setVisible(true);
@@ -414,6 +416,26 @@ public class TimerPanel2 extends JPanel implements IClockPanel
             logger.error("Music Player not set!");
             if (null == inputStream) printStackTrace(e, "An issue occurred while reading the alarm file.");
             else printStackTrace(e, "A JavaLayerException occurred: " + e.getMessage());
+        }
+    }
+
+    /**
+     * Checks if the timer has concluded
+     */
+    void checkIfTimerHasConcluded()
+    {
+        logger.info("check if timer has concluded");
+        ExecutorService executor = Executors.newCachedThreadPool();
+        boolean anyTimerIsGoingOff = activeTimers.stream().anyMatch(Timer::isTimerGoingOff);
+        if (anyTimerIsGoingOff)
+        {
+            activeTimers.parallelStream().forEach(timer -> {
+                if (timer.isTimerGoingOff())
+                {
+                    timer.triggerTimer(executor);
+                    timer.setTimerGoingOff(false);
+                }
+            });
         }
     }
 
@@ -761,7 +783,7 @@ public class TimerPanel2 extends JPanel implements IClockPanel
     public void addComponentsToPanel()
     {
         logger.info("addComponentsToPanel");
-        addComponent(setupTimerPanel,0,0,1,1,0,0,   GridBagConstraints.BOTH, new Insets(0,0,0,0)); // H
+        addComponent(setupTimerPanel,0,0,1,1,0,0, GridBagConstraints.BOTH, new Insets(0,0,0,0)); // H
         constraints.weighty = 4;
         constraints.weightx = 2;
         addComponent(scrollPane,1,6,2,4, 0,0, GridBagConstraints.BOTH, new Insets(1,1,1,1)); // textArea
@@ -859,6 +881,7 @@ public class TimerPanel2 extends JPanel implements IClockPanel
     JScrollPane getJScrollPane() { return this.scrollPane; }
     JTextArea getJTextArea() { return this.textArea; }
     AdvancedPlayer getMusicPlayer() { return musicPlayer; }
+    List<Timer> getActiveTimers() { return activeTimers; }
 
     /* Setters */
     protected void setGridBagLayout(GridBagLayout layout) { this.layout = layout; }
@@ -868,4 +891,5 @@ public class TimerPanel2 extends JPanel implements IClockPanel
     protected void setJTextArea(final JTextArea textArea) { this.textArea = textArea; }
     protected void setMusicPlayer(AdvancedPlayer musicPlayer) { this.musicPlayer = musicPlayer; }
     public void setClock(Clock clock) { this.clock = clock; }
+    public void setActiveTimers(List<Timer> activeTimers) { this.activeTimers = activeTimers; }
 }

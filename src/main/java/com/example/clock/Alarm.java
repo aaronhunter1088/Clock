@@ -19,7 +19,7 @@ import static com.example.clock.ClockConstants.*;
 public class Alarm
 {
     private static final Logger logger = LogManager.getLogger(Alarm.class);
-    private int minutes,hours;
+    private int hours, minutes;
     private String minutesAsStr,hoursAsStr,ampm;
     private List<DayOfWeek> days;
     boolean alarmGoingOff,updatingAlarm;

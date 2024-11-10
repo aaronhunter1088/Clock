@@ -80,6 +80,7 @@ public class ClockMenuBar extends JMenuBar
         setTimeZones(Arrays.asList(new JMenuItem(HAWAII), new JMenuItem(ALASKA),
                 new JMenuItem(PACIFIC), new JMenuItem(CENTRAL), new JMenuItem(EASTERN) ));
         getTimezones().forEach(this::setupTimezone);
+        refreshTimezones();
         setCurrentTimeZone();
 
         // Features menu choices
@@ -215,19 +216,29 @@ public class ClockMenuBar extends JMenuBar
     void setCurrentTimeZone()
     {
         ZoneId currentTimezone = clock.getTimezone();
-        timezones.forEach(timezone -> {
-            if (timezone.getText().equals(clock.getPlainTimezoneFromZoneId(currentTimezone))) {
-                if (!timezone.getText().contains(STAR)) {
-                    timezone.setText(timezone.getText()+SPACE+STAR);
+        timezones.forEach(jMenuItemTimeZone -> {
+            if (jMenuItemTimeZone.getText().equals(clock.getPlainTimezoneFromZoneId(currentTimezone))) {
+                if (!jMenuItemTimeZone.getText().contains(STAR)) {
+                    jMenuItemTimeZone.setText(jMenuItemTimeZone.getText()+SPACE+STAR);
                 } else {
                     logger.info("selected timezone already has *");
                     logger.info("no change to timezone: {}", clock.getPlainTimezoneFromZoneId(currentTimezone));
                 }
             } else {
-                var tzName = timezone.getText().replace(STAR,EMPTY).trim();
-                timezone.setText(tzName);
+                var tzName = jMenuItemTimeZone.getText().replace(STAR,EMPTY).trim();
+                jMenuItemTimeZone.setText(tzName);
             }
         });
+    }
+
+    /**
+     * Refreshes each timezone menu item by removing the star
+     */
+    void refreshTimezones()
+    {
+        timezones.forEach(jMenuItemTimeZone ->
+            jMenuItemTimeZone.setText(jMenuItemTimeZone.getText().replace(STAR,EMPTY).trim())
+        );
     }
 
     /**
