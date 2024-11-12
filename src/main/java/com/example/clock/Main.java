@@ -1,15 +1,9 @@
 package com.example.clock;
 
 import javax.swing.*;
-
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-
-import static com.example.clock.ClockConstants.AM;
-import static com.example.clock.ClockConstants.PM;
-import static java.lang.Thread.sleep;
-import static java.time.DayOfWeek.*;
-import static java.time.Month.*;
+import java.util.concurrent.TimeUnit;
 
 /**
  * Main application to start Clock
@@ -27,7 +21,6 @@ public class Main
      * @param args command line arguments
      * @throws InvalidInputException if there is an invalid input
      */
-    @SuppressWarnings({"BusyWait", "InfiniteLoopStatement"})
     public static void main(String[] args) throws InvalidInputException
     {
         logger.info("Starting Clock...");
@@ -36,30 +29,18 @@ public class Main
         new Clock(1, 59, 50, MARCH, SUNDAY, 10, 2024, AM); // for testing DST on
         new Clock(1, 59, 50, NOVEMBER, SUNDAY, 3, 2024, AM); // for testing DST off
         */
-        SwingUtilities.invokeLater(() -> SwingUtilities.updateComponentTreeUI(clock));
-        try
-        {
-            while (true)
-            {
-                clock.tick();
-                sleep(250);
-                // check alarms
-                clock.getAlarmPanel().checkIfAnyAlarmsAreGoingOff();
-                // check timers
-                clock.getTimerPanel().checkIfTimerHasConcluded();
-                sleep(250);
-                if (clock.isNewYear())
-                {
-                    clock.setIsNewYear(false);
-                    logger.info("Happy New Year. Here's wishing you a healthy, productive {}.", clock.getYear());
-                }
-                sleep(250);
-                clock.setTheCurrentTime();
-                sleep(250);
+        SwingUtilities.invokeLater(() -> {
+            try {
+                clock.getScheduler().scheduleAtFixedRate(clock::tick, 0, 1, TimeUnit.SECONDS);
+                clock.getScheduler().scheduleAtFixedRate(clock.getAlarmPanel()::checkIfAnyAlarmsAreGoingOff, 0, 1, TimeUnit.SECONDS);
+                clock.getScheduler().scheduleAtFixedRate(clock.getTimerPanel2()::checkIfAnyTimersAreGoingOff, 0, 1, TimeUnit.SECONDS);
+                clock.getScheduler().scheduleAtFixedRate(clock::checkIfItIsNewYears, 0, 1, TimeUnit.SECONDS);
+                clock.getScheduler().scheduleAtFixedRate(clock::setTheCurrentTime, 0, 1, TimeUnit.SECONDS);
+            } catch (Exception e) {
+                logger.error("Error in Clock: ", e);
             }
-        }
-        catch (Exception e)
-        { logger.error("Exception in clock: {}", e.getMessage()); }
+        });
+        Runtime.getRuntime().addShutdownHook(new Thread(() -> logger.info("Closing Clock")));
     }
 
 }

@@ -557,7 +557,7 @@ public class AlarmPanel extends JPanel implements IClockPanel
 
     void checkIfAnyAlarmsAreGoingOff()
     {
-        logger.info("check if any alarms are going off");
+        logger.info("checking if any alarms are going off");
         // alarm has reference to time
         // check all alarms
         // if any alarm matches clock's time, an alarm should be going off

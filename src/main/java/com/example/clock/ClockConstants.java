@@ -33,6 +33,7 @@ public interface ClockConstants
     String PM = "PM";
     String S = "S";
     String No_Alarms = "No Alarms";
+    String No_Timers = "No Timers";
     String is_going_off = "is going off!";
     String MIDNIGHT_STANDARD_TIME = "12:00:00 AM";
     String MIDNIGHT_MILITARY_TIME = "2400 hours 00"; // check on 0000 hours 00
@@ -58,6 +59,7 @@ public interface ClockConstants
 
     // Timer
     String SET = "Set";
+    String TIMER = "Timer";
     String VIEW_TIMER = "View Timer";
     String RESUME_TIMER = "Resume Timer";
     String PAUSE_TIMER = "Pause Timer";
@@ -70,6 +72,7 @@ public interface ClockConstants
     String TIMER_HOUR_ERROR = "0 <= "+HOUR+" > 24";
     String TIMER_MIN_ERROR = "0 <= "+MIN+" > 60";
     String TIMER_SEC_ERROR = "0 <= "+SEC+" > 60";
+    String CURRENT_TIMERS = "Current Timers";
 
     // Alarm
     String SET_ALARMS = "Set Alarms";
