@@ -1,8 +1,13 @@
-package com.example.clock;
+package clock.panel;
 
+import clock.contract.IClockPanel;
+import clock.entity.Alarm;
+import clock.entity.Clock;
+import clock.entity.Timer;
+import clock.exception.InvalidInputException;
 import javazoom.jl.decoder.JavaLayerException;
 import javazoom.jl.player.advanced.AdvancedPlayer;
-import org.apache.commons.lang.math.NumberUtils;
+import org.apache.commons.lang3.math.NumberUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -13,13 +18,13 @@ import java.awt.event.ActionEvent;
 import java.awt.event.FocusEvent;
 import java.awt.event.FocusListener;
 import java.io.InputStream;
-import java.text.ParseException;
-import java.time.DayOfWeek;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.*;
 
-import static com.example.clock.ClockPanel.*;
+import static clock.panel.ClockPanel.*;
 import static java.lang.Thread.sleep;
 
 // TODO: Replace TimerPanel2 with TimerPanel when done
@@ -41,23 +46,23 @@ public class TimerPanel2 extends JPanel implements IClockPanel
                        secondField;
     private JButton timerButton;
     private JButton resetButton;
-    //private boolean timerGoingOff;
+    private JButton stopButton;
     private boolean disableTimerFunctionality;
     private AdvancedPlayer musicPlayer;
+    private Map<Timer, ScheduledFuture<?>> timersAndFutures;
     //private ScheduledExecutorService scheduler;
-    //private ScheduledFuture<?> countdownFuture;
 
     private JTextArea textArea;
     private JScrollPane scrollPane;
     private Clock clock;
     private JPanel setupTimerPanel;
-    private List<Timer> activeTimers;
+    private List<clock.entity.Timer> activeTimers;
 
     /**
      * Main constructor for creating the TimerPanel2
      * @param clock the clock object reference
      */
-    TimerPanel2(Clock clock)
+    public TimerPanel2(Clock clock)
     {
         super();
         this.clock = clock;
@@ -78,7 +83,7 @@ public class TimerPanel2 extends JPanel implements IClockPanel
     /**
      * Adds all the components to the TimerPanel2
      */
-    void setupTimerPanel2()
+    public void setupTimerPanel2()
     {
         logger.info("setup TimerPanel2");
         setupTimerPanel = new JPanel();
@@ -113,17 +118,12 @@ public class TimerPanel2 extends JPanel implements IClockPanel
                         hourField.grabFocus();
                     }
                 }
-                if (!validateSecondTextField())
+                else if (!validateFirstTextField())
                 {
-                    SwingUtilities.invokeLater(() -> minuteField.grabFocus());
+                    SwingUtilities.invokeLater(() -> hourField.grabFocus());
                     timerButton.setEnabled(false);
                 }
-                else if (!validateThirdTextField())
-                {
-                    secondField.grabFocus();
-                    timerButton.setEnabled(false);
-                }
-                else
+                else if (validTextFields())
                 { enableTimerButton(); }
             }
         });
@@ -155,13 +155,13 @@ public class TimerPanel2 extends JPanel implements IClockPanel
                         minuteField.grabFocus();
                     }
                 }
-                if (!validateFirstTextField())
+                else if (!validateSecondTextField())
                 {
-                    hourField.grabFocus();
+                    SwingUtilities.invokeLater(() -> minuteField.grabFocus());
                     timerButton.setEnabled(false);
-                } else {
-                    enableTimerButton();
                 }
+                else if (validTextFields())
+                { enableTimerButton(); }
             }
         });
         secondField.addFocusListener(new FocusListener(){
@@ -192,17 +192,12 @@ public class TimerPanel2 extends JPanel implements IClockPanel
                         secondField.grabFocus();
                     }
                 }
-                if (!validateFirstTextField())
+                else if (!validateThirdTextField())
                 {
-                    hourField.grabFocus();
+                    SwingUtilities.invokeLater(() -> secondField.grabFocus());
                     timerButton.setEnabled(false);
                 }
-                else if (!validateSecondTextField())
-                {
-                    minuteField.grabFocus();
-                    timerButton.setEnabled(false);
-                }
-                else
+                else if (validTextFields())
                 { enableTimerButton(); }
             }
         });
@@ -213,6 +208,7 @@ public class TimerPanel2 extends JPanel implements IClockPanel
         });
         timerButton = new JButton(SET);
         resetButton = new JButton(RESET);
+        stopButton = new JButton(STOP);
         List.of(timerButton, resetButton).forEach(button -> {
             button.setFont(Clock.font20);
             button.setOpaque(true);
@@ -220,9 +216,11 @@ public class TimerPanel2 extends JPanel implements IClockPanel
             button.setForeground(Color.WHITE);
             button.setBorder(new LineBorder(Color.WHITE));
         });
+        stopButton.addActionListener(this::stopAllTimers);
         timerButton.addActionListener(this::run);
-        resetButton.addActionListener(this::resetTimerPanel);
         timerButton.setEnabled(false);
+        resetButton.addActionListener(this::resetTimerPanel);
+        resetButton.setEnabled(false);
         setBackground(Color.BLACK);
         alarmLabel4 = new JLabel(CURRENT_ALARMS, SwingConstants.CENTER); // Current Alarms
         alarmLabel4.setFont(Clock.font20); // All Alarms
@@ -252,13 +250,14 @@ public class TimerPanel2 extends JPanel implements IClockPanel
         alarmLabel4.setForeground(Color.WHITE);
 
         //scheduler = Executors.newScheduledThreadPool(10);
+        timersAndFutures = new HashMap<>();
         activeTimers = new ArrayList<>();
     }
 
     /**
      * Enables the timer button if the text fields are valid
      */
-    void enableTimerButton()
+    public void enableTimerButton()
     {
         logger.debug("enable timer button");
         var allValid = validateFirstTextField() && validateSecondTextField() && validateThirdTextField();
@@ -271,12 +270,12 @@ public class TimerPanel2 extends JPanel implements IClockPanel
      * Executes when we hit the timer button
      * @param action the action event
      */
-    void run(ActionEvent action)
+    public void run(ActionEvent action)
     {
         logger.info("run");
         if (SET.equals(timerButton.getText()))
         {
-            Timer timer = createTimer();
+            clock.entity.Timer timer = createTimer();
             logger.info("timer created: {}", timer);
             startTimer(timer);
             clearTextFields();
@@ -292,12 +291,14 @@ public class TimerPanel2 extends JPanel implements IClockPanel
     /**
      * Starts the timer
      */
-    void startTimer(Timer timer)
+    public void startTimer(clock.entity.Timer timer)
     {
         logger.info("starting countdown");
-        clock.getScheduler().scheduleAtFixedRate(timer::performCountDown, 0, 1, TimeUnit.SECONDS);
-        if (!activeTimers.isEmpty()) {
-            clock.getScheduler().scheduleAtFixedRate(this::resetJTextArea, 0, 1, TimeUnit.SECONDS);
+        ScheduledFuture<?> future = clock.getScheduler().scheduleAtFixedRate(timer::performCountDown, 0, 1, TimeUnit.SECONDS);
+        timersAndFutures.put(timer, future);
+        if (!activeTimers.isEmpty() && clock.getCountdownFuture() == null) {
+            future = clock.getScheduler().scheduleAtFixedRate(this::resetJTextArea, 0, 1, TimeUnit.SECONDS);
+            clock.setCountdownFuture(future);
         }
         //scheduler = Executors.newScheduledThreadPool(activeTimers.size());
         //scheduler.scheduleAtFixedRate(this::performCountDown, 0, 1, TimeUnit.SECONDS);
@@ -310,17 +311,17 @@ public class TimerPanel2 extends JPanel implements IClockPanel
     /**
      * Creates a new Timer
      */
-    public Timer createTimer()
+    public clock.entity.Timer createTimer()
     {
         logger.info("creating timer");
-        Timer timer = null;
+        clock.entity.Timer timer = null;
         try
         {
             if (validTextFields()) {
                 if (HOUR.equals(hourField.getText())) hourField.setText(ZERO);
                 if (MIN.equals(minuteField.getText())) minuteField.setText(ZERO);
                 if (SEC.equals(secondField.getText())) secondField.setText(ZERO);
-                timer = new Timer(Integer.parseInt(hourField.getText()), Integer.parseInt(minuteField.getText()), Integer.parseInt(secondField.getText()), clock);
+                timer = new clock.entity.Timer(Integer.parseInt(hourField.getText()), Integer.parseInt(minuteField.getText()), Integer.parseInt(secondField.getText()), clock);
                 activeTimers.add(timer);
                 resetJTextArea();
                 resetJAlarmLabel4();
@@ -338,20 +339,30 @@ public class TimerPanel2 extends JPanel implements IClockPanel
     /**
      * Stops a Timer. Currently only the Timer can call this
      */
-    public void stopTimer()
+    public void stopTimer(clock.entity.Timer timer)
     {
         logger.info("stopping timer");
-        //if (countdownFuture != null && !countdownFuture.isCancelled())
-        //{ countdownFuture.cancel(true); }
-        if (clock.getScheduler() != null && !clock.getScheduler().isShutdown())
-        { clock.getScheduler().shutdown(); }
-        enableTimerButton();
+        if (clock.getCountdownFuture() != null && !clock.getCountdownFuture().isCancelled())
+        { clock.getCountdownFuture().cancel(true); }
+        timer.setTimerGoingOff(false);
+        timer.setStopTimer(true);
+        //if (clock.getScheduler() != null && !clock.getScheduler().isShutdown())
+        //{ clock.getScheduler().shutdown(); }
+        //enableTimerButton();
+    }
+
+    public void stopAllTimers(ActionEvent actionEvent)
+    {
+        activeTimers.stream()
+                .parallel()
+                .filter(Timer::isHasBeenTriggered)
+                .forEach(this::stopTimer);
     }
 
     /**
      * Pauses the timer
      */
-    void pauseTimer()
+    public void pauseTimer()
     {
         logger.info("pausing timer");
         timerButton.setText(RESUME_TIMER);
@@ -363,7 +374,7 @@ public class TimerPanel2 extends JPanel implements IClockPanel
     /**
      * Resumes an active timer
      */
-    void resumeTimer()
+    public void resumeTimer()
     {
         logger.info("resuming timer");
         timerButton.setText(PAUSE_TIMER);
@@ -377,7 +388,7 @@ public class TimerPanel2 extends JPanel implements IClockPanel
      * If disableTimerFunctionality is true, then we will
      * not countdown any timers.
      */
-    void performCountDown()
+    public void performCountDown()
     {
         if (disableTimerFunctionality) return;
         else
@@ -398,18 +409,18 @@ public class TimerPanel2 extends JPanel implements IClockPanel
      * Resets the timer panel
      * @param action the action event
      */
-    void resetTimerPanel(ActionEvent action)
+    public void resetTimerPanel(ActionEvent action)
     {
         logger.info("reset timer fields");
         clearTextFields();
         resetButton.setEnabled(false);
-        stopTimer();
+        timerButton.setEnabled(false);
     }
 
     /**
      * Sets the textFields to their beginning state
      */
-    void clearTextFields()
+    public void clearTextFields()
     {
         hourField.setText(HOUR);
         minuteField.setText(MIN);
@@ -420,7 +431,7 @@ public class TimerPanel2 extends JPanel implements IClockPanel
     /**
      * Defines the music player object
      */
-    void setupMusicPlayer()
+    public void setupMusicPlayer()
     {
         logger.info("setup music player");
         InputStream inputStream = null;
@@ -438,32 +449,43 @@ public class TimerPanel2 extends JPanel implements IClockPanel
         }
     }
 
+    /* TODO: Rework. Logic should be as follows:
+    ?? What happens when two timers are going off at the same time?
+     */
     /**
      * Checks if the timer has concluded
      */
-    void checkIfAnyTimersAreGoingOff()
+    public void checkIfAnyTimersAreGoingOff()
     {
         logger.info("checking if any timers are going off");
-        ExecutorService executor = Executors.newCachedThreadPool();
         boolean anyTimerIsGoingOff = activeTimers.stream().anyMatch(Timer::isTimerGoingOff);
         if (anyTimerIsGoingOff)
         {
+            //List<Timer> toBeRemoved = new ArrayList<>();
+            //timer.setTimerGoingOff(false);
+            //toBeRemoved.add(timer);
+            //clock.getTimerPanel2().stopTimer(timer);
+            //ScheduledFuture<?> future = clock.getScheduler().scheduleAtFixedRate(timer::performCountDown, 0, 1, TimeUnit.SECONDS);
+
             activeTimers.stream()
                 .parallel()
+                .filter(Timer::isTimerGoingOff)
+                .filter(Timer::isHasBeenTriggered)
                 .forEach(timer -> {
-                    if (timer.isTimerGoingOff())
-                    {
-                        timer.triggerTimer(executor);
-                        timer.setTimerGoingOff(false);
+                    if (timersAndFutures.get(timer) == null) {
+                        logger.info("timer does not exist in timersAndFutures");
+                        var future = clock.getScheduler().scheduleAtFixedRate(timer::triggerTimer, 0, 1, TimeUnit.SECONDS);
+                        clock.getTimerPanel2().getTimersAndFutures().put(timer, future);
                     }
-            });
+                });
+            //activeTimers.removeAll(toBeRemoved);
         }
     }
 
     /**
      * Resets alarm label 4
      */
-    void resetJAlarmLabel4()
+    public void resetJAlarmLabel4()
     {
         logger.info("reset alarm label 4");
         if (activeTimers.isEmpty())
@@ -472,7 +494,7 @@ public class TimerPanel2 extends JPanel implements IClockPanel
         {
             alarmLabel4.setText(activeTimers.size() == 1
                             ? activeTimers.size() + SPACE+TIMER+SPACE+ADDED
-                            : activeTimers.size() + SPACE+TIMER+S+SPACE+ADDED
+                            : activeTimers.size() + SPACE+TIMER+S.toLowerCase()+SPACE+ADDED
             );
         }
     }
@@ -481,7 +503,7 @@ public class TimerPanel2 extends JPanel implements IClockPanel
      * Validates the first text field
      * @return true if the text field is valid
      */
-    boolean validateFirstTextField()
+    public boolean validateFirstTextField()
     {
         boolean result;
         if (HOUR.equals(hourField.getText())) { result = true; }
@@ -499,7 +521,7 @@ public class TimerPanel2 extends JPanel implements IClockPanel
      * Validates the second text field
      * @return true if the text field is valid
      */
-    boolean validateSecondTextField()
+    public boolean validateSecondTextField()
     {
         boolean result;
         if (MIN.equals(minuteField.getText())) { result = true; }
@@ -516,7 +538,7 @@ public class TimerPanel2 extends JPanel implements IClockPanel
      * Validates the third text field
      * @return true if the text field is valid
      */
-    boolean validateThirdTextField()
+    public boolean validateThirdTextField()
     {
         boolean result;
         if (SEC.equals(secondField.getText())) { result = true; }
@@ -530,7 +552,7 @@ public class TimerPanel2 extends JPanel implements IClockPanel
         return result;
     }
 
-    boolean validTextFields()
+    public boolean validTextFields()
     { return validateFirstTextField() && validateSecondTextField() && validateThirdTextField(); }
 
     // TODO: Update for Timers
@@ -538,7 +560,7 @@ public class TimerPanel2 extends JPanel implements IClockPanel
      * Adds the alarm to the menu
      * @param alarm the alarm to set
      */
-    void addAlarmToAlarmMenu(Alarm alarm)
+    public void addAlarmToAlarmMenu(Alarm alarm)
     {
         logger.info("adding alarm to alarm menu");
         JMenuItem alarmItem = new JMenuItem(alarm.toString());
@@ -554,7 +576,7 @@ public class TimerPanel2 extends JPanel implements IClockPanel
      * Removes an alarm from the list in the menu
      * @param alarm the alarm to remove
      */
-    void deleteAlarmMenuItemFromViewAlarms(Alarm alarm)
+    public void deleteAlarmMenuItemFromViewAlarms(Alarm alarm)
     {
         logger.info("delete alarm menu item from view alarms");
         logger.info("Size of viewAlarms before removal {}", clock.getClockMenuBar().getAlarmFeature_Menu().getItemCount());
@@ -569,11 +591,11 @@ public class TimerPanel2 extends JPanel implements IClockPanel
     /**
      * Resets the text area
      */
-    void resetJTextArea()
+    public void resetJTextArea()
     {
         logger.info("reset textarea");
         textArea.setText(EMPTY);
-        for(Timer timer : activeTimers)
+        for(clock.entity.Timer timer : activeTimers)
         {
             if (!textArea.getText().isEmpty())
             { textArea.append(NEWLINE); }
@@ -586,7 +608,7 @@ public class TimerPanel2 extends JPanel implements IClockPanel
      * Sets an alarm to go off
      * @param executor the executor service
      */
-    void triggerAlarm(ExecutorService executor)
+    public void triggerAlarm(ExecutorService executor)
     {
         logger.info("trigger timer");
         // TODO: Update for Timer
@@ -636,7 +658,7 @@ public class TimerPanel2 extends JPanel implements IClockPanel
     /**
      * Adds alarms created to the menu
      */
-    void setupAlarmsInMenuFunctionality()
+    public void setupAlarmsInMenuFunctionality()
     {
         // get the view alarms menu
         // for each except the Set Alarms (option1)
@@ -720,7 +742,7 @@ public class TimerPanel2 extends JPanel implements IClockPanel
      * that may occur when the digital panel is in use.
      * @param e the exception
      */
-    void printStackTrace(Exception e)
+    public void printStackTrace(Exception e)
     { printStackTrace(e, ""); }
 
     /**
@@ -751,6 +773,7 @@ public class TimerPanel2 extends JPanel implements IClockPanel
         addComponentToSetupTimerPanel(secondField, 0,2,1,1,0,0, GridBagConstraints.HORIZONTAL); // TextField 3
         addComponentToSetupTimerPanel(resetButton, 1, 0, 3, 1, 0, 0, GridBagConstraints.HORIZONTAL); // Reset Button
         addComponentToSetupTimerPanel(timerButton, 2,0,3,1,0,0, GridBagConstraints.HORIZONTAL); // Set Timer Button
+        addComponentToSetupTimerPanel(stopButton, 3, 0, 3, 1, 0, 0, 2); // horizontal
     }
 
     /**
@@ -765,7 +788,7 @@ public class TimerPanel2 extends JPanel implements IClockPanel
      * @param ipady     the y padding
      * @param fill      the fill
      */
-    void addComponentToSetupTimerPanel(Component cpt, int gridy, int gridx, double gwidth, double gheight, int ipadx, int ipady, int fill)
+    public void addComponentToSetupTimerPanel(Component cpt, int gridy, int gridx, double gwidth, double gheight, int ipadx, int ipady, int fill)
     {
         logger.debug("add component");
         constraints.gridx = gridx;
@@ -795,7 +818,7 @@ public class TimerPanel2 extends JPanel implements IClockPanel
      * @param fill      the fill
      * @param insets    the insets
      */
-    void addComponent(Component cpt, int gridy, int gridx, double gwidth, double gheight,
+    public void addComponent(Component cpt, int gridy, int gridx, double gwidth, double gheight,
                       int ipadx, int ipady, int fill, Insets insets)
     {
         constraints.gridx = gridx;
@@ -821,20 +844,21 @@ public class TimerPanel2 extends JPanel implements IClockPanel
     }
 
     /* Getters */
-    GridBagLayout getGridBagLayout() { return this.layout; }
-    GridBagConstraints getGridBagConstraints() { return this.constraints; }
-    Clock getClock() { return this.clock; }
-    JLabel getJAlarmLbl4() { return this.alarmLabel4; } // All alarms
-    JScrollPane getJScrollPane() { return this.scrollPane; }
-    JTextArea getJTextArea() { return this.textArea; }
-    AdvancedPlayer getMusicPlayer() { return musicPlayer; }
-    List<Timer> getActiveTimers() { return activeTimers; }
+    public GridBagLayout getGridBagLayout() { return this.layout; }
+    public GridBagConstraints getGridBagConstraints() { return this.constraints; }
+    public Clock getClock() { return this.clock; }
+    public JLabel getJAlarmLbl4() { return this.alarmLabel4; } // All alarms
+    public JScrollPane getJScrollPane() { return this.scrollPane; }
+    public JTextArea getJTextArea() { return this.textArea; }
+    public AdvancedPlayer getMusicPlayer() { return musicPlayer; }
+    public List<clock.entity.Timer> getActiveTimers() { return activeTimers; }
     public boolean isDisableTimerFunctionality() { return disableTimerFunctionality; }
     public JTextField getHourField() { return hourField; }
     public JTextField getMinuteField() { return minuteField; }
     public JTextField getSecondField() { return secondField; }
     public JButton getResetButton() { return resetButton; }
     public JButton getTimerButton() { return timerButton; }
+    public Map<clock.entity.Timer, ScheduledFuture<?>> getTimersAndFutures() { return timersAndFutures; }
 
     /* Setters */
     protected void setGridBagLayout(GridBagLayout layout) { this.layout = layout; }
@@ -844,7 +868,7 @@ public class TimerPanel2 extends JPanel implements IClockPanel
     protected void setJTextArea(final JTextArea textArea) { this.textArea = textArea; }
     protected void setMusicPlayer(AdvancedPlayer musicPlayer) { this.musicPlayer = musicPlayer; }
     public void setClock(Clock clock) { this.clock = clock; }
-    public void setActiveTimers(List<Timer> activeTimers) { this.activeTimers = activeTimers; }
+    public void setActiveTimers(List<clock.entity.Timer> activeTimers) { this.activeTimers = activeTimers; }
     public void setHourField(JTextField hourField) { this.hourField = hourField; }
     public void setMinuteField(JTextField minuteField) { this.minuteField = minuteField; }
     public void setSecondField(JTextField secondField) { this.secondField = secondField; }

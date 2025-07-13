@@ -1,4 +1,4 @@
-package com.example.clock;
+package clock.contract;
 
 /**
  * Constants for Clock application
@@ -34,7 +34,9 @@ public interface ClockConstants
     String S = "S";
     String No_Alarms = "No Alarms";
     String No_Timers = "No Timers";
-    String is_going_off = "is going off!";
+    String is = "is";
+    String are = "are";
+    String going_off = "going off!";
     String MIDNIGHT_STANDARD_TIME = "12:00:00 AM";
     String MIDNIGHT_MILITARY_TIME = "2400 hours 00"; // check on 0000 hours 00
 
@@ -64,6 +66,7 @@ public interface ClockConstants
     String RESUME_TIMER = "Resume Timer";
     String PAUSE_TIMER = "Pause Timer";
     String RESET = "Reset";
+    String STOP = "Stop";
     String COMPLETE = "Complete";
     String HOUR = "Hour";
     String MIN = "Min";

@@ -1,8 +1,10 @@
-package com.example.clock;
+package clock.panel;
 
+import clock.contract.IClockPanel;
+import clock.entity.Clock;
 import javazoom.jl.decoder.JavaLayerException;
 import javazoom.jl.player.advanced.AdvancedPlayer;
-import org.apache.commons.lang.math.NumberUtils;
+import org.apache.commons.lang3.math.NumberUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -15,7 +17,7 @@ import java.io.InputStream;
 import java.util.concurrent.*;
 
 import static java.lang.Thread.sleep;
-import static com.example.clock.ClockPanel.PANEL_TIMER;
+import static clock.panel.ClockPanel.PANEL_TIMER;
 
 /**
  * This is the Timer panel.
@@ -49,7 +51,7 @@ public class TimerPanel extends JPanel implements IClockPanel
      * The main constructor for the Timer Panel
      * @param clock the clock reference
      */
-    TimerPanel(Clock clock) {
+    public TimerPanel(Clock clock) {
         super();
         this.clock = clock;
         this.clock.setClockPanel(PANEL_TIMER);
@@ -307,7 +309,7 @@ public class TimerPanel extends JPanel implements IClockPanel
     /**
      * Starts the timer
      */
-    void startTimer()
+    public void startTimer()
     {
         logger.info("starting timer");
         timerButton.setText(PAUSE_TIMER);
@@ -337,7 +339,7 @@ public class TimerPanel extends JPanel implements IClockPanel
     /**
      * Pauses the timer
      */
-    void pauseTimer()
+    public void pauseTimer()
     {
         logger.info("pausing timer");
         timerButton.setText(RESUME_TIMER);
@@ -349,7 +351,7 @@ public class TimerPanel extends JPanel implements IClockPanel
     /**
      * Resumes an active timer
      */
-    void resumeTimer()
+    public void resumeTimer()
     {
         logger.info("resuming timer");
         timerButton.setText(PAUSE_TIMER);
@@ -361,7 +363,7 @@ public class TimerPanel extends JPanel implements IClockPanel
     /**
      * This method performs the countdown for the timer
      */
-    void performCountDown()
+    public void performCountDown()
     {
         if (paused) return;
         else
@@ -417,7 +419,7 @@ public class TimerPanel extends JPanel implements IClockPanel
      * Resets the timer panel
      * @param action the action event
      */
-    void resetTimerPanel(ActionEvent action)
+    public void resetTimerPanel(ActionEvent action)
     {
         logger.info("reset timer fields");
         hourField.setText(HOUR);
@@ -470,7 +472,7 @@ public class TimerPanel extends JPanel implements IClockPanel
      * @param ipady     the y padding
      * @param fill      the fill
      */
-    void addComponent(Component cpt, int gridy, int gridx, double gwidth, double gheight, int ipadx, int ipady, int fill)
+    public void addComponent(Component cpt, int gridy, int gridx, double gwidth, double gheight, int ipadx, int ipady, int fill)
     {
         logger.debug("add component");
         constraints.gridx = gridx;
@@ -490,7 +492,7 @@ public class TimerPanel extends JPanel implements IClockPanel
     /**
      * Checks if the timer has concluded
      */
-    void checkIfTimerHasConcluded()
+    public void checkIfTimerHasConcluded()
     {
         logger.info("check if timer has concluded");
         ExecutorService executor = Executors.newCachedThreadPool();
@@ -505,7 +507,7 @@ public class TimerPanel extends JPanel implements IClockPanel
      * Triggers the sound for the timer
      * @param executor the executor service
      */
-    void triggerSound(ExecutorService executor)
+    public void triggerSound(ExecutorService executor)
     {
         logger.info("triggering timer sound");
         timerGoingOff = true;
@@ -543,7 +545,7 @@ public class TimerPanel extends JPanel implements IClockPanel
     /**
      * Stops the sound from playing
      */
-    void stopSound()
+    public void stopSound()
     {
         logger.info("stop sound");
         musicPlayer = null;
@@ -555,7 +557,7 @@ public class TimerPanel extends JPanel implements IClockPanel
     /**
      * Places focus on textField1
      */
-    void updateLabels()
+    public void updateLabels()
     {
         logger.info("update textField1");
         hourField.grabFocus();
@@ -566,7 +568,7 @@ public class TimerPanel extends JPanel implements IClockPanel
      * Executes when we hit the timer button
      * @param action the action event
      */
-    void run(ActionEvent action)
+    public void run(ActionEvent action)
     {
         logger.info("run");
         if (SET.equals(timerButton.getText()))
@@ -580,7 +582,7 @@ public class TimerPanel extends JPanel implements IClockPanel
     /**
      * Sets up the music player for the timer panel
      */
-    void setupMusicPlayer()
+    public void setupMusicPlayer()
     {
         logger.info("setup music player");
         InputStream inputStream;
@@ -611,16 +613,16 @@ public class TimerPanel extends JPanel implements IClockPanel
     }
 
     /* Getters */
-    JTextField getHourField() { return this.hourField; }
-    JTextField getMinuteField() { return this.minuteField; }
-    JTextField getSecondField() { return this.secondField; }
-    JButton getTimerButton() { return this.timerButton; }
-    JButton getResetButton() { return this.resetButton; }
-    boolean isTimerGoingOff() { return timerGoingOff; }
-    AdvancedPlayer getMusicPlayer() { return musicPlayer; }
-    boolean isPaused() { return paused; }
-    ScheduledExecutorService getScheduler() { return scheduler; }
-    ScheduledFuture<?> getCountdownFuture() { return countdownFuture; }
+    public JTextField getHourField() { return this.hourField; }
+    public JTextField getMinuteField() { return this.minuteField; }
+    public JTextField getSecondField() { return this.secondField; }
+    public JButton getTimerButton() { return this.timerButton; }
+    public JButton getResetButton() { return this.resetButton; }
+    public boolean isTimerGoingOff() { return timerGoingOff; }
+    public AdvancedPlayer getMusicPlayer() { return musicPlayer; }
+    public boolean isPaused() { return paused; }
+    public ScheduledExecutorService getScheduler() { return scheduler; }
+    public ScheduledFuture<?> getCountdownFuture() { return countdownFuture; }
 
     /* Setters */
     protected void setTimerGoingOff(boolean timerGoingOff) { this.timerGoingOff = timerGoingOff; }

@@ -1,12 +1,15 @@
-package com.example.clock;
+package clock.panel;
 
+import clock.contract.IClockPanel;
+import clock.entity.Clock;
+import clock.entity.Timer;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import javax.swing.*;
 import java.awt.*;
 
-import static com.example.clock.ClockPanel.PANEL_DIGITAL_CLOCK;
+import static clock.panel.ClockPanel.PANEL_DIGITAL_CLOCK;
 
 /**
  * The DigitalClockPanel is the main panel and is
@@ -19,7 +22,7 @@ import static com.example.clock.ClockPanel.PANEL_DIGITAL_CLOCK;
  * @author michael ball
 *  @version 2.8
  */
-class DigitalClockPanel extends JPanel implements IClockPanel
+public class DigitalClockPanel extends JPanel implements IClockPanel
 {
     private static final Logger logger = LogManager.getLogger(DigitalClockPanel.class);
     private GridBagLayout layout;
@@ -33,7 +36,7 @@ class DigitalClockPanel extends JPanel implements IClockPanel
      * The main constructor for the digital clock panel
      * @param clock the clock object reference
      */
-    DigitalClockPanel(Clock clock)
+    public DigitalClockPanel(Clock clock)
     {
         super();
         this.clock = clock;
@@ -142,15 +145,24 @@ class DigitalClockPanel extends JPanel implements IClockPanel
      * This method updates the labels on the digital
      * clock panel.
      */
-    void updateLabels()
+    public void updateLabels()
     {
         logger.info("updateLabels");
         label1.setForeground(Color.WHITE);
         label2.setForeground(Color.WHITE);
+        // Show which alarm is going off
         if (clock.getAlarmPanel().getActiveAlarm() != null)
         {
             label1.setText(clock.defaultText(8));
             label2.setText(clock.defaultText(9));
+        }
+        // Show which timer is going off
+        else if (clock.getCurrentPanel() instanceof TimerPanel2 timerPanel)
+        {
+            var activeTimers = timerPanel.getActiveTimers().stream().filter(Timer::isTimerGoingOff).toList();
+            label1.setText(activeTimers.size() == 1 ? "One Timer" : "Many Timers"); // TODO: update this to be a real timer <specific timer>
+            var label2Adjusted = activeTimers.size() == 1 ? is+going_off : are+going_off;
+            label2.setText(label2Adjusted); // is going off
         }
         // default date and time
         else

@@ -1,5 +1,6 @@
-package com.example.clock;
+package clock.entity;
 
+import clock.exception.InvalidInputException;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.junit.jupiter.api.*;
@@ -15,7 +16,7 @@ import static java.lang.Thread.sleep;
 import static javax.swing.WindowConstants.DISPOSE_ON_CLOSE;
 import static org.junit.jupiter.api.Assertions.*;
 
-public class TimerTest
+class TimerTest
 {
     static { System.setProperty("appName", TimerTest.class.getSimpleName()); }
     private static final Logger logger = LogManager.getLogger(TimerTest.class);
@@ -26,17 +27,20 @@ public class TimerTest
     ActionEvent actionEvent;
 
     @BeforeAll
-    static void beforeAll() { logger.info("Starting TimerTest..."); }
+    static void beforeAll()
+    { logger.info("Starting TimerTest..."); }
 
     @BeforeEach
-    void beforeEach() {
+    void beforeEach()
+    {
         clock = new Clock();
         clock.setTestingClock(true);
         clock.setDefaultCloseOperation(DISPOSE_ON_CLOSE);
     }
 
     @AfterEach
-    void afterEach() {
+    void afterEach()
+    {
         if (clock != null) {
             logger.info("Test complete. Closing the clock...");
             // Create a WindowEvent with WINDOW_CLOSING event type
@@ -54,21 +58,24 @@ public class TimerTest
     }
 
     @AfterAll
-    static void afterAll() { logger.info("Concluding TimerTest."); }
+    static void afterAll()
+    { logger.info("Concluding TimerTest."); }
 
     @Test
     @DisplayName("Create a Timer")
-    void testCreatingATimer() throws InvalidInputException {
-        assertNotEquals(null, new Timer());
-        assertEquals("00:00:00", new Timer().toString());
+    void testCreatingATimer() throws InvalidInputException
+    {
+        assertNotEquals(null, new clock.entity.Timer());
+        assertEquals("00:00:00", new clock.entity.Timer().toString());
     }
 
     @Test
     @DisplayName("Create a 5 min Timer")
-    void testCreatingA5MinuteTimer() throws InvalidInputException {
-        Timer timer = new Timer(0, 5, 0, clock);
+    void testCreatingA5MinuteTimer() throws InvalidInputException
+    {
+        clock.entity.Timer timer = new clock.entity.Timer(0, 5, 0, clock);
 
-        assertEquals(timer.toString(), "00:05:00");
+        assertEquals("00:05:00", timer.toString(), "Strings don't match");
         assertSame(0, timer.getHour());
         assertSame(5, timer.getMinute());
         assertSame(0, timer.getSecond());
@@ -78,9 +85,10 @@ public class TimerTest
 
     @Test
     @DisplayName("Create 2 Timers")
-    void testCreateTwoTimers() throws InvalidInputException, InterruptedException {
-        Timer timer1 = new Timer(0, 4, 0, clock);
-        Timer timer2 = new Timer(0, 5, 0, clock);
+    void testCreateTwoTimers() throws InvalidInputException, InterruptedException
+    {
+        clock.entity.Timer timer1 = new Timer(0, 4, 0, clock);
+        clock.entity.Timer timer2 = new clock.entity.Timer(0, 5, 0, clock);
 
         clock.getTimerPanel2().startTimer(timer1);
         clock.getTimerPanel2().startTimer(timer2); // timer1 now at 3:59, timer2 at 5:00
@@ -102,9 +110,10 @@ public class TimerTest
 
     @Test
     @DisplayName("Create 2 Timers Using GUI")
-    void testCreateTwoTimersUsingGUI() throws InvalidInputException, InterruptedException, InvocationTargetException {
-        AtomicReference<Timer> timer1 = new AtomicReference<>(new Timer(0, 4, 0, clock));
-        AtomicReference<Timer> timer2 = new AtomicReference<>(new Timer(0, 5, 0, clock));
+    void testCreateTwoTimersUsingGUI() throws InvalidInputException, InterruptedException, InvocationTargetException
+    {
+        AtomicReference<clock.entity.Timer> timer1 = new AtomicReference<>(new clock.entity.Timer(0, 4, 0, clock));
+        AtomicReference<clock.entity.Timer> timer2 = new AtomicReference<>(new clock.entity.Timer(0, 5, 0, clock));
 
         openTimerPanel();
 
@@ -154,7 +163,8 @@ public class TimerTest
     }
 
     // Helper methods
-    private void tick(int times) {
+    private void tick(int times)
+    {
         for (int i=0; i<times; i++) {
             clock.ticking();
         }

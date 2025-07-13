@@ -1,6 +1,9 @@
-package com.example.clock;
+package clock;
 
 import javax.swing.*;
+
+import clock.entity.Clock;
+import clock.exception.InvalidInputException;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import java.util.concurrent.TimeUnit;

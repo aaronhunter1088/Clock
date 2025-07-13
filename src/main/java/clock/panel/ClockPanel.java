@@ -1,4 +1,4 @@
-package com.example.clock;
+package clock.panel;
 
 /**
  * Used to distinguish which panel the Clock is using

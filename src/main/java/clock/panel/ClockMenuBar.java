@@ -1,5 +1,6 @@
-package com.example.clock;
+package clock.panel;
 
+import clock.entity.Clock;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -11,8 +12,8 @@ import java.time.ZoneId;
 import java.util.Arrays;
 import java.util.List;
 
-import static com.example.clock.ClockConstants.*;
-import static com.example.clock.ClockPanel.*;
+import static clock.contract.ClockConstants.*;
+import static clock.panel.ClockPanel.*;
 
 /**
  * The menu bar for the Clock.
@@ -47,7 +48,7 @@ public class ClockMenuBar extends JMenuBar
      * It creates a Settings and Features menu options,
      * each with several items to choose from.
      */
-    ClockMenuBar(Clock clock)
+    public ClockMenuBar(Clock clock)
     {
         this.clock = clock;
         setForeground(Color.WHITE);
@@ -200,7 +201,7 @@ public class ClockMenuBar extends JMenuBar
      * Sets up the timezone menu item
      * @param timezone the timezone menu item to set up
      */
-    void setupTimezone(JMenuItem timezone)
+    public void setupTimezone(JMenuItem timezone)
     {
         logger.debug("setup timezone for {}", timezone.getText());
         timezone.addActionListener(l -> clock.updateTheTime(timezone));
@@ -213,7 +214,7 @@ public class ClockMenuBar extends JMenuBar
      * Updates the text on the currently selected timezone
      * so that it's clear which timezone is currently selected.
      */
-    void setCurrentTimeZone()
+    public void setCurrentTimeZone()
     {
         ZoneId currentTimezone = clock.getTimezone();
         timezones.forEach(jMenuItemTimeZone -> {
@@ -234,7 +235,7 @@ public class ClockMenuBar extends JMenuBar
     /**
      * Refreshes each timezone menu item by removing the star
      */
-    void refreshTimezones()
+    public void refreshTimezones()
     {
         timezones.forEach(jMenuItemTimeZone ->
             jMenuItemTimeZone.setText(jMenuItemTimeZone.getText().replace(STAR,EMPTY).trim())
@@ -256,20 +257,20 @@ public class ClockMenuBar extends JMenuBar
     }
 
     /* Getters */
-    JMenu getSettingsMenu() { return this.settingsMenu; }
-    JMenu getFeaturesMenu() { return this.featuresMenu; }
-    JMenu getAlarmFeature_Menu() { return this.alarmFeature_Menu; }
-    JMenuItem getMilitaryTimeSetting() { return this.militaryTimeSetting; }
-    JMenuItem getFullTimeSetting() { return this.fullTimeSetting; }
-    JMenuItem getPartialTimeSetting() { return this.partialTimeSetting; }
-    JMenuItem getToggleDSTSetting() { return toggleDSTSetting; }
-    JMenuItem getShowDigitalTimeOnAnalogueClockSetting() { return this.showDigitalTimeSettingOnAnalogueClockSetting; }
-    JMenu getChangeTimeZoneMenu() { return this.changeTimeZone; }
-    java.util.List<JMenuItem> getTimezones() { return this.timezones; }
-    JMenuItem getDigitalClockFeature() { return this.digitalClockFeature; }
-    JMenuItem getAnalogueClockFeature() { return this.analogueClockFeature; }
-    JMenuItem getSetAlarms() { return this.setAlarms; }
-    JMenuItem getTimerFeature() { return this.timerFeature; }
+    public JMenu getSettingsMenu() { return this.settingsMenu; }
+    public JMenu getFeaturesMenu() { return this.featuresMenu; }
+    public JMenu getAlarmFeature_Menu() { return this.alarmFeature_Menu; }
+    public JMenuItem getMilitaryTimeSetting() { return this.militaryTimeSetting; }
+    public JMenuItem getFullTimeSetting() { return this.fullTimeSetting; }
+    public JMenuItem getPartialTimeSetting() { return this.partialTimeSetting; }
+    public JMenuItem getToggleDSTSetting() { return toggleDSTSetting; }
+    public JMenuItem getShowDigitalTimeOnAnalogueClockSetting() { return this.showDigitalTimeSettingOnAnalogueClockSetting; }
+    public JMenu getChangeTimeZoneMenu() { return this.changeTimeZone; }
+    public java.util.List<JMenuItem> getTimezones() { return this.timezones; }
+    public JMenuItem getDigitalClockFeature() { return this.digitalClockFeature; }
+    public JMenuItem getAnalogueClockFeature() { return this.analogueClockFeature; }
+    public JMenuItem getSetAlarms() { return this.setAlarms; }
+    public JMenuItem getTimerFeature() { return this.timerFeature; }
 
     /* Setters */
     protected void setSettingsMenu(JMenu settingsMenu) { this.settingsMenu = settingsMenu; }

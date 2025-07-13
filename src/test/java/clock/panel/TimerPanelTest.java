@@ -1,11 +1,13 @@
-package com.example.clock;
+package clock.panel;
 
+import clock.entity.Clock;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.junit.*;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnitRunner;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.FocusEvent;
@@ -13,12 +15,12 @@ import java.awt.event.MouseEvent;
 import java.awt.event.WindowEvent;
 import java.util.Arrays;
 
-import static com.example.clock.ClockConstants.*;
+import static clock.contract.ClockConstants.*;
 import static javax.swing.WindowConstants.DISPOSE_ON_CLOSE;
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.mock;
 
-public class TimerPanelTest
+class TimerPanelTest
 {
     static { System.setProperty("appName", TimerPanelTest.class.getSimpleName()); }
     private static final Logger logger = LogManager.getLogger(TimerPanelTest.class);
@@ -29,12 +31,12 @@ public class TimerPanelTest
     @Mock
     ActionEvent action;
 
-    @BeforeClass
-    public static void beforeClass()
+    @BeforeAll
+    static void beforeClass()
     { logger.info("Starting TimerPanelTest..."); }
 
-    @Before
-    public void beforeEach()
+    @BeforeEach
+    void beforeEach()
     {
         clock = new Clock();
         clock.setDefaultCloseOperation(DISPOSE_ON_CLOSE);
@@ -42,8 +44,9 @@ public class TimerPanelTest
         //MockitoAnnotations.initMocks(this);
     }
 
-    @After
-    public void afterEach() {
+    @AfterEach
+    void afterEach() 
+    {
         if (clock != null) {
             logger.info("Test complete. Closing the clock...");
             // Create a WindowEvent with WINDOW_CLOSING event type
@@ -61,69 +64,69 @@ public class TimerPanelTest
     }
 
     @Test
-    public void validateFirstTextField()
+    void validateFirstTextField()
     {
         timerPanel.getHourField().setText(HOUR);
-        assertTrue("Expected value to be Hour", timerPanel.validateFirstTextField());
+        assertTrue(timerPanel.validateFirstTextField(), "Expected value to be Hour");
 
         timerPanel.getHourField().setText("13");
-        assertTrue("Expected value to be 13", timerPanel.validateFirstTextField());
+        assertTrue(timerPanel.validateFirstTextField(), "Expected value to be 13");
 
         timerPanel.getHourField().setText("24");
-        assertFalse("Expected value to be 24", timerPanel.validateFirstTextField());
+        assertFalse(timerPanel.validateFirstTextField(), "Expected value to be 24");
 
         timerPanel.getHourField().setText("-1");
-        assertFalse("Expected value to be invalid", timerPanel.validateFirstTextField());
+        assertFalse(timerPanel.validateFirstTextField(), "Expected value to be invalid");
 
         timerPanel.getHourField().setText(EMPTY);
-        assertFalse("Expected value to be invalid", timerPanel.validateFirstTextField());
+        assertFalse(timerPanel.validateFirstTextField(), "Expected value to be invalid");
     }
 
     @Test
-    public void validateSecondTextField()
+    void validateSecondTextField()
     {
         timerPanel.getMinuteField().setText(MIN);
-        assertTrue("Expected value to be Min", timerPanel.validateSecondTextField());
+        assertTrue(timerPanel.validateSecondTextField(), "Expected value to be Min");
 
         timerPanel.getMinuteField().setText("13");
-        assertTrue("Expected value to be 13", timerPanel.validateSecondTextField());
+        assertTrue(timerPanel.validateSecondTextField(), "Expected value to be 13");
 
         timerPanel.getMinuteField().setText("60");
-        assertFalse("Expected value to be invalid", timerPanel.validateSecondTextField());
+        assertFalse(timerPanel.validateSecondTextField(), "Expected value to be invalid");
 
         timerPanel.getMinuteField().setText("-1");
-        assertFalse("Expected value to be invalid", timerPanel.validateSecondTextField());
+        assertFalse(timerPanel.validateSecondTextField(), "Expected value to be invalid");
 
         timerPanel.getMinuteField().setText(EMPTY);
-        assertFalse("Expected value to be invalid", timerPanel.validateSecondTextField());
+        assertFalse(timerPanel.validateSecondTextField(), "Expected value to be invalid");
     }
 
     @Test
-    public void validateThirdTextField()
+    void validateThirdTextField()
     {
         timerPanel.getSecondField().setText(SEC);
-        assertTrue("Expected value to be SEC", timerPanel.validateThirdTextField());
+        assertTrue(timerPanel.validateThirdTextField(), "Expected value to be SEC");
 
         timerPanel.getSecondField().setText("13");
-        assertTrue("Expected value to be 13", timerPanel.validateThirdTextField());
+        assertTrue(timerPanel.validateThirdTextField(), "Expected value to be 13");
 
         timerPanel.getSecondField().setText("59");
-        assertTrue("Expected value to be 59", timerPanel.validateThirdTextField());
+        assertTrue(timerPanel.validateThirdTextField(), "Expected value to be 59");
 
         timerPanel.getSecondField().setText("60");
-        assertFalse("Expected value to be invalid", timerPanel.validateThirdTextField());
+        assertFalse(timerPanel.validateThirdTextField(), "Expected value to be invalid");
 
         timerPanel.getSecondField().setText(EMPTY);
-        assertFalse("Expected value to be invalid", timerPanel.validateThirdTextField());
+        assertFalse(timerPanel.validateThirdTextField(), "Expected value to be invalid");
     }
 
     @Test
-    public void resetTimerFields()
+    void resetTimerFields()
     {
     }
 
     @Test
-    public void performCountDownWith5Seconds() throws InterruptedException
+    void performCountDownWith5Seconds() throws InterruptedException
     {
         timerPanel.getHourField().setText(ZERO);
         timerPanel.getMinuteField().setText(ZERO);
@@ -131,11 +134,11 @@ public class TimerPanelTest
         timerPanel.getTimerButton().setText(SET);
         timerPanel.run(mock(ActionEvent.class));
         Thread.sleep(5000);
-        assertEquals("Expected timer to be done", 0, Integer.parseInt(timerPanel.getSecondField().getText()));
+        assertEquals(0, Integer.parseInt(timerPanel.getSecondField().getText()), "Expected timer to be done");
     }
 
     @Test
-    public void pauseCountDown() throws InterruptedException
+    void pauseCountDown() throws InterruptedException
     {
         timerPanel.getHourField().setText(ZERO);
         timerPanel.getMinuteField().setText("1");
@@ -145,24 +148,24 @@ public class TimerPanelTest
         Thread.sleep(5000);
         timerPanel.run(mock(ActionEvent.class));
 
-        assertEquals("After 5 seconds, 1 minute is shown", 1, Integer.parseInt(timerPanel.getMinuteField().getText()));
-        assertEquals("After 5 seconds, 0 seconds is shown", 0, Integer.parseInt(timerPanel.getSecondField().getText()));
+        assertEquals(1, Integer.parseInt(timerPanel.getMinuteField().getText()), "After 5 seconds, 1 minute is shown");
+        assertEquals(0, Integer.parseInt(timerPanel.getSecondField().getText()), "After 5 seconds, 0 seconds is shown");
     }
 
     @Test
-    public void testHittingSetButtonStartsTimer()
+    void testHittingSetButtonStartsTimer()
     {
         timerPanel.run(action);
 
         assertEquals("Expected timer button text to be "+PAUSE_TIMER, PAUSE_TIMER, timerPanel.getTimerButton().getText());
-        assertTrue("Expected Reset Button to be enabled", timerPanel.getResetButton().isEnabled());
-        assertFalse("Expected paused to be false", timerPanel.isPaused());
-        assertNotNull("Expected scheduler to be set", timerPanel.getScheduler());
-        assertNotNull("Expected future to be set", timerPanel.getCountdownFuture());
+        assertTrue(timerPanel.getResetButton().isEnabled(), "Expected Reset Button to be enabled");
+        assertFalse(timerPanel.isPaused(), "Expected paused to be false");
+        assertNotNull(timerPanel.getScheduler(), "Expected scheduler to be set");
+        assertNotNull(timerPanel.getCountdownFuture(), "Expected future to be set");
     }
 
     @Test
-    public void testHittingSetButtonResumesTimer()
+    void testHittingSetButtonResumesTimer()
     {
         // set up the timer
         timerPanel.getHourField().setText(ZERO);
@@ -174,13 +177,13 @@ public class TimerPanelTest
         timerPanel.run(action);
 
         assertEquals("Expected timer button text to be "+PAUSE_TIMER, PAUSE_TIMER, timerPanel.getTimerButton().getText());
-        assertFalse("Expected paused to be false", timerPanel.isPaused());
-        assertNotNull("Expected scheduler to be set", timerPanel.getScheduler());
-        assertNotNull("Expected future to be set", timerPanel.getCountdownFuture());
+        assertFalse(timerPanel.isPaused(), "Expected paused to be false");
+        assertNotNull(timerPanel.getScheduler(), "Expected scheduler to be set");
+        assertNotNull(timerPanel.getCountdownFuture(), "Expected future to be set");
     }
 
     @Test
-    public void testHittingSetButtonPausesTimer()
+    void testHittingSetButtonPausesTimer()
     {
         // set up the timer
         timerPanel.getHourField().setText(ZERO);
@@ -192,24 +195,24 @@ public class TimerPanelTest
         timerPanel.run(action);
 
         assertEquals("Expected timer button text to be "+RESUME_TIMER, RESUME_TIMER, timerPanel.getTimerButton().getText());
-        assertTrue("Expected paused to be true", timerPanel.isPaused());
-        assertNotNull("Expected scheduler to be set", timerPanel.getScheduler());
-        assertNotNull("Expected future to be set", timerPanel.getCountdownFuture());
+        assertTrue(timerPanel.isPaused(), "Expected paused to be true");
+        assertNotNull(timerPanel.getScheduler(), "Expected scheduler to be set");
+        assertNotNull(timerPanel.getCountdownFuture(), "Expected future to be set");
     }
 
     @Test
-    public void testCheckIfTimerHasConcluded()
+    void testCheckIfTimerHasConcluded()
     {
         clock.setTimerActive(true);
         timerPanel.checkIfTimerHasConcluded();
 
-        assertFalse("Expected clock timer to be inactive", clock.isTimerActive());
-        assertNull("Expected music player to be null", timerPanel.getMusicPlayer());
-        assertFalse("Expected timerGoingOff to be false", timerPanel.isTimerGoingOff());
+        assertFalse(clock.isTimerActive(), "Expected clock timer to be inactive");
+        assertNull(timerPanel.getMusicPlayer(), "Expected music player to be null");
+        assertFalse(timerPanel.isTimerGoingOff(), "Expected timerGoingOff to be false");
     }
 
     @Test
-    public void testClickOnTimerPanel()
+    void testClickOnTimerPanel()
     {
         // Create a MouseEvent
         MouseEvent clickEvent = new MouseEvent(
@@ -225,7 +228,7 @@ public class TimerPanelTest
     }
 
     @Test
-    public void testClickedOnHourFieldFocusGained()
+    void testClickedOnHourFieldFocusGained()
     {
         // user opens timer panel, and clicks on hour field
         timerPanel.getHourField().setFocusable(true);
@@ -240,7 +243,7 @@ public class TimerPanelTest
         Arrays.stream(timerPanel.getHourField().getFocusListeners())
             .forEach(listener -> {
                 // anonymous inner class defined in TimerPanel
-                if ("com.example.clock.TimerPanel$2".equals(listener.getClass().getName()))
+                if ("clock.panel.TimerPanel$2".equals(listener.getClass().getName()))
                 { listener.focusGained(focusEvent); }
             }
         );
@@ -249,7 +252,7 @@ public class TimerPanelTest
     }
 
     @Test
-    public void testClickedOnMinutesFieldFocusGained()
+    void testClickedOnMinutesFieldFocusGained()
     {
         // user opens timer panel, and clicks on hour field
         timerPanel.getMinuteField().setFocusable(true);
@@ -264,7 +267,7 @@ public class TimerPanelTest
         Arrays.stream(timerPanel.getMinuteField().getFocusListeners())
             .forEach(listener -> {
                 // anonymous inner class defined in TimerPanel
-                if ("com.example.clock.TimerPanel$3".equals(listener.getClass().getName()))
+                if ("clock.panel.TimerPanel$3".equals(listener.getClass().getName()))
                 { listener.focusGained(focusEvent); }
             }
         );
@@ -273,7 +276,7 @@ public class TimerPanelTest
     }
 
     @Test
-    public void testClickedOnSecondsFieldFocusGained()
+    void testClickedOnSecondsFieldFocusGained()
     {
         // user opens timer panel, and clicks on hour field
         timerPanel.getSecondField().setFocusable(true);
@@ -288,7 +291,7 @@ public class TimerPanelTest
         Arrays.stream(timerPanel.getSecondField().getFocusListeners())
             .forEach(listener -> {
                 // anonymous inner class defined in TimerPanel
-                if ("com.example.clock.TimerPanel$4".equals(listener.getClass().getName()))
+                if ("clock.panel.TimerPanel$4".equals(listener.getClass().getName()))
                 { listener.focusGained(focusEvent); }
             }
         );
@@ -297,7 +300,7 @@ public class TimerPanelTest
     }
 
     @Test
-    public void testClickedOffHourFieldNoInputFocusLost()
+    void testClickedOffHourFieldNoInputFocusLost()
     {
         timerPanel.getHourField().setText(EMPTY);
         // user opens timer panel, clicks on hour field, then clicks off hour field
@@ -313,7 +316,7 @@ public class TimerPanelTest
         Arrays.stream(timerPanel.getHourField().getFocusListeners())
             .forEach(listener -> {
                 // anonymous inner class defined in TimerPanel
-                if ("com.example.clock.TimerPanel$2".equals(listener.getClass().getName()))
+                if ("clock.panel.TimerPanel$2".equals(listener.getClass().getName()))
                 { listener.focusLost(focusEvent); }
             }
         );
@@ -322,7 +325,7 @@ public class TimerPanelTest
     }
 
     @Test
-    public void testClickedOffHourFieldEmptyInputFocusLost()
+    void testClickedOffHourFieldEmptyInputFocusLost()
     {
         timerPanel.getHourField().setText(" ");
         // user opens timer panel, clicks space and clicks off hour field
@@ -338,7 +341,7 @@ public class TimerPanelTest
         Arrays.stream(timerPanel.getHourField().getFocusListeners())
             .forEach(listener -> {
                 // anonymous inner class defined in TimerPanel
-                if ("com.example.clock.TimerPanel$2".equals(listener.getClass().getName()))
+                if ("clock.panel.TimerPanel$2".equals(listener.getClass().getName()))
                 { listener.focusLost(focusEvent); }
             }
         );
@@ -347,7 +350,7 @@ public class TimerPanelTest
     }
 
     @Test
-    public void testClickedOffHourFieldValidNumberInputFocusLost()
+    void testClickedOffHourFieldValidNumberInputFocusLost()
     {
         timerPanel.getHourField().setText("1"); // start a 1 hour timer
         // user opens timer panel, enters number and clicks off hour field
@@ -363,18 +366,18 @@ public class TimerPanelTest
         Arrays.stream(timerPanel.getHourField().getFocusListeners())
             .forEach(listener -> {
                 // anonymous inner class defined in TimerPanel
-                if ("com.example.clock.TimerPanel$2".equals(listener.getClass().getName()))
+                if ("clock.panel.TimerPanel$2".equals(listener.getClass().getName()))
                 { listener.focusLost(focusEvent); }
             }
         );
 
         assertEquals("Expected field to be 1", "1", timerPanel.getHourField().getText());
         assertEquals("Expected set timer button text to be "+SET, SET, timerPanel.getTimerButton().getText());
-        assertTrue("Expected set timer button to be enabled", timerPanel.getTimerButton().isEnabled());
+        assertTrue(timerPanel.getTimerButton().isEnabled(), "Expected set timer button to be enabled");
     }
 
     @Test
-    public void testClickedOffHourFieldInvalidNumberInputFocusLost()
+    void testClickedOffHourFieldInvalidNumberInputFocusLost()
     {
         timerPanel.getHourField().setText("-1"); // start a -1 hour timer
         // user opens timer panel, enters invalid number and clicks off hour field
@@ -390,18 +393,18 @@ public class TimerPanelTest
         Arrays.stream(timerPanel.getHourField().getFocusListeners())
             .forEach(listener -> {
                 // anonymous inner class defined in TimerPanel
-                if ("com.example.clock.TimerPanel$2".equals(listener.getClass().getName()))
+                if ("clock.panel.TimerPanel$2".equals(listener.getClass().getName()))
                 { listener.focusLost(focusEvent); }
             }
         );
 
         assertEquals("Expected field to be -1", "-1", timerPanel.getHourField().getText());
         assertEquals("Expected set timer button text to be "+TIMER_HOUR_ERROR, TIMER_HOUR_ERROR, timerPanel.getTimerButton().getText());
-        assertFalse("Expected set timer button to be disabled", timerPanel.getTimerButton().isEnabled());
+        assertFalse(timerPanel.getTimerButton().isEnabled(), "Expected set timer button to be disabled");
     }
 
     @Test
-    public void testClickedOffHourFieldInvalidNumberAgainInputFocusLost()
+    void testClickedOffHourFieldInvalidNumberAgainInputFocusLost()
     {
         timerPanel.getHourField().setText("24"); // start a 24 hour timer
         // user opens timer panel, enters number and clicks off hour field
@@ -417,18 +420,18 @@ public class TimerPanelTest
         Arrays.stream(timerPanel.getHourField().getFocusListeners())
                 .forEach(listener -> {
                             // anonymous inner class defined in TimerPanel
-                            if ("com.example.clock.TimerPanel$2".equals(listener.getClass().getName()))
+                            if ("clock.panel.TimerPanel$2".equals(listener.getClass().getName()))
                             { listener.focusLost(focusEvent); }
                         }
                 );
 
         assertEquals("Expected field to be 24", "24", timerPanel.getHourField().getText());
         assertEquals("Expected set timer button text to be "+TIMER_HOUR_ERROR, TIMER_HOUR_ERROR, timerPanel.getTimerButton().getText());
-        assertFalse("Expected set timer button to be disabled", timerPanel.getTimerButton().isEnabled());
+        assertFalse(timerPanel.getTimerButton().isEnabled(), "Expected set timer button to be disabled");
     }
 
     @Test
-    public void testClickedOffHourFieldValidNumberInputFocusLostMinutesIsInvalid()
+    void testClickedOffHourFieldValidNumberInputFocusLostMinutesIsInvalid()
     {
         timerPanel.getHourField().setText("1"); // start a 1 hour timer
         timerPanel.getMinuteField().setText("M"); // invalid minute
@@ -444,16 +447,16 @@ public class TimerPanelTest
         Arrays.stream(timerPanel.getHourField().getFocusListeners())
             .forEach(listener -> {
                 // anonymous inner class defined in TimerPanel
-                if ("com.example.clock.TimerPanel$2".equals(listener.getClass().getName()))
+                if ("clock.panel.TimerPanel$2".equals(listener.getClass().getName()))
                 { listener.focusLost(focusEvent); }
             }
         );
 
-        assertEquals("Expected field to be 1", "1", timerPanel.getHourField().getText());
+        assertEquals("1", timerPanel.getHourField().getText(), "Expected field to be 1");
         // TODO: FIX THIS
         //assertTrue("Expected minutes field to have focus", timerPanel.getMinuteField().isFocusOwner());
         assertEquals("Expected set timer button text to be "+SET, SET, timerPanel.getTimerButton().getText());
-        assertFalse("Expected set timer button to be disabled", timerPanel.getTimerButton().isEnabled());
+        assertFalse(timerPanel.getTimerButton().isEnabled(), "Expected set timer button to be disabled");
     }
 
 }

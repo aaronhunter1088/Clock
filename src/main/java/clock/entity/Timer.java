@@ -1,16 +1,14 @@
-package com.example.clock;
+package clock.entity;
 
+import clock.exception.InvalidInputException;
 import javazoom.jl.decoder.JavaLayerException;
 import javazoom.jl.player.advanced.AdvancedPlayer;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import java.io.InputStream;
-import java.util.List;
-import java.util.concurrent.Callable;
-import java.util.concurrent.ExecutorService;
 
-import static com.example.clock.ClockConstants.*;
+import static clock.contract.ClockConstants.*;
 import static java.lang.Thread.sleep;
 
 public class Timer implements Runnable
@@ -20,8 +18,11 @@ public class Timer implements Runnable
     private String hourAsStr, minuteAsStr, secondAsStr;
     // ensures that all changes are immediately visible to all threads
     private volatile boolean timerGoingOff;
+
     private volatile boolean paused;
     private volatile boolean hasBeenStarted;
+    private volatile boolean hasBeenTriggered;
+    private volatile boolean stopTimer;
     private Clock clock;
     private AdvancedPlayer musicPlayer;
 
@@ -96,36 +97,45 @@ public class Timer implements Runnable
 
     /**
      * Sets a timer to go off
-     * @param executor the executor service
      */
-    void triggerTimer(ExecutorService executor)
+    public void triggerTimer()
     {
         logger.info("trigger timer");
-        timerGoingOff = true;
         clock.getDigitalClockPanel().updateLabels();
+        this.setHasBeenTriggered(true);
+
+        try
+        {
+            logger.debug("while timer is going off, play sound");
+            musicPlayer.play(50);
+        }
+        catch (Exception e)
+        {
+            logger.error(e.getCause().getClass().getName() + " - " + e.getMessage());
+        }
+        //this.timerGoingOff = false; // turn it off now that method has been called
         //clock.getDigitalClockPanel().getLabel1().setText(activeAlarm.toString());
         //clock.getDigitalClockPanel().getLabel2().setText("is going off!");
         // play sound
-        Callable<String> c = () -> {
-            try
-            {
-                logger.debug("while timer is going off, play sound");
-                List<Timer> activeTimers = ((TimerPanel2)clock.getCurrentPanel()).getActiveTimers();
-                while (!activeTimers.isEmpty())
-                { musicPlayer.play(50); }
-                logger.debug("alarm has stopped");
-                return "Alarm triggered";
-            }
-            catch (Exception e)
-            {
-                logger.error(e.getCause().getClass().getName() + " - " + e.getMessage());
-                printStackTrace(e, e.getMessage());
-                setupMusicPlayer();
-                musicPlayer.play(50);
-                return "Reset music player required";
-            }
-        };
-        executor.submit(c);
+//        Callable<String> c = () -> {
+//            try
+//            {
+//                logger.debug("while timer is going off, play sound");
+//                if (this.timerGoingOff)
+//                { musicPlayer.play(50); }
+//                logger.debug("timer has stopped");
+//                return "Timer triggered";
+//            }
+//            catch (Exception e)
+//            {
+//                logger.error(e.getCause().getClass().getName() + " - " + e.getMessage());
+//                printStackTrace(e, e.getMessage());
+//                setupMusicPlayer();
+//                musicPlayer.play(50);
+//                return "Reset music player required";
+//            }
+//        };
+//        clock.getScheduler().submit(c);
     }
 
     /**
@@ -147,7 +157,7 @@ public class Timer implements Runnable
     /**
      * This method performs the countdown for the timer
      */
-    void performCountDown()
+    public void performCountDown()
     {
         if (paused && !hasBeenStarted) {
             hasBeenStarted = true;
@@ -171,7 +181,8 @@ public class Timer implements Runnable
             {
                 if (second >= 0)
                 {
-                    setSecond(getSecond()-1);
+                    if (minute > 0 && second == 0) setSecond(59);
+                    else setSecond(second-1);
                     //secondField.setText(Integer.toString(second));
                     // check hours and minutes, to see if they now need to be decreased
                     if (second < 0 && minute >= 0)
@@ -198,6 +209,8 @@ public class Timer implements Runnable
                 //timerButton.setEnabled(false);
                 //clock.setTimerActive(true);
                 setTimerGoingOff(true);
+                var future = clock.getTimerPanel2().getTimersAndFutures().get(this);
+                future.cancel(true);
             }
         }
         catch (Exception e)
@@ -223,6 +236,9 @@ public class Timer implements Runnable
     public int getSecond() { return second; }
     public String getSecondAsStr() { return secondAsStr; }
     public boolean isTimerGoingOff() { return timerGoingOff; }
+    public boolean isHasBeenStarted() { return hasBeenStarted; }
+    public boolean isHasBeenTriggered() { return hasBeenTriggered; }
+    public boolean isStopTimer() { return stopTimer; }
 
     /* Setters */
     public void setClock(Clock clock) { this.clock = clock; }
@@ -246,4 +262,7 @@ public class Timer implements Runnable
     }
     public void setSecondAsStr(String secondAsStr) { this.secondAsStr = secondAsStr; }
     public void setTimerGoingOff(boolean timerGoingOff) { this.timerGoingOff = timerGoingOff; }
+    public void setHasBeenStarted(boolean hasBeenStarted) { this.hasBeenStarted = hasBeenStarted; }
+    public void setHasBeenTriggered(boolean hasBeenTriggered) { this.hasBeenTriggered = hasBeenTriggered; }
+    public void setStopTimer(boolean stopTimer) { this.stopTimer = stopTimer; }
 }

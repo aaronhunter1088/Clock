@@ -1,8 +1,12 @@
-package com.example.clock;
+package clock.panel;
 
+import clock.entity.Alarm;
+import clock.entity.Clock;
+import clock.contract.IClockPanel;
+import clock.exception.InvalidInputException;
 import javazoom.jl.decoder.JavaLayerException;
 import javazoom.jl.player.advanced.AdvancedPlayer;
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -18,7 +22,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 import static java.time.DayOfWeek.*;
-import static com.example.clock.ClockPanel.PANEL_ALARM;
+import static clock.panel.ClockPanel.PANEL_ALARM;
 
 /**
  * The AlarmPanel is used to set and view alarms. The
@@ -59,7 +63,7 @@ public class AlarmPanel extends JPanel implements IClockPanel
      * Main constructor for creating the AlarmPanel
      * @param clock the clock object reference
      */
-    AlarmPanel(Clock clock)
+    public AlarmPanel(Clock clock)
     {
         super();
         this.clock = clock;
@@ -296,7 +300,7 @@ public class AlarmPanel extends JPanel implements IClockPanel
      * Removes an alarm from the list in the menu
      * @param alarm the alarm to remove
      */
-    void deleteAlarmMenuItemFromViewAlarms(Alarm alarm)
+    public void deleteAlarmMenuItemFromViewAlarms(Alarm alarm)
     {
         logger.info("delete alarm menu item from view alarms");
         logger.info("Size of viewAlarms before removal {}", clock.getClockMenuBar().getAlarmFeature_Menu().getItemCount());
@@ -311,7 +315,7 @@ public class AlarmPanel extends JPanel implements IClockPanel
     /**
      * Resets the text area
      */
-    void resetJTextArea()
+    public void resetJTextArea()
     {
         logger.info("reset textarea");
         textArea.setText(EMPTY);
@@ -327,7 +331,7 @@ public class AlarmPanel extends JPanel implements IClockPanel
     /**
      * Sets up the alarm button
      */
-    void setupAlarmButton()
+    public void setupAlarmButton()
     {
         logger.info("setup alarm button");
         setAlarmButton.addActionListener(action -> {
@@ -442,7 +446,7 @@ public class AlarmPanel extends JPanel implements IClockPanel
      * @return Alarm
      * @throws ParseException will be thrown if hour, minutes, or time is inappropriate.
      */
-    Alarm createAlarm() throws ParseException, InvalidInputException
+    public Alarm createAlarm() throws ParseException, InvalidInputException
     {
         logger.info("create alarm");
         int hour = Integer.parseInt(textField1.getText());
@@ -477,7 +481,7 @@ public class AlarmPanel extends JPanel implements IClockPanel
      * Updates an alarm
      * @param alarmToUpdate the alarm to update
      */
-    void updateTheAlarm(Alarm alarmToUpdate)
+    public void updateTheAlarm(Alarm alarmToUpdate)
     {
         logger.info("updating alarm");
         if (null != alarmToUpdate)
@@ -514,7 +518,7 @@ public class AlarmPanel extends JPanel implements IClockPanel
      * Sets an alarm to go off
      * @param executor the executor service
      */
-    void triggerAlarm(ExecutorService executor)
+    public void triggerAlarm(ExecutorService executor)
     {
         logger.info("trigger alarm");
         setAlarmIsGoingOff(true);
@@ -527,7 +531,7 @@ public class AlarmPanel extends JPanel implements IClockPanel
             {
                 setupMusicPlayer();
                 logger.debug("while alarm is going off, play sound");
-                while (getActiveAlarm().alarmGoingOff)
+                while (getActiveAlarm().isAlarmGoingOff())
                 { getMusicPlayer().play(50); }
                 logger.debug("alarm has stopped");
                 return "Alarm triggered";
@@ -547,7 +551,7 @@ public class AlarmPanel extends JPanel implements IClockPanel
     /**
      * Stops an actively going off alarm
      */
-    void stopAlarm()
+    public void stopAlarm()
     {
         logger.info("stop alarm");
         musicPlayer = null;
@@ -555,7 +559,7 @@ public class AlarmPanel extends JPanel implements IClockPanel
         logger.info("{} alarm turned off", alarm.toString());
     }
 
-    void checkIfAnyAlarmsAreGoingOff()
+    public void checkIfAnyAlarmsAreGoingOff()
     {
         logger.info("checking if any alarms are going off");
         // alarm has reference to time
@@ -615,7 +619,7 @@ public class AlarmPanel extends JPanel implements IClockPanel
     /**
      * Adds alarms created to the menu
      */
-    void setupAlarmsInMenuFunctionality()
+    public void setupAlarmsInMenuFunctionality()
     {
         // get the view alarms menu
         // for each except the Set Alarms (option1)
@@ -679,7 +683,7 @@ public class AlarmPanel extends JPanel implements IClockPanel
      * Returns a list of days that were checked
      * @return List<DayOfWeek> the days selected
      */
-    List<DayOfWeek> getDaysChecked()
+    public List<DayOfWeek> getDaysChecked()
     {
         logger.info("check which checkBoxes were checked");
         List<DayOfWeek> daysSelected = new ArrayList<>();
@@ -707,7 +711,7 @@ public class AlarmPanel extends JPanel implements IClockPanel
     /**
      * Rests all the checkboxes to false
      */
-    void resetJCheckBoxes() 
+    public void resetJCheckBoxes()
     {
         logger.info("resetJCheckBoxes");
         if (sundayCheckBox.isSelected()) { sundayCheckBox.setSelected(false); }
@@ -726,7 +730,7 @@ public class AlarmPanel extends JPanel implements IClockPanel
      * because it is going to be updated
      * @param alarmToUpdate the alarm to update
      */
-    void setCheckBoxesIfWasSelected(Alarm alarmToUpdate)
+    public void setCheckBoxesIfWasSelected(Alarm alarmToUpdate)
     {
         logger.info("setCheckBoxesIfWasSelected");
         if (alarmToUpdate.getDays().contains(MONDAY)) { mondayCheckBox.setSelected(true); }
@@ -759,7 +763,7 @@ public class AlarmPanel extends JPanel implements IClockPanel
     /**
      * Sets up the checkboxes for the Alarm Panel
      */
-    void setupCheckBoxes()
+    public void setupCheckBoxes()
     {
         logger.info("setup checkboxes");
         sundayCheckBox = new JCheckBox(SUNDAY.toString().substring(0,2), false);
@@ -942,33 +946,33 @@ public class AlarmPanel extends JPanel implements IClockPanel
     }
 
     /* Getters */
-    GridBagLayout getGridBagLayout() { return this.layout; }
-    GridBagConstraints getGridBagConstraints() { return this.constraints; }
-    Clock getClock() { return this.clock; }
-    Alarm getAlarm() { return this.alarm; }
-    JLabel getJAlarmLbl1() { return this.alarmLabel1; } // H
-    JLabel getJAlarmLbl2() { return this.alarmLabel2; } // M
-    JLabel getJAlarmLbl3() { return this.alarmLabel3; } // T
-    JLabel getJAlarmLbl4() { return this.alarmLabel4; } // All alarms
-    JTextField getJTextField1() { return this.textField1; }
-    JTextField getJTextField2() { return this.textField2; }
-    JTextField getJTextField3() { return this.textField3; }
-    JButton getSetAlarmButton() { return this.setAlarmButton; }
-    JScrollPane getJScrollPane() { return this.scrollPane; }
-    JTextArea getJTextArea() { return this.textArea; }
-    boolean isUpdatingAlarm() { return updatingAlarm; }
-    AdvancedPlayer getMusicPlayer() { return musicPlayer; }
-    Alarm getActiveAlarm() { return this.activeAlarm; }
-    JCheckBox getMondayCheckBox() { return mondayCheckBox; }
-    JCheckBox getTuesdayCheckBox() { return tuesdayCheckBox; }
-    JCheckBox getWednesdayCheckBox() { return wednesdayCheckBox; }
-    JCheckBox getThursdayCheckBox() { return thursdayCheckBox; }
-    JCheckBox getFridayCheckBox() { return fridayCheckBox; }
-    JCheckBox getSaturdayCheckBox() { return saturdayCheckBox; }
-    JCheckBox getSundayCheckBox() { return sundayCheckBox; }
-    JCheckBox getWeekCheckBox() { return weekCheckBox; }
-    JCheckBox getWeekendCheckBox() { return weekendCheckBox; }
-    boolean isAlarmIsGoingOff() { return alarmIsGoingOff; }
+    public GridBagLayout getGridBagLayout() { return this.layout; }
+    public GridBagConstraints getGridBagConstraints() { return this.constraints; }
+    public Clock getClock() { return this.clock; }
+    public Alarm getAlarm() { return this.alarm; }
+    public JLabel getJAlarmLbl1() { return this.alarmLabel1; } // H
+    public JLabel getJAlarmLbl2() { return this.alarmLabel2; } // M
+    public JLabel getJAlarmLbl3() { return this.alarmLabel3; } // T
+    public JLabel getJAlarmLbl4() { return this.alarmLabel4; } // All alarms
+    public JTextField getJTextField1() { return this.textField1; }
+    public JTextField getJTextField2() { return this.textField2; }
+    public JTextField getJTextField3() { return this.textField3; }
+    public JButton getSetAlarmButton() { return this.setAlarmButton; }
+    public JScrollPane getJScrollPane() { return this.scrollPane; }
+    public JTextArea getJTextArea() { return this.textArea; }
+    public boolean isUpdatingAlarm() { return updatingAlarm; }
+    public AdvancedPlayer getMusicPlayer() { return musicPlayer; }
+    public Alarm getActiveAlarm() { return this.activeAlarm; }
+    public JCheckBox getMondayCheckBox() { return mondayCheckBox; }
+    public JCheckBox getTuesdayCheckBox() { return tuesdayCheckBox; }
+    public JCheckBox getWednesdayCheckBox() { return wednesdayCheckBox; }
+    public JCheckBox getThursdayCheckBox() { return thursdayCheckBox; }
+    public JCheckBox getFridayCheckBox() { return fridayCheckBox; }
+    public JCheckBox getSaturdayCheckBox() { return saturdayCheckBox; }
+    public JCheckBox getSundayCheckBox() { return sundayCheckBox; }
+    public JCheckBox getWeekCheckBox() { return weekCheckBox; }
+    public JCheckBox getWeekendCheckBox() { return weekendCheckBox; }
+    public boolean isAlarmIsGoingOff() { return alarmIsGoingOff; }
 
     /* Setters */
     protected void setGridBagLayout(GridBagLayout layout) { this.layout = layout; }

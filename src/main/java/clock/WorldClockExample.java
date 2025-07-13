@@ -1,4 +1,4 @@
-package com.example.clock;
+package clock;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -12,7 +12,7 @@ import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 
-import static com.example.clock.ClockConstants.AMERICA_CHICAGO;
+import static clock.contract.ClockConstants.AMERICA_CHICAGO;
 
 public class WorldClockExample 
 {

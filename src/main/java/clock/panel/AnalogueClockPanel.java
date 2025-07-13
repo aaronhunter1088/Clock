@@ -1,19 +1,16 @@
-package com.example.clock;
+package clock.panel;
 
 import java.awt.*;
-import java.text.SimpleDateFormat;
-import java.time.LocalDateTime;
-import java.time.ZoneOffset;
-import java.time.ZonedDateTime;
-import java.time.temporal.TemporalAccessor;
-import java.util.Date;
-import java.util.Locale;
 import javax.swing.JPanel;
+
+import clock.contract.ClockConstants;
+import clock.entity.Clock;
+import clock.contract.IClockPanel;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import static java.lang.Thread.sleep;
-import static com.example.clock.ClockPanel.PANEL_ANALOGUE_CLOCK;
+import static clock.panel.ClockPanel.PANEL_ANALOGUE_CLOCK;
 
 /**
  * The AnalogueClockPanel is used to view the time
@@ -38,7 +35,7 @@ public class AnalogueClockPanel extends JPanel implements IClockPanel, Runnable
      * Default constructor
      * @param clock the clock reference
      */
-    AnalogueClockPanel(Clock clock)
+    public AnalogueClockPanel(Clock clock)
     {
         super();
         setupDefaultActions(clock);
@@ -49,7 +46,7 @@ public class AnalogueClockPanel extends JPanel implements IClockPanel, Runnable
      * Draws the analogue clock
      * @param g the graphics object
      */
-    void drawStructure(Graphics g)
+    public void drawStructure(Graphics g)
     {
         logger.info("drawing structure");
         g.setFont(new Font("TimesRoman", Font.BOLD, 20));
@@ -79,7 +76,7 @@ public class AnalogueClockPanel extends JPanel implements IClockPanel, Runnable
      * Starts the analogue clock
      * @param panel the analogue clock panel
      */
-    void start(AnalogueClockPanel panel)
+    public void start(AnalogueClockPanel panel)
     {
         logger.info("starting analogue clock");
         if (thread == null)
@@ -92,7 +89,7 @@ public class AnalogueClockPanel extends JPanel implements IClockPanel, Runnable
     /**
      * Stops the analogue clock
      */
-    void stop()
+    public void stop()
     {
         logger.info("stopping analogue thread");
         thread = null;
@@ -102,7 +99,7 @@ public class AnalogueClockPanel extends JPanel implements IClockPanel, Runnable
      * Sets up the default actions for the analogue clock panel
      * @param clock the clock reference
      */
-    void setupDefaultActions(Clock clock)
+    public void setupDefaultActions(Clock clock)
     {
         logger.info("setup default actions with clock");
         this.clock = clock;
@@ -115,7 +112,7 @@ public class AnalogueClockPanel extends JPanel implements IClockPanel, Runnable
     /**
      * Sets up the analogue clock panel
      */
-    void setDefaults()
+    public void setDefaults()
     {
         logger.info("setupDefaultActions");
         setMaximumSize(new Dimension(350, 400));

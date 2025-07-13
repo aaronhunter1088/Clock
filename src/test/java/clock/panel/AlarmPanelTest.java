@@ -1,47 +1,53 @@
-package com.example.clock;
+package clock.panel;
 
+import clock.entity.Alarm;
+import clock.entity.Clock;
+import clock.exception.InvalidInputException;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.junit.*;
-import org.junit.runner.RunWith;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import java.awt.event.WindowEvent;
 import java.time.DayOfWeek;
 import java.util.List;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.function.Predicate;
 
 import static java.time.Month.MARCH;
-import static com.example.clock.ClockConstants.*;
+import static clock.contract.ClockConstants.*;
 import static javax.swing.WindowConstants.DISPOSE_ON_CLOSE;
-import static org.junit.Assert.*;
 import static java.time.DayOfWeek.*;
+import static org.junit.jupiter.api.Assertions.*;
 
-public class AlarmPanelTest
+class AlarmPanelTest
 {
     static { System.setProperty("appName", AlarmPanelTest.class.getSimpleName()); }
     private static final Logger logger = LogManager.getLogger(AlarmPanelTest.class);
     private Clock clock;
     private Alarm alarm;
 
-    @BeforeClass
-    public static void beforeClass()
+    @BeforeAll
+    static void beforeClass()
     {
         logger.info("Starting AlarmPanelTest...");
     }
 
-    @Before
-    public void beforeEach() throws InvalidInputException
+    @BeforeEach
+    void beforeEach() throws InvalidInputException
     {
         clock = new Clock();
         clock.setDefaultCloseOperation(DISPOSE_ON_CLOSE);
         alarm = new Alarm(clock, true);
     }
 
-    @After
-    public void afterEach() {
+    @AfterEach
+    void afterEach()
+    {
         if (clock != null) {
             logger.info("Test complete. Closing the clock...");
             // Create a WindowEvent with WINDOW_CLOSING event type
@@ -59,40 +65,40 @@ public class AlarmPanelTest
     }
 
     @Test
-    public void testSettingAudioStreamWorks()
+    void testSettingAudioStreamWorks()
     {
         AlarmPanel testAlarmPanel = createAndSetupAlarmPanel();
-        assertNotNull("Music player should be set", testAlarmPanel.getMusicPlayer());
+        assertNotNull(testAlarmPanel.getMusicPlayer(), "Music player should be set");
     }
 
     @Test
-    public void testMusicPlayerCanSoundAlarm() throws InterruptedException
+    void testMusicPlayerCanSoundAlarm() throws InterruptedException, ExecutionException
     {
         AlarmPanel testAlarmPanel = createAndSetupAlarmPanel();
         ExecutorService executor = Executors.newCachedThreadPool();
         testAlarmPanel.setActiveAlarm(alarm);
         testAlarmPanel.triggerAlarm(executor);
-        assertTrue("Alarm is going off", testAlarmPanel.isAlarmIsGoingOff());
+        assertTrue(testAlarmPanel.isAlarmIsGoingOff(), "Alarm is going off");
         Thread.sleep(1000);
         testAlarmPanel.stopAlarm();
-        assertFalse("Alarm is off", testAlarmPanel.isAlarmIsGoingOff());
-        assertNull("Music Player is null", testAlarmPanel.getMusicPlayer());
+        assertFalse(testAlarmPanel.isAlarmIsGoingOff(), "Alarm is off");
+        assertNull(testAlarmPanel.getMusicPlayer(), "Music Player is null");
     }
 
     @Test
-    public void testCheckingWhichCheckBoxesAreCheckedWorks()
+    void testCheckingWhichCheckBoxesAreCheckedWorks()
     {
         clock.getAlarmPanel().getMondayCheckBox().doClick();
         clock.getAlarmPanel().getTuesdayCheckBox().doClick();
         List<DayOfWeek> daysChecked = clock.getAlarmPanel().getDaysChecked();
 
         Predicate<DayOfWeek> predicate = p -> daysChecked.contains(MONDAY) && daysChecked.contains(TUESDAY);
-        assertTrue("DaysChecked list size should be 2", daysChecked.size() == 2);
-        assertTrue("daysChecked should contain only MONDAY and TUESDAY", daysChecked.stream().allMatch(predicate));
+        assertEquals(2, daysChecked.size(), "DaysChecked list size should be 2");
+        assertTrue(daysChecked.stream().allMatch(predicate), "daysChecked should contain only MONDAY and TUESDAY");
     }
 
     @Test
-    public void alarmWorksAsExpected() throws InvalidInputException
+    void alarmWorksAsExpected() throws InvalidInputException
     {
         clock.setHours(12);
         clock.setMinutes(0);
@@ -106,19 +112,20 @@ public class AlarmPanelTest
         clock.setListOfAlarms(List.of(alarm));
         clock.getAlarmPanel().setActiveAlarm(alarm);
         clock.getAlarmPanel().checkIfAnyAlarmsAreGoingOff();
-        assertTrue("Alarm should be going off!", alarm.isAlarmGoingOff());
-        assertEquals("This 'alarm' is set as the current alarm going off", alarm, clock.getAlarmPanel().getActiveAlarm());
-        assertTrue("Alarm should not be triggered to go off!", alarm.isAlarmGoingOff());
+        assertTrue(alarm.isAlarmGoingOff(), "Alarm should be going off!");
+        assertEquals(alarm, clock.getAlarmPanel().getActiveAlarm(), "This 'alarm' is set as the current alarm going off");
+        assertTrue(alarm.isAlarmGoingOff(), "Alarm should not be triggered to go off!");
     }
 
     @Test
-    public void testRangeIsCorrect()
+    void testRangeIsCorrect()
     {
         assertFalse(12 <= 0);
         assertFalse(12 > 23);
     }
+
     // Helper methods
-    public AlarmPanel createAndSetupAlarmPanel()
+    private AlarmPanel createAndSetupAlarmPanel()
     {
         AlarmPanel testAlarmPanel = clock.getAlarmPanel();
         testAlarmPanel.setAlarm(alarm);

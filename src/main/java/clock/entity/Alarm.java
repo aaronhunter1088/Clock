@@ -1,13 +1,15 @@
-package com.example.clock;
+package clock.entity;
 
 import java.time.DayOfWeek;
 import java.util.ArrayList;
 import java.util.List;
+
+import clock.exception.InvalidInputException;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import static java.time.DayOfWeek.*;
-import static com.example.clock.ClockConstants.*;
+import static clock.contract.ClockConstants.*;
 
 /**
  * An Alarm object that can be set to go off
@@ -76,7 +78,7 @@ public class Alarm
     public String toString()
     { return hoursAsStr+COLON+minutesAsStr+SPACE+ampm; }
 
-    List<String> getDaysShortened()
+    public List<String> getDaysShortened()
     {
         logger.info("getDaysShortened");
         List<String> shortenedDays = new ArrayList<>();
@@ -108,30 +110,30 @@ public class Alarm
     }
 
     /* Getters */
-    Clock getClock() { return this.clock; }
-    boolean isAlarmGoingOff() { return alarmGoingOff; }
-    boolean isUpdatingAlarm() { return updatingAlarm; }
-    List<DayOfWeek> getDays() { return this.days; }
-    int getHours() { return this.hours; }
-    String getHoursAsStr() { return this.hoursAsStr; }
-    int getMinutes() { return this.minutes; }
-    String getMinutesAsStr() { return this.minutesAsStr; }
-    String getAMPM() { return this.ampm; }
+    public Clock getClock() { return this.clock; }
+    public boolean isAlarmGoingOff() { return alarmGoingOff; }
+    public boolean isUpdatingAlarm() { return updatingAlarm; }
+    public List<DayOfWeek> getDays() { return this.days; }
+    public int getHours() { return this.hours; }
+    public String getHoursAsStr() { return this.hoursAsStr; }
+    public int getMinutes() { return this.minutes; }
+    public String getMinutesAsStr() { return this.minutesAsStr; }
+    public String getAMPM() { return this.ampm; }
 
     /* Setters */
-    protected void setClock(Clock clock) { this.clock = clock; }
-    protected void setIsAlarmGoingOff(boolean alarmGoingOff) { this.alarmGoingOff = alarmGoingOff; }
-    protected void setIsAlarmUpdating(boolean updatingAlarm) { this.updatingAlarm = updatingAlarm; }
-    protected void setAlarmGoingOff(boolean alarmGoingOff) { this.alarmGoingOff = alarmGoingOff; }
-    protected void setUpdatingAlarm(boolean updatingAlarm) { this.updatingAlarm = updatingAlarm; }
-    protected void setDays(List<DayOfWeek> days) { this.days = days; }
-    protected void setHours(int hours) {
+    public void setClock(Clock clock) { this.clock = clock; }
+    public void setIsAlarmGoingOff(boolean alarmGoingOff) { this.alarmGoingOff = alarmGoingOff; }
+    public void setIsAlarmUpdating(boolean updatingAlarm) { this.updatingAlarm = updatingAlarm; }
+    public void setAlarmGoingOff(boolean alarmGoingOff) { this.alarmGoingOff = alarmGoingOff; }
+    public void setUpdatingAlarm(boolean updatingAlarm) { this.updatingAlarm = updatingAlarm; }
+    public void setDays(List<DayOfWeek> days) { this.days = days; }
+    public void setHours(int hours) {
         this.hours = hours;
         this.hoursAsStr = (hours < 10) ? "0"+this.hours : String.valueOf(this.hours);
     }
-    protected void setMinutes(int minutes) {
+    public void setMinutes(int minutes) {
         this.minutes = minutes;
         this.minutesAsStr = (minutes < 10) ? "0"+this.minutes : String.valueOf(this.minutes);
     }
-    protected void setAMPM(String ampm) { this.ampm = ampm; }
+    public void setAMPM(String ampm) { this.ampm = ampm; }
 }

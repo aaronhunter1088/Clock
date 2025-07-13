@@ -1,4 +1,4 @@
-package com.example.clock;
+package clock.exception;
 
 /**
  * This class is used to determine that an error
@@ -11,7 +11,6 @@ package com.example.clock;
  * generate this exception must declare that this
  * exception is thrown.
  * It forces the programmer to deal with the exception."
- *
  * Example: Supplying a negative minutes value or a value
  * greater than 59 will throw this exception. The rule of
  * thumb being that a proper minute value is between 0 and 59,
@@ -30,21 +29,21 @@ public class InvalidInputException extends Exception
 	/**
 	 * Default constructor for InvalidInputException
 	 */
-	InvalidInputException()
+	public InvalidInputException()
 	{ this(null, null); }
 
 	/**
 	 * Constructor for InvalidInputException with a message
 	 * @param message the message provided
 	 */
-	InvalidInputException(String message)
+	public InvalidInputException(String message)
 	{ this(message, null); }
 
 	/**
 	 * Constructor for InvalidInputException with a cause
 	 * @param cause the reason why
 	 */
-	InvalidInputException(Throwable cause)
+	public InvalidInputException(Throwable cause)
 	{ this(null, cause); }
 
 	/**
@@ -52,7 +51,7 @@ public class InvalidInputException extends Exception
 	 * @param message the message provided
 	 * @param cause the reason why
 	 */
-	InvalidInputException(String message, Throwable cause)
+	public InvalidInputException(String message, Throwable cause)
 	{
 		super(message, cause);
 		setMessage(message);

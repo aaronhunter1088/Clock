@@ -1,7 +1,9 @@
-package com.example.clock;
+package clock.contract;
+
+import clock.entity.Clock;
 
 /**
- * An interface for the clock's panels. Each panel must
+ * An contract for the clock's panels. Each panel must
  * update the labels accordingly. This reduces the need
  * to create new labels. The panel also needs to make
  * sure it has updated itself accordingly.
