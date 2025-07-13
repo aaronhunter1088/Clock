@@ -8,3 +8,4 @@ src/main/.DS_Store
 Clock.iml
 dist/**
 logs/**
+misc.xml
