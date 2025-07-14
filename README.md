@@ -1,6 +1,8 @@
-# Clock v2.8
+# Clock v2.9
 
 This is a simple GUI project which displays the time and allows the user to set alarms.
+
+v2.9 Updated to use my parent pom.
 
 v2.8 Added Javadocs and cleaned up the code quite a bit. When running the application, you
 can set this envVar: logLevel to be DEBUG, or INFO depending on how much info you want. 
