@@ -63,6 +63,7 @@ public interface ClockConstants
     String SET = "Set";
     String TIMER = "Timer";
     String VIEW_TIMER = "View Timer";
+    String VIEW_STOPWATCH = "View Stopwatch";
     String RESUME_TIMER = "Resume Timer";
     String PAUSE_TIMER = "Pause Timer";
     String RESET = "Reset";

@@ -40,6 +40,7 @@ public class ClockMenuBar extends JMenuBar
     private JMenuItem analogueClockFeature;
     private JMenu alarmFeature_Menu;
     private JMenuItem timerFeature;
+    private JMenuItem stopwatchFeature;
     // Options for alarmFeature_Menu
     private JMenuItem setAlarms;
 
@@ -99,11 +100,15 @@ public class ClockMenuBar extends JMenuBar
         setTimerFeature(new JMenuItem(VIEW_TIMER));
         getTimerFeature().setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_T, InputEvent.CTRL_DOWN_MASK));
 
+        setStopwatchFeature(new JMenuItem(VIEW_STOPWATCH));
+        getStopwatchFeature().setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_S, InputEvent.CTRL_DOWN_MASK));
+
         // Add options to Features Menu
         getFeaturesMenu().add(getDigitalClockFeature());
         getFeaturesMenu().add(getAnalogueClockFeature());
         getFeaturesMenu().add(getAlarmFeature_Menu());
         getFeaturesMenu().add(getTimerFeature());
+        getFeaturesMenu().add(getStopwatchFeature());
 
         getSettingsMenu().setOpaque(false);
         getSettingsMenu().setForeground(Color.WHITE);
@@ -122,6 +127,7 @@ public class ClockMenuBar extends JMenuBar
         getDigitalClockFeature().setForeground(Color.WHITE);
         getAnalogueClockFeature().setForeground(Color.WHITE);
         getTimerFeature().setForeground(Color.WHITE);
+        getStopwatchFeature().setForeground(Color.WHITE);
         // Set functionality for Settings menu
         getMilitaryTimeSetting().addActionListener(action -> {
             logger.info("clicked show military time setting");
@@ -271,6 +277,7 @@ public class ClockMenuBar extends JMenuBar
     public JMenuItem getAnalogueClockFeature() { return this.analogueClockFeature; }
     public JMenuItem getSetAlarms() { return this.setAlarms; }
     public JMenuItem getTimerFeature() { return this.timerFeature; }
+    public JMenuItem getStopwatchFeature() { return this.stopwatchFeature; }
 
     /* Setters */
     protected void setSettingsMenu(JMenu settingsMenu) { this.settingsMenu = settingsMenu; }
@@ -287,4 +294,5 @@ public class ClockMenuBar extends JMenuBar
     protected void setTimeZones(java.util.List<JMenuItem> timezones) { this.timezones = timezones;}
     protected void setSetAlarms(JMenuItem setAlarms) { this.setAlarms = setAlarms; }
     protected void setTimerFeature(JMenuItem timerFeature) { this.timerFeature = timerFeature; }
+    protected void setStopwatchFeature(JMenuItem stopwatchFeature) { this.stopwatchFeature = stopwatchFeature; }
 }
