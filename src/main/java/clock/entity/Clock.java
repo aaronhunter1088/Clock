@@ -739,7 +739,7 @@ public class Clock extends JFrame
         else if (labelVersion == 6) { defaultText = No_Alarms; }
         else if (labelVersion == 7) { defaultText = S; }
         else if (labelVersion == 8) { defaultText = alarmPanel.getActiveAlarm().toString(); }
-        else if (labelVersion == 9) { defaultText = is+going_off; }
+        else if (labelVersion == 9) { defaultText = is+SPACE+going_off; }
         else if (labelVersion == 10) { defaultText = No_Timers; }
         return defaultText;
     }
