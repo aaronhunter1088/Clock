@@ -74,7 +74,7 @@ public class Clock extends JFrame
     private boolean leapYear,doesTodayMatchDSTDate,dateChanged,isNewYear,
             alarmActive, timerActive,updateAlarm,showFullDate,showPartialDate,
             showMilitaryTime,showDigitalTimeOnAnalogueClock,testingClock,
-            daylightSavingsTimeEnabled=true;
+            daylightSavingsTimeEnabled;
     private List<Alarm> listOfAlarms;
     private ScheduledFuture<?> countdownFuture;
     private ScheduledExecutorService scheduler;
@@ -188,6 +188,7 @@ public class Clock extends JFrame
             dateChanged = false;
             alarmActive = false;
             timerActive = false;
+            daylightSavingsTimeEnabled = true;
             scheduler = Executors.newScheduledThreadPool(25);
             updatePanel(PANEL_DIGITAL_CLOCK, false);
         }
