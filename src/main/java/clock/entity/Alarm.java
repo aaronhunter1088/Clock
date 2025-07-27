@@ -88,6 +88,7 @@ public class Alarm implements Serializable, Comparable<Alarm>
         this.name = StringUtils.isBlank(name) ? null : name;
         setupMusicPlayer();
         alarmsCounter++;
+        logger.debug("Alarm {} created", alarmsCounter);
         logger.info("Alarm created with specific times");
     }
 
@@ -135,7 +136,7 @@ public class Alarm implements Serializable, Comparable<Alarm>
             setupMusicPlayer();
             getMusicPlayer().play();
         }
-        catch (Throwable e)
+        catch (Exception e)
         {
             printStackTrace(e, e.getMessage());
         }
@@ -147,7 +148,7 @@ public class Alarm implements Serializable, Comparable<Alarm>
      * @param e the exception
      * @param message the message to print
      */
-    public void printStackTrace(Throwable e, String message)
+    public void printStackTrace(Exception e, String message)
     {
         if (null != message)
             logger.error(message);
@@ -165,7 +166,10 @@ public class Alarm implements Serializable, Comparable<Alarm>
     void printStackTrace(Exception e)
     { printStackTrace(e, ""); }
 
-
+    /**
+     * Returns a shortened version of the day
+     * @return a string representing the day
+     */
     public List<String> getDaysShortened()
     {
         logger.info("getDaysShortened");
