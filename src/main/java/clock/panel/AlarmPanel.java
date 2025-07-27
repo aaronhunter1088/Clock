@@ -187,11 +187,18 @@ public class AlarmPanel extends JPanel implements IClockPanel
             textField1.grabFocus();
             throw new InvalidInputException("Hour cannot be blank");
         }
-        else if (Integer.parseInt(textField1.getText()) <= 0 ||
-                 Integer.parseInt(textField1.getText()) > 23 )
-        {
-            textField1.grabFocus();
-            throw new InvalidInputException("Hours must be between 0 and 12");
+        else {
+            try {
+                if (Integer.parseInt(textField1.getText()) <= 0 ||
+                        Integer.parseInt(textField1.getText()) > 23 )
+                {
+                    textField1.grabFocus();
+                    throw new InvalidInputException("Hours must be between 0 and 12");
+                }
+            } catch (NumberFormatException nfe) {
+                textField1.grabFocus();
+                throw new InvalidInputException("Hours must be a number");
+            }
         }
         return true;
     }
@@ -209,11 +216,18 @@ public class AlarmPanel extends JPanel implements IClockPanel
             textField2.grabFocus();
             throw new InvalidInputException("Minutes cannot be blank");
         }
-        else if (Integer.parseInt(textField2.getText()) < 0 ||
-                 Integer.parseInt(textField2.getText()) > 59 )
-        {
-            textField2.grabFocus();
-            throw new InvalidInputException("Minutes must be between 0 and 59");
+        else {
+            try {
+                if (Integer.parseInt(textField2.getText()) < 0 ||
+                        Integer.parseInt(textField2.getText()) > 59 )
+                {
+                    textField2.grabFocus();
+                    throw new InvalidInputException("Minutes must be between 0 and 59");
+                }
+            } catch (NumberFormatException nfe) {
+                textField2.grabFocus();
+                throw new InvalidInputException("Minutes must be a number");
+            }
         }
         return true;
     }
@@ -416,7 +430,7 @@ public class AlarmPanel extends JPanel implements IClockPanel
                     resetJAlarmLabel4();
                 }
             }
-            catch (InvalidInputException | ParseException e)
+            catch (InvalidInputException | ParseException | NumberFormatException e)
             {
                 textArea.setLineWrap(true);
                 textArea.setWrapStyleWord(true);
