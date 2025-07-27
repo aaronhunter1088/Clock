@@ -173,7 +173,7 @@ public class DigitalClockPanel extends JPanel implements IClockPanel, Runnable
             dateStr = activeAlarms.size() == 1
                     ? (activeAlarms.getFirst().getName() != null)
                         ? activeAlarms.getFirst().getName()
-                        : "One Alarm"
+                        : activeAlarms.toString()
                     : "Many Alarms";
             timeStr = clock.defaultText(9);
         }
@@ -280,8 +280,6 @@ public class DigitalClockPanel extends JPanel implements IClockPanel, Runnable
                     }
                 }
             }
-            // update lbl1 and lbl2 to display alarm
-            // user must "view that alarm" to turn it off
         });
     }
 
