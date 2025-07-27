@@ -13,6 +13,7 @@ import java.util.Locale;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
+import java.util.concurrent.TimeUnit;
 
 import clock.exception.InvalidInputException;
 import clock.panel.*;
@@ -493,7 +494,7 @@ public class Clock extends JFrame
         else if (labelVersion == 5) { defaultText = AM+SLASH+PM; }
         else if (labelVersion == 6) { defaultText = No_Alarms; }
         else if (labelVersion == 7) { defaultText = S; }
-        else if (labelVersion == 8) { defaultText = alarmPanel.getActiveAlarm().toString(); }
+        //else if (labelVersion == 8) { defaultText = alarmPanel.getActiveAlarm().toString(); }
         else if (labelVersion == 9) { defaultText = is+SPACE+going_off; }
         else if (labelVersion == 10) { defaultText = No_Timers; }
         return defaultText;
@@ -523,7 +524,7 @@ public class Clock extends JFrame
         //digitalClockPanel.updateLabels();
         setBackground(Color.BLACK);
         clockPanel = DigitalClockPanel.PANEL;
-        digitalClockPanel.setupSettingsMenu();
+        repaint();
     }
 
     /**
@@ -929,6 +930,68 @@ public class Clock extends JFrame
         }
     }
 
+    public void setActiveAlarms()
+    {
+        logger.info("checking if any alarms are going off");
+        getListOfAlarms().forEach((alarm) -> {
+            for(DayOfWeek day : alarm.getDays()) {
+                if (alarm.getAlarmAsString().equals(getClockTimeAsAlarmString())
+                        &&
+                        day == getDayOfWeek()
+                        &&
+                        !alarm.isAlarmGoingOff()
+                ) {
+                    alarm.setIsAlarmGoingOff(true);
+                    logger.info("Alarm " + alarm + " matches clock's time. ");
+                    logger.info("Sounding alarm...");
+                }
+            }
+        });
+        // alarm has reference to time
+        // check all alarms
+        // if any alarm matches clock's time, an alarm should be going off
+    }
+
+    public void triggerAlarms()
+    {
+        getListOfAlarms().stream()
+            .filter(Alarm::isAlarmGoingOff)
+            .forEach(Alarm::triggerAlarm);
+    }
+
+        /* TODO: Rework. Logic should be as follows:
+    ?? What happens when two timers are going off at the same time?
+     */
+    /**
+     * Checks if the timer has concluded
+     */
+    public void checkIfAnyTimersAreGoingOff()
+    {
+        logger.info("checking if any timers are going off");
+        boolean anyTimerIsGoingOff = listOfTimers.stream().anyMatch(Timer::isTimerGoingOff);
+        if (anyTimerIsGoingOff)
+        {
+            //List<Timer> toBeRemoved = new ArrayList<>();
+            //timer.setTimerGoingOff(false);
+            //toBeRemoved.add(timer);
+            //clock.getTimerPanel2().stopTimer(timer);
+            //ScheduledFuture<?> future = clock.getScheduler().scheduleAtFixedRate(timer::performCountDown, 0, 1, TimeUnit.SECONDS);
+
+            listOfTimers.stream()
+                    .parallel()
+                    .filter(Timer::isTimerGoingOff)
+                    .filter(Timer::isHasBeenTriggered)
+                    .forEach(timer -> {
+                        //if (timersAndFutures.get(timer) == null) {
+                        //    logger.info("timer does not exist in timersAndFutures");
+                        //    var future = clock.getScheduler().scheduleAtFixedRate(timer::triggerTimer, 0, 1, TimeUnit.SECONDS);
+                        //    clock.getTimerPanel2().getTimersAndFutures().put(timer, future);
+                        //}
+                    });
+            //activeTimers.removeAll(toBeRemoved);
+        }
+    }
+
     /* Getters */
     public ClockPanel getClockPanel() { return clockPanel; }
     public Component getCurrentPanel() { return currentPanel; }
@@ -960,7 +1023,7 @@ public class Clock extends JFrame
      * @return 'HH:MM:SS AMPM' ex: 05:15:24 PM
      */
     public String getTimeAsStr() { return hoursAsStr+COLON+minutesAsStr+COLON+secondsAsStr+SPACE+ampm; }
-    public String getAlarmTimeAsStr() { return hoursAsStr+COLON+minutesAsStr+SPACE+ampm; }
+    public String getClockTimeAsAlarmString() { return hoursAsStr+COLON+minutesAsStr+SPACE+ampm; }
     /**
      * Returns the date like: MAY 4, 2000
      * @return the date as a formatted string

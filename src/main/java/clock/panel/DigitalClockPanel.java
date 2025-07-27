@@ -1,6 +1,7 @@
 package clock.panel;
 
 import clock.contract.IClockPanel;
+import clock.entity.Alarm;
 import clock.entity.Clock;
 import clock.entity.Timer;
 import org.apache.logging.log4j.LogManager;
@@ -8,6 +9,8 @@ import org.apache.logging.log4j.Logger;
 
 import javax.swing.*;
 import java.awt.*;
+import java.time.DayOfWeek;
+import java.util.concurrent.TimeUnit;
 
 import static clock.panel.ClockPanel.PANEL_DIGITAL_CLOCK;
 import static clock.util.Constants.*;
@@ -113,7 +116,9 @@ public class DigitalClockPanel extends JPanel implements IClockPanel, Runnable
         logger.info("starting digital clock");
         while (thread != null)
         {
-            try { sleep(1000); }
+            try {
+                sleep(1000);
+            }
             catch (InterruptedException e) { printStackTrace(e, e.getMessage());}
             repaint(); // goes to paint
         }
@@ -162,19 +167,22 @@ public class DigitalClockPanel extends JPanel implements IClockPanel, Runnable
         String dateStr = clock.defaultText(1);
         String timeStr = clock.defaultText(2);
         // Adjust as needed
-        if (clock.getAlarmPanel().getActiveAlarm() != null)
+        if (clock.getListOfAlarms().stream().anyMatch(Alarm::isAlarmGoingOff))
         {
-            dateStr = clock.defaultText(8);
+            var activeAlarms = clock.getListOfAlarms().stream().filter(Alarm::isAlarmGoingOff).toList();
+            dateStr = activeAlarms.size() == 1
+                    ? (activeAlarms.getFirst().getName() != null)
+                        ? activeAlarms.getFirst().getName()
+                        : "One Alarm"
+                    : "Many Alarms";
             timeStr = clock.defaultText(9);
         }
         // Show which timer is going off
         else if (clock.getCurrentPanel() instanceof TimerPanel2 timerPanel)
         {
             var activeTimers = timerPanel.getActiveTimers().stream().filter(Timer::isTimerGoingOff).toList();
-            //label1.setText(activeTimers.size() == 1 ? "One Timer" : "Many Timers"); // TODO: update this to be a real timer <specific timer>
             dateStr = activeTimers.size() == 1 ? "One Timer" : "Many Timers";
             timeStr = activeTimers.size() == 1 ? is+SPACE+going_off : are+SPACE+going_off;
-            //label2.setText(label2Adjusted); // is going off
         }
 
         // Calculate centered x positions
@@ -220,6 +228,62 @@ public class DigitalClockPanel extends JPanel implements IClockPanel, Runnable
      */
     void printStackTrace(Exception e)
     { printStackTrace(e, EMPTY); }
+
+    private void updateAlarms()
+    {
+        clock.getListOfAlarms().forEach((alarm) -> {
+            for(DayOfWeek day : alarm.getDays()) {
+                if (alarm.getAlarmAsString().equals(clock.getClockTimeAsAlarmString())
+                        &&
+                        clock.getSeconds() == 0
+                        &&
+                        day == clock.getDayOfWeek()) {
+                    // time for alarm to be triggered
+                    alarm.setIsAlarmGoingOff(true);
+                    //alarm.triggerAlarm(getScheduler());
+                    alarm.setIsAlarmGoingOff(true);
+                    //setActiveAlarm(alarm);
+                    //setAlarmIsGoingOff(true);
+                    logger.info("Alarm " + alarm + " matches clock's time. ");
+                    logger.info("Sounding alarm...");
+                }
+        /* TODO: Check if this is still necessary
+           Above should match alarm.toString() to clock.getClockTimeAsAlarmString()
+           So if alarm time is same as clock's time (as shown as alarm string)
+         */
+                else if (clock.isShowMilitaryTime()) { // if in military time, change clocks hours back temporarily
+                    if (clock.getHours() > 12) {
+                        int tempHour = clock.getHours()-12;
+                        String tempHourAsStr = (tempHour < 10) ? "0"+tempHour : String.valueOf(tempHour);
+                        if (alarm.toString().equals(tempHourAsStr+":"+clock.getMinutesAsStr()+" "+clock.getAMPM())
+                                &&
+                                day == clock.getDayOfWeek()) {
+                            // time for alarm to be triggered on
+                            //setActiveAlarm(alarm);
+                            alarm.setIsAlarmGoingOff(true);
+                            //setAlarmIsGoingOff(true);
+                            logger.info("Alarm " + alarm + " matches clock's time. ");
+                            logger.info("Sounding alarm...");
+                        }
+                    }
+                    else {
+                        if (alarm.toString().equals(clock.getHoursAsStr()+":"+clock.getMinutesAsStr()+" "+clock.getAMPM())
+                                &&
+                                day == clock.getDayOfWeek()) {
+                            // time for alarm to be triggered on
+                            //setActiveAlarm(alarm);
+                            alarm.setIsAlarmGoingOff(true);
+                            //setAlarmIsGoingOff(true);
+                            logger.info("Alarm " + alarm + " matches clock's time. ");
+                            logger.info("Sounding alarm...");
+                        }
+                    }
+                }
+            }
+            // update lbl1 and lbl2 to display alarm
+            // user must "view that alarm" to turn it off
+        });
+    }
 
     /**
      * The main method used for adding components

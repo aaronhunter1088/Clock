@@ -450,39 +450,6 @@ public class TimerPanel2 extends JPanel implements IClockPanel
         }
     }
 
-    /* TODO: Rework. Logic should be as follows:
-    ?? What happens when two timers are going off at the same time?
-     */
-    /**
-     * Checks if the timer has concluded
-     */
-    public void checkIfAnyTimersAreGoingOff()
-    {
-        logger.info("checking if any timers are going off");
-        boolean anyTimerIsGoingOff = activeTimers.stream().anyMatch(Timer::isTimerGoingOff);
-        if (anyTimerIsGoingOff)
-        {
-            //List<Timer> toBeRemoved = new ArrayList<>();
-            //timer.setTimerGoingOff(false);
-            //toBeRemoved.add(timer);
-            //clock.getTimerPanel2().stopTimer(timer);
-            //ScheduledFuture<?> future = clock.getScheduler().scheduleAtFixedRate(timer::performCountDown, 0, 1, TimeUnit.SECONDS);
-
-            activeTimers.stream()
-                .parallel()
-                .filter(Timer::isTimerGoingOff)
-                .filter(Timer::isHasBeenTriggered)
-                .forEach(timer -> {
-                    if (timersAndFutures.get(timer) == null) {
-                        logger.info("timer does not exist in timersAndFutures");
-                        var future = clock.getScheduler().scheduleAtFixedRate(timer::triggerTimer, 0, 1, TimeUnit.SECONDS);
-                        clock.getTimerPanel2().getTimersAndFutures().put(timer, future);
-                    }
-                });
-            //activeTimers.removeAll(toBeRemoved);
-        }
-    }
-
     /**
      * Resets alarm label 4
      */

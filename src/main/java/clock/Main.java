@@ -34,8 +34,9 @@ public class Main
         SwingUtilities.invokeLater(() -> {
             try {
                 clock.getScheduler().scheduleAtFixedRate(clock::tick, 0, 1, TimeUnit.SECONDS);
-                clock.getScheduler().scheduleAtFixedRate(clock.getAlarmPanel()::checkIfAnyAlarmsAreGoingOff, 0, 1, TimeUnit.SECONDS);
-                clock.getScheduler().scheduleAtFixedRate(clock.getTimerPanel2()::checkIfAnyTimersAreGoingOff, 0, 1, TimeUnit.SECONDS);
+                clock.getScheduler().scheduleAtFixedRate(clock::setActiveAlarms, 0, 1, TimeUnit.SECONDS);
+                clock.getScheduler().scheduleAtFixedRate(clock::triggerAlarms, 0, 1, TimeUnit.SECONDS);
+                clock.getScheduler().scheduleAtFixedRate(clock::checkIfAnyTimersAreGoingOff, 0, 1, TimeUnit.SECONDS);
                 clock.getScheduler().scheduleAtFixedRate(clock::checkIfItIsNewYears, 0, 1, TimeUnit.SECONDS);
                 clock.getScheduler().scheduleAtFixedRate(clock::setTheCurrentTime, 0, 1, TimeUnit.SECONDS);
             } catch (Exception e) {

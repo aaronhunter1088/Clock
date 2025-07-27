@@ -1,12 +1,19 @@
 package clock.entity;
 
+import java.io.InputStream;
 import java.io.Serial;
 import java.io.Serializable;
 import java.time.DayOfWeek;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Future;
 
 import clock.exception.InvalidInputException;
+import javazoom.jl.decoder.JavaLayerException;
+import javazoom.jl.player.advanced.AdvancedPlayer;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -20,16 +27,19 @@ import static clock.util.Constants.*;
  * @author michael ball
 *  @version 2.0
  */
-public class Alarm implements Serializable
+public class Alarm implements Serializable, Comparable<Alarm>
 {
     @Serial
     private static final long serialVersionUID = 2L;
     private static final Logger logger = LogManager.getLogger(Alarm.class);
+    private static long alarmsCounter = 0L;
     private int hours, minutes;
+    private String name;
     private String minutesAsStr,hoursAsStr,ampm;
     private List<DayOfWeek> days;
     boolean alarmGoingOff,updatingAlarm;
     private Clock clock;
+    private AdvancedPlayer musicPlayer;
 
     /**
      * Creates a new Alarm object with default values
@@ -37,7 +47,7 @@ public class Alarm implements Serializable
      */
     public Alarm() throws InvalidInputException
     {
-        this(0, 0, AM, false, new ArrayList<>(), null);
+        this("Alarm", 0, 0, AM, false, new ArrayList<>(), null);
         logger.debug("Alarm created");
     }
 
@@ -48,7 +58,7 @@ public class Alarm implements Serializable
      */
     public Alarm(Clock clock, boolean isUpdateAlarm) throws InvalidInputException
     {
-        this(clock.getHours(), 0, clock.getAMPM(), isUpdateAlarm, List.of(clock.getDayOfWeek()), clock);
+        this("Alarm", clock.getHours(), 0, clock.getAMPM(), isUpdateAlarm, List.of(clock.getDayOfWeek()), clock);
         logger.debug("Alarm created from clock values");
     }
 
@@ -63,8 +73,8 @@ public class Alarm implements Serializable
      * @throws InvalidInputException thrown when invalid input is given
      * @see InvalidInputException
      */
-    public Alarm(int hours, int minutes, String ampm, boolean updatingAlarm,
-                 List<DayOfWeek> days, Clock clock) throws InvalidInputException
+    public Alarm(String name, int hours, int minutes, String ampm,
+                 boolean updatingAlarm, List<DayOfWeek> days, Clock clock) throws InvalidInputException
     {
         this.clock = clock;
         if (hours < 0 || hours > 12) throw new IllegalArgumentException("Hours must be between 0 and 12");
@@ -75,12 +85,91 @@ public class Alarm implements Serializable
         else throw new IllegalArgumentException("AMPM must be 'AM' or 'PM'");
         this.days = days;
         this.updatingAlarm = updatingAlarm;
+        this.name = StringUtils.isBlank(name) ? null : name;
+        setupMusicPlayer();
+        alarmsCounter++;
         logger.info("Alarm created with specific times");
     }
 
-    @Override
-    public String toString()
-    { return hoursAsStr+COLON+minutesAsStr+SPACE+ampm; }
+    /**
+     * Defines the music player object
+     */
+    public void setupMusicPlayer()
+    {
+        logger.info("setup music player");
+        InputStream inputStream = null;
+        try
+        {
+            inputStream = ClassLoader.getSystemResourceAsStream("sounds/alarmSound1.mp3");
+            if (null != inputStream) { musicPlayer = new AdvancedPlayer(inputStream); }
+            else throw new NullPointerException();
+        }
+        catch (NullPointerException | JavaLayerException e)
+        {
+            logger.error("Music Player not set!");
+            if (null == inputStream) printStackTrace(e, "An issue occurred while reading the alarm file.");
+            else printStackTrace(e, "A JavaLayerException occurred: " + e.getMessage());
+        }
+    }
+
+    /**
+     * Stops an actively going off alarm
+     */
+    public void stopAlarm()
+    {
+        logger.info("stop alarm");
+        musicPlayer = null;
+        alarmGoingOff = false;
+        logger.info("{} alarm turned off", this);
+    }
+
+    /**
+     * Sets an alarm to go off
+     */
+    public void triggerAlarm()
+    {
+        logger.info("trigger alarm");
+        try
+        {
+            logger.debug("while alarm is going off, play sound");
+            setupMusicPlayer();
+            getMusicPlayer().play();
+            //musicPlayer.close();
+        }
+        catch (Exception e)
+        {
+            logger.error(e.getCause().getClass().getName() + " - " + e.getMessage());
+            printStackTrace(e, "message");
+            //setupMusicPlayer();
+            //getMusicPlayer().play(50);
+        }
+
+    }
+
+    /**
+     * This method prints the stack trace of an exception
+     * that may occur when the digital panel is in use.
+     * @param e the exception
+     * @param message the message to print
+     */
+    public void printStackTrace(Exception e, String message)
+    {
+        if (null != message)
+            logger.error(message);
+        else
+            logger.error(e.getMessage());
+        for(StackTraceElement ste : e.getStackTrace())
+        { logger.error(ste.toString()); }
+    }
+
+    /**
+     * This method prints the stack trace of an exception
+     * that may occur when the digital panel is in use.
+     * @param e the exception
+     */
+    void printStackTrace(Exception e)
+    { printStackTrace(e, ""); }
+
 
     public List<String> getDaysShortened()
     {
@@ -91,10 +180,9 @@ public class Alarm implements Serializable
             days.contains(WEDNESDAY) && days.contains(THURSDAY) && days.contains(FRIDAY))
         { shortenedDays.add("Weekdays "); }
         else if (days.contains(SATURDAY) && days.contains(SUNDAY))
-        { shortenedDays.add("Weekend"); }
+        { shortenedDays.add("Weekends "); }
         else
         {
-
             for(DayOfWeek day : days)
             {
                 switch (day)
@@ -113,6 +201,15 @@ public class Alarm implements Serializable
         return shortenedDays;
     }
 
+    @Override
+    public String toString()
+    {
+        if (name == null || name.isBlank())
+        { return hoursAsStr+COLON+minutesAsStr+SPACE+ampm; }
+        else
+        { return name + SPACE + "(" + hoursAsStr+COLON+minutesAsStr+SPACE+ampm + ")"; }
+    }
+
     /* Getters */
     public Clock getClock() { return this.clock; }
     public boolean isAlarmGoingOff() { return alarmGoingOff; }
@@ -123,6 +220,11 @@ public class Alarm implements Serializable
     public int getMinutes() { return this.minutes; }
     public String getMinutesAsStr() { return this.minutesAsStr; }
     public String getAMPM() { return this.ampm; }
+    public String getName() { return this.name; }
+    public AdvancedPlayer getMusicPlayer() { return this.musicPlayer; }
+    public String getAlarmAsString() {
+        return hoursAsStr+COLON+minutesAsStr+SPACE+ampm;
+    }
 
     /* Setters */
     public void setClock(Clock clock) { this.clock = clock; }
@@ -140,4 +242,19 @@ public class Alarm implements Serializable
         this.minutesAsStr = (minutes < 10) ? "0"+this.minutes : String.valueOf(this.minutes);
     }
     public void setAMPM(String ampm) { this.ampm = ampm; }
+    public void setName(String name) {
+        if (name == null || name.isBlank()) {
+            this.name = "Alarm" + alarmsCounter;
+        } else {
+            this.name = name;
+        }
+    }
+    public void setMusicPlayer(AdvancedPlayer musicPlayer) {
+        this.musicPlayer = musicPlayer;
+    }
+
+    @Override
+    public int compareTo(Alarm o) {
+        return this.getAlarmAsString().compareTo(o.getAlarmAsString());
+    }
 }

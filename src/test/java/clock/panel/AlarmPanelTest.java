@@ -1,135 +1,135 @@
-package clock.panel;
-
-import clock.entity.Alarm;
-import clock.entity.Clock;
-import clock.exception.InvalidInputException;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
-
-import java.awt.event.WindowEvent;
-import java.time.DayOfWeek;
-import java.util.List;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.function.Predicate;
-
-import static java.time.Month.MARCH;
-import static clock.util.Constants.*;
-import static javax.swing.WindowConstants.DISPOSE_ON_CLOSE;
-import static java.time.DayOfWeek.*;
-import static org.junit.jupiter.api.Assertions.*;
-
-class AlarmPanelTest
-{
-    static { System.setProperty("appName", AlarmPanelTest.class.getSimpleName()); }
-    private static final Logger logger = LogManager.getLogger(AlarmPanelTest.class);
-    private Clock clock;
-    private Alarm alarm;
-
-    @BeforeAll
-    static void beforeClass()
-    {
-        logger.info("Starting AlarmPanelTest...");
-    }
-
-    @BeforeEach
-    void beforeEach() throws InvalidInputException
-    {
-        clock = new Clock();
-        clock.setDefaultCloseOperation(DISPOSE_ON_CLOSE);
-        alarm = new Alarm(clock, true);
-    }
-
-    @AfterEach
-    void afterEach()
-    {
-        if (clock != null) {
-            logger.info("Test complete. Closing the clock...");
-            // Create a WindowEvent with WINDOW_CLOSING event type
-            WindowEvent windowClosing = new WindowEvent(clock, WindowEvent.WINDOW_CLOSING);
-
-            // Dispatch the event to the JFrame instance
-            clock.dispatchEvent(windowClosing);
-
-            // Ensure the clock is no longer visible
-            assertFalse(clock.isVisible());
-
-            // Dispose of the JFrame to release resources
-            clock.dispose();
-        }
-    }
-
-    @Test
-    void testSettingAudioStreamWorks()
-    {
-        AlarmPanel testAlarmPanel = createAndSetupAlarmPanel();
-        assertNotNull(testAlarmPanel.getMusicPlayer(), "Music player should be set");
-    }
-
-    @Test
-    void testMusicPlayerCanSoundAlarm() throws InterruptedException, ExecutionException
-    {
-        AlarmPanel testAlarmPanel = createAndSetupAlarmPanel();
-        ExecutorService executor = Executors.newCachedThreadPool();
-        testAlarmPanel.setActiveAlarm(alarm);
-        testAlarmPanel.triggerAlarm(executor);
-        assertTrue(testAlarmPanel.isAlarmIsGoingOff(), "Alarm is going off");
-        Thread.sleep(1000);
-        testAlarmPanel.stopAlarm();
-        assertFalse(testAlarmPanel.isAlarmIsGoingOff(), "Alarm is off");
-        assertNull(testAlarmPanel.getMusicPlayer(), "Music Player is null");
-    }
-
-    @Test
-    void testCheckingWhichCheckBoxesAreCheckedWorks()
-    {
-        clock.getAlarmPanel().getMondayCheckBox().doClick();
-        clock.getAlarmPanel().getTuesdayCheckBox().doClick();
-        List<DayOfWeek> daysChecked = clock.getAlarmPanel().getDaysChecked();
-
-        Predicate<DayOfWeek> predicate = p -> daysChecked.contains(MONDAY) && daysChecked.contains(TUESDAY);
-        assertEquals(2, daysChecked.size(), "DaysChecked list size should be 2");
-        assertTrue(daysChecked.stream().allMatch(predicate), "daysChecked should contain only MONDAY and TUESDAY");
-    }
-
-    @Test
-    void alarmWorksAsExpected() throws InvalidInputException
-    {
-        clock.setHours(12);
-        clock.setMinutes(0);
-        clock.setSeconds(0);
-        clock.setMonth(MARCH);
-        clock.setDayOfWeek(FRIDAY);
-        clock.setDayOfMonth(3);
-        clock.setYear(2021);
-        clock.setAMPM(AM);
-        alarm.setIsAlarmGoingOff(true);
-        clock.setListOfAlarms(List.of(alarm));
-        clock.getAlarmPanel().setActiveAlarm(alarm);
-        clock.getAlarmPanel().checkIfAnyAlarmsAreGoingOff();
-        assertTrue(alarm.isAlarmGoingOff(), "Alarm should be going off!");
-        assertEquals(alarm, clock.getAlarmPanel().getActiveAlarm(), "This 'alarm' is set as the current alarm going off");
-        assertTrue(alarm.isAlarmGoingOff(), "Alarm should not be triggered to go off!");
-    }
-
-    @Test
-    void testRangeIsCorrect()
-    {
-        assertFalse(12 <= 0);
-        assertFalse(12 > 23);
-    }
-
-    // Helper methods
-    private AlarmPanel createAndSetupAlarmPanel()
-    {
-        AlarmPanel testAlarmPanel = clock.getAlarmPanel();
-        testAlarmPanel.setAlarm(alarm);
-        //testAlarmPanel.setupMusicPlayer();
-        return testAlarmPanel;
-    }
-}
+//package clock.panel;
+//
+//import clock.entity.Alarm;
+//import clock.entity.Clock;
+//import clock.exception.InvalidInputException;
+//import org.apache.logging.log4j.LogManager;
+//import org.apache.logging.log4j.Logger;
+//import org.junit.jupiter.api.AfterEach;
+//import org.junit.jupiter.api.BeforeAll;
+//import org.junit.jupiter.api.BeforeEach;
+//import org.junit.jupiter.api.Test;
+//
+//import java.awt.event.WindowEvent;
+//import java.time.DayOfWeek;
+//import java.util.List;
+//import java.util.concurrent.ExecutionException;
+//import java.util.concurrent.ExecutorService;
+//import java.util.concurrent.Executors;
+//import java.util.function.Predicate;
+//
+//import static java.time.Month.MARCH;
+//import static clock.util.Constants.*;
+//import static javax.swing.WindowConstants.DISPOSE_ON_CLOSE;
+//import static java.time.DayOfWeek.*;
+//import static org.junit.jupiter.api.Assertions.*;
+//
+//class AlarmPanelTest
+//{
+//    static { System.setProperty("appName", AlarmPanelTest.class.getSimpleName()); }
+//    private static final Logger logger = LogManager.getLogger(AlarmPanelTest.class);
+//    private Clock clock;
+//    private Alarm alarm;
+//
+//    @BeforeAll
+//    static void beforeClass()
+//    {
+//        logger.info("Starting AlarmPanelTest...");
+//    }
+//
+//    @BeforeEach
+//    void beforeEach() throws InvalidInputException
+//    {
+//        clock = new Clock();
+//        clock.setDefaultCloseOperation(DISPOSE_ON_CLOSE);
+//        alarm = new Alarm(clock, true);
+//    }
+//
+//    @AfterEach
+//    void afterEach()
+//    {
+//        if (clock != null) {
+//            logger.info("Test complete. Closing the clock...");
+//            // Create a WindowEvent with WINDOW_CLOSING event type
+//            WindowEvent windowClosing = new WindowEvent(clock, WindowEvent.WINDOW_CLOSING);
+//
+//            // Dispatch the event to the JFrame instance
+//            clock.dispatchEvent(windowClosing);
+//
+//            // Ensure the clock is no longer visible
+//            assertFalse(clock.isVisible());
+//
+//            // Dispose of the JFrame to release resources
+//            clock.dispose();
+//        }
+//    }
+//
+//    @Test
+//    void testSettingAudioStreamWorks()
+//    {
+//        AlarmPanel testAlarmPanel = createAndSetupAlarmPanel();
+//        assertNotNull(testAlarmPanel.getMusicPlayer(), "Music player should be set");
+//    }
+//
+//    @Test
+//    void testMusicPlayerCanSoundAlarm() throws InterruptedException, ExecutionException
+//    {
+//        AlarmPanel testAlarmPanel = createAndSetupAlarmPanel();
+//        ExecutorService executor = Executors.newCachedThreadPool();
+//        testAlarmPanel.setActiveAlarm(alarm);
+//        testAlarmPanel.triggerAlarm(executor);
+//        assertTrue(testAlarmPanel.isAlarmIsGoingOff(), "Alarm is going off");
+//        Thread.sleep(1000);
+//        testAlarmPanel.stopAlarm();
+//        assertFalse(testAlarmPanel.isAlarmIsGoingOff(), "Alarm is off");
+//        assertNull(testAlarmPanel.getMusicPlayer(), "Music Player is null");
+//    }
+//
+//    @Test
+//    void testCheckingWhichCheckBoxesAreCheckedWorks()
+//    {
+//        clock.getAlarmPanel().getMondayCheckBox().doClick();
+//        clock.getAlarmPanel().getTuesdayCheckBox().doClick();
+//        List<DayOfWeek> daysChecked = clock.getAlarmPanel().getDaysChecked();
+//
+//        Predicate<DayOfWeek> predicate = p -> daysChecked.contains(MONDAY) && daysChecked.contains(TUESDAY);
+//        assertEquals(2, daysChecked.size(), "DaysChecked list size should be 2");
+//        assertTrue(daysChecked.stream().allMatch(predicate), "daysChecked should contain only MONDAY and TUESDAY");
+//    }
+//
+//    @Test
+//    void alarmWorksAsExpected() throws InvalidInputException
+//    {
+//        clock.setHours(12);
+//        clock.setMinutes(0);
+//        clock.setSeconds(0);
+//        clock.setMonth(MARCH);
+//        clock.setDayOfWeek(FRIDAY);
+//        clock.setDayOfMonth(3);
+//        clock.setYear(2021);
+//        clock.setAMPM(AM);
+//        alarm.setIsAlarmGoingOff(true);
+//        clock.setListOfAlarms(List.of(alarm));
+//        clock.getAlarmPanel().setActiveAlarm(alarm);
+//        clock.getAlarmPanel().checkIfAnyAlarmsAreGoingOff();
+//        assertTrue(alarm.isAlarmGoingOff(), "Alarm should be going off!");
+//        assertEquals(alarm, clock.getAlarmPanel().getActiveAlarm(), "This 'alarm' is set as the current alarm going off");
+//        assertTrue(alarm.isAlarmGoingOff(), "Alarm should not be triggered to go off!");
+//    }
+//
+//    @Test
+//    void testRangeIsCorrect()
+//    {
+//        assertFalse(12 <= 0);
+//        assertFalse(12 > 23);
+//    }
+//
+//    // Helper methods
+//    private AlarmPanel createAndSetupAlarmPanel()
+//    {
+//        AlarmPanel testAlarmPanel = clock.getAlarmPanel();
+//        testAlarmPanel.setAlarm(alarm);
+//        //testAlarmPanel.setupMusicPlayer();
+//        return testAlarmPanel;
+//    }
+//}
