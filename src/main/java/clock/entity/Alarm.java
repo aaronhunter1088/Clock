@@ -1,5 +1,7 @@
 package clock.entity;
 
+import java.io.Serial;
+import java.io.Serializable;
 import java.time.DayOfWeek;
 import java.util.ArrayList;
 import java.util.List;
@@ -9,17 +11,19 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import static java.time.DayOfWeek.*;
-import static clock.contract.ClockConstants.*;
+import static clock.util.Constants.*;
 
 /**
  * An Alarm object that can be set to go off
  * at a specific time, on specific days.
  *
  * @author michael ball
-*  @version 2.8
+*  @version 2.0
  */
-public class Alarm
+public class Alarm implements Serializable
 {
+    @Serial
+    private static final long serialVersionUID = 2L;
     private static final Logger logger = LogManager.getLogger(Alarm.class);
     private int hours, minutes;
     private String minutesAsStr,hoursAsStr,ampm;

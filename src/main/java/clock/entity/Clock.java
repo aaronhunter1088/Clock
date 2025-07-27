@@ -13,7 +13,6 @@ import java.util.Locale;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
-import java.util.concurrent.TimeUnit;
 
 import clock.exception.InvalidInputException;
 import clock.panel.*;
@@ -23,7 +22,7 @@ import org.apache.logging.log4j.Logger;
 import static java.lang.Thread.sleep;
 import static java.time.Month.*;
 import static java.time.DayOfWeek.*;
-import static clock.contract.ClockConstants.*;
+import static clock.util.Constants.*;
 import static clock.panel.ClockPanel.*;
 
 /**
@@ -35,7 +34,7 @@ import static clock.panel.ClockPanel.*;
  * (DAY_OF_WEEK MONTH DATE, YEAR).
  * 
  * @author Michael Ball 
-*  @version 2.8
+*  @version since 1.0
  */
 public class Clock extends JFrame
 {
@@ -51,6 +50,7 @@ public class Clock extends JFrame
     public final static Font font40 = new Font("Courier New", Font.BOLD, 40);
     public final static Font font20 = new Font("Courier New", Font.BOLD, 20);
     public final static Font font10 = new Font("Courier New", Font.BOLD, 10);
+    public final static Font analogueFont = new Font("TimesRoman", Font.BOLD, 20);
 
     private ClockPanel clockPanel;
     private Component currentPanel;
@@ -60,6 +60,7 @@ public class Clock extends JFrame
     private AlarmPanel alarmPanel;
     private TimerPanel timerPanel;
     private TimerPanel2 timerPanel2;
+    private StopwatchPanel stopwatchPanel;
     private LocalDate beginDaylightSavingsTimeDate;
     private LocalDate endDaylightSavingsTimeDate;
     private LocalDateTime currentTime;
@@ -76,6 +77,7 @@ public class Clock extends JFrame
             showMilitaryTime,showDigitalTimeOnAnalogueClock,testingClock,
             daylightSavingsTimeEnabled;
     private List<Alarm> listOfAlarms;
+    private List<Timer> listOfTimers;
     private ScheduledFuture<?> countdownFuture;
     private ScheduledExecutorService scheduler;
 
@@ -88,6 +90,10 @@ public class Clock extends JFrame
         initialize();
     }
 
+    /**
+     * Creates a new Clock object with the testing flag set.
+     * @param testing if the clock is for testing purposes
+     */
     public Clock(boolean testing)
     {
         super();
@@ -113,9 +119,7 @@ public class Clock extends JFrame
      */
     public Clock(int hours, int minutes, int seconds, Month month, DayOfWeek dayOfWeek, int dayOfMonth, int year, String ampm) throws InvalidInputException
     {
-        super();
-        testingClock = true;
-        initialize();
+        this(true);
         if (seconds < 0 || seconds > 59 && seconds != 60) throw new IllegalArgumentException("Seconds must be between 0 and 59");
         else setSeconds(seconds);
         if (minutes < 0 || minutes > 59 && minutes != 60) throw new IllegalArgumentException("Minutes must be between 0 and 59");
@@ -152,7 +156,7 @@ public class Clock extends JFrame
         dateChanged = false;
         alarmActive = false;
         timerActive = false;
-        updatePanel(PANEL_DIGITAL_CLOCK, false);
+        showPanel(PANEL_DIGITAL_CLOCK, false);
     }
 
     /**
@@ -164,7 +168,7 @@ public class Clock extends JFrame
     {
         getContentPane().setBackground(Color.BLACK);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        setBounds(200, 200, 700, 300);
+        setBounds(200, 200, Clock.defaultSize.width, Clock.defaultSize.height);
         setSize(Clock.defaultSize);
         ImageIcon icon = createImageIcon("src/main/resources/images/clockImageIcon.png");
         final Taskbar taskbar = Taskbar.getTaskbar();
@@ -173,6 +177,7 @@ public class Clock extends JFrame
         setVisible(true);
         setResizable(false);
         listOfAlarms = new ArrayList<>();
+        listOfTimers = new ArrayList<>();
         if (!testingClock) {
             showMilitaryTime = false;
             setTheTime(LocalDateTime.now());
@@ -185,30 +190,10 @@ public class Clock extends JFrame
             timerPanel = new TimerPanel(this);
             timerPanel2 = new TimerPanel2(this);
             leapYear = date.isLeapYear();
-            dateChanged = false;
-            alarmActive = false;
-            timerActive = false;
             daylightSavingsTimeEnabled = true;
             scheduler = Executors.newScheduledThreadPool(25);
-            updatePanel(PANEL_DIGITAL_CLOCK, false);
-        }
-    }
-
-    /**
-     * Updates the Clock to display a new panel
-     * based on the provided clockPanel value.
-     * @param clockPanel the panel to update to
-     */
-    public void updatePanel(ClockPanel clockPanel, boolean resetValues)
-    {
-        logger.debug("updating to {}", clockPanel);
-        switch (clockPanel)
-        {
-            case PANEL_DIGITAL_CLOCK -> changeToDigitalClockPanel();
-            case PANEL_ANALOGUE_CLOCK -> changeToAnalogueClockPanel();
-            case PANEL_ALARM -> changeToAlarmPanel(resetValues);
-            case PANEL_TIMER -> changeToTimerPanel2();
-            case PANEL_TIMER2 -> changeToTimerPanel2();
+            //showPanel(PANEL_ANALOGUE_CLOCK, false);
+            changePanels(PANEL_DIGITAL_CLOCK, false);
         }
     }
 
@@ -355,7 +340,7 @@ public class Clock extends JFrame
                 String ampm = getAMPMFromTime(null);
                 setAMPM(ampm);
             }
-            digitalClockPanel.updateLabels();
+            //digitalClockPanel.updateLabels();
             return true;
         }
         return false;
@@ -481,24 +466,204 @@ public class Clock extends JFrame
                date.isEqual(endDaylightSavingsTimeDate);
     }
 
-    public void ticking()
+    /**
+     * Returns the default text for the clock label
+     * @param labelVersion the value of the label to sue
+     * @return String the default text for a label
+     */
+    public String defaultText(int labelVersion)
     {
-        try
-        {
-            // creates a thread pool with three threads
-            //ScheduledExecutorService executor = Executors.newScheduledThreadPool(3);
-            //while (true)
-            //{
-                tick();
-                scheduler.schedule(() -> alarmPanel.checkIfAnyAlarmsAreGoingOff(), 0, TimeUnit.MILLISECONDS);
-                scheduler.schedule(() -> timerPanel2.checkIfAnyTimersAreGoingOff(), 0, TimeUnit.MILLISECONDS);
-                scheduler.schedule(this::checkIfItIsNewYears, 0, TimeUnit.MILLISECONDS);
-                scheduler.schedule(this::setTheCurrentTime, 0, TimeUnit.MILLISECONDS);
-                sleep(1000);
-            //}
+        String defaultText = EMPTY;
+        if (labelVersion == 1) {
+            if (showFullDate && !showPartialDate) defaultText = getFullDateAsStr();
+            else if (showPartialDate && !showFullDate) defaultText = getPartialDateAsStr();
+            else defaultText = getDateAsStr();
         }
-        catch (Exception e)
-        { logger.error("Exception in clock: {}", e.getMessage()); }
+        else if (labelVersion == 2) {
+            if (!showMilitaryTime) {
+                if (PM.equals(ampm) && hours > 12) { setHours(hours-12); }
+                defaultText = getTimeAsStr();
+            }
+            else {
+                defaultText = getMilitaryTimeAsStr();
+            }
+        }
+        else if (labelVersion == 3) { defaultText = Hours; }
+        else if (labelVersion == 4) { defaultText = Minutes; }
+        else if (labelVersion == 5) { defaultText = AM+SLASH+PM; }
+        else if (labelVersion == 6) { defaultText = No_Alarms; }
+        else if (labelVersion == 7) { defaultText = S; }
+        else if (labelVersion == 8) { defaultText = alarmPanel.getActiveAlarm().toString(); }
+        else if (labelVersion == 9) { defaultText = is+SPACE+going_off; }
+        else if (labelVersion == 10) { defaultText = No_Timers; }
+        return defaultText;
+    }
+
+    /**
+     * Sets up the menu bar
+     */
+    public void setupMenuBar()
+    {
+        logger.info("setup menubar");
+        UIManager.put("MenuItem.background", Color.BLACK);
+        menuBar = new ClockMenuBar(this);
+        setJMenuBar(menuBar);
+    }
+
+    /**
+     * Changes the panel to the digital clock panel
+     */
+    public void changeToDigitalClockPanel()
+    {
+        logger.info("change to digital clock");
+        add(digitalClockPanel);
+        currentPanel = digitalClockPanel;
+        digitalClockPanel.setupDefaultActions(this);
+        setSize(Clock.defaultSize);
+        //digitalClockPanel.updateLabels();
+        setBackground(Color.BLACK);
+        clockPanel = DigitalClockPanel.PANEL;
+        digitalClockPanel.setupSettingsMenu();
+    }
+
+    /**
+     * Changes the panel to the analogue clock panel
+     */
+    public void changeToAnalogueClockPanel()
+    {
+        logger.info("change to analogue clock");
+        add(analogueClockPanel);
+        currentPanel = analogueClockPanel;
+        analogueClockPanel.setupDefaultActions(this);
+        setSize(analogueClockPanel.getMaximumSize());
+        setBackground(Color.BLACK);
+        clockPanel = AnalogueClockPanel.PANEL;
+        analogueClockPanel.setupSettingsMenu();
+    }
+
+    /**
+     * Changes the panel to the alarm panel
+     * @param resetValues if the values should be reset
+     */
+    public void changeToAlarmPanel(boolean resetValues)
+    {
+        logger.info("change to alarm panel. reset values: {}", resetValues);
+        add(alarmPanel);
+        currentPanel = alarmPanel;
+        if (resetValues)
+        {
+            alarmPanel.getJTextField1().setText(EMPTY);
+            alarmPanel.getJTextField2().setText(EMPTY);
+            alarmPanel.getJTextField3().setText(EMPTY);
+            alarmPanel.resetJCheckBoxes();
+            alarmPanel.resetJTextArea(); // so error alarms don't show up after navigating out and back in
+            alarmPanel.getJAlarmLbl4().setText("Current Alarms");
+        }
+        setSize(Clock.defaultSize);
+        clockPanel = PANEL_ALARM;
+        alarmPanel.setupSettingsMenu();
+    }
+
+    /**
+     * Changes the panel to the timer panel
+     */
+    public void changeToTimerPanel()
+    {
+        logger.info("change to timer panel");
+        add(timerPanel);
+        currentPanel = timerPanel;
+        setSize(Clock.defaultSize);
+        clockPanel = PANEL_TIMER;
+        timerPanel.setupSettingsMenu();
+        timerPanel.updateLabels();
+    }
+
+    /**
+     * Changes the panel to the timer panel
+     */
+    public void changeToTimerPanel2()
+    {
+        logger.info("change to timer panel");
+        add(timerPanel2);
+        currentPanel = timerPanel2;
+        setSize(Clock.defaultSize);
+        clockPanel = PANEL_TIMER2;
+        timerPanel.setupSettingsMenu();
+        timerPanel.updateLabels();
+    }
+
+    public void changeToStopwatchPanel()
+    {
+        logger.debug("change to stopwatch panel");
+        add(stopwatchPanel);
+        currentPanel = stopwatchPanel;
+        setSize(Clock.defaultSize);
+        clockPanel = PANEL_STOPWATCH;
+        //timerPanel.setupSettingsMenu();
+        //timerPanel.updateLabels();
+    }
+
+    /**
+     * Updates the Clock to display a new panel
+     * based on the provided clockPanel value.
+     * @param clockPanel the panel to update to
+     */
+    public void showPanel(ClockPanel clockPanel, boolean resetValues)
+    {
+        logger.debug("updating to {}", clockPanel);
+        switch (clockPanel)
+        {
+            case PANEL_DIGITAL_CLOCK -> changeToDigitalClockPanel();
+            case PANEL_ANALOGUE_CLOCK -> changeToAnalogueClockPanel();
+            case PANEL_ALARM -> changeToAlarmPanel(resetValues);
+            case PANEL_TIMER -> changeToTimerPanel2();
+            case PANEL_TIMER2 -> changeToTimerPanel2();
+            case PANEL_STOPWATCH -> changeToStopwatchPanel();
+        }
+    }
+
+    /**
+     * Changes the panels based on the provided clockPanel value
+     * @param clockPanel the panel to change to
+     */
+    public void changePanels(ClockPanel clockPanel, boolean resetValues)
+    {
+        logger.info("change panels");
+        if (currentPanel != null) remove(currentPanel);
+        if (currentPanel instanceof DigitalClockPanel dcp)
+            dcp.stop();
+        if (currentPanel instanceof AnalogueClockPanel acp)
+            acp.stop();
+        showPanel(clockPanel, resetValues);
+        repaint();
+        setVisible(true);
+    }
+
+    /**
+     * A default tick of the clock
+     */
+    public void tick()
+    { tick(1,1,1); }
+
+    /**
+     * The purpose of tick is to update the clock.
+     * Given the values of seconds, minutes, and hours, with each tick,
+     * when one of these values rolls over, it will update its respective
+     * value by that amount.
+     * Then updates the clock labels to display the changes
+     * in time or date.
+     *
+     * @param seconds, the amount of seconds to tick forward or backwards with each tick
+     * @param minutes, the amount of minutes to tick forward or backwards with each tick
+     * @param hours,   the amount of hours   to tick forward or backwards with each tick
+     */
+    public void tick(int seconds, int minutes, int hours)
+    {
+        logger.info("tick rate: sec: {} min: {} hrs: {}", seconds, minutes, hours);
+        performTick(seconds, minutes, hours);
+        //if (PANEL_DIGITAL_CLOCK == clockPanel) { digitalClockPanel.updateLabels(); }
+        updateTimeIfMidnight();
+        setTheCurrentTime();
     }
 
     /**
@@ -574,51 +739,51 @@ public class Clock extends JFrame
                 case SATURDAY -> setDayOfWeek(SUNDAY);
                 default -> logger.error("Unknown DayOfWeek: " + getDayOfWeek());
             }
-            switch (month) 
+            switch (month)
             {
-                case JANUARY -> 
+                case JANUARY ->
                 {
-                    if (dayOfMonth == 31) 
+                    if (dayOfMonth == 31)
                     {
                         setDayOfMonth(1);
                         setMonth(FEBRUARY);
                     }
                 }
-                case FEBRUARY -> 
+                case FEBRUARY ->
                 {
-                    if (!leapYear && dayOfMonth == 29 || leapYear && dayOfMonth == 30) 
+                    if (!leapYear && dayOfMonth == 29 || leapYear && dayOfMonth == 30)
                     {
                         setDayOfMonth(1);
                         setMonth(MARCH);
                     }
-                    else if (leapYear && dayOfMonth == 29) 
+                    else if (leapYear && dayOfMonth == 29)
                     { logger.info("happy leap day"); }
                 }
-                case MARCH -> 
+                case MARCH ->
                 {
-                    if (dayOfMonth == 32) 
+                    if (dayOfMonth == 32)
                     {
                         setDayOfMonth(1);
                         setMonth(APRIL);
                     }
                 }
-                case APRIL -> 
+                case APRIL ->
                 {
-                    if (dayOfMonth == 31) 
+                    if (dayOfMonth == 31)
                     {
                         setDayOfMonth(1);
                         setMonth(MAY);
                     }
                 }
-                case MAY -> 
+                case MAY ->
                 {
-                    if (dayOfMonth == 32) 
+                    if (dayOfMonth == 32)
                     {
                         setDayOfMonth(1);
                         setMonth(JUNE);
                     }
                 }
-                case JUNE -> 
+                case JUNE ->
                 {
                     if (dayOfMonth == 31)
                     {
@@ -626,23 +791,23 @@ public class Clock extends JFrame
                         setMonth(JULY);
                     }
                 }
-                case JULY -> 
+                case JULY ->
                 {
-                    if (dayOfMonth == 32) 
+                    if (dayOfMonth == 32)
                     {
                         setDayOfMonth(1);
                         setMonth(AUGUST);
                     }
                 }
-                case AUGUST -> 
+                case AUGUST ->
                 {
-                    if (dayOfMonth == 32) 
+                    if (dayOfMonth == 32)
                     {
                         setDayOfMonth(1);
                         setMonth(SEPTEMBER);
                     }
                 }
-                case SEPTEMBER -> 
+                case SEPTEMBER ->
                 {
                     if (dayOfMonth == 31)
                     {
@@ -650,7 +815,7 @@ public class Clock extends JFrame
                         setMonth(OCTOBER);
                     }
                 }
-                case OCTOBER -> 
+                case OCTOBER ->
                 {
                     if (dayOfMonth == 32)
                     {
@@ -658,7 +823,7 @@ public class Clock extends JFrame
                         setMonth(NOVEMBER);
                     }
                 }
-                case NOVEMBER -> 
+                case NOVEMBER ->
                 {
                     if (dayOfMonth == 31)
                     {
@@ -666,9 +831,9 @@ public class Clock extends JFrame
                         setMonth(DECEMBER);
                     }
                 }
-                case DECEMBER -> 
+                case DECEMBER ->
                 {
-                    if (dayOfMonth == 32) 
+                    if (dayOfMonth == 32)
                     {
                         setDayOfMonth(1);
                         setMonth(JANUARY);
@@ -710,172 +875,6 @@ public class Clock extends JFrame
             else
             { logger.debug("!! today is not dst !!"); }
         }
-    }
-
-    /**
-     * Returns the default text for the clock label
-     * @param labelVersion the value of the label to sue
-     * @return String the default text for a label
-     */
-    public String defaultText(int labelVersion)
-    {
-        String defaultText = EMPTY;
-        if (labelVersion == 1) {
-            if (showFullDate && !showPartialDate) defaultText = getFullDateAsStr();
-            else if (showPartialDate && !showFullDate) defaultText = getPartialDateAsStr();
-            else defaultText = getDateAsStr();
-        }
-        else if (labelVersion == 2) {
-            if (!showMilitaryTime) {
-                if (PM.equals(ampm) && hours > 12) { setHours(hours-12); }
-                defaultText = getTimeAsStr();
-            }
-            else {
-                defaultText = getMilitaryTimeAsStr();
-            }
-        }
-        else if (labelVersion == 3) { defaultText = Hours; }
-        else if (labelVersion == 4) { defaultText = Minutes; }
-        else if (labelVersion == 5) { defaultText = AM+SLASH+PM; }
-        else if (labelVersion == 6) { defaultText = No_Alarms; }
-        else if (labelVersion == 7) { defaultText = S; }
-        else if (labelVersion == 8) { defaultText = alarmPanel.getActiveAlarm().toString(); }
-        else if (labelVersion == 9) { defaultText = is+SPACE+going_off; }
-        else if (labelVersion == 10) { defaultText = No_Timers; }
-        return defaultText;
-    }
-
-    /**
-     * Sets up the menu bar
-     */
-    public void setupMenuBar()
-    {
-        logger.info("setup menubar");
-        UIManager.put("MenuItem.background", Color.BLACK);
-        menuBar = new ClockMenuBar(this);
-        setJMenuBar(menuBar);
-    }
-
-    /**
-     * Changes the panel to the digital clock panel
-     */
-    public void changeToDigitalClockPanel()
-    {
-        logger.info("change to digital clock");
-        add(digitalClockPanel);
-        currentPanel = digitalClockPanel;
-        setSize(Clock.defaultSize);
-        digitalClockPanel.updateLabels();
-        clockPanel = PANEL_DIGITAL_CLOCK;
-        digitalClockPanel.setupSettingsMenu();
-    }
-
-    /**
-     * Changes the panel to the analogue clock panel
-     */
-    public void changeToAnalogueClockPanel()
-    {
-        logger.info("change to analogue clock");
-        add(analogueClockPanel);
-        currentPanel = analogueClockPanel;
-        analogueClockPanel.setupDefaultActions(this);
-        setSize(analogueClockPanel.getMaximumSize());
-        setBackground(Color.BLACK);
-        clockPanel = PANEL_ANALOGUE_CLOCK;
-        analogueClockPanel.setupSettingsMenu();
-    }
-
-    /**
-     * Changes the panel to the alarm panel
-     * @param resetValues if the values should be reset
-     */
-    public void changeToAlarmPanel(boolean resetValues)
-    {
-        logger.info("change to alarm panel. reset values: {}", resetValues);
-        add(alarmPanel);
-        currentPanel = alarmPanel;
-        if (resetValues)
-        {
-            alarmPanel.getJTextField1().setText(EMPTY);
-            alarmPanel.getJTextField2().setText(EMPTY);
-            alarmPanel.getJTextField3().setText(EMPTY);
-            alarmPanel.resetJCheckBoxes();
-            alarmPanel.resetJTextArea(); // so error alarms don't show up after navigating out and back in
-            alarmPanel.getJAlarmLbl4().setText("Current Alarms");
-        }
-        setSize(Clock.defaultSize);
-        clockPanel = PANEL_ALARM;
-        alarmPanel.setupSettingsMenu();
-    }
-
-    /**
-     * Changes the panel to the timer panel
-     */
-    public void changeToTimerPanel()
-    {
-        logger.info("change to timer panel");
-        add(timerPanel);
-        currentPanel = timerPanel;
-        setSize(Clock.defaultSize);
-        clockPanel = PANEL_TIMER;
-        timerPanel.setupSettingsMenu();
-        timerPanel.updateLabels();
-    }
-
-    /**
-     * Changes the panel to the timer panel
-     */
-    public void changeToTimerPanel2()
-    {
-        logger.info("change to timer panel");
-        add(timerPanel2);
-        currentPanel = timerPanel2;
-        setSize(Clock.defaultSize);
-        clockPanel = PANEL_TIMER2;
-        timerPanel.setupSettingsMenu();
-        timerPanel.updateLabels();
-    }
-
-    /**
-     * Changes the panels based on the provided clockPanel value
-     * @param clockPanel the panel to change to
-     */
-    public void changePanels(ClockPanel clockPanel, boolean resetValues)
-    {
-        logger.info("change panels");
-        remove(currentPanel);
-        if (currentPanel instanceof AnalogueClockPanel acp)
-            acp.stop();
-        updatePanel(clockPanel, resetValues);
-        repaint();
-        setVisible(true);
-    }
-
-    /**
-     * The main purpose of the clock
-     */
-    public void tick()
-    { tick(1,1,1); }
-
-    /**
-     * The purpose of tick is to update the clock.
-     * Given the values of seconds, minutes, and hours, with each tick,
-     * when one of these values rolls over, it will update its respective
-     * value by that amount.
-     * Then updates the clock labels to display the changes
-     * in time or date.
-     *
-     * @param seconds, the amount of seconds to tick forward or backwards with each tick
-     * @param minutes, the amount of minutes to tick forward of backwards with each tick
-     * @param hours,   the amount of hours   to tick forward or backwards with each tick
-     */
-    public void tick(int seconds, int minutes, int hours)
-    {
-        logger.info("tick rate: sec: {} min: {} hrs: {}", seconds, minutes, hours);
-        performTick(seconds, minutes, hours);
-        if (PANEL_DIGITAL_CLOCK == clockPanel) { digitalClockPanel.updateLabels(); }
-        updateTimeIfMidnight();
-        setTheCurrentTime();
     }
 
     /**

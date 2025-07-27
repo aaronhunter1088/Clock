@@ -3,12 +3,12 @@ package clock.panel;
 import java.awt.*;
 import javax.swing.JPanel;
 
-import clock.contract.ClockConstants;
 import clock.entity.Clock;
 import clock.contract.IClockPanel;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import static clock.util.Constants.*;
 import static java.lang.Thread.sleep;
 import static clock.panel.ClockPanel.PANEL_ANALOGUE_CLOCK;
 
@@ -19,11 +19,12 @@ import static clock.panel.ClockPanel.PANEL_ANALOGUE_CLOCK;
  * to hide this, the settings allows for that.
  *
  * @author michael ball
-*  @version 2.8
+*  @version 2.6
  */
 public class AnalogueClockPanel extends JPanel implements IClockPanel, Runnable
 {
     private static final Logger logger = LogManager.getLogger(AnalogueClockPanel.class);
+    public static final ClockPanel PANEL = PANEL_ANALOGUE_CLOCK;
     private GridBagLayout layout;
     private GridBagConstraints constraints;
     private Thread thread = null;
@@ -43,33 +44,35 @@ public class AnalogueClockPanel extends JPanel implements IClockPanel, Runnable
     }
 
     /**
-     * Draws the analogue clock
-     * @param g the graphics object
+     * Sets up the default actions for the analogue clock panel
+     * @param clock the clock reference
      */
-    public void drawStructure(Graphics g)
+    public void setupDefaultActions(Clock clock)
     {
-        logger.info("drawing structure");
-        g.setFont(new Font("TimesRoman", Font.BOLD, 20));
-        g.setColor(Color.BLACK);
-        g.fillOval(xcenter - 150, ycenter - 150, 300, 300);
+        logger.debug("setup default actions with clock");
+        this.clock = clock;
+        setClockText(clock.getTimeAsStr());
+        setupSettingsMenu();
+        setMaximumSize(new Dimension(350, 400));
+        setGridBagLayout(new GridBagLayout()); // sets layout
+        setLayout(layout);
+        setGridBagConstraints(new GridBagConstraints());
+        setBackground(Color.BLACK);
+        setForeground(Color.BLACK);
+        start(this);
+    }
 
-        g.setColor(Color.BLUE);
-        g.drawString(clockText, 120, 260);
-
-        g.setColor(Color.WHITE);
-        g.drawString("1", xcenter + 60, ycenter - 110);
-        g.drawString("2", xcenter + 110, ycenter - 60);
-        g.drawString("3", xcenter + 135, ycenter);
-        g.drawString("4", xcenter + 110, ycenter + 60);
-        g.drawString("5", xcenter + 60, ycenter + 110);
-        g.drawString("6", xcenter - 10, ycenter + 145);
-        g.drawString("8", xcenter - 120, ycenter + 60);
-        g.drawString("7", xcenter - 80, ycenter + 110);
-        g.drawString("9", xcenter - 145, ycenter);
-        g.drawString("10", xcenter - 130, ycenter - 60);
-        g.drawString("11", xcenter - 80, ycenter - 110);
-        g.drawString("12", xcenter - 10, ycenter - 130);
-        g.setColor(Color.BLACK); // needed to avoid second hand delay UI issue
+    /**
+     * Sets up the checkboxes for the Analogue Clock Panel
+     */
+    public void setupSettingsMenu()
+    {
+        clock.clearSettingsMenu();
+        clock.getClockMenuBar().getSettingsMenu().add(clock.getClockMenuBar().getShowDigitalTimeOnAnalogueClockSetting());
+        clock.getClockMenuBar().getSettingsMenu().add(clock.getClockMenuBar().getToggleDSTSetting());
+        clock.getClockMenuBar().getSettingsMenu().add(clock.getClockMenuBar().getChangeTimeZoneMenu());
+        clock.setShowDigitalTimeOnAnalogueClock(true);
+        clock.getClockMenuBar().getShowDigitalTimeOnAnalogueClockSetting().setText(HIDE+SPACE+DIGITAL_TIME);
     }
 
     /**
@@ -96,32 +99,17 @@ public class AnalogueClockPanel extends JPanel implements IClockPanel, Runnable
     }
 
     /**
-     * Sets up the default actions for the analogue clock panel
-     * @param clock the clock reference
+     * Repaints the analogue clock after it has been updated
      */
-    public void setupDefaultActions(Clock clock)
+    public void run()
     {
-        logger.info("setup default actions with clock");
-        this.clock = clock;
-        this.clock.setClockPanel(PANEL_ANALOGUE_CLOCK);
-        clockText = clock.getTimeAsStr();
-        setupSettingsMenu();
-        setDefaults();
-    }
-
-    /**
-     * Sets up the analogue clock panel
-     */
-    public void setDefaults()
-    {
-        logger.info("setupDefaultActions");
-        setMaximumSize(new Dimension(350, 400));
-        setGridBagLayout(new GridBagLayout());
-        setLayout(layout);
-        setGridBagConstraints(new GridBagConstraints());
-        setBackground(Color.BLACK);
-        setForeground(Color.BLACK);
-        start(this);
+        logger.info("starting analogue clock");
+        while (thread != null)
+        {
+            try { sleep(1000); }
+            catch (InterruptedException e) { printStackTrace(e, e.getMessage());}
+            repaint();
+        }
     }
 
     /**
@@ -192,30 +180,36 @@ public class AnalogueClockPanel extends JPanel implements IClockPanel, Runnable
     }
 
     /**
-     * Repaints the analogue clock after it has been updated
+     * Draws the analogue clock
+     * @param g the graphics object
      */
-    public void run()
+    public void drawStructure(Graphics g)
     {
-        logger.info("starting analogue clock");
-        while (thread != null)
-        {
-            try { sleep(1000); }
-            catch (InterruptedException e) { printStackTrace(e, e.getMessage());}
-            repaint();
-        }
-    }
+        logger.info("drawing structure");
+        g.setFont(Clock.analogueFont);
+        g.setColor(Color.BLACK);
+        g.fillOval(xcenter - 150, ycenter - 150, 300, 300);
 
-    /**
-     * Sets up the checkboxes for the Analogue Clock Panel
-     */
-    public void setupSettingsMenu()
-    {
-        clock.clearSettingsMenu();
-        clock.getClockMenuBar().getSettingsMenu().add(clock.getClockMenuBar().getShowDigitalTimeOnAnalogueClockSetting());
-        clock.getClockMenuBar().getSettingsMenu().add(clock.getClockMenuBar().getToggleDSTSetting());
-        clock.getClockMenuBar().getSettingsMenu().add(clock.getClockMenuBar().getChangeTimeZoneMenu());
-        clock.setShowDigitalTimeOnAnalogueClock(true);
-        clock.getClockMenuBar().getShowDigitalTimeOnAnalogueClockSetting().setText(ClockConstants.HIDE+ClockConstants.SPACE+ClockConstants.DIGITAL_TIME);
+        if (clock.isShowDigitalTimeOnAnalogueClock())
+        {
+            g.setColor(Color.WHITE);
+            g.drawString(clockText, xcenter - 50, ycenter + 90); // 170
+        }
+
+        g.setColor(Color.WHITE);
+        g.drawString(ONE, xcenter + 60, ycenter - 110);
+        g.drawString(TWO, xcenter + 110, ycenter - 60);
+        g.drawString(THREE, xcenter + 135, ycenter);
+        g.drawString(FOUR, xcenter + 110, ycenter + 60);
+        g.drawString(FIVE, xcenter + 60, ycenter + 110);
+        g.drawString(SIX, xcenter - 10, ycenter + 145);
+        g.drawString(SEVEN, xcenter - 80, ycenter + 110);
+        g.drawString(EIGHT, xcenter - 120, ycenter + 60);
+        g.drawString(NINE, xcenter - 145, ycenter);
+        g.drawString(TEN, xcenter - 130, ycenter - 60);
+        g.drawString(ELEVEN, xcenter - 80, ycenter - 110);
+        g.drawString(TWELVE, xcenter - 10, ycenter - 130);
+        g.setColor(Color.BLACK); // needed to avoid second hand delay UI issue
     }
 
     /**
@@ -249,8 +243,8 @@ public class AnalogueClockPanel extends JPanel implements IClockPanel, Runnable
     String getClockText() { return this.clockText; }
 
     /* Setters */
-    protected void setGridBagLayout(GridBagLayout layout) { this.layout = layout; }
-    protected void setGridBagConstraints(GridBagConstraints constraints) { this.constraints = constraints; }
-    protected void setClockText(String clockText) { this.clockText = clockText; }
+    private void setGridBagLayout(GridBagLayout layout) { this.layout = layout; }
+    private void setGridBagConstraints(GridBagConstraints constraints) { this.constraints = constraints; }
+    private void setClockText(String clockText) { this.clockText = clockText; }
     public void setClock(Clock clock) { this.clock = clock; }
 }

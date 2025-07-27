@@ -163,12 +163,6 @@ class TimerTest
     }
 
     // Helper methods
-    private void tick(int times)
-    {
-        for (int i=0; i<times; i++) {
-            clock.ticking();
-        }
-    }
 
     private void openTimerPanel() throws InterruptedException
     {

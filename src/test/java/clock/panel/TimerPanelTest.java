@@ -15,7 +15,7 @@ import java.awt.event.MouseEvent;
 import java.awt.event.WindowEvent;
 import java.util.Arrays;
 
-import static clock.contract.ClockConstants.*;
+import static clock.util.Constants.*;
 import static javax.swing.WindowConstants.DISPOSE_ON_CLOSE;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.mock;

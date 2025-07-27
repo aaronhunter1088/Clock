@@ -7,12 +7,23 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import java.io.InputStream;
+import java.io.Serial;
+import java.io.Serializable;
 
-import static clock.contract.ClockConstants.*;
+import static clock.util.Constants.*;
 import static java.lang.Thread.sleep;
 
-public class Timer implements Runnable
+/**
+ * A Timer object that can be set to go off
+ * after a specific amount of time
+ *
+ * @author michael ball
+ *  @version 2.0
+ */
+public class Timer implements Serializable, Runnable
 {
+    @Serial
+    private static final long serialVersionUID = 2L;
     private static final Logger logger = LogManager.getLogger(Timer.class);
     private int hour, minute, second;
     private String hourAsStr, minuteAsStr, secondAsStr;
@@ -101,7 +112,7 @@ public class Timer implements Runnable
     public void triggerTimer()
     {
         logger.info("trigger timer");
-        clock.getDigitalClockPanel().updateLabels();
+        //clock.getDigitalClockPanel().updateLabels();
         this.setHasBeenTriggered(true);
 
         try

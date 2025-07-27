@@ -16,7 +16,7 @@ import java.util.ArrayList;
 
 import static java.time.DayOfWeek.*;
 import static java.time.Month.*;
-import static clock.contract.ClockConstants.*;
+import static clock.util.Constants.*;
 import static javax.swing.WindowConstants.DISPOSE_ON_CLOSE;
 import static org.junit.jupiter.api.Assertions.*;
 

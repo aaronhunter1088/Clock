@@ -12,7 +12,7 @@ import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 
-import static clock.contract.ClockConstants.AMERICA_CHICAGO;
+import static clock.util.Constants.AMERICA_CHICAGO;
 
 public class WorldClockExample 
 {

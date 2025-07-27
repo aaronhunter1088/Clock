@@ -26,6 +26,7 @@ import java.util.concurrent.*;
 
 import static clock.panel.ClockPanel.*;
 import static java.lang.Thread.sleep;
+import static clock.util.Constants.*;
 
 // TODO: Replace TimerPanel2 with TimerPanel when done
 /**
@@ -613,7 +614,7 @@ public class TimerPanel2 extends JPanel implements IClockPanel
         logger.info("trigger timer");
         // TODO: Update for Timer
         //setAlarmIsGoingOff(true);
-        clock.getDigitalClockPanel().updateLabels();
+        //clock.getDigitalClockPanel().updateLabels();
         //clock.getDigitalClockPanel().getLabel1().setText(activeAlarm.toString());
         //clock.getDigitalClockPanel().getLabel2().setText("is going off!");
         // play sound

@@ -12,12 +12,11 @@ import java.util.concurrent.TimeUnit;
  * Main application to start Clock
  *
  * @author Michael Ball
-*  @version 2.8
+*  @version 1.0
  */
 public class Main
 {
-    static { System.setProperty("appName", Main.class.getSimpleName()); }
-    private final static Logger logger = LogManager.getLogger(Main.class);
+    private final static Logger logger = LogManager.getLogger();
 
     /**
      * Main method to start the Clock

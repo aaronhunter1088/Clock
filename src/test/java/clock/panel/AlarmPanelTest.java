@@ -19,7 +19,7 @@ import java.util.concurrent.Executors;
 import java.util.function.Predicate;
 
 import static java.time.Month.MARCH;
-import static clock.contract.ClockConstants.*;
+import static clock.util.Constants.*;
 import static javax.swing.WindowConstants.DISPOSE_ON_CLOSE;
 import static java.time.DayOfWeek.*;
 import static org.junit.jupiter.api.Assertions.*;

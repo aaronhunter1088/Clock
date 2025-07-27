@@ -1,6 +1,5 @@
-package clock.panel;
+package clock.entity;
 
-import clock.entity.Clock;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -12,13 +11,13 @@ import java.time.ZoneId;
 import java.util.Arrays;
 import java.util.List;
 
-import static clock.contract.ClockConstants.*;
+import static clock.util.Constants.*;
 import static clock.panel.ClockPanel.*;
 
 /**
  * The menu bar for the Clock.
  * @author Michael Ball
-*  @version 2.8
+*  @version 1.0
  */
 public class ClockMenuBar extends JMenuBar
 {
@@ -180,17 +179,18 @@ public class ClockMenuBar extends JMenuBar
             logger.info("show digital time: {}", clock.isShowDigitalTimeOnAnalogueClock());
             if (clock.isShowDigitalTimeOnAnalogueClock())
             {
-                clock.getAnalogueClockPanel().setClockText(EMPTY);
-                clock.getAnalogueClockPanel().repaint();
+                //clock.getAnalogueClockPanel().setClockText(EMPTY);
+
                 clock.setShowDigitalTimeOnAnalogueClock(false);
                 getShowDigitalTimeOnAnalogueClockSetting().setText(SHOW+SPACE+DIGITAL_TIME);
             } else
             {
-                clock.getAnalogueClockPanel().setClockText(clock.getTimeAsStr());
-                clock.getAnalogueClockPanel().repaint();
+                //clock.getAnalogueClockPanel().setClockText(clock.getTimeAsStr());
+                //clock.getAnalogueClockPanel().repaint();
                 clock.setShowDigitalTimeOnAnalogueClock(true);
                 getShowDigitalTimeOnAnalogueClockSetting().setText(HIDE+SPACE+DIGITAL_TIME);
             }
+            clock.getAnalogueClockPanel().repaint();
         });
         // Set functionality for Features menu
         getDigitalClockFeature().addActionListener(action -> clock.changePanels(PANEL_DIGITAL_CLOCK, false));

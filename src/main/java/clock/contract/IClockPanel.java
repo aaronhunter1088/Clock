@@ -11,8 +11,9 @@ import clock.entity.Clock;
  * @author Michael Ball
 *  @version 2.8
  */
-public interface IClockPanel extends ClockConstants
+public interface IClockPanel
 {
+    @Deprecated(since = "2.9")
     void addComponentsToPanel();
     void setClock(Clock clock);
     void setupSettingsMenu();

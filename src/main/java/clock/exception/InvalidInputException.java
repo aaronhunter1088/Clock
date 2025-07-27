@@ -1,5 +1,8 @@
 package clock.exception;
 
+import java.io.Serial;
+import java.io.Serializable;
+
 /**
  * This class is used to determine that an error
  * has occurred while initializing Clock. It is
@@ -19,10 +22,13 @@ package clock.exception;
  * which determines whether or not to increase any hour
  * value (in this example) executes.
  * @author michael ball
-*  @version 2.8
+*  @version 2.0
  */
-public class InvalidInputException extends Exception
+public class InvalidInputException extends Exception implements Serializable
 {
+	@Serial
+	private static final long serialVersionUID = 2L;
+
 	private String message;
 	private Throwable cause;
 

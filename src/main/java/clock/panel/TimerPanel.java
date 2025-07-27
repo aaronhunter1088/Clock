@@ -18,6 +18,7 @@ import java.util.concurrent.*;
 
 import static java.lang.Thread.sleep;
 import static clock.panel.ClockPanel.PANEL_TIMER;
+import static clock.util.Constants.*;
 
 /**
  * This is the Timer panel.

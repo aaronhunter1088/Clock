@@ -10,6 +10,8 @@ import javax.swing.*;
 import java.awt.*;
 
 import static clock.panel.ClockPanel.PANEL_DIGITAL_CLOCK;
+import static clock.util.Constants.*;
+import static java.lang.Thread.sleep;
 
 /**
  * The DigitalClockPanel is the main panel and is
@@ -20,17 +22,18 @@ import static clock.panel.ClockPanel.PANEL_DIGITAL_CLOCK;
  * look.
  *
  * @author michael ball
-*  @version 2.8
+*  @version 1.0
  */
-public class DigitalClockPanel extends JPanel implements IClockPanel
+public class DigitalClockPanel extends JPanel implements IClockPanel, Runnable
 {
     private static final Logger logger = LogManager.getLogger(DigitalClockPanel.class);
+    public static final ClockPanel PANEL = PANEL_DIGITAL_CLOCK;
     private GridBagLayout layout;
     private GridBagConstraints constraints;
-    private JLabel label1;
-    private JLabel label2;
+    private Thread thread = null;
+    private int xcenter = Clock.defaultSize.height/2;
     private Clock clock;
-    private ClockPanel clockPanel;
+    private String row1 = EMPTY, row2 = EMPTY;
 
     /**
      * The main constructor for the digital clock panel
@@ -39,35 +42,162 @@ public class DigitalClockPanel extends JPanel implements IClockPanel
     public DigitalClockPanel(Clock clock)
     {
         super();
-        this.clock = clock;
-        this.clock.setClockPanel(PANEL_DIGITAL_CLOCK);
-        setMaximumSize(Clock.defaultSize);
-        layout = new GridBagLayout();
-        setLayout(layout);
-        constraints = new GridBagConstraints();
-        constraints.fill = GridBagConstraints.HORIZONTAL;
-        setBackground(Color.BLACK);
-        setForeground(Color.WHITE);
-        setupClockPanel();
-        addComponentsToPanel();
-        setupSettingsMenu();
+        setupDefaultActions(clock);
         logger.info("Finished creating DigitalClock Panel");
     }
 
     /**
-     * This method sets up the digital clock panel.
+     * Sets up the default actions for the digital clock panel
+     * @param clock the clock reference
      */
-    void setupClockPanel()
+    public void setupDefaultActions(Clock clock)
     {
-        logger.info("setup digital clock panel");
+        logger.debug("setup default actions with clock");
+        this.clock = clock;
+        row1 = clock.defaultText(1);
+        row2 = clock.defaultText(2);
         setupSettingsMenu();
-        clock.setDateChanged(false);
-        clock.setShowFullDate(false);
-        clock.setShowPartialDate(false);
-        clock.setShowMilitaryTime(false);
-        label1 = new JLabel(EMPTY, SwingConstants.CENTER);
-        label2 = new JLabel(EMPTY, SwingConstants.CENTER);
+        setMaximumSize(Clock.defaultSize);
+        setGridBagLayout(new GridBagLayout()); // sets layout
+        setLayout(layout);
+        setGridBagConstraints(new GridBagConstraints());
+        //constraints.fill = GridBagConstraints.HORIZONTAL;
+        setBackground(Color.WHITE);
+        setBorder(BorderFactory.createLineBorder(Color.BLACK));
+        setForeground(Color.BLACK);
+        start(this);
     }
+
+    /**
+     * This method sets up the settings menu for the
+     * digital clock panel.
+     */
+    public void setupSettingsMenu()
+    {
+        clock.clearSettingsMenu();
+        clock.getClockMenuBar().getSettingsMenu().add(clock.getClockMenuBar().getMilitaryTimeSetting());
+        clock.getClockMenuBar().getSettingsMenu().add(clock.getClockMenuBar().getFullTimeSetting());
+        clock.getClockMenuBar().getSettingsMenu().add(clock.getClockMenuBar().getPartialTimeSetting());
+        clock.getClockMenuBar().getSettingsMenu().add(clock.getClockMenuBar().getToggleDSTSetting());
+        clock.getClockMenuBar().getSettingsMenu().add(clock.getClockMenuBar().getChangeTimeZoneMenu());
+    }
+
+    /**
+     * Starts the analogue clock
+     * @param panel the analogue clock panel
+     */
+    public void start(DigitalClockPanel panel)
+    {
+        logger.info("starting digital clock");
+        if (thread == null)
+        {
+            thread = new Thread(panel);
+            thread.start();
+        }
+    }
+
+    /**
+     * Stops the digital clock
+     */
+    public void stop()
+    {
+        logger.info("stopping digital thread");
+        thread = null;
+    }
+
+    /**
+     * Repaints the digital clock after it has been updated
+     */
+    public void run()
+    {
+        logger.info("starting digital clock");
+        while (thread != null)
+        {
+            try { sleep(1000); }
+            catch (InterruptedException e) { printStackTrace(e, e.getMessage());}
+            repaint(); // goes to paint
+        }
+    }
+
+    /**
+     * Paints the analogue clock panel
+     * @param g the graphics object
+     */
+    @Override
+    public void paint(Graphics g)
+    {
+        logger.info("painting analogue clock panel");
+        drawStructure(g);
+    }
+
+    /**
+     * Updates the digital clock
+     * @param g the graphics object
+     */
+    @Override
+    public void update(Graphics g)
+    {
+        logger.info("updating graphics");
+        paint(g);
+    }
+
+    /**
+     * Draws the analogue clock
+     * @param g the graphics object
+     */
+    public void drawStructure(Graphics g)
+    {
+        logger.info("drawing structure");
+        g.setFont(Clock.font60);
+        if (clock.isShowFullDate()) g.setFont(Clock.font40);
+
+        g.setColor(Color.BLACK);
+        g.fillRect(0, 0, Clock.defaultSize.width, Clock.defaultSize.height);
+
+        g.setColor(Color.WHITE);
+        // Get FontMetrics for string width calculation
+        FontMetrics fm = g.getFontMetrics(g.getFont());
+
+        // Strings to draw
+        String dateStr = clock.defaultText(1);
+        String timeStr = clock.defaultText(2);
+        // Adjust as needed
+        if (clock.getAlarmPanel().getActiveAlarm() != null)
+        {
+            dateStr = clock.defaultText(8);
+            timeStr = clock.defaultText(9);
+        }
+        // Show which timer is going off
+        else if (clock.getCurrentPanel() instanceof TimerPanel2 timerPanel)
+        {
+            var activeTimers = timerPanel.getActiveTimers().stream().filter(Timer::isTimerGoingOff).toList();
+            //label1.setText(activeTimers.size() == 1 ? "One Timer" : "Many Timers"); // TODO: update this to be a real timer <specific timer>
+            dateStr = activeTimers.size() == 1 ? "One Timer" : "Many Timers";
+            timeStr = activeTimers.size() == 1 ? is+SPACE+going_off : are+SPACE+going_off;
+            //label2.setText(label2Adjusted); // is going off
+        }
+
+        // Calculate centered x positions
+        int dateWidth = fm.stringWidth(dateStr);
+        int timeWidth = fm.stringWidth(timeStr);
+        int panelWidth = getWidth();
+
+        int dateX = (panelWidth - dateWidth) / 2;
+        int timeX = (panelWidth - timeWidth) / 2;
+
+        int baseY = Clock.defaultSize.height / 2;
+
+        g.drawString(dateStr, dateX, baseY - 30);
+        g.drawString(timeStr, timeX, baseY + 30);
+        g.setColor(Color.BLACK);
+    }
+
+    /**
+     * This method adds the components to the digital clock panel
+     */
+    @Override
+    public void addComponentsToPanel()
+    { /* no operation */ }
 
     /**
      * This method prints the stack trace of an exception
@@ -117,79 +247,13 @@ public class DigitalClockPanel extends JPanel implements IClockPanel
         add(cpt);
     }
 
-    /**
-     * This method adds the components to the digital clock panel
-     */
-    public void addComponentsToPanel()
-    {
-        logger.info("addComponentsToPanel");
-        addComponent(getLabel1(), 0,0,1,1, 0,0);
-        addComponent(getLabel2(), 1,0,1,1, 0,0);
-    }
-
-    /**
-     * This method sets up the settings menu for the
-     * digital clock panel.
-     */
-    public void setupSettingsMenu()
-    {
-        clock.clearSettingsMenu();
-        clock.getClockMenuBar().getSettingsMenu().add(clock.getClockMenuBar().getMilitaryTimeSetting());
-        clock.getClockMenuBar().getSettingsMenu().add(clock.getClockMenuBar().getFullTimeSetting());
-        clock.getClockMenuBar().getSettingsMenu().add(clock.getClockMenuBar().getPartialTimeSetting());
-        clock.getClockMenuBar().getSettingsMenu().add(clock.getClockMenuBar().getToggleDSTSetting());
-        clock.getClockMenuBar().getSettingsMenu().add(clock.getClockMenuBar().getChangeTimeZoneMenu());
-    }
-
-    /**
-     * This method updates the labels on the digital
-     * clock panel.
-     */
-    public void updateLabels()
-    {
-        logger.info("updateLabels");
-        label1.setForeground(Color.WHITE);
-        label2.setForeground(Color.WHITE);
-        // Show which alarm is going off
-        if (clock.getAlarmPanel().getActiveAlarm() != null)
-        {
-            label1.setText(clock.defaultText(8));
-            label2.setText(clock.defaultText(9));
-        }
-        // Show which timer is going off
-        else if (clock.getCurrentPanel() instanceof TimerPanel2 timerPanel)
-        {
-            var activeTimers = timerPanel.getActiveTimers().stream().filter(Timer::isTimerGoingOff).toList();
-            label1.setText(activeTimers.size() == 1 ? "One Timer" : "Many Timers"); // TODO: update this to be a real timer <specific timer>
-            var label2Adjusted = activeTimers.size() == 1 ? is+going_off : are+going_off;
-            label2.setText(label2Adjusted); // is going off
-        }
-        // default date and time
-        else
-        {
-            label1.setText(clock.defaultText(1));
-            label2.setText(clock.defaultText(2));
-        }
-        if (clock.isShowFullDate()) label1.setFont(Clock.font40);
-        else if (clock.isShowPartialDate()) label1.setFont(Clock.font50);
-        else label1.setFont(Clock.font60);
-        label2.setFont(Clock.font50);
-        clock.repaint();
-    }
-
     /* Getters */
     GridBagLayout getGridBagLayout() { return this.layout; }
     GridBagConstraints getGridBagConstraints() { return this.constraints; }
     Clock getClock() { return this.clock; }
-    JLabel getLabel1() { return this.label1; }
-    JLabel getLabel2() { return this.label2; }
-    ClockPanel getPanelType() { return this.clockPanel; }
 
     /* Setters */
     protected void setGridBagLayout(GridBagLayout layout) { this.layout = layout; }
     protected void setGridBagConstraints(GridBagConstraints constraints) { this.constraints = constraints; }
-    protected void setLabel1(JLabel label1) { this.label1 = label1; }
-    protected void setLabel2(JLabel label2) { this.label2 = label2; }
     public void setClock(Clock clock) { this.clock = clock; }
-    protected void setClockPanel(ClockPanel clockPanel) { this.clockPanel = clockPanel; }
 }

@@ -21,6 +21,7 @@ import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
+import static clock.util.Constants.*;
 import static java.time.DayOfWeek.*;
 import static clock.panel.ClockPanel.PANEL_ALARM;
 
@@ -40,7 +41,7 @@ import static clock.panel.ClockPanel.PANEL_ALARM;
  * and an alarm will be created.
  *
  * @author michael ball
-*  @version 2.8
+*  @version 2.0
  */
 public class AlarmPanel extends JPanel implements IClockPanel
 {
@@ -522,7 +523,7 @@ public class AlarmPanel extends JPanel implements IClockPanel
     {
         logger.info("trigger alarm");
         setAlarmIsGoingOff(true);
-        clock.getDigitalClockPanel().updateLabels();
+        //clock.getDigitalClockPanel().updateLabels();
         //clock.getDigitalClockPanel().getLabel1().setText(activeAlarm.toString());
         //clock.getDigitalClockPanel().getLabel2().setText("is going off!");
         // play sound

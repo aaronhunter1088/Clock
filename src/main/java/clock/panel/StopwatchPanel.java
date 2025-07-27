@@ -9,7 +9,7 @@ import javax.swing.*;
 import java.awt.*;
 
 import static clock.panel.ClockPanel.PANEL_STOPWATCH;
-import static clock.panel.ClockPanel.PANEL_TIMER2;
+import static clock.util.Constants.*;
 
 /**
  * This is the Stopwatch panel.
