@@ -128,22 +128,17 @@ public class Alarm implements Serializable, Comparable<Alarm>
      */
     public void triggerAlarm()
     {
-        logger.info("trigger alarm");
+        logger.debug("trigger alarm");
         try
         {
-            logger.debug("while alarm is going off, play sound");
+            logger.debug("playing sound");
             setupMusicPlayer();
             getMusicPlayer().play();
-            //musicPlayer.close();
         }
-        catch (Exception e)
+        catch (Throwable e)
         {
-            logger.error(e.getCause().getClass().getName() + " - " + e.getMessage());
-            printStackTrace(e, "message");
-            //setupMusicPlayer();
-            //getMusicPlayer().play(50);
+            printStackTrace(e, e.getMessage());
         }
-
     }
 
     /**
@@ -152,7 +147,7 @@ public class Alarm implements Serializable, Comparable<Alarm>
      * @param e the exception
      * @param message the message to print
      */
-    public void printStackTrace(Exception e, String message)
+    public void printStackTrace(Throwable e, String message)
     {
         if (null != message)
             logger.error(message);
