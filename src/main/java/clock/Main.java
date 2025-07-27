@@ -6,7 +6,9 @@ import clock.entity.Clock;
 import clock.exception.InvalidInputException;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+
 import java.util.concurrent.TimeUnit;
+import java.util.function.Function;
 
 /**
  * Main application to start Clock
@@ -23,27 +25,36 @@ public class Main
      * @param args command line arguments
      * @throws InvalidInputException if there is an invalid input
      */
-    public static void main(String[] args) throws InvalidInputException
-    {
+    public static void main(String[] args) throws InvalidInputException {
         logger.info("Starting Clock...");
         Clock clock = new Clock();
-        /*
-        new Clock(1, 59, 50, MARCH, SUNDAY, 10, 2024, AM); // for testing DST on
-        new Clock(1, 59, 50, NOVEMBER, SUNDAY, 3, 2024, AM); // for testing DST off
-        */
+
+        Runtime.getRuntime().addShutdownHook(new Thread(() -> logger.info("Closing Clock")));
+
         SwingUtilities.invokeLater(() -> {
             try {
-                clock.getScheduler().scheduleAtFixedRate(clock::tick, 0, 1, TimeUnit.SECONDS);
-                clock.getScheduler().scheduleAtFixedRate(clock::setActiveAlarms, 0, 1, TimeUnit.SECONDS);
-                clock.getScheduler().scheduleAtFixedRate(clock::triggerAlarms, 0, 1, TimeUnit.SECONDS);
-                clock.getScheduler().scheduleAtFixedRate(clock::checkIfAnyTimersAreGoingOff, 0, 1, TimeUnit.SECONDS);
-                clock.getScheduler().scheduleAtFixedRate(clock::checkIfItIsNewYears, 0, 1, TimeUnit.SECONDS);
-                clock.getScheduler().scheduleAtFixedRate(clock::setTheCurrentTime, 0, 1, TimeUnit.SECONDS);
+                var scheduler = clock.getScheduler();
+
+                // Wrap tasks to prevent exceptions from killing scheduled execution
+                Function<Runnable, Runnable> taskRunner = task -> () -> {
+                    try {
+                        task.run();
+                    } catch (Exception e) {
+                        logger.error("Scheduled task failed: {}", task, e);
+                    }
+                };
+
+                scheduler.scheduleAtFixedRate(taskRunner.apply(clock::tick), 0, 1, TimeUnit.SECONDS);
+                scheduler.scheduleAtFixedRate(taskRunner.apply(clock::setActiveAlarms), 0, 1, TimeUnit.SECONDS);
+                scheduler.scheduleAtFixedRate(taskRunner.apply(clock::triggerAlarms), 0, 1, TimeUnit.SECONDS);
+                scheduler.scheduleAtFixedRate(taskRunner.apply(clock::checkIfAnyTimersAreGoingOff), 0, 1, TimeUnit.SECONDS);
+                scheduler.scheduleAtFixedRate(taskRunner.apply(clock::checkIfItIsNewYears), 0, 1, TimeUnit.SECONDS);
+                scheduler.scheduleAtFixedRate(taskRunner.apply(clock::setTheCurrentTime), 0, 1, TimeUnit.SECONDS);
+
             } catch (Exception e) {
-                logger.error("Error in Clock: ", e);
+                logger.error("Error scheduling tasks in Clock", e);
             }
         });
-        Runtime.getRuntime().addShutdownHook(new Thread(() -> logger.info("Closing Clock")));
     }
 
 }
