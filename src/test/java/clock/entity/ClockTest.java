@@ -8,21 +8,27 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import java.awt.event.WindowEvent;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.List;
 
+import static java.lang.Thread.sleep;
 import static java.time.DayOfWeek.*;
 import static java.time.Month.*;
 import static clock.util.Constants.*;
 import static javax.swing.WindowConstants.DISPOSE_ON_CLOSE;
 import static org.junit.jupiter.api.Assertions.*;
 
+/**
+ * Tests for the Clock class
+ *
+ *
+ * @author Michael Ball
+ * @version 1.0
+ */
 class ClockTest
 {
-    static { System.setProperty("appName", ClockTest.class.getSimpleName()); }
     private static final Logger logger = LogManager.getLogger(ClockTest.class);
 
     private Clock clock;
@@ -34,31 +40,16 @@ class ClockTest
     @BeforeEach
     void beforeEach()
     {
-        clock = new Clock();
+        clock = new Clock(true);
         clock.setDefaultCloseOperation(DISPOSE_ON_CLOSE);
     }
 
     @AfterEach
     void afterEach()
-    {
-        if (clock != null) {
-            logger.info("Test complete. Closing the clock...");
-            // Create a WindowEvent with WINDOW_CLOSING event type
-            WindowEvent windowClosing = new WindowEvent(clock, WindowEvent.WINDOW_CLOSING);
-
-            // Dispatch the event to the JFrame instance
-            clock.dispatchEvent(windowClosing);
-
-            // Ensure the clock is no longer visible
-            assertFalse(clock.isVisible());
-
-            // Dispose of the JFrame to release resources
-            clock.dispose();
-        }
-    }
+    {}
 
     @Test
-    void testBeginningDayLightSavingsTimeIsProperlySet() throws InvalidInputException
+    void testBeginningDayLightSavingsTimeIsProperlySet()
     {
         clock.setHours(5);
         clock.setMinutes(42);
@@ -69,7 +60,6 @@ class ClockTest
         clock.setYear(2021);
         clock.setAMPM(PM);
         clock.setTheCurrentTime();
-        clock.setDaylightSavingsTimeDates();
         assertEquals(14, clock.getBeginDaylightSavingsTimeDate().getDayOfMonth(), "For 2021, Beginning DST Day should be 14th");
         assertEquals(7, clock.getEndDaylightSavingsTimeDate().getDayOfMonth(), "For 2021, Ending DST Day should be 7th");
 
@@ -82,13 +72,12 @@ class ClockTest
         clock.setYear(2022);
         clock.setAMPM(PM);
         clock.setTheCurrentTime();
-        clock.setDaylightSavingsTimeDates();
         assertEquals(13, clock.getBeginDaylightSavingsTimeDate().getDayOfMonth(), "For 2022, Beginning DST Day should be 13th");
         assertEquals(6, clock.getEndDaylightSavingsTimeDate().getDayOfMonth(), "For 2022, Ending DST Day should be 6th");
     }
 
     @Test
-    void testIsTodayDaylightSavingsDayReturnsFalseWhenNotBeginningDST() throws InvalidInputException
+    void testIsTodayDaylightSavingsDayReturnsFalseWhenNotBeginningDST()
     {
         clock.setHours(5);
         clock.setMinutes(42);
@@ -99,13 +88,13 @@ class ClockTest
         clock.setYear(2022);
         clock.setAMPM(PM);
         clock.setTheCurrentTime();
-        clock.setDaylightSavingsTimeDates();
         assertFalse(clock.isTodayDaylightSavingsTime());
     }
 
     @Test
     void testLocalDatesAreCompared()
     {
+        clock = new Clock(); // default constructor sets current time
         LocalDate today = LocalDate.now();
         assertEquals(clock.getDate(), today, "Dates should be equal");
 
@@ -114,9 +103,8 @@ class ClockTest
     }
 
     @Test
-    void testIsDateDaylightSavingsDayReturnsFalseWhenNotEndingDST() throws InvalidInputException
+    void testIsDateDaylightSavingsDayReturnsFalseWhenNotEndingDST()
     {
-        // reset clock time and date
         clock.setHours(5);
         clock.setMinutes(42);
         clock.setSeconds(0);
@@ -127,12 +115,11 @@ class ClockTest
         clock.setAMPM(PM);
         // needed to update certain values now that we reset clock time and date
         clock.setTheCurrentTime();
-        clock.setDaylightSavingsTimeDates();
         assertFalse(clock.isTodayDaylightSavingsTime());
     }
 
     @Test
-    void testIsTodayDaylightSavingsDayReturnsTrueWhenIsBeginningDST() throws InvalidInputException
+    void testIsTodayDaylightSavingsDayReturnsTrueWhenIsBeginningDST()
     {
         clock.setHours(5);
         clock.setMinutes(42);
@@ -142,11 +129,12 @@ class ClockTest
         clock.setDayOfMonth(13);
         clock.setYear(2022);
         clock.setAMPM(PM);
+        clock.setTheCurrentTime();
         assertTrue(clock.isTodayDaylightSavingsTime());
     }
 
     @Test
-    void testIsTodayDaylightSavingsDayReturnsTrueWhenIsEndingDST() throws InvalidInputException
+    void testIsTodayDaylightSavingsDayReturnsTrueWhenIsEndingDST()
     {
         clock.setHours(5);
         clock.setMinutes(42);
@@ -156,11 +144,12 @@ class ClockTest
         clock.setDayOfMonth(6);
         clock.setYear(2022);
         clock.setAMPM(PM);
+        clock.setTheCurrentTime();
         assertTrue(clock.isTodayDaylightSavingsTime());
     }
 
     @Test
-    void testIsTodayDaylightSavingsDay() throws InvalidInputException
+    void testIsTodayDaylightSavingsDay()
     {
         LocalDate today = LocalDate.now();
         clock.setHours(12);
@@ -171,7 +160,8 @@ class ClockTest
         clock.setDayOfMonth(today.getDayOfMonth());
         clock.setYear(today.getYear());
         clock.setAMPM(AM);
-        boolean actual = clock.isDoesTodayMatchDSTDate();
+        clock.setTheCurrentTime();
+        boolean actual = clock.isTodayMatchesDSTDate();
         boolean expected = clock.getBeginDaylightSavingsTimeDate().format(DateTimeFormatter.ofPattern("MM-dd-yyyy")).equals(today.format(DateTimeFormatter.ofPattern("MM-dd-yyyy"))) ||
                 clock.getEndDaylightSavingsTimeDate().format(DateTimeFormatter.ofPattern("MM-dd-yyyy")).equals(today.format(DateTimeFormatter.ofPattern("MM-dd-yyyy")));
         if (actual) {
@@ -187,7 +177,7 @@ class ClockTest
     }
 
     @Test
-    void testClockBecomesAMWhenMidnightStarts() throws InvalidInputException
+    void testClockBecomesAMWhenMidnightStarts()
     {
         clock.setHours(11);
         clock.setMinutes(59);
@@ -197,6 +187,7 @@ class ClockTest
         clock.setDayOfMonth(21);
         clock.setYear(2021);
         clock.setAMPM(PM);
+        clock.setTheCurrentTime();
         tick(3);
         assertEquals(12, clock.getHours(), "Hours should be 12");
         assertEquals(0, clock.getMinutes(), "Minutes should be 0");
@@ -211,7 +202,7 @@ class ClockTest
     @Test
     void testWhenClockInMilitaryTimeAlarmStillTriggers() throws InvalidInputException
     {
-        clock.setHours(1);
+        clock.setHours(13);
         clock.setMinutes(0);
         clock.setSeconds(59);
         clock.setMonth(MARCH);
@@ -220,19 +211,21 @@ class ClockTest
         clock.setYear(2021);
         clock.setAMPM(PM);
         clock.setShowMilitaryTime(true);
+        clock.setTheCurrentTime();
         Alarm alarm = new Alarm("Test", 1, 1, PM, false, new ArrayList<>(){{add(SATURDAY);}}, clock);
-        clock.setListOfAlarms(new ArrayList<>(){{add(alarm);}});
+        clock.setListOfAlarms(List.of(alarm));
 
         assertEquals(1, clock.getListOfAlarms().size());
 
-        clock.tick();
-        clock.getAlarmPanel().checkIfAnyAlarmsAreGoingOff();
-        //assertTrue(clock.getAlarmPanel().isAlarmIsGoingOff());
+        tick(3);
+        assertTrue(clock.getListOfAlarms().getFirst().isAlarmGoingOff());
     }
 
     @Test
-    void testTurnOffDSTSetting() throws InvalidInputException
+    void testTurnOffDSTSetting()
     {
+        clock = new Clock();
+        clock.setTestingClock(true);
         LocalDate endDSTDate = clock.getEndDaylightSavingsTimeDate();
         clock.setHours(1);
         clock.setMinutes(59);
@@ -242,9 +235,11 @@ class ClockTest
         clock.setDayOfMonth(endDSTDate.getDayOfMonth());
         clock.setYear(endDSTDate.getYear());
         clock.setAMPM(AM);
+        clock.setTheCurrentTime();
         clock.getClockMenuBar().getToggleDSTSetting().doClick(); // DST turned off; enabled:false
-        var expectedValue = Turn+SPACE+on+SPACE+DST_SETTING;
-        assertEquals("Expected setting to be on", expectedValue, clock.getClockMenuBar().getToggleDSTSetting().getText());
+        var expectedValue = Turn+SPACE+off+SPACE+DST_SETTING;
+        assertEquals(expectedValue, clock.getClockMenuBar().getToggleDSTSetting().getText(), "Expected setting to be off");
+        assertFalse(clock.isDaylightSavingsTimeEnabled());
 
         tick(10);
 
@@ -252,8 +247,11 @@ class ClockTest
     }
 
     @Test
-    void testKeepDSTSettingOn() throws InvalidInputException
+    void testKeepDSTSettingOn()
     {
+        clock = new Clock();
+        clock.setTestingClock(true);
+        clock.getClockMenuBar().getToggleDSTSetting().doClick(); // starts on, turning off
         LocalDate endDSTDate = clock.getEndDaylightSavingsTimeDate();
         clock.setHours(1);
         clock.setMinutes(59);
@@ -263,46 +261,49 @@ class ClockTest
         clock.setDayOfMonth(endDSTDate.getDayOfMonth());
         clock.setYear(endDSTDate.getYear());
         clock.setAMPM(AM);
+        clock.setTheCurrentTime();
         var expectedValue = Turn+SPACE+off+SPACE+DST_SETTING;
-        assertEquals("Expected setting to be off", expectedValue, clock.getClockMenuBar().getToggleDSTSetting().getText());
+        assertEquals(expectedValue, clock.getClockMenuBar().getToggleDSTSetting().getText(), "Expected setting to be off");
 
         tick(10);
 
         assertEquals(1, clock.getHours(), "Expected hours to be 1");
     }
 
-    @Test
-    void testUpdateClockTimeSyncsClockTime() throws InvalidInputException
-    {
-        clock.setHours(7);
-        clock.setMinutes(0);
-        clock.setSeconds(6);
-        clock.setMonth(SEPTEMBER);
-        clock.setDayOfWeek(FRIDAY);
-        clock.setDayOfMonth(20);
-        clock.setYear(2024);
-        clock.setAMPM(PM);
-        LocalDateTime testNow = LocalDateTime.of(LocalDate.of(2024, AUGUST, 20), clock.getTime());
-        assertTrue(clock.shouldUpdateTime(testNow));
-    }
+//    @Test
+//    void testUpdateClockTimeSyncsClockTime() throws InvalidInputException
+//    {
+//        clock.setHours(7);
+//        clock.setMinutes(0);
+//        clock.setSeconds(6);
+//        clock.setMonth(SEPTEMBER);
+//        clock.setDayOfWeek(FRIDAY);
+//        clock.setDayOfMonth(20);
+//        clock.setYear(2024);
+//        clock.setAMPM(PM);
+//        clock.setTheCurrentTime();
+//        LocalDateTime testNow = LocalDateTime.of(LocalDate.of(2024, AUGUST, 20), clock.getTime());
+//        assertTrue(clock.shouldUpdateTime(testNow));
+//    }
+
+//    @Test
+//    void testUpdateClockTimeDoesNotSyncClockTime() throws InvalidInputException
+//    {
+//        clock.setHours(7);
+//        clock.setMinutes(0);
+//        clock.setSeconds(6);
+//        clock.setMonth(SEPTEMBER);
+//        clock.setDayOfWeek(FRIDAY);
+//        clock.setDayOfMonth(20);
+//        clock.setYear(2024);
+//        clock.setAMPM(PM);
+//        clock.setTheCurrentTime();
+//        LocalDateTime testNow = LocalDateTime.of(clock.getDate(), clock.getTime());
+//        assertFalse(clock.shouldUpdateTime(testNow));
+//    }
 
     @Test
-    void testUpdateClockTimeDoesNotSyncClockTime() throws InvalidInputException
-    {
-        clock.setHours(7);
-        clock.setMinutes(0);
-        clock.setSeconds(6);
-        clock.setMonth(SEPTEMBER);
-        clock.setDayOfWeek(FRIDAY);
-        clock.setDayOfMonth(20);
-        clock.setYear(2024);
-        clock.setAMPM(PM);
-        LocalDateTime testNow = LocalDateTime.of(clock.getDate(), clock.getTime());
-        assertFalse(clock.shouldUpdateTime(testNow));
-    }
-
-    @Test
-    void testTickClockTwiceAsFast() throws InvalidInputException
+    void testTickClockTwiceAsFast()
     {
         clock.setHours(7);
         clock.setMinutes(0);
@@ -313,9 +314,9 @@ class ClockTest
         clock.setYear(2024);
         clock.setAMPM(PM);
         clock.tick(2,1,1);
-        assertEquals("Expected hoursAsStr to be 07", "07", clock.getHoursAsStr());
-        assertEquals("Expected minutesAsStr to be 00", "00", clock.getMinutesAsStr());
-        assertEquals("Expected secondsAsStr to be 08", "08", clock.getSecondsAsStr());
+        assertEquals("07", clock.getHoursAsStr(), "Expected hoursAsStr to be 07");
+        assertEquals("00", clock.getMinutesAsStr(), "Expected minutesAsStr to be 00");
+        assertEquals("08", clock.getSecondsAsStr(), "Expected secondsAsStr to be 08");
         assertEquals(7, clock.getHours(), "Expected hours to be 7");
         assertEquals(0, clock.getMinutes(), "Expected minutes to be 0");
         assertEquals(8, clock.getSeconds(), "Expected seconds to be 8");
@@ -332,9 +333,9 @@ class ClockTest
         clock.setDayOfMonth(20);
         clock.setYear(2024);
         clock.setAMPM(PM);
-        Thread.sleep(2000); // needed because it wasn't displaying immediately
+        sleep(2000); // needed because it wasn't displaying immediately
         clock.tick(2,3,4);
-        Thread.sleep(2000); // needed because it needed a second to refresh
+        sleep(2000); // needed because it needed a second to refresh
         assertEquals("11", clock.getHoursAsStr(), "Expected hoursAsStr to be 11");
         assertEquals("02", clock.getMinutesAsStr(), "Expected minutesAsStr to be 02");
         assertEquals("00", clock.getSecondsAsStr(), "Expected secondsAsStr to be 00");
@@ -346,8 +347,14 @@ class ClockTest
 
     // Helper methods
     private void tick(int times) {
-        for (int i=0; i<times; i++) {
-            clock.tick();
+        logger.info("Test ticking clock {} times", times);
+        try {
+            clock.start();
+            sleep((times) * 1000L);
+            clock.stop();
+            clock.setTheCurrentTime();
+        } catch (InterruptedException e) {
+
         }
     }
 

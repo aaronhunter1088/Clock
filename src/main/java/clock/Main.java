@@ -10,6 +10,10 @@ import org.apache.logging.log4j.Logger;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Function;
 
+import static clock.util.Constants.AM;
+import static java.time.DayOfWeek.SUNDAY;
+import static java.time.Month.JULY;
+
 /**
  * Main application to start Clock
  *
@@ -27,30 +31,18 @@ public class Main
      */
     public static void main(String[] args) throws InvalidInputException {
         logger.info("Starting Clock...");
-        Clock clock = new Clock();
+        Clock clock = null;
+        // Start the default clock:
+        clock = new Clock();
+        // Start the clock at a specific time:
+        //clock = new Clock(11, 59, 50, JULY, SUNDAY, 27, 2025, AM);
 
         Runtime.getRuntime().addShutdownHook(new Thread(() -> logger.info("Closing Clock")));
 
+        Clock finalClock = clock;
         SwingUtilities.invokeLater(() -> {
             try {
-                var scheduler = clock.getScheduler();
-
-                // Wrap tasks to prevent exceptions from killing scheduled execution
-                Function<Runnable, Runnable> taskRunner = task -> () -> {
-                    try {
-                        task.run();
-                    } catch (Exception e) {
-                        logger.error("Scheduled task failed: {}", task, e);
-                    }
-                };
-
-                scheduler.scheduleAtFixedRate(taskRunner.apply(clock::tick), 0, 1, TimeUnit.SECONDS);
-                scheduler.scheduleAtFixedRate(taskRunner.apply(clock::setActiveAlarms), 0, 1, TimeUnit.SECONDS);
-                scheduler.scheduleAtFixedRate(taskRunner.apply(clock::triggerAlarms), 0, 1, TimeUnit.SECONDS);
-                scheduler.scheduleAtFixedRate(taskRunner.apply(clock::checkIfAnyTimersAreGoingOff), 0, 1, TimeUnit.SECONDS);
-                scheduler.scheduleAtFixedRate(taskRunner.apply(clock::checkIfItIsNewYears), 0, 1, TimeUnit.SECONDS);
-                scheduler.scheduleAtFixedRate(taskRunner.apply(clock::setTheCurrentTime), 0, 1, TimeUnit.SECONDS);
-
+                finalClock.start();
             } catch (Exception e) {
                 logger.error("Error scheduling tasks in Clock", e);
             }

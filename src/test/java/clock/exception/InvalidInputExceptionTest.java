@@ -14,7 +14,6 @@ import static org.junit.jupiter.api.Assertions.*;
 
 class InvalidInputExceptionTest
 {
-    static { System.setProperty("appName", InvalidInputExceptionTest.class.getSimpleName()); }
     private static final Logger logger = LogManager.getLogger(InvalidInputExceptionTest.class);
 
     private Month goodMonth;

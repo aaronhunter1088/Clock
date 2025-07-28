@@ -171,7 +171,7 @@ public class ClockMenuBar extends JMenuBar
             var isEnabled = clock.isDaylightSavingsTimeEnabled();
             logger.debug("toggling dst to be {}", !isEnabled);
             clock.setDaylightSavingsTimeEnabled(!isEnabled);
-            getToggleDSTSetting().setText(Turn+SPACE+(clock.isDaylightSavingsTimeEnabled()?off:on)+SPACE+DST_SETTING);
+            getToggleDSTSetting().setText(Turn+SPACE+(clock.isDaylightSavingsTimeEnabled()?on:off)+SPACE+DST_SETTING);
             logger.debug("setting text: '{}'", getToggleDSTSetting().getText());
         });
         getShowDigitalTimeOnAnalogueClockSetting().addActionListener(action -> {

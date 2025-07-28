@@ -15,7 +15,6 @@ import static org.junit.jupiter.api.Assertions.*;
 
 class PanelTypeTest
 {
-    static { System.setProperty("appName", PanelTypeTest.class.getSimpleName()); }
     private static final Logger logger = LogManager.getLogger(PanelTypeTest.class);
 
     @BeforeAll

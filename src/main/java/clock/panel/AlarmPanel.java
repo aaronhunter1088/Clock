@@ -14,6 +14,7 @@ import java.text.ParseException;
 import java.time.DayOfWeek;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -51,6 +52,7 @@ public class AlarmPanel extends JPanel implements IClockPanel
                    alarmLabel3, // am/pm
                    alarmLabel4, // current alarms
                    alarmLabel5; // name of alarm
+    private JComboBox<String> ampmDropDown; // am/pm dropdown
     private JCheckBox mondayCheckBox,tuesdayCheckBox,wednesdayCheckBox,thursdayCheckBox,
                       fridayCheckBox,saturdayCheckBox,sundayCheckBox,weekCheckBox,weekendCheckBox;
     private JTextField textField1, // hours textfield
@@ -75,9 +77,9 @@ public class AlarmPanel extends JPanel implements IClockPanel
         this.clock = clock;
         this.clock.setClockPanel(PANEL_ALARM);
         setMaximumSize(Clock.alarmSize);
-        this.layout = new GridBagLayout();
+        setGridBagLayout(new GridBagLayout());
         setLayout(layout);
-        this.constraints = new GridBagConstraints();
+        setGridBagConstraints(new GridBagConstraints());
         setBackground(Color.BLACK);
         setForeground(Color.BLACK);
         setupAlarmPanel();
@@ -111,6 +113,7 @@ public class AlarmPanel extends JPanel implements IClockPanel
         textField4.setSize(new Dimension(50,50));
         alarmLabel4 = new JLabel(CURRENT_ALARMS, SwingConstants.CENTER); // Current Alarms
         alarmLabel5 = new JLabel("Name", SwingConstants.CENTER);
+        setupOptionsSelection();
         textField1.requestFocusInWindow();
         textField1.setText(EMPTY);
         //getJTextField1().setBorder(BorderFactory.createLineBorder(Color.RED));
@@ -155,6 +158,17 @@ public class AlarmPanel extends JPanel implements IClockPanel
         setupCheckBoxes();
     }
 
+    /**
+     * The main method used to set up
+     * the selection dropdown box and adds
+     * its functionality
+     */
+    private void setupOptionsSelection()
+    {
+        setDateOperationsDropdown(new JComboBox<>(new String[]{AM, PM}));
+        ampmDropDown.setSelectedItem(clock.getAMPM().equals(AM)?AM:PM);
+        ampmDropDown.setComponentOrientation(ComponentOrientation.LEFT_TO_RIGHT);
+    }
 
 
     /**
@@ -170,13 +184,14 @@ public class AlarmPanel extends JPanel implements IClockPanel
             alarmLabel4.setText(
                 clock.getListOfAlarms().size() == 1
                     ? clock.getListOfAlarms().size() + SPACE+ALARM+SPACE+ADDED
-                    : clock.getListOfAlarms().size() + SPACE+ALARM+S+SPACE+ADDED
+                    : clock.getListOfAlarms().size() + SPACE+ALARM+S.toLowerCase()+SPACE+ADDED
             );
         }
     }
 
     /**
-     * Validates the first text field
+     * Validates the first text field is a valid hour
+     * Allows military time format if the clock is set to show military time
      * @return boolean true if the first text field is valid
      * @throws InvalidInputException if the first text field is invalid
      */
@@ -189,11 +204,20 @@ public class AlarmPanel extends JPanel implements IClockPanel
         }
         else {
             try {
-                if (Integer.parseInt(textField1.getText()) <= 0 ||
-                        Integer.parseInt(textField1.getText()) > 23 )
-                {
-                    textField1.grabFocus();
-                    throw new InvalidInputException("Hours must be between 0 and 12");
+                if (clock.isShowMilitaryTime()) {
+                    if (Integer.parseInt(textField1.getText()) <= 0 ||
+                            Integer.parseInt(textField1.getText()) > 23)
+                    {
+                        textField1.grabFocus();
+                        throw new InvalidInputException("Hours must be between 0 and 23");
+                    }
+                } else {
+                    if (Integer.parseInt(textField1.getText()) <= 0 ||
+                            Integer.parseInt(textField1.getText()) > 12)
+                    {
+                        textField1.grabFocus();
+                        throw new InvalidInputException("Hours must be between 0 and 12");
+                    }
                 }
             } catch (NumberFormatException nfe) {
                 textField1.grabFocus();
@@ -280,13 +304,6 @@ public class AlarmPanel extends JPanel implements IClockPanel
         if (days.isEmpty()) { throw new InvalidInputException("At least one checkbox must be selected."); }
         return true;
     }
-
-    /**
-     * Validates that at least one checkbox is selected
-     * @return boolean true if at least one checkbox is selected
-     */
-    boolean validateACheckboxWasSelected()
-    { return !getDaysChecked().isEmpty(); }
 
     /**
      * Adds the alarm to the menu
@@ -379,48 +396,30 @@ public class AlarmPanel extends JPanel implements IClockPanel
         logger.info("setup alarm button");
         setAlarmButton.addActionListener(action -> {
             logger.info("set alarm button clicked");
-            boolean validated;
             try
             {
-                validated = validateFirstTextField() && validateSecondTextField() // Hours and Minutes
-                        && validateThirdTextField() && validateOnTheCheckBoxes(); // Time and Checkboxes
+                boolean validated = validateFirstTextField() && validateSecondTextField() // Hours and Minutes
+                        && validateOnTheCheckBoxes(); // Checkboxes
 
                 if (!validated)
                 {
                     logger.error("not valid inputs. not setting alarm");
-                    //this.alarm = null; // new Alarm()
                 }
                 else
                 {
                     logger.info("creating new alarm");
                     Alarm alarm = createAlarm();
-                    //setAlarm(alarm);
-                    //setUpdatingAlarm(false);
-                    if (clock.getListOfAlarms().isEmpty())
-                    {
+                    if (!clock.getListOfAlarms().contains(alarm)) {
                         addAlarmToAlarmMenu(alarm);
                         clock.getListOfAlarms().add(alarm);
+                        // display list of alarms below All Alarms
+                        resetJTextArea();
+                    } else {
+                        logger.warn("alarm already exists");
+                        // display list of alarms below All Alarms
+                        resetJTextArea();
+                        textArea.append(NEWLINE+"Alarm already exists!"+NEWLINE);
                     }
-                    else
-                    {
-                        boolean addToList = false;
-                        for(int i=0; i<clock.getListOfAlarms().size(); i++)
-                        {
-                            if (!clock.getListOfAlarms().get(i).toString().equals(alarm.toString()) ||
-                                clock.getListOfAlarms().get(i).getDays() != alarm.getDays())
-                            { addToList = true; }
-                            else
-                            { logger.error("Tried adding an alarm but it already exists! Cannot create duplicate alarm."); }
-                        }
-                        if (addToList)
-                        {
-                            addAlarmToAlarmMenu(alarm);
-                            clock.getListOfAlarms().add(alarm);
-                        }
-                    }
-                    logger.info("clock.alarmsList size {}", clock.getListOfAlarms().size());
-                    // display list of alarms below All Alarms
-                    resetJTextArea();
                     resetJCheckBoxes();
                     // erase input in textFields
                     textField1.setText(EMPTY);
@@ -430,7 +429,7 @@ public class AlarmPanel extends JPanel implements IClockPanel
                     resetJAlarmLabel4();
                 }
             }
-            catch (InvalidInputException | ParseException | NumberFormatException e)
+            catch (InvalidInputException | NumberFormatException e)
             {
                 textArea.setLineWrap(true);
                 textArea.setWrapStyleWord(true);
@@ -445,38 +444,28 @@ public class AlarmPanel extends JPanel implements IClockPanel
      * Creates an alarm and sets the latest one created as the currentAlarm
      * defined in setAlarm
      * @return Alarm
-     * @throws ParseException will be thrown if hour, minutes, or time is inappropriate.
      */
-    public Alarm createAlarm() throws ParseException, InvalidInputException
+    public Alarm createAlarm()
     {
-        logger.info("create alarm");
         int hour = Integer.parseInt(textField1.getText());
         int minutes = Integer.parseInt(textField2.getText());
-        String ampm = textField3.getText();
+        String ampm = Objects.requireNonNull(ampmDropDown.getSelectedItem()).toString();
         String alarmName = textField4.getText();
-        boolean valid;
-        valid = validateFirstTextField() && validateSecondTextField()
-                && validateThirdTextField() && validateACheckboxWasSelected();
-        if (valid)
+        List<DayOfWeek> days = getDaysChecked();
+        logger.info("create alarm");
+        Alarm alarm = new Alarm(alarmName, hour, minutes, ampm, false, days, getClock());
+        alarm.setIsAlarmGoingOff(false);
+        StringBuilder daysStr = new StringBuilder();
+        daysStr.append("days: ");
+        for(DayOfWeek day: days)
         {
-            logger.info("valid alarm values...");
-            List<DayOfWeek> days = getDaysChecked();
-            Alarm alarm = new Alarm(alarmName, hour, minutes, ampm, false, days, getClock());
-            alarm.setIsAlarmGoingOff(false);
-            StringBuilder daysStr = new StringBuilder();
-            daysStr.append("days: ");
-            for(DayOfWeek day: days)
-            {
-                daysStr.append(day);
-                daysStr.append("\t");
-            }
-            logger.info("Created an alarm: {}", alarm);
-            logger.info("days: {}", daysStr);
-            logger.info("Alarm created");
-            return alarm;
+            daysStr.append(day);
+            daysStr.append("\t");
         }
-        else
-        { return null; }
+        logger.info("Created an alarm: {}", alarm);
+        logger.info("days: {}", daysStr);
+        logger.info("Alarm created");
+        return alarm;
     }
 
     /**
@@ -508,7 +497,6 @@ public class AlarmPanel extends JPanel implements IClockPanel
             setCheckBoxesIfWasSelected(alarmToUpdate);
             alarmToUpdate.setupMusicPlayer();
         }
-        //updatingAlarm = true;
         // remove alarm from list of alarms
         deleteAlarmMenuItemFromViewAlarms(alarmToUpdate);
         logger.info("Size of listOfAlarms before removing {}", clock.getListOfAlarms().size());
@@ -517,69 +505,6 @@ public class AlarmPanel extends JPanel implements IClockPanel
         resetJTextArea();
         alarmLabel4.setText("Updating alarm");
     }
-
-
-    /**
-     * Adds alarms created to the menu
-     */
-//    public void setupAlarmsInMenuFunctionality()
-//    {
-//        // get the view alarms menu
-//        // for each except the Set Alarms (option1)
-//        // create an action listener which
-//        // takes the alarmClock, set the hour, min, and ampm
-//        // in the textFields, and we will set a boolean to true
-//        // which will allow editing the textFields to any value
-//        // changing all values to 0 or explicitly Time to 0
-//        // will delete the alarm
-//        // changing the values and clicking Set will save the alarm
-//        //05:06:00 PM
-//        logger.info("setup alarms in menu functionality");
-//        for(int i=0; i<getClock().getClockMenuBar().getAlarmFeature_Menu().getItemCount(); i++)
-//        {
-//            if (!SET_ALARMS.equals(clock.getClockMenuBar().getAlarmFeature_Menu().getItem(i).getText()))
-//            {
-//                JMenuItem menuItem = clock.getClockMenuBar().getAlarmFeature_Menu().getItem(i);
-//                menuItem.addActionListener(action -> {
-//                    clock.getListOfAlarms().forEach(alarm -> {
-//                        if (alarm.toString().equals(menuItem.getText()))
-//                        {
-//                            //if (alarm.getMusicPlayer() == null) { alarm.setupMusicPlayer(); }
-//                            // if an alarm is going off and we clicked on it in the menuBar
-//                            if (alarm.isAlarmGoingOff())
-//                            {
-//                                alarm.stopAlarm();
-//                                setCheckBoxesIfWasSelected(alarm);
-//                                alarm.setIsAlarmGoingOff(false);
-//                                alarm.setIsAlarmUpdating(true); // this and the boolean below we want true
-//                                //updatingAlarm = true; // we want to continue with the logic that's done in the next if
-//                                //activeAlarm = null;
-//                                logger.info("Size of listOfAlarms before removing {}", clock.getListOfAlarms().size());
-//                                // remove alarm from list of alarms
-//                                clock.getListOfAlarms().remove(alarm);
-//                                logger.info("Size of listOfAlarms after removing {}", clock.getListOfAlarms().size());
-//                                deleteAlarmMenuItemFromViewAlarms(alarm);
-//                                resetJTextArea();
-//                                clock.getAlarmPanel().getJTextField1().setText(alarm.getHoursAsStr());
-//                                clock.getAlarmPanel().getJTextField2().setText(alarm.getMinutesAsStr());
-//                                clock.getAlarmPanel().getJTextField3().setText(alarm.getAMPM());
-//                                alarmLabel4.setText("Alarm off.");
-//                            }
-//                            // we are updating an alarm by clicking on it in the menuBar
-//                            else if (alarm != null)
-//                            {
-//                                updateTheAlarm(alarm);
-//                                textField1.setText(alarm.getHoursAsStr());
-//                                textField2.setText(alarm.getMinutesAsStr());
-//                                textField3.setText(alarm.getAMPM());
-//                            }
-//                            clock.changePanels(PANEL_ALARM, false);
-//                        }
-//                    });
-//                });
-//            }
-//        }
-//    }
 
     /**
      * Returns a list of days that were checked
@@ -763,7 +688,8 @@ public class AlarmPanel extends JPanel implements IClockPanel
         addComponent(alarmLabel2,0,2,1,1, 0,0, GridBagConstraints.BOTH, new Insets(0,0,0,0)); // M
         addComponent(textField2,0,3,1,1, 0,0, GridBagConstraints.BOTH, new Insets(0,0,0,0)); // textField
         addComponent(alarmLabel3,0,4,1,1, 0,0, GridBagConstraints.BOTH, new Insets(0,0,0,0)); // Time (AM/PM)
-        addComponent(textField3,0,5,1,1, 0,0, GridBagConstraints.BOTH, new Insets(0,0,0,0)); // textField
+        //addComponent(textField3,0,5,1,1, 0,0, GridBagConstraints.BOTH, new Insets(0,0,0,0)); // textField
+        addComponent(ampmDropDown,0,5,1,1, 0,0, GridBagConstraints.BOTH, new Insets(0,0,0,0)); // textField
         addComponent(alarmLabel4, 0, 6, 2, 1, 2, 2, GridBagConstraints.BOTH, new Insets(0,0,0,0));
         constraints.weighty = 1;
         constraints.weightx = 1;
@@ -866,6 +792,7 @@ public class AlarmPanel extends JPanel implements IClockPanel
     public JCheckBox getSundayCheckBox() { return sundayCheckBox; }
     public JCheckBox getWeekCheckBox() { return weekCheckBox; }
     public JCheckBox getWeekendCheckBox() { return weekendCheckBox; }
+    public JComboBox<String> getJComboBox() { return this.ampmDropDown; }
 
     /* Setters */
     protected void setGridBagLayout(GridBagLayout layout) { this.layout = layout; }
@@ -890,4 +817,6 @@ public class AlarmPanel extends JPanel implements IClockPanel
     protected void setWeekCheckBox(JCheckBox weekCheckBox) { this.weekCheckBox = weekCheckBox; }
     protected void setWeekendCheckBox(JCheckBox weekendCheckBox) { this.weekendCheckBox = weekendCheckBox; }
     public void setClock(Clock clock) { this.clock = clock; }
+    private void setDateOperationsDropdown(JComboBox<String> ampmDropDown) { this.ampmDropDown = ampmDropDown; }
+
 }

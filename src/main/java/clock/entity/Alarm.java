@@ -6,6 +6,7 @@ import java.io.Serializable;
 import java.time.DayOfWeek;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Future;
@@ -74,15 +75,15 @@ public class Alarm implements Serializable, Comparable<Alarm>
      * @see InvalidInputException
      */
     public Alarm(String name, int hours, int minutes, String ampm,
-                 boolean updatingAlarm, List<DayOfWeek> days, Clock clock) throws InvalidInputException
+                 boolean updatingAlarm, List<DayOfWeek> days, Clock clock)
     {
         this.clock = clock;
-        if (hours < 0 || hours > 12) throw new IllegalArgumentException("Hours must be between 0 and 12");
+        if (hours < 0 || hours > 12) throw new InvalidInputException("Hours must be between 0 and 12");
         else setHours(hours);
-        if (minutes < 0 || minutes > 59) throw new IllegalArgumentException("Minutes must be between 0 and 59");
+        if (minutes < 0 || minutes > 59) throw new InvalidInputException("Minutes must be between 0 and 59");
         else setMinutes(minutes);
         if (List.of(AM,PM,AM.toLowerCase(),PM.toLowerCase()).contains(ampm)) setAMPM(ampm.toUpperCase());
-        else throw new IllegalArgumentException("AMPM must be 'AM' or 'PM'");
+        else throw new InvalidInputException("AMPM must be 'AM' or 'PM'");
         this.days = days;
         this.updatingAlarm = updatingAlarm;
         this.name = StringUtils.isBlank(name) ? null : name;
@@ -255,5 +256,34 @@ public class Alarm implements Serializable, Comparable<Alarm>
     @Override
     public int compareTo(Alarm o) {
         return this.getAlarmAsString().compareTo(o.getAlarmAsString());
+    }
+
+    /**
+     * Checks if two alarms are equals
+     * If they have a name, it will check
+     * against the lowercase version of the name.
+     * @param o the object to compare with
+     * @return true if the objects are equal, false otherwise
+     */
+    @Override
+    public boolean equals(Object o) {
+        if (!(o instanceof Alarm alarm)) return false;
+        if (getName() != null) {
+            return getHours() == alarm.getHours() &&
+                   getMinutes() == alarm.getMinutes() &&
+                   Objects.equals(getName().toLowerCase(), alarm.getName().toLowerCase()) &&
+                   Objects.equals(ampm, alarm.ampm) &&
+                   Objects.equals(getDays(), alarm.getDays());
+        } else {
+            return getHours() == alarm.getHours() &&
+                   getMinutes() == alarm.getMinutes() &&
+                   Objects.equals(ampm, alarm.ampm) &&
+                   Objects.equals(getDays(), alarm.getDays());
+        }
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(getHours(), getMinutes(), getName(), getMinutesAsStr(), getHoursAsStr(), ampm, getDays(), isAlarmGoingOff(), isUpdatingAlarm(), getClock(), getMusicPlayer());
     }
 }

@@ -14,6 +14,8 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.function.Function;
 
 import clock.exception.InvalidInputException;
 import clock.panel.*;
@@ -73,7 +75,7 @@ public class Clock extends JFrame
     private DayOfWeek dayOfWeek;
     private Month month;
     private String hoursAsStr=EMPTY, minutesAsStr=EMPTY, secondsAsStr=EMPTY;
-    private boolean leapYear,doesTodayMatchDSTDate,dateChanged,isNewYear,
+    private boolean leapYear, todayMatchesDSTDate,dateChanged,isNewYear,
             alarmActive, timerActive,updateAlarm,showFullDate,showPartialDate,
             showMilitaryTime,showDigitalTimeOnAnalogueClock,testingClock,
             daylightSavingsTimeEnabled;
@@ -118,17 +120,20 @@ public class Clock extends JFrame
      * @throws InvalidInputException when an InvalidInput has been given
      * @see InvalidInputException
      */
-    public Clock(int hours, int minutes, int seconds, Month month, DayOfWeek dayOfWeek, int dayOfMonth, int year, String ampm) throws InvalidInputException
+    public Clock(int hours, int minutes, int seconds, Month month, DayOfWeek dayOfWeek,
+                 int dayOfMonth, int year, String ampm) throws InvalidInputException
     {
         this(true);
-        if (seconds < 0 || seconds > 59 && seconds != 60) throw new IllegalArgumentException("Seconds must be between 0 and 59");
-        else setSeconds(seconds);
+        // Validate the inputs
         if (minutes < 0 || minutes > 59 && minutes != 60) throw new IllegalArgumentException("Minutes must be between 0 and 59");
         else setMinutes(minutes);
+        if (seconds < 0 || seconds > 59 && seconds != 60) throw new IllegalArgumentException("Seconds must be between 0 and 59");
+        else setSeconds(seconds);
         if (!showMilitaryTime) {
             if (hours < 0 || hours > 12) throw new IllegalArgumentException("Hours must be between 0 and 12");
             else setHours(hours);
-        } else {
+        }
+        else {
             if (hours < 0 || hours > 23) throw new IllegalArgumentException("Hours must be between 0 and 23");
             else setHours(hours);
         }
@@ -143,21 +148,16 @@ public class Clock extends JFrame
         if (year < 1000) throw new IllegalArgumentException("Year must be greater than 1000");
         else setYear(year);
         setTheTime(LocalDateTime.of(LocalDate.of(year,month,dayOfMonth), LocalTime.of(hours,minutes,seconds)));
-        if (List.of(AM,PM,AM.toLowerCase(),PM.toLowerCase()).contains(ampm)) setAMPM(ampm.toUpperCase());
-        else throw new IllegalArgumentException("AMPM must be 'AM' or 'PM'");
-        showMilitaryTime = false;
+        setAMPM(ampm);
         setDaylightSavingsTimeDates();
         setupMenuBar();
-        if (isTodayDaylightSavingsTime()) { doesTodayMatchDSTDate = true; }
+        if (isTodayDaylightSavingsTime()) { todayMatchesDSTDate = true; }
         digitalClockPanel = new DigitalClockPanel(this);
         analogueClockPanel = new AnalogueClockPanel(this);
         alarmPanel = new AlarmPanel(this);
         timerPanel = new TimerPanel(this);
         leapYear = date.isLeapYear();
-        dateChanged = false;
-        alarmActive = false;
-        timerActive = false;
-        showPanel(PANEL_DIGITAL_CLOCK, false);
+        changePanels(PANEL_DIGITAL_CLOCK, false);
     }
 
     /**
@@ -179,21 +179,19 @@ public class Clock extends JFrame
         setResizable(false);
         listOfAlarms = new ArrayList<>();
         listOfTimers = new ArrayList<>();
+        scheduler = Executors.newScheduledThreadPool(25);
         if (!testingClock) {
-            showMilitaryTime = false;
             setTheTime(LocalDateTime.now());
             setDaylightSavingsTimeDates();
-            setupMenuBar();
-            if (isTodayDaylightSavingsTime()) { doesTodayMatchDSTDate = true; }
+            daylightSavingsTimeEnabled = true;
+            setupMenuBar(); // daylightSavingsTimeEnabled directly influences menu bar setup
+            if (isTodayDaylightSavingsTime()) { todayMatchesDSTDate = true; }
             digitalClockPanel = new DigitalClockPanel(this);
             analogueClockPanel = new AnalogueClockPanel(this);
             alarmPanel = new AlarmPanel(this);
             timerPanel = new TimerPanel(this);
             timerPanel2 = new TimerPanel2(this);
             leapYear = date.isLeapYear();
-            daylightSavingsTimeEnabled = true;
-            scheduler = Executors.newScheduledThreadPool(25);
-            //showPanel(PANEL_ANALOGUE_CLOCK, false);
             changePanels(PANEL_DIGITAL_CLOCK, false);
         }
     }
@@ -245,6 +243,8 @@ public class Clock extends JFrame
         setDate(LocalDate.of(year, month, dayOfMonth));
         setTime(LocalTime.of(hours, minutes, seconds));
         setCurrentTime(LocalDateTime.of(date, time));
+        // TODO: Test
+        setDaylightSavingsTimeDates();
     }
 
     /**
@@ -427,7 +427,7 @@ public class Clock extends JFrame
      */
     public void setDaylightSavingsTimeDates()
     {
-        logger.info("setting begin and end daylight savings dates");
+        logger.debug("setting begin and end daylight savings dates");
         int sundayCount = 0;
         int firstOfMonth = 1;
         LocalDate beginDate = LocalDate.of(year, MARCH, firstOfMonth); // 3
@@ -662,7 +662,6 @@ public class Clock extends JFrame
     {
         logger.info("tick rate: sec: {} min: {} hrs: {}", seconds, minutes, hours);
         performTick(seconds, minutes, hours);
-        //if (PANEL_DIGITAL_CLOCK == clockPanel) { digitalClockPanel.updateLabels(); }
         updateTimeIfMidnight();
         setTheCurrentTime();
     }
@@ -682,17 +681,23 @@ public class Clock extends JFrame
         setSeconds(this.seconds+seconds);
         if (this.seconds >= 60)
         {
-            logger.debug("updating minute");
+            logger.debug("updating second");
             setSeconds(this.seconds-60);
             setMinutes(this.minutes+minutes);
             if (this.minutes >= 60)
             {
-                logger.debug("updating hour");
+                logger.debug("updating minute");
                 setMinutes(this.minutes-60);
+//                if (this.minutes == 0 && this.hours == 0) {
+//                    setHours(this.hours);
+//                } else {
+//                    setHours(this.hours+hours);
+//                }
                 setHours(this.hours+hours);
                 logger.debug("time: " + getTimeAsStr());
                 if (this.hours >= 12 && this.minutes == 0 && this.seconds == 0 && !showMilitaryTime)
                 {
+                    logger.debug("updating hour");
                     setHours(12);
                     if (PM.equals(ampm))
                     {
@@ -729,7 +734,7 @@ public class Clock extends JFrame
         if (dateChanged) {
             logger.info("date has changed");
             setDayOfMonth(dayOfMonth+1);
-            setDoesTodayMatchDSTDate(isTodayDaylightSavingsTime());
+            setTodayMatchesDSTDate(isTodayDaylightSavingsTime());
             switch(dayOfWeek) {
                 case SUNDAY -> setDayOfWeek(MONDAY);
                 case MONDAY -> setDayOfWeek(TUESDAY);
@@ -848,24 +853,24 @@ public class Clock extends JFrame
                 default -> logger.error("Unknown Month: {}", month);
             }
             setDate(LocalDate.of(year, month, dayOfMonth));
-            if (isTodayDaylightSavingsTime()) { setDoesTodayMatchDSTDate(true); }
+            if (isTodayDaylightSavingsTime()) { setTodayMatchesDSTDate(true); }
         }
-        if (daylightSavingsTimeEnabled && doesTodayMatchDSTDate && this.hours == 2)
+        if (daylightSavingsTimeEnabled && todayMatchesDSTDate && this.hours == 2)
         {
             logger.debug("!! daylight savings time now !!");
             if (month == MARCH && AM.equals(ampm))
             {
                 logger.debug("spring forward");
                 setHours(3);
-                setDoesTodayMatchDSTDate(false);
+                setTodayMatchesDSTDate(false);
             }
             else if (month == NOVEMBER && AM.equals(ampm))
             {
                 logger.debug("fall back");
                 setHours(1);
-                setDoesTodayMatchDSTDate(false);
+                setTodayMatchesDSTDate(false);
             }
-            logger.debug("setting doesTodayMatchDSTDate to {}", doesTodayMatchDSTDate);
+            logger.debug("setting doesTodayMatchDSTDate to {}", todayMatchesDSTDate);
         }
         else {
             if (!daylightSavingsTimeEnabled)
@@ -923,6 +928,7 @@ public class Clock extends JFrame
 
     public void checkIfItIsNewYears()
     {
+        logger.info("is today new years: {}", isNewYear);
         if (isNewYear)
         {
             setIsNewYear(false);
@@ -930,23 +936,35 @@ public class Clock extends JFrame
         }
     }
 
+    /**
+     * Scheduled to run once every second.
+     * For each alarm, check if the alarm's
+     * time and day matches the clocks current
+     * time and day. And, if the alarm is not
+     * already going off, set it to going off.
+     */
     public void setActiveAlarms()
     {
-        logger.info("checking if any alarms are going off");
+        AtomicInteger total = new AtomicInteger();
         getListOfAlarms().forEach((alarm) -> {
             for(DayOfWeek day : alarm.getDays()) {
                 if (alarm.getAlarmAsString().equals(getClockTimeAsAlarmString())
                         &&
                         day == getDayOfWeek()
                         &&
-                        !alarm.isAlarmGoingOff()
+                        seconds <= 0
                 ) {
                     alarm.setIsAlarmGoingOff(true);
-                    logger.info("Alarm " + alarm + " matches clock's time. ");
-                    logger.info("Sounding alarm...");
+                    total.getAndIncrement();
+                    logger.info("Alarm " + alarm + " matches clock's time. Activating alarm");
                 }
             }
         });
+        if (total.get() == 0) {
+            logger.info("no alarms are active");
+        } else {
+            logger.info("{} alarms are active", total.get());
+        }
         // alarm has reference to time
         // check all alarms
         // if any alarm matches clock's time, an alarm should be going off
@@ -954,12 +972,18 @@ public class Clock extends JFrame
 
     public void triggerAlarms()
     {
-        getListOfAlarms().stream()
+        List<Alarm> alarmsToTrigger = getListOfAlarms().stream()
             .filter(Alarm::isAlarmGoingOff)
-            .forEach(Alarm::triggerAlarm);
+                .toList();
+        if (alarmsToTrigger.isEmpty()) {
+            logger.info("no alarms are going off");
+        } else {
+            logger.info("triggering {} alarms", alarmsToTrigger.size());
+            alarmsToTrigger.forEach(Alarm::triggerAlarm);
+        }
     }
 
-        /* TODO: Rework. Logic should be as follows:
+        /* TODO: Update! Rework. Logic should be as follows:
     ?? What happens when two timers are going off at the same time?
      */
     /**
@@ -967,10 +991,10 @@ public class Clock extends JFrame
      */
     public void checkIfAnyTimersAreGoingOff()
     {
-        logger.info("checking if any timers are going off");
         boolean anyTimerIsGoingOff = listOfTimers.stream().anyMatch(Timer::isTimerGoingOff);
         if (anyTimerIsGoingOff)
         {
+            logger.info("activating timers that should be going off");
             //List<Timer> toBeRemoved = new ArrayList<>();
             //timer.setTimerGoingOff(false);
             //toBeRemoved.add(timer);
@@ -989,6 +1013,43 @@ public class Clock extends JFrame
                         //}
                     });
             //activeTimers.removeAll(toBeRemoved);
+        }
+        else {
+            logger.info("no timers are going off");
+        }
+    }
+
+    /**
+     * Starts the clock and schedules the
+     * tasks to run at a fixed rate.
+     */
+    public void start()
+    {
+        var scheduler = getScheduler();
+
+        // Wrap tasks to prevent exceptions from killing scheduled execution
+        Function<Runnable, Runnable> taskRunner = task -> () -> {
+            try {
+                task.run();
+            } catch (Exception e) {
+                logger.error("Scheduled task failed: {}", task, e);
+            }
+        };
+
+        scheduler.scheduleAtFixedRate(taskRunner.apply(this::tick), 0, 1, TimeUnit.SECONDS);
+        scheduler.scheduleAtFixedRate(taskRunner.apply(this::setActiveAlarms), 0, 1, TimeUnit.SECONDS);
+        scheduler.scheduleAtFixedRate(taskRunner.apply(this::triggerAlarms), 0, 1, TimeUnit.SECONDS);
+        scheduler.scheduleAtFixedRate(taskRunner.apply(this::checkIfAnyTimersAreGoingOff), 0, 1, TimeUnit.SECONDS);
+        scheduler.scheduleAtFixedRate(taskRunner.apply(this::checkIfItIsNewYears), 0, 1, TimeUnit.SECONDS);
+        //scheduler.scheduleAtFixedRate(taskRunner.apply(this::setTheCurrentTime), 0, 1, TimeUnit.SECONDS);
+    }
+
+    /**
+     * Stops the clock and all scheduled tasks.
+     */
+    public void stop() {
+        if (scheduler != null && !scheduler.isShutdown()) {
+            scheduler.shutdownNow();
         }
     }
 
@@ -1023,7 +1084,22 @@ public class Clock extends JFrame
      * @return 'HH:MM:SS AMPM' ex: 05:15:24 PM
      */
     public String getTimeAsStr() { return hoursAsStr+COLON+minutesAsStr+COLON+secondsAsStr+SPACE+ampm; }
-    public String getClockTimeAsAlarmString() { return hoursAsStr+COLON+minutesAsStr+SPACE+ampm; }
+    public String getClockTimeAsAlarmString() {
+        if (showMilitaryTime) {
+            if (hours > 12) {
+                var hours = this.hours - 12;
+                if (hours <= 9) {
+                    return "0"+hours+COLON+minutesAsStr+SPACE+ampm;
+                } else {
+                    return hours+COLON+minutesAsStr+SPACE+ampm;
+                }
+            } else {
+                return hoursAsStr+COLON+minutesAsStr+SPACE+ampm;
+            }
+        } else {
+            return hoursAsStr+COLON+minutesAsStr+SPACE+ampm;
+        }
+    }
     /**
      * Returns the date like: MAY 4, 2000
      * @return the date as a formatted string
@@ -1033,7 +1109,7 @@ public class Clock extends JFrame
     public String getMilitaryTimeAsStr() { return hoursAsStr+minutesAsStr+SPACE+Hours.toLowerCase()+SPACE+secondsAsStr; }
     public String getPartialDateAsStr() { return dayOfWeek.toString().substring(0,3)+SPACE+month.toString().substring(0,3)+SPACE+dayOfMonth+COMMA+SPACE+year; }
     public boolean isLeapYear() { return leapYear; }
-    public boolean isDoesTodayMatchDSTDate() { return doesTodayMatchDSTDate; }
+    public boolean isTodayMatchesDSTDate() { return todayMatchesDSTDate; }
     public boolean isDateChanged() { return dateChanged; }
     public boolean isNewYear() { return isNewYear; }
     public boolean isAlarmActive() { return alarmActive; }
@@ -1128,7 +1204,7 @@ public class Clock extends JFrame
      * Sets and logs the new current time
      * @param currentTime the new current time
      */
-    public void setCurrentTime(LocalDateTime currentTime) { this.currentTime = currentTime; logger.debug("currentTime: {}", currentTime); }
+    public void setCurrentTime(LocalDateTime currentTime) { this.currentTime = currentTime; logger.debug("currentTime: {}", DateTimeFormatter.ofPattern("dd-MM-yyyy hh:mm:ss a").format(currentTime)); }
     /**
      * Sets and logs the new begin dst date value
      * @param beginDaylightSavingsTimeDate the new begin dst date value
@@ -1146,9 +1222,9 @@ public class Clock extends JFrame
      * When the clock starts and the date matches a daylight savings
      * date, this value is set. It is also set after the date updates,
      * and that new date matches a daylight savings date.
-     * @param doesTodayMatchDSTDate if today is daylight savings day
+     * @param todayMatchesDSTDate if today is daylight savings day
      */
-    public void setDoesTodayMatchDSTDate(boolean doesTodayMatchDSTDate) { this.doesTodayMatchDSTDate = doesTodayMatchDSTDate; logger.debug("today is dst? {}", doesTodayMatchDSTDate); }
+    public void setTodayMatchesDSTDate(boolean todayMatchesDSTDate) { this.todayMatchesDSTDate = todayMatchesDSTDate; logger.debug("today is dst? {}", todayMatchesDSTDate); }
     /**
      * Sets and logs the new dateChanged value
      * @param isDateChanged the dateChanged value to set

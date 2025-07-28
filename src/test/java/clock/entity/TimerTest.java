@@ -18,7 +18,6 @@ import static org.junit.jupiter.api.Assertions.*;
 
 class TimerTest
 {
-    static { System.setProperty("appName", TimerTest.class.getSimpleName()); }
     private static final Logger logger = LogManager.getLogger(TimerTest.class);
 
     private Clock clock;

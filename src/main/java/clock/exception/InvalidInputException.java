@@ -24,7 +24,7 @@ import java.io.Serializable;
  * @author michael ball
 *  @version 2.0
  */
-public class InvalidInputException extends Exception implements Serializable
+public class InvalidInputException extends RuntimeException implements Serializable
 {
 	@Serial
 	private static final long serialVersionUID = 2L;
