@@ -663,6 +663,7 @@ public class Clock extends JFrame
         logger.info("tick rate: sec: {} min: {} hrs: {}", seconds, minutes, hours);
         performTick(seconds, minutes, hours);
         updateTimeIfMidnight();
+        setAlarmsNotTriggered();
         setTheCurrentTime();
     }
 
@@ -688,11 +689,6 @@ public class Clock extends JFrame
             {
                 logger.debug("updating minute");
                 setMinutes(this.minutes-60);
-//                if (this.minutes == 0 && this.hours == 0) {
-//                    setHours(this.hours);
-//                } else {
-//                    setHours(this.hours+hours);
-//                }
                 setHours(this.hours+hours);
                 logger.debug("time: " + getTimeAsStr());
                 if (this.hours >= 12 && this.minutes == 0 && this.seconds == 0 && !showMilitaryTime)
@@ -712,7 +708,7 @@ public class Clock extends JFrame
                         setDateChanged(false);
                     }
                 }
-                else if (this.hours >= 24 && this.minutes == 0 && this.seconds == 0)
+                else if (this.hours >= 0 && this.minutes == 0 && this.seconds == 0)
                 {
                     setHours(0);
                     setAMPM(AM);
@@ -723,7 +719,11 @@ public class Clock extends JFrame
                     setHours(this.hours-12);
                     setDateChanged(false);
                 }
-                else { setHours(this.hours); }
+                else
+                {
+                    setHours(this.hours);
+                    setDateChanged(false);
+                }
             }
         }
         else { setDateChanged(false); }
@@ -901,6 +901,24 @@ public class Clock extends JFrame
     }
 
     /**
+     * Resets the alarms that were triggered today.
+     * This will allow alarms to be reset and not triggered
+     * again while the current time is still the same as
+     * when the alarm should triggered.
+     */
+    private void setAlarmsNotTriggered()
+    {
+        logger.info("updating alarms");
+        if (getListOfAlarms().isEmpty()) {
+            logger.info("no alarms to update");
+        } else {
+            if (dateChanged) {
+                getListOfAlarms().forEach(alarm -> alarm.setTriggeredToday(false));
+            }
+        }
+    }
+
+    /**
      * Returns an ImageIcon, or null if the path was invalid.
      * @param path the path of the image
      */
@@ -947,16 +965,16 @@ public class Clock extends JFrame
     {
         AtomicInteger total = new AtomicInteger();
         getListOfAlarms().forEach((alarm) -> {
-            for(DayOfWeek day : alarm.getDays()) {
-                if (alarm.getAlarmAsString().equals(getClockTimeAsAlarmString())
-                        &&
-                        day == getDayOfWeek()
-                        &&
-                        seconds <= 0
-                ) {
-                    alarm.setIsAlarmGoingOff(true);
-                    total.getAndIncrement();
-                    logger.info("Alarm " + alarm + " matches clock's time. Activating alarm");
+            if (!alarm.isTriggeredToday()) {
+                for(DayOfWeek day : alarm.getDays()) {
+                    if (alarm.getAlarmAsString().equals(getClockTimeAsAlarmString())
+                            && day == getDayOfWeek()
+                    ) {
+                        alarm.setIsAlarmGoingOff(true);
+                        alarm.setTriggeredToday(true);
+                        total.getAndIncrement();
+                        logger.info("Alarm " + alarm + " matches clock's time. Activating alarm");
+                    }
                 }
             }
         });

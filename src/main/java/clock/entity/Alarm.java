@@ -7,9 +7,6 @@ import java.time.DayOfWeek;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
-import java.util.concurrent.Callable;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Future;
 
 import clock.exception.InvalidInputException;
 import javazoom.jl.decoder.JavaLayerException;
@@ -38,7 +35,7 @@ public class Alarm implements Serializable, Comparable<Alarm>
     private String name;
     private String minutesAsStr,hoursAsStr,ampm;
     private List<DayOfWeek> days;
-    boolean alarmGoingOff,updatingAlarm;
+    private boolean alarmGoingOff,updatingAlarm, triggeredToday;
     private Clock clock;
     private AdvancedPlayer musicPlayer;
 
@@ -225,6 +222,7 @@ public class Alarm implements Serializable, Comparable<Alarm>
     public String getAlarmAsString() {
         return hoursAsStr+COLON+minutesAsStr+SPACE+ampm;
     }
+    public boolean isTriggeredToday() { return triggeredToday; }
 
     /* Setters */
     public void setClock(Clock clock) { this.clock = clock; }
@@ -251,6 +249,10 @@ public class Alarm implements Serializable, Comparable<Alarm>
     }
     public void setMusicPlayer(AdvancedPlayer musicPlayer) {
         this.musicPlayer = musicPlayer;
+    }
+    public void setTriggeredToday(boolean triggeredToday) {
+        logger.debug("{} triggered today set to {}", this, triggeredToday);
+        this.triggeredToday = triggeredToday;
     }
 
     @Override
