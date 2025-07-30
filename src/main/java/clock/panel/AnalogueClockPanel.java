@@ -21,7 +21,7 @@ import static clock.panel.Panel.PANEL_ANALOGUE_CLOCK;
  * @author michael ball
 *  @version 2.6
  */
-public class AnalogueClockPanel extends JPanel implements IClockPanel, Runnable
+public class AnalogueClockPanel extends ClockPanel implements Runnable
 {
     private static final Logger logger = LogManager.getLogger(AnalogueClockPanel.class);
     public static final Panel PANEL = PANEL_ANALOGUE_CLOCK;

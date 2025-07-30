@@ -31,7 +31,7 @@ import static clock.util.Constants.*;
  * @author michael ball
 *  @version 2.8
  */
-public class TimerPanel extends JPanel implements IClockPanel
+public class TimerPanel extends ClockPanel
 {
     private static final Logger logger = LogManager.getLogger(TimerPanel.class);
     private final GridBagLayout layout;

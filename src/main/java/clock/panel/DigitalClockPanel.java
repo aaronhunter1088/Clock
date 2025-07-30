@@ -26,7 +26,7 @@ import static java.lang.Thread.sleep;
  * @author michael ball
 *  @version 1.0
  */
-public class DigitalClockPanel extends JPanel implements IClockPanel, Runnable
+public class DigitalClockPanel extends ClockPanel implements Runnable
 {
     private static final Logger logger = LogManager.getLogger(DigitalClockPanel.class);
     public static final Panel PANEL = PANEL_DIGITAL_CLOCK;

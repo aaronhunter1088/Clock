@@ -20,7 +20,7 @@
 // * @author michael ball
 // * @version 2.9
 // */
-//public class StopwatchPanel extends JPanel implements IClockPanel
+//public class StopwatchPanel extends ClockPanel implements Runnable
 //{
 //    private static final Logger logger = LogManager.getLogger(StopwatchPanel.class);
 //    private final GridBagLayout layout;

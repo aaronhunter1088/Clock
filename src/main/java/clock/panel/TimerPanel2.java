@@ -36,7 +36,7 @@ import static clock.util.Constants.*;
  * timers, and see them executing to the right
  * similar to the Alarm Panel view.
  */
-public class TimerPanel2 extends JPanel implements IClockPanel
+public class TimerPanel2 extends ClockPanel
 {
     private static final Logger logger = LogManager.getLogger(TimerPanel2.class);
     private GridBagLayout layout;
