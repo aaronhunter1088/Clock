@@ -10,9 +10,8 @@ import org.apache.logging.log4j.Logger;
 import javax.swing.*;
 import java.awt.*;
 import java.time.DayOfWeek;
-import java.util.concurrent.TimeUnit;
 
-import static clock.panel.ClockPanel.PANEL_DIGITAL_CLOCK;
+import static clock.panel.Panel.PANEL_DIGITAL_CLOCK;
 import static clock.util.Constants.*;
 import static java.lang.Thread.sleep;
 
@@ -30,37 +29,40 @@ import static java.lang.Thread.sleep;
 public class DigitalClockPanel extends JPanel implements IClockPanel, Runnable
 {
     private static final Logger logger = LogManager.getLogger(DigitalClockPanel.class);
-    public static final ClockPanel PANEL = PANEL_DIGITAL_CLOCK;
+    public static final Panel PANEL = PANEL_DIGITAL_CLOCK;
     private GridBagLayout layout;
     private GridBagConstraints constraints;
     private Thread thread = null;
-    private int xcenter = Clock.defaultSize.height/2;
+    private int xcenter = ClockFrame.clockDefaultSize.height/2;
     private Clock clock;
+    private ClockFrame clockFrame;
     private String row1 = EMPTY, row2 = EMPTY;
 
     /**
      * The main constructor for the digital clock panel
-     * @param clock the clock object reference
+     * @param clockFrame the clockFrame object reference
      */
-    public DigitalClockPanel(Clock clock)
+    public DigitalClockPanel(ClockFrame clockFrame)
     {
         super();
-        setupDefaultActions(clock);
+        setupDefaultActions(clockFrame);
         logger.info("Finished creating DigitalClock Panel");
     }
 
     /**
      * Sets up the default actions for the digital clock panel
-     * @param clock the clock reference
+     * @param clockFrame the clockFrame reference
      */
-    public void setupDefaultActions(Clock clock)
+    public void setupDefaultActions(ClockFrame clockFrame)
     {
         logger.debug("setup default actions with clock");
-        this.clock = clock;
+        clock = clockFrame.getClock();
+        this.clockFrame = clockFrame;
+        clockFrame.setClockPanel(PANEL_DIGITAL_CLOCK);
         row1 = clock.defaultText(1);
         row2 = clock.defaultText(2);
         setupSettingsMenu();
-        setMaximumSize(Clock.defaultSize);
+        setMaximumSize(ClockFrame.clockDefaultSize);
         setGridBagLayout(new GridBagLayout()); // sets layout
         setLayout(layout);
         setGridBagConstraints(new GridBagConstraints());
@@ -77,12 +79,12 @@ public class DigitalClockPanel extends JPanel implements IClockPanel, Runnable
      */
     public void setupSettingsMenu()
     {
-        clock.clearSettingsMenu();
-        clock.getClockMenuBar().getSettingsMenu().add(clock.getClockMenuBar().getMilitaryTimeSetting());
-        clock.getClockMenuBar().getSettingsMenu().add(clock.getClockMenuBar().getFullTimeSetting());
-        clock.getClockMenuBar().getSettingsMenu().add(clock.getClockMenuBar().getPartialTimeSetting());
-        clock.getClockMenuBar().getSettingsMenu().add(clock.getClockMenuBar().getToggleDSTSetting());
-        clock.getClockMenuBar().getSettingsMenu().add(clock.getClockMenuBar().getChangeTimeZoneMenu());
+        clockFrame.clearSettingsMenu();
+        clockFrame.getClockMenuBar().getSettingsMenu().add(clockFrame.getClockMenuBar().getMilitaryTimeSetting());
+        clockFrame.getClockMenuBar().getSettingsMenu().add(clockFrame.getClockMenuBar().getFullTimeSetting());
+        clockFrame.getClockMenuBar().getSettingsMenu().add(clockFrame.getClockMenuBar().getPartialTimeSetting());
+        clockFrame.getClockMenuBar().getSettingsMenu().add(clockFrame.getClockMenuBar().getToggleDSTSetting());
+        clockFrame.getClockMenuBar().getSettingsMenu().add(clockFrame.getClockMenuBar().getChangeTimeZoneMenu());
     }
 
     /**
@@ -131,7 +133,7 @@ public class DigitalClockPanel extends JPanel implements IClockPanel, Runnable
     @Override
     public void paint(Graphics g)
     {
-        logger.info("painting analogue clock panel");
+        logger.info("painting digital clock panel");
         drawStructure(g);
     }
 
@@ -153,11 +155,11 @@ public class DigitalClockPanel extends JPanel implements IClockPanel, Runnable
     public void drawStructure(Graphics g)
     {
         logger.info("drawing structure");
-        g.setFont(Clock.font60);
-        if (clock.isShowFullDate()) g.setFont(Clock.font40);
+        g.setFont(ClockFrame.font60);
+        if (clock.isShowFullDate()) g.setFont(ClockFrame.font40);
 
         g.setColor(Color.BLACK);
-        g.fillRect(0, 0, Clock.defaultSize.width, Clock.defaultSize.height);
+        g.fillRect(0, 0, ClockFrame.clockDefaultSize.width, ClockFrame.clockDefaultSize.height);
 
         g.setColor(Color.WHITE);
         // Get FontMetrics for string width calculation
@@ -167,9 +169,9 @@ public class DigitalClockPanel extends JPanel implements IClockPanel, Runnable
         String dateStr = clock.defaultText(1);
         String timeStr = clock.defaultText(2);
         // Adjust as needed
-        if (clock.getListOfAlarms().stream().anyMatch(Alarm::isAlarmGoingOff))
+        if (clockFrame.getListOfAlarms().stream().anyMatch(Alarm::isAlarmGoingOff))
         {
-            var activeAlarms = clock.getListOfAlarms().stream().filter(Alarm::isAlarmGoingOff).toList();
+            var activeAlarms = clockFrame.getListOfAlarms().stream().filter(Alarm::isAlarmGoingOff).toList();
             dateStr = activeAlarms.size() == 1
                     ? (activeAlarms.getFirst().getName() != null)
                         ? activeAlarms.getFirst().getName()
@@ -178,7 +180,7 @@ public class DigitalClockPanel extends JPanel implements IClockPanel, Runnable
             timeStr = clock.defaultText(9);
         }
         // Show which timer is going off
-        else if (clock.getCurrentPanel() instanceof TimerPanel2 timerPanel)
+        else if (clockFrame.getCurrentPanel() instanceof TimerPanel2 timerPanel)
         {
             var activeTimers = timerPanel.getActiveTimers().stream().filter(Timer::isTimerGoingOff).toList();
             dateStr = activeTimers.size() == 1 ? "One Timer" : "Many Timers";
@@ -193,7 +195,7 @@ public class DigitalClockPanel extends JPanel implements IClockPanel, Runnable
         int dateX = (panelWidth - dateWidth) / 2;
         int timeX = (panelWidth - timeWidth) / 2;
 
-        int baseY = Clock.defaultSize.height / 2;
+        int baseY = ClockFrame.clockDefaultSize.height / 2;
 
         g.drawString(dateStr, dateX, baseY - 30);
         g.drawString(timeStr, timeX, baseY + 30);
@@ -231,7 +233,7 @@ public class DigitalClockPanel extends JPanel implements IClockPanel, Runnable
 
     private void updateAlarms()
     {
-        clock.getListOfAlarms().forEach((alarm) -> {
+        clockFrame.getListOfAlarms().forEach((alarm) -> {
             for(DayOfWeek day : alarm.getDays()) {
                 if (alarm.getAlarmAsString().equals(clock.getClockTimeAsAlarmString())
                         &&

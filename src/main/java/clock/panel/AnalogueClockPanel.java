@@ -10,7 +10,7 @@ import org.apache.logging.log4j.Logger;
 
 import static clock.util.Constants.*;
 import static java.lang.Thread.sleep;
-import static clock.panel.ClockPanel.PANEL_ANALOGUE_CLOCK;
+import static clock.panel.Panel.PANEL_ANALOGUE_CLOCK;
 
 /**
  * The AnalogueClockPanel is used to view the time
@@ -24,33 +24,36 @@ import static clock.panel.ClockPanel.PANEL_ANALOGUE_CLOCK;
 public class AnalogueClockPanel extends JPanel implements IClockPanel, Runnable
 {
     private static final Logger logger = LogManager.getLogger(AnalogueClockPanel.class);
-    public static final ClockPanel PANEL = PANEL_ANALOGUE_CLOCK;
+    public static final Panel PANEL = PANEL_ANALOGUE_CLOCK;
     private GridBagLayout layout;
     private GridBagConstraints constraints;
     private Thread thread = null;
     private int xcenter = 175, ycenter = 175, lastxs = 0, lastys = 0, lastxm = 0, lastym = 0, lastxh = 0, lastyh = 0;
+    private ClockFrame clockFrame;
     private Clock clock;
     private String clockText = EMPTY;
 
     /**
      * Default constructor
-     * @param clock the clock reference
+     * @param clockFrame the clockFrame reference
      */
-    public AnalogueClockPanel(Clock clock)
+    public AnalogueClockPanel(ClockFrame clockFrame)
     {
         super();
-        setupDefaultActions(clock);
+        setupDefaultActions(clockFrame);
         logger.info("Finished creating AnalogueClock Panel");
     }
 
     /**
      * Sets up the default actions for the analogue clock panel
-     * @param clock the clock reference
+     * @param clockFrame the clockFrame reference
      */
-    public void setupDefaultActions(Clock clock)
+    public void setupDefaultActions(ClockFrame clockFrame)
     {
         logger.debug("setup default actions with clock");
-        this.clock = clock;
+        this.clockFrame = clockFrame;
+        this.clockFrame.setClockPanel(PANEL_ANALOGUE_CLOCK);
+        this.clock = clockFrame.getClock();
         setClockText(clock.getTimeAsStr());
         setupSettingsMenu();
         setMaximumSize(new Dimension(350, 400));
@@ -67,12 +70,12 @@ public class AnalogueClockPanel extends JPanel implements IClockPanel, Runnable
      */
     public void setupSettingsMenu()
     {
-        clock.clearSettingsMenu();
-        clock.getClockMenuBar().getSettingsMenu().add(clock.getClockMenuBar().getShowDigitalTimeOnAnalogueClockSetting());
-        clock.getClockMenuBar().getSettingsMenu().add(clock.getClockMenuBar().getToggleDSTSetting());
-        clock.getClockMenuBar().getSettingsMenu().add(clock.getClockMenuBar().getChangeTimeZoneMenu());
+        clockFrame.clearSettingsMenu();
+        clockFrame.getClockMenuBar().getSettingsMenu().add(clockFrame.getClockMenuBar().getShowDigitalTimeOnAnalogueClockSetting());
+        clockFrame.getClockMenuBar().getSettingsMenu().add(clockFrame.getClockMenuBar().getToggleDSTSetting());
+        clockFrame.getClockMenuBar().getSettingsMenu().add(clockFrame.getClockMenuBar().getChangeTimeZoneMenu());
         clock.setShowDigitalTimeOnAnalogueClock(true);
-        clock.getClockMenuBar().getShowDigitalTimeOnAnalogueClockSetting().setText(HIDE+SPACE+DIGITAL_TIME);
+        clockFrame.getClockMenuBar().getShowDigitalTimeOnAnalogueClockSetting().setText(HIDE+SPACE+DIGITAL_TIME);
     }
 
     /**
@@ -186,7 +189,7 @@ public class AnalogueClockPanel extends JPanel implements IClockPanel, Runnable
     public void drawStructure(Graphics g)
     {
         logger.info("drawing structure");
-        g.setFont(Clock.analogueFont);
+        g.setFont(ClockFrame.analogueFont);
         g.setColor(Color.BLACK);
         g.fillOval(xcenter - 150, ycenter - 150, 300, 300);
 

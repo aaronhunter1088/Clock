@@ -4,6 +4,7 @@ import javax.swing.*;
 
 import clock.entity.Clock;
 import clock.exception.InvalidInputException;
+import clock.panel.ClockFrame;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -31,22 +32,18 @@ public class Main
      */
     public static void main(String[] args) throws InvalidInputException {
         logger.info("Starting Clock...");
-        Clock clock = null;
-        // Start the default clock:
-        clock = new Clock();
-        // Start the clock at a specific time:
-        //clock = new Clock(11, 59, 50, JULY, SUNDAY, 27, 2025, AM);
-
-        Runtime.getRuntime().addShutdownHook(new Thread(() -> logger.info("Closing Clock")));
-
-        Clock finalClock = clock;
+        // Start the clock application
+        ClockFrame finalFrame = new ClockFrame();
+        // Start the clock at a specific time
+        //ClockFrame finalFrame = new ClockFrame(new Clock(11, 59, 50, JULY, SUNDAY, 27, 2025, AM));
         SwingUtilities.invokeLater(() -> {
             try {
-                finalClock.start();
+                finalFrame.start();
             } catch (Exception e) {
                 logger.error("Error scheduling tasks in Clock", e);
             }
         });
+        Runtime.getRuntime().addShutdownHook(new Thread(() -> logger.info("Closing Clock")));
     }
 
 }

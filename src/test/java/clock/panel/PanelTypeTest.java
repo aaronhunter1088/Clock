@@ -10,7 +10,7 @@ import org.junit.jupiter.api.Test;
 import java.util.ArrayList;
 import java.util.List;
 
-import static clock.panel.ClockPanel.*;
+import static clock.panel.Panel.*;
 import static org.junit.jupiter.api.Assertions.*;
 
 class PanelTypeTest
@@ -32,26 +32,26 @@ class PanelTypeTest
     @Test
     void testClockFacesAreDifferent()
     {
-        ClockPanel c1 = PANEL_DIGITAL_CLOCK;
-        ClockPanel c2 = PANEL_ALARM;
+        Panel c1 = PANEL_DIGITAL_CLOCK;
+        Panel c2 = PANEL_ALARM;
         assertNotSame(c1, c2);
     }
 
     @Test
     void testThatWeGetAllValues()
     {
-        List<ClockPanel> clockPanels = new ArrayList<>();
-        for (ClockPanel cf : ClockPanel.values()) {
+        List<Panel> clockPanels = new ArrayList<>();
+        for (Panel cf : Panel.values()) {
             clockPanels.add(cf);
         }
         // x should be hard coded for future tests
-        assertTrue(ClockPanel.values().length == clockPanels.size());
+        assertTrue(Panel.values().length == clockPanels.size());
     }
 
     @Test
     void testToStringPrintsFaceName()
     {
-        ClockPanel cf = PANEL_DIGITAL_CLOCK;
+        Panel cf = PANEL_DIGITAL_CLOCK;
         assertEquals("PANEL_DIGITAL_CLOCK", cf.toString(), "Printed the Name");
     }
 }

@@ -220,7 +220,7 @@ public class Timer implements Serializable, Runnable
                 //timerButton.setEnabled(false);
                 //clock.setTimerActive(true);
                 setTimerGoingOff(true);
-                var future = clock.getTimerPanel2().getTimersAndFutures().get(this);
+                var future = clock.getClockFrame().getTimerPanel2().getTimersAndFutures().get(this);
                 future.cancel(true);
             }
         }

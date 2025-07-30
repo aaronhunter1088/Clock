@@ -24,7 +24,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.*;
 
-import static clock.panel.ClockPanel.*;
+import static clock.panel.Panel.*;
 import static java.lang.Thread.sleep;
 import static clock.util.Constants.*;
 
@@ -55,20 +55,21 @@ public class TimerPanel2 extends JPanel implements IClockPanel
 
     private JTextArea textArea;
     private JScrollPane scrollPane;
-    private Clock clock;
+    private ClockFrame clockFrame;
     private JPanel setupTimerPanel;
     private List<clock.entity.Timer> activeTimers;
 
     /**
      * Main constructor for creating the TimerPanel2
-     * @param clock the clock object reference
+     * @param clockFrame the clockFrame object reference
      */
-    public TimerPanel2(Clock clock)
+    public TimerPanel2(ClockFrame clockFrame)
     {
         super();
-        this.clock = clock;
-        this.clock.setClockPanel(PANEL_TIMER2);
-        setSize(Clock.panelSize);
+        logger.info("Creating TimerPanel2");
+        clockFrame.setClockPanel(PANEL_TIMER2);
+        this.clockFrame = clockFrame;
+        setSize(ClockFrame.panelSize);
         this.layout = new GridBagLayout();
         setLayout(layout);
         this.constraints = new GridBagConstraints();
@@ -88,7 +89,7 @@ public class TimerPanel2 extends JPanel implements IClockPanel
     {
         logger.info("setup TimerPanel2");
         setupTimerPanel = new JPanel();
-        setupTimerPanel.setSize(Clock.panelSize);
+        setupTimerPanel.setSize(ClockFrame.panelSize);
         hourField = new JTextField(HOUR, 4);
         minuteField = new JTextField(MIN, 4);
         secondField = new JTextField(SEC, 4);
@@ -211,7 +212,7 @@ public class TimerPanel2 extends JPanel implements IClockPanel
         resetButton = new JButton(RESET);
         stopButton = new JButton(STOP);
         List.of(timerButton, resetButton).forEach(button -> {
-            button.setFont(Clock.font20);
+            button.setFont(ClockFrame.font20);
             button.setOpaque(true);
             button.setBackground(Color.BLACK);
             button.setForeground(Color.WHITE);
@@ -224,7 +225,7 @@ public class TimerPanel2 extends JPanel implements IClockPanel
         resetButton.setEnabled(false);
         setBackground(Color.BLACK);
         alarmLabel4 = new JLabel(CURRENT_ALARMS, SwingConstants.CENTER); // Current Alarms
-        alarmLabel4.setFont(Clock.font20); // All Alarms
+        alarmLabel4.setFont(ClockFrame.font20); // All Alarms
         alarmLabel4.setForeground(Color.WHITE);
         addComponentsToSetupTimerPanel();
 
@@ -232,7 +233,7 @@ public class TimerPanel2 extends JPanel implements IClockPanel
         textArea = new JTextArea(2, 2);
         textArea.setText("TextArea");
         textArea.setSize(new Dimension(100, 100));
-        textArea.setFont(Clock.font10); // message
+        textArea.setFont(ClockFrame.font10); // message
         textArea.setVisible(true);
         textArea.setEditable(false);
         textArea.setLineWrap(false);
@@ -247,7 +248,7 @@ public class TimerPanel2 extends JPanel implements IClockPanel
         scrollPane.setSize(textArea.getSize());
 
         alarmLabel4 = new JLabel(CURRENT_TIMERS, SwingConstants.CENTER); // Current Timers
-        alarmLabel4.setFont(Clock.font20); // All Timers
+        alarmLabel4.setFont(ClockFrame.font20); // All Timers
         alarmLabel4.setForeground(Color.WHITE);
 
         //scheduler = Executors.newScheduledThreadPool(10);
@@ -295,11 +296,11 @@ public class TimerPanel2 extends JPanel implements IClockPanel
     public void startTimer(clock.entity.Timer timer)
     {
         logger.info("starting countdown");
-        ScheduledFuture<?> future = clock.getScheduler().scheduleAtFixedRate(timer::performCountDown, 0, 1, TimeUnit.SECONDS);
+        ScheduledFuture<?> future = clockFrame.getScheduler().scheduleAtFixedRate(timer::performCountDown, 0, 1, TimeUnit.SECONDS);
         timersAndFutures.put(timer, future);
-        if (!activeTimers.isEmpty() && clock.getCountdownFuture() == null) {
-            future = clock.getScheduler().scheduleAtFixedRate(this::resetJTextArea, 0, 1, TimeUnit.SECONDS);
-            clock.setCountdownFuture(future);
+        if (!activeTimers.isEmpty() && clockFrame.getCountdownFuture() == null) {
+            future = clockFrame.getScheduler().scheduleAtFixedRate(this::resetJTextArea, 0, 1, TimeUnit.SECONDS);
+            clockFrame.setCountdownFuture(future);
         }
         //scheduler = Executors.newScheduledThreadPool(activeTimers.size());
         //scheduler.scheduleAtFixedRate(this::performCountDown, 0, 1, TimeUnit.SECONDS);
@@ -322,7 +323,7 @@ public class TimerPanel2 extends JPanel implements IClockPanel
                 if (HOUR.equals(hourField.getText())) hourField.setText(ZERO);
                 if (MIN.equals(minuteField.getText())) minuteField.setText(ZERO);
                 if (SEC.equals(secondField.getText())) secondField.setText(ZERO);
-                timer = new clock.entity.Timer(Integer.parseInt(hourField.getText()), Integer.parseInt(minuteField.getText()), Integer.parseInt(secondField.getText()), clock);
+                timer = new clock.entity.Timer(Integer.parseInt(hourField.getText()), Integer.parseInt(minuteField.getText()), Integer.parseInt(secondField.getText()), clockFrame.getClock());
                 activeTimers.add(timer);
                 resetJTextArea();
                 resetJAlarmLabel4();
@@ -343,8 +344,8 @@ public class TimerPanel2 extends JPanel implements IClockPanel
     public void stopTimer(clock.entity.Timer timer)
     {
         logger.info("stopping timer");
-        if (clock.getCountdownFuture() != null && !clock.getCountdownFuture().isCancelled())
-        { clock.getCountdownFuture().cancel(true); }
+        if (clockFrame.getCountdownFuture() != null && !clockFrame.getCountdownFuture().isCancelled())
+        { clockFrame.getCountdownFuture().cancel(true); }
         timer.setTimerGoingOff(false);
         timer.setStopTimer(true);
         //if (clock.getScheduler() != null && !clock.getScheduler().isShutdown())
@@ -400,7 +401,7 @@ public class TimerPanel2 extends JPanel implements IClockPanel
 //                    .parallel()
 //                    .forEach(Timer::performCountDown);
             //scheduler = Executors.newScheduledThreadPool(activeTimers.size());
-            activeTimers.forEach(timer -> clock.getScheduler().scheduleAtFixedRate(timer::performCountDown, 0, 1, TimeUnit.SECONDS));
+            activeTimers.forEach(timer -> clockFrame.getScheduler().scheduleAtFixedRate(timer::performCountDown, 0, 1, TimeUnit.SECONDS));
 
             resetJTextArea(); // leave here
         }
@@ -457,7 +458,7 @@ public class TimerPanel2 extends JPanel implements IClockPanel
     {
         logger.info("reset alarm label 4");
         if (activeTimers.isEmpty())
-        { alarmLabel4.setText(clock.defaultText(10)); }// All Alarms label...
+        { alarmLabel4.setText(clockFrame.getClock().defaultText(10)); }// All Alarms label...
         else
         {
             alarmLabel4.setText(activeTimers.size() == 1
@@ -534,9 +535,9 @@ public class TimerPanel2 extends JPanel implements IClockPanel
         JMenuItem alarmItem = new JMenuItem(alarm.toString());
         alarmItem.setForeground(Color.WHITE);
         alarmItem.setBackground(Color.BLACK);
-        logger.info("Size of viewAlarms before adding " + clock.getClockMenuBar().getAlarmFeature_Menu().getItemCount());
-        clock.getClockMenuBar().getAlarmFeature_Menu().add(alarmItem);
-        logger.info("Size of viewAlarms after adding " + clock.getClockMenuBar().getAlarmFeature_Menu().getItemCount());
+        logger.info("Size of viewAlarms before adding " + clockFrame.getClockMenuBar().getAlarmFeature_Menu().getItemCount());
+        clockFrame.getClockMenuBar().getAlarmFeature_Menu().add(alarmItem);
+        logger.info("Size of viewAlarms after adding " + clockFrame.getClockMenuBar().getAlarmFeature_Menu().getItemCount());
     }
 
     // TODO: Update for Timers
@@ -547,13 +548,13 @@ public class TimerPanel2 extends JPanel implements IClockPanel
     public void deleteAlarmMenuItemFromViewAlarms(Alarm alarm)
     {
         logger.info("delete alarm menu item from view alarms");
-        logger.info("Size of viewAlarms before removal {}", clock.getClockMenuBar().getAlarmFeature_Menu().getItemCount());
-        for(int i=0; i<clock.getClockMenuBar().getAlarmFeature_Menu().getItemCount(); i++)
+        logger.info("Size of viewAlarms before removal {}", clockFrame.getClockMenuBar().getAlarmFeature_Menu().getItemCount());
+        for(int i=0; i<clockFrame.getClockMenuBar().getAlarmFeature_Menu().getItemCount(); i++)
         {
-            if (clock.getClockMenuBar().getAlarmFeature_Menu().getItem(i).getText().equals(alarm.toString()))
-            { clock.getClockMenuBar().getAlarmFeature_Menu().remove(getClock().getClockMenuBar().getAlarmFeature_Menu().getItem(i)); }
+            if (clockFrame.getClockMenuBar().getAlarmFeature_Menu().getItem(i).getText().equals(alarm.toString()))
+            { clockFrame.getClockMenuBar().getAlarmFeature_Menu().remove(clockFrame.getClockMenuBar().getAlarmFeature_Menu().getItem(i)); }
         }
-        logger.info("Size of viewAlarms after removal {}", clock.getClockMenuBar().getAlarmFeature_Menu().getItemCount());
+        logger.info("Size of viewAlarms after removal {}", clockFrame.getClockMenuBar().getAlarmFeature_Menu().getItemCount());
     }
 
     /**
@@ -640,13 +641,13 @@ public class TimerPanel2 extends JPanel implements IClockPanel
         //05:06:00 PM
         logger.info("setup timers in menu functionality");
         // TODO: Update for TimersFeature_Menu
-        for(int i=0; i<getClock().getClockMenuBar().getAlarmFeature_Menu().getItemCount(); i++)
+        for(int i=0; i<clockFrame.getClockMenuBar().getAlarmFeature_Menu().getItemCount(); i++)
         {
-            if (!"Set Timers".equals(clock.getClockMenuBar().getAlarmFeature_Menu().getItem(i).getText()))
+            if (!"Set Timers".equals(clockFrame.getClockMenuBar().getAlarmFeature_Menu().getItem(i).getText()))
             {
-                JMenuItem menuItem = clock.getClockMenuBar().getAlarmFeature_Menu().getItem(i);
+                JMenuItem menuItem = clockFrame.getClockMenuBar().getAlarmFeature_Menu().getItem(i);
                 menuItem.addActionListener(action -> {
-                    clock.getListOfAlarms().forEach(alarm -> {
+                    clockFrame.getListOfAlarms().forEach(alarm -> {
                         // TODO: Update for Timers
                         //if (alarm.toString().equals(menuItem.getText()))
                         //{ this.alarm = alarm; }
@@ -683,7 +684,7 @@ public class TimerPanel2 extends JPanel implements IClockPanel
                         //minuteField.setText(alarm.getMinutesAsStr());
                         //secondField.setText(alarm.getAMPM());
                     //}
-                    clock.changePanels(PANEL_TIMER, false);
+                    clockFrame.changePanels(PANEL_TIMER, false);
                 });
             }
         }
@@ -807,14 +808,14 @@ public class TimerPanel2 extends JPanel implements IClockPanel
      */
     public void setupSettingsMenu()
     {
-        clock.clearSettingsMenu();
+        clockFrame.clearSettingsMenu();
         logger.info("No settings defined for the Timer Panel");
     }
 
     /* Getters */
     public GridBagLayout getGridBagLayout() { return this.layout; }
     public GridBagConstraints getGridBagConstraints() { return this.constraints; }
-    public Clock getClock() { return this.clock; }
+    public Clock getClock() { return clockFrame.getClock(); }
     public JLabel getJAlarmLbl4() { return this.alarmLabel4; } // All alarms
     public JScrollPane getJScrollPane() { return this.scrollPane; }
     public JTextArea getJTextArea() { return this.textArea; }
@@ -835,7 +836,7 @@ public class TimerPanel2 extends JPanel implements IClockPanel
     protected void setJScrollPane(JScrollPane scrollPane) { this.scrollPane = scrollPane; }
     protected void setJTextArea(final JTextArea textArea) { this.textArea = textArea; }
     protected void setMusicPlayer(AdvancedPlayer musicPlayer) { this.musicPlayer = musicPlayer; }
-    public void setClock(Clock clock) { this.clock = clock; }
+    public void setClock(Clock clock) { this.clockFrame.setClock(clock); }
     public void setActiveTimers(List<clock.entity.Timer> activeTimers) { this.activeTimers = activeTimers; }
     public void setHourField(JTextField hourField) { this.hourField = hourField; }
     public void setMinuteField(JTextField minuteField) { this.minuteField = minuteField; }

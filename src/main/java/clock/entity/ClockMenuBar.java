@@ -1,5 +1,6 @@
 package clock.entity;
 
+import clock.panel.ClockFrame;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -12,7 +13,7 @@ import java.util.Arrays;
 import java.util.List;
 
 import static clock.util.Constants.*;
-import static clock.panel.ClockPanel.*;
+import static clock.panel.Panel.*;
 
 /**
  * The menu bar for the Clock.
@@ -22,6 +23,7 @@ import static clock.panel.ClockPanel.*;
 public class ClockMenuBar extends JMenuBar
 {
     private static final Logger logger = LogManager.getLogger(ClockMenuBar.class);
+    private final ClockFrame clockFrame;
     private final Clock clock;
     // Two main menu options
     private JMenu settingsMenu;
@@ -48,9 +50,11 @@ public class ClockMenuBar extends JMenuBar
      * It creates a Settings and Features menu options,
      * each with several items to choose from.
      */
-    public ClockMenuBar(Clock clock)
+    public ClockMenuBar(ClockFrame clockFrame)
     {
-        this.clock = clock;
+        logger.info("Creating Clock menubar");
+        this.clockFrame = clockFrame;
+        this.clock = clockFrame.getClock();
         setForeground(Color.WHITE);
         setBackground(Color.BLACK);
         // Menu options
@@ -190,13 +194,13 @@ public class ClockMenuBar extends JMenuBar
                 clock.setShowDigitalTimeOnAnalogueClock(true);
                 getShowDigitalTimeOnAnalogueClockSetting().setText(HIDE+SPACE+DIGITAL_TIME);
             }
-            clock.getAnalogueClockPanel().repaint();
+            clockFrame.getAnalogueClockPanel().repaint();
         });
         // Set functionality for Features menu
-        getDigitalClockFeature().addActionListener(action -> clock.changePanels(PANEL_DIGITAL_CLOCK, false));
-        getAnalogueClockFeature().addActionListener(action -> clock.changePanels(PANEL_ANALOGUE_CLOCK, false));
-        getSetAlarms().addActionListener(action -> clock.changePanels(PANEL_ALARM, true));
-        getTimerFeature().addActionListener(action -> clock.changePanels(PANEL_TIMER, false));
+        getDigitalClockFeature().addActionListener(action -> clockFrame.changePanels(PANEL_DIGITAL_CLOCK, false));
+        getAnalogueClockFeature().addActionListener(action -> clockFrame.changePanels(PANEL_ANALOGUE_CLOCK, false));
+        getSetAlarms().addActionListener(action -> clockFrame.changePanels(PANEL_ALARM, true));
+        getTimerFeature().addActionListener(action -> clockFrame.changePanels(PANEL_TIMER, false));
         // Add both menus to main menu
         add(getSettingsMenu());
         add(getFeaturesMenu());
@@ -210,7 +214,7 @@ public class ClockMenuBar extends JMenuBar
     public void setupTimezone(JMenuItem timezone)
     {
         logger.debug("setup timezone for {}", timezone.getText());
-        timezone.addActionListener(l -> clock.updateTheTime(timezone));
+        timezone.addActionListener(l -> clockFrame.updateTheTime(timezone));
         timezone.setForeground(Color.WHITE);
         timezone.setBackground(Color.BLACK);
         getChangeTimeZoneMenu().add(timezone);

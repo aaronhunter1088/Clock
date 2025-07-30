@@ -17,7 +17,7 @@ import java.io.InputStream;
 import java.util.concurrent.*;
 
 import static java.lang.Thread.sleep;
-import static clock.panel.ClockPanel.PANEL_TIMER;
+import static clock.panel.Panel.PANEL_TIMER;
 import static clock.util.Constants.*;
 
 /**
@@ -41,7 +41,7 @@ public class TimerPanel extends JPanel implements IClockPanel
                        secondField;
     private JButton timerButton;
     private JButton resetButton;
-    private Clock clock;
+    private ClockFrame clockFrame;
     private boolean timerGoingOff;
     private volatile boolean paused;
     private AdvancedPlayer musicPlayer;
@@ -50,13 +50,14 @@ public class TimerPanel extends JPanel implements IClockPanel
 
     /**
      * The main constructor for the Timer Panel
-     * @param clock the clock reference
+     * @param clockFrame the clockFrame reference
      */
-    public TimerPanel(Clock clock) {
+    public TimerPanel(ClockFrame clockFrame) {
         super();
-        this.clock = clock;
-        this.clock.setClockPanel(PANEL_TIMER);
-        setSize(Clock.panelSize);
+        logger.info("Creating Timer Panel");
+        this.clockFrame = clockFrame;
+        clockFrame.setClockPanel(PANEL_TIMER);
+        setSize(ClockFrame.panelSize);
         layout = new GridBagLayout();
         setLayout(layout);
         constraints = new GridBagConstraints();
@@ -231,7 +232,7 @@ public class TimerPanel extends JPanel implements IClockPanel
         timerButton = new JButton(SET);
         resetButton = new JButton(RESET);
         List.of(timerButton, resetButton).forEach(button -> {
-            button.setFont(Clock.font20);
+            button.setFont(ClockFrame.font20);
             button.setOpaque(true);
             button.setBackground(Color.BLACK);
             button.setForeground(Color.WHITE);
@@ -408,7 +409,7 @@ public class TimerPanel extends JPanel implements IClockPanel
                 {
                     timerButton.setText(COMPLETE);
                     timerButton.setEnabled(false);
-                    clock.setTimerActive(true);
+                    clockFrame.getClock().setTimerActive(true);
                 }
             }
             catch (Exception e)
@@ -497,10 +498,10 @@ public class TimerPanel extends JPanel implements IClockPanel
     {
         logger.info("check if timer has concluded");
         ExecutorService executor = Executors.newCachedThreadPool();
-        if (clock.isTimerActive())
+        if (clockFrame.getClock().isTimerActive())
         {
             triggerSound(executor);
-            clock.setTimerActive(false);
+            clockFrame.getClock().setTimerActive(false);
         }
     }
 
@@ -562,7 +563,7 @@ public class TimerPanel extends JPanel implements IClockPanel
     {
         logger.info("update textField1");
         hourField.grabFocus();
-        clock.repaint();
+        repaint();
     }
 
     /**
@@ -609,7 +610,7 @@ public class TimerPanel extends JPanel implements IClockPanel
      */
     public void setupSettingsMenu()
     {
-        clock.clearSettingsMenu();
+        clockFrame.clearSettingsMenu();
         logger.info("No settings defined for the Timer Panel");
     }
 
@@ -628,5 +629,5 @@ public class TimerPanel extends JPanel implements IClockPanel
     /* Setters */
     protected void setTimerGoingOff(boolean timerGoingOff) { this.timerGoingOff = timerGoingOff; }
     protected void setMusicPlayer(AdvancedPlayer musicPlayer) { this.musicPlayer = musicPlayer; }
-    public void setClock(Clock clock) { this.clock = clock; }
+    public void setClock(Clock clock) { this.clockFrame.setClock(clock); }
 }
