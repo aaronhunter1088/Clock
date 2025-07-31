@@ -121,7 +121,11 @@ public class TimerPanel2 extends ClockPanel
                 {
                     switch (e.getSource() instanceof JTextField textField ? textField.getName() : null)
                     {
-                        case NAME+FIELD -> { logger.debug("Focus gained on name field"); }
+                        case NAME+FIELD -> {
+                            if (nameField.getText().equals(NO+SPACE+NAME))
+                            { nameField.setText(EMPTY); }
+                            logger.debug("Focus gained on name field");
+                        }
                         case HOUR+FIELD -> { logger.debug("Focus gained on hour field"); }
                         case MIN+FIELD -> { logger.debug("Focus gained on minute field"); }
                         case SEC+FIELD -> { logger.debug("Focus gained on second field"); }
@@ -395,10 +399,11 @@ public class TimerPanel2 extends ClockPanel
         try
         {
             if (validTextFields()) {
-                if (HOUR.equals(hourField.getText())) hourField.setText(ZERO);
-                if (MIN.equals(minuteField.getText())) minuteField.setText(ZERO);
-                if (SEC.equals(secondField.getText())) secondField.setText(ZERO);
-                timer = new clock.entity.Timer(Integer.parseInt(hourField.getText()), Integer.parseInt(minuteField.getText()), Integer.parseInt(secondField.getText()), clockFrame.getClock());
+                if (EMPTY.equals(hourField.getText())) hourField.setText(ZERO);
+                if (EMPTY.equals(minuteField.getText())) minuteField.setText(ZERO);
+                if (EMPTY.equals(secondField.getText())) secondField.setText(ZERO);
+                timer = new clock.entity.Timer(Integer.parseInt(hourField.getText()), Integer.parseInt(minuteField.getText()),
+                        Integer.parseInt(secondField.getText()), nameField.getText(), clockFrame.getClock());
                 activeTimers.add(timer);
                 //resetJTextArea();
                 //resetJAlarmLabel4();
