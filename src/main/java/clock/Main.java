@@ -12,7 +12,9 @@ import java.util.concurrent.TimeUnit;
 import java.util.function.Function;
 
 import static clock.util.Constants.AM;
+import static clock.util.Constants.PM;
 import static java.time.DayOfWeek.SUNDAY;
+import static java.time.DayOfWeek.WEDNESDAY;
 import static java.time.Month.JULY;
 
 /**
@@ -35,7 +37,7 @@ public class Main
         // Start the clock application
         ClockFrame finalFrame = new ClockFrame();
         // Start the clock at a specific time
-        //ClockFrame finalFrame = new ClockFrame(new Clock(11, 59, 50, JULY, SUNDAY, 27, 2025, AM));
+        //ClockFrame finalFrame = new ClockFrame(new Clock(8, 59, 50, JULY, WEDNESDAY, 30, 2025, PM));
         SwingUtilities.invokeLater(() -> {
             try {
                 finalFrame.start();

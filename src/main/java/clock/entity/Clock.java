@@ -498,7 +498,7 @@ public class Clock implements Serializable, Comparable<Clock>
                         setDateChanged(false);
                     }
                 }
-                else if (this.hours >= 0 && this.minutes == 0 && this.seconds == 0)
+                else if (this.hours >= 24 && this.minutes == 0 && this.seconds == 0)
                 {
                     setHours(0);
                     setAMPM(AM);

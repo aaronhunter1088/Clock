@@ -739,6 +739,7 @@ public class AlarmPanel extends ClockPanel
      */
     void addComponent(Component cpt, int gridy, int gridx, double gwidth, double gheight, int ipadx, int ipady, int fill, Insets insets)
     {
+        logger.debug("add component");
         constraints.gridx = gridx;
         constraints.gridy = gridy;
         constraints.gridwidth = (int)Math.ceil(gwidth);

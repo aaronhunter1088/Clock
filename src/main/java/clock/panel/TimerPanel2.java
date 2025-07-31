@@ -1,6 +1,5 @@
 package clock.panel;
 
-import clock.contract.IClockPanel;
 import clock.entity.Alarm;
 import clock.entity.Clock;
 import clock.entity.Timer;
@@ -10,6 +9,7 @@ import javazoom.jl.player.advanced.AdvancedPlayer;
 import org.apache.commons.lang3.math.NumberUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.codehaus.plexus.util.StringUtils;
 
 import javax.swing.*;
 import javax.swing.border.LineBorder;
@@ -41,8 +41,12 @@ public class TimerPanel2 extends ClockPanel
     private static final Logger logger = LogManager.getLogger(TimerPanel2.class);
     private GridBagLayout layout;
     private GridBagConstraints constraints;
-    private JLabel alarmLabel4;
-    private JTextField hourField,
+    private JLabel nameLabel,
+                   hoursLabel,
+                   minutesLabel,
+                   secondsLabel;
+    private JTextField nameField,
+                       hourField,
                        minuteField,
                        secondField;
     private JButton timerButton;
@@ -53,10 +57,10 @@ public class TimerPanel2 extends ClockPanel
     private Map<Timer, ScheduledFuture<?>> timersAndFutures;
     //private ScheduledExecutorService scheduler;
 
-    private JTextArea textArea;
-    private JScrollPane scrollPane;
+    private JTable timersTable;
+    private JScrollPane scrollTable;
     private ClockFrame clockFrame;
-    private JPanel setupTimerPanel;
+    //private JPanel setupTimerPanel;
     private List<clock.entity.Timer> activeTimers;
 
     /**
@@ -88,125 +92,147 @@ public class TimerPanel2 extends ClockPanel
     public void setupTimerPanel2()
     {
         logger.info("setup TimerPanel2");
-        setupTimerPanel = new JPanel();
-        setupTimerPanel.setSize(ClockFrame.panelSize);
-        hourField = new JTextField(HOUR, 4);
-        minuteField = new JTextField(MIN, 4);
-        secondField = new JTextField(SEC, 4);
-        hourField.addFocusListener(new FocusListener(){
-            @Override
-            public void focusGained(FocusEvent e)
-            { if (HOUR.equals(hourField.getText())) hourField.setText(EMPTY); }
-
-            @Override
-            public void focusLost(FocusEvent e)
-            {
-                if (hourField.getText().isBlank() || hourField.getText().isEmpty())
-                { hourField.setText(HOUR); }
-                if (NumberUtils.isNumber(hourField.getText()))
-                {
-                    var hour = Integer.parseInt(hourField.getText());
-                    if (hour < 24 && hour >= 0)
-                    {
-                        timerButton.setText(SET);
-                        timerButton.repaint();
-                        timerButton.updateUI();
-                    }
-                    else
-                    {
-                        timerButton.setText(TIMER_HOUR_ERROR);
-                        timerButton.repaint();
-                        timerButton.updateUI();
-                        hourField.grabFocus();
-                    }
-                }
-                else if (!validateFirstTextField())
-                {
-                    SwingUtilities.invokeLater(() -> hourField.grabFocus());
-                    timerButton.setEnabled(false);
-                }
-                else if (validTextFields())
-                { enableTimerButton(); }
-            }
-        });
-        minuteField.addFocusListener(new FocusListener(){
-            @Override
-            public void focusGained(FocusEvent e)
-            { if (MIN.equals(minuteField.getText())) minuteField.setText(EMPTY); }
-
-            @Override
-            public void focusLost(FocusEvent e)
-            {
-                if (minuteField.getText().isBlank() || minuteField.getText().isEmpty())
-                { minuteField.setText(MIN); }
-                if (NumberUtils.isNumber(minuteField.getText()))
-                {
-                    var minute = Integer.parseInt(minuteField.getText());
-                    if (minute < 60 && minute >= 0
-                            && !ZERO.equals(minuteField.getText()) && !ZERO.equals(secondField.getText()))
-                    {
-                        timerButton.setText(SET);
-                        timerButton.repaint();
-                        timerButton.updateUI();
-                    }
-                    if (minute >= 60 || minute < 0)
-                    {
-                        timerButton.setText(TIMER_MIN_ERROR);
-                        timerButton.repaint();
-                        timerButton.updateUI();
-                        minuteField.grabFocus();
-                    }
-                }
-                else if (!validateSecondTextField())
-                {
-                    SwingUtilities.invokeLater(() -> minuteField.grabFocus());
-                    timerButton.setEnabled(false);
-                }
-                else if (validTextFields())
-                { enableTimerButton(); }
-            }
-        });
-        secondField.addFocusListener(new FocusListener(){
-            @Override
-            public void focusGained(FocusEvent e)
-            { if (SEC.equals(secondField.getText())) secondField.setText(EMPTY); }
-
-            @Override
-            public void focusLost(FocusEvent e)
-            {
-                if (secondField.getText().isBlank() || secondField.getText().isEmpty())
-                { secondField.setText(SEC); }
-                if (NumberUtils.isNumber(secondField.getText()))
-                {
-                    var second = Integer.parseInt(secondField.getText());
-                    if (second < 60 && second >= 0
-                            && !ZERO.equals(minuteField.getText()) && !ZERO.equals(secondField.getText()))
-                    {
-                        timerButton.setText(SET);
-                        timerButton.repaint();
-                        timerButton.updateUI();
-                    }
-                    else if (second >= 60 || second < 0)
-                    {
-                        timerButton.setText(TIMER_SEC_ERROR);
-                        timerButton.repaint();
-                        timerButton.updateUI();
-                        secondField.grabFocus();
-                    }
-                }
-                else if (!validateThirdTextField())
-                {
-                    SwingUtilities.invokeLater(() -> secondField.grabFocus());
-                    timerButton.setEnabled(false);
-                }
-                else if (validTextFields())
-                { enableTimerButton(); }
-            }
-        });
-        List.of(hourField, minuteField, secondField).forEach(textField -> {
-            textField.setSize(new Dimension(50, 50));
-            textField.setBorder(new LineBorder(Color.WHITE));
+        nameLabel = new JLabel(NAME, SwingConstants.CENTER);
+        nameLabel.setName(NAME+LABEL);
+        nameField = new JTextField(EMPTY, 10);
+        nameField.setName(NAME+FIELD);
+        nameField.requestFocusInWindow();
+        hoursLabel = new JLabel(Hours, SwingConstants.CENTER);
+        hoursLabel.setName(Hours+LABEL);
+        hourField = new JTextField(EMPTY, 4);
+        hourField.setName(HOUR+FIELD);
+        minutesLabel = new JLabel(Minutes, SwingConstants.CENTER);
+        minutesLabel.setName(Minutes+LABEL);
+        minuteField = new JTextField(EMPTY, 4);
+        minuteField.setName(MIN+FIELD);
+        secondsLabel = new JLabel(Seconds, SwingConstants.CENTER);
+        secondsLabel.setName(Seconds+LABEL);
+        secondField = new JTextField(EMPTY, 4);
+        secondField.setName(SEC+FIELD);
+        List.of(nameField, hourField, minuteField, secondField).forEach(textField -> {
+            textField.setFont(ClockFrame.font20);
+            textField.setForeground(Color.BLACK);
+            //textField.setPreferredSize(new Dimension(50, 50));
+            textField.setBorder(new LineBorder(Color.ORANGE));
             textField.setHorizontalAlignment(JTextField.CENTER);
+            textField.addFocusListener(new FocusListener() {
+                @Override
+                public void focusGained(FocusEvent e)
+                {
+                    switch (e.getSource() instanceof JTextField textField ? textField.getName() : null)
+                    {
+                        case NAME+FIELD -> { logger.debug("Focus gained on name field"); }
+                        case HOUR+FIELD -> { logger.debug("Focus gained on hour field"); }
+                        case MIN+FIELD -> { logger.debug("Focus gained on minute field"); }
+                        case SEC+FIELD -> { logger.debug("Focus gained on second field"); }
+                        case null -> logger.warn("Lost focus on a text field with no name");
+                        default -> throw new InvalidInputException("Lost focus on an unknown text field: " + e.getSource());
+                    }
+                }
+
+                @Override
+                public void focusLost(FocusEvent e)
+                {
+                    enableDisableTimerButton();
+                    switch (e.getSource() instanceof JTextField textField ? textField.getName() : null)
+                    {
+                        case NAME+FIELD -> {
+                            if (nameField.getText().isBlank() || nameField.getText().isEmpty())
+                            { nameField.setText(NO+SPACE+NAME); }
+                        }
+                        case HOUR+FIELD -> {
+                            try {
+                                if (StringUtils.isNotBlank(hourField.getText()) && Integer.parseInt(hourField.getText()) >= 0)
+                                {
+                                    int hour = Integer.parseInt(hourField.getText());
+                                    if (clockFrame.getClock().isShowMilitaryTime()) {
+                                        if (hour < 24 && hour >= 0)
+                                        {
+                                            timerButton.setText(SET);
+                                            hourField.setBorder(new LineBorder(Color.ORANGE));
+                                        }
+                                        else
+                                        {
+                                            timerButton.setText(TIMER_HOUR_ERROR);
+                                            hourField.setBorder(new LineBorder(Color.RED));
+                                            hourField.requestFocusInWindow();
+                                        }
+                                    }
+                                    else {
+                                        if (hour < 12 && hour >= 0)
+                                        {
+                                            timerButton.setText(SET);
+                                            hourField.setBorder(new LineBorder(Color.ORANGE));
+                                        }
+                                        else
+                                        {
+                                            timerButton.setText(TIMER_HOUR_ERROR);
+                                            hourField.setBorder(new LineBorder(Color.RED));
+                                            hourField.requestFocusInWindow();
+                                        }
+                                    }
+                                }
+                            } catch (NumberFormatException ignored) {
+                                logger.warn("Hour field is not a number: {}", hourField.getText());
+                                hourField.setBorder(new LineBorder(Color.RED));
+                                hourField.requestFocusInWindow();
+                            }
+                        }
+                        case MIN+FIELD -> {
+                            try {
+                                if (StringUtils.isNotBlank(minuteField.getText()) && Integer.parseInt(minuteField.getText()) >= 0)
+                                {
+                                    int minute = Integer.parseInt(minuteField.getText());
+                                    if (minute < 60 && minute >= 0)
+                                    {
+                                        timerButton.setText(SET);
+                                        minuteField.setBorder(new LineBorder(Color.ORANGE));
+                                    }
+                                    else
+                                    {
+                                        timerButton.setText(TIMER_MIN_ERROR);
+                                        minuteField.setBorder(new LineBorder(Color.RED));
+                                        minuteField.requestFocusInWindow();
+                                    }
+                                }
+                            } catch (NumberFormatException ignored) {
+                                logger.warn("Minute field is not a number: {}", minuteField.getText());
+                                minuteField.setBorder(new LineBorder(Color.RED));
+                                minuteField.requestFocusInWindow();
+                            }
+                        }
+                        case SEC+FIELD -> {
+                            try {
+                                if (StringUtils.isNotBlank(secondField.getText()) && Integer.parseInt(secondField.getText()) >= 0)
+                                {
+                                    int second = Integer.parseInt(secondField.getText());
+                                    if (second < 60 && second >= 0)
+                                    {
+                                        timerButton.setText(SET);
+                                        secondField.setBorder(new LineBorder(Color.ORANGE));
+                                    }
+                                    else
+                                    {
+                                        timerButton.setText(TIMER_SEC_ERROR);
+                                        secondField.setBorder(new LineBorder(Color.RED));
+                                        secondField.requestFocusInWindow();
+                                    }
+                                }
+                            } catch (NumberFormatException ignored) {
+                                logger.warn("Second field is not a number: {}", secondField.getText());
+                                secondField.setBorder(new LineBorder(Color.RED));
+                                secondField.requestFocusInWindow();
+                            }
+                        }
+                        case null -> logger.warn("Lost focus on a text field with no name");
+                        default -> throw new InvalidInputException("Lost focus on an unknown text field: " + e.getSource());
+                    }
+                }
+            });
+        });
+        List.of(nameLabel, hoursLabel, minutesLabel, secondsLabel).forEach(label -> {
+            label.setFont(ClockFrame.font20);
+            label.setForeground(Color.WHITE);
         });
         timerButton = new JButton(SET);
         resetButton = new JButton(RESET);
@@ -223,49 +249,96 @@ public class TimerPanel2 extends ClockPanel
         timerButton.setEnabled(false);
         resetButton.addActionListener(this::resetTimerPanel);
         resetButton.setEnabled(false);
+        //alarmLabel4 = new JLabel(CURRENT_ALARMS, SwingConstants.CENTER); // Current Alarms
+        //alarmLabel4.setFont(ClockFrame.font20); // All Alarms
+        //alarmLabel4.setForeground(Color.WHITE);
+        Object[][] data = clockFrame.getListOfTimers().stream()
+                .map(timer -> new Object[] { timer.getName() != null ? timer.getName() : timer.toString(),
+                        timer.getHours(), timer.getMinutes(), timer.getSeconds() })
+                .toArray(Object[][]::new);
+        timersTable = new JTable(data, new String[]{"Name", "Hours", "Minutes", "Seconds"});
+        timersTable.setPreferredScrollableViewportSize(new Dimension(400, 300));
+        timersTable.setFillsViewportHeight(true);
+        timersTable.setFont(ClockFrame.font10);
+        timersTable.setForeground(Color.WHITE);
+        timersTable.setBackground(Color.BLACK);
+        scrollTable = new JScrollPane(timersTable);
+
         setBackground(Color.BLACK);
-        alarmLabel4 = new JLabel(CURRENT_ALARMS, SwingConstants.CENTER); // Current Alarms
-        alarmLabel4.setFont(ClockFrame.font20); // All Alarms
-        alarmLabel4.setForeground(Color.WHITE);
-        addComponentsToSetupTimerPanel();
-
-        // setup textarea
-        textArea = new JTextArea(2, 2);
-        textArea.setText("TextArea");
-        textArea.setSize(new Dimension(100, 100));
-        textArea.setFont(ClockFrame.font10); // message
-        textArea.setVisible(true);
-        textArea.setEditable(false);
-        textArea.setLineWrap(false);
-        textArea.setWrapStyleWord(false);
-        textArea.setBackground(Color.BLACK);
-        textArea.setForeground(Color.WHITE);
-        // setup scrollPane
-        scrollPane = new JScrollPane(textArea);
-        scrollPane.setHorizontalScrollBar(null);
-        scrollPane.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
-        scrollPane.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED);
-        scrollPane.setSize(textArea.getSize());
-
-        alarmLabel4 = new JLabel(CURRENT_TIMERS, SwingConstants.CENTER); // Current Timers
-        alarmLabel4.setFont(ClockFrame.font20); // All Timers
-        alarmLabel4.setForeground(Color.WHITE);
-
         //scheduler = Executors.newScheduledThreadPool(10);
         timersAndFutures = new HashMap<>();
         activeTimers = new ArrayList<>();
     }
 
     /**
+     * This method adds the components to the alarm panel
+     */
+    public void addComponentsToPanel()
+    {
+        logger.info("addComponentsToPanel");
+        addComponent(nameLabel,0,0,1,1,0,0, 1, 0, GridBagConstraints.NONE, new Insets(0,0,0,0)); // H
+        addComponent(nameField,0,1,1,1,0,0, 3, 0, GridBagConstraints.BOTH, new Insets(0,0,0,0)); // All Timers
+        addComponent(hoursLabel,0,3,1,1, 0,0, 1, 0, GridBagConstraints.NONE, new Insets(0,0,0,0)); // M
+        addComponent(hourField,0,4,1,1, 0,0, 1, 0, GridBagConstraints.BOTH, new Insets(0,0,0,0)); // textField
+        addComponent(minutesLabel,0,5,1,1, 0,0, 1, 0, GridBagConstraints.NONE, new Insets(0,0,0,0)); // M
+        addComponent(minuteField,0,6,1,1, 0,0, 1, 0, GridBagConstraints.BOTH, new Insets(0,0,0,0)); // textField
+        addComponent(secondsLabel,0,7,1,1, 0,0, 1, 0, GridBagConstraints.NONE, new Insets(0,0,0,0)); // M
+        addComponent(secondField,0,8,1,1, 0,0, 1, 0, GridBagConstraints.BOTH, new Insets(0,0,0,0)); // textField
+        addComponent(resetButton,0,9,1,1, 0,0, 1, 0, GridBagConstraints.NONE, new Insets(0,0,0,0));
+        addComponent(timerButton,0,10,1,1, 0,0, 1, 0, GridBagConstraints.NONE, new Insets(0,0,0,0)); // Set Timer
+
+        // leaving row 1 blank for spacing
+
+        addComponent(scrollTable, 2, 0, 11, 1, 0, 0, 1, 2, GridBagConstraints.BOTH, new Insets(0,0,0,0));
+
+        constraints.weighty = 4;
+        constraints.weightx = 2;
+        // 1, 6
+        //addComponent(scrollPane,1,1,2,4, 0,0, GridBagConstraints.BOTH, new Insets(1,1,1,1)); // textArea
+    }
+
+    /**
+     * The main method used for adding
+     * components to the setup timer panel
+     * @param cpt       the component to add
+     * @param gridy     the y position or the row
+     * @param gridx     the x position or the column
+     * @param gwidth    the width how many columns it takes up
+     * @param gheight   the height how many rows it takes up
+     * @param ipadx     the x padding
+     * @param ipady     the y padding
+     * @param fill      the fill
+     * @param insets    the insets
+     */
+    public void addComponent(Component cpt, int gridy, int gridx, double gwidth, double gheight,
+                             int ipadx, int ipady, int weightx, int weighty, int fill, Insets insets)
+    {
+        logger.debug("add component");
+        constraints.gridx = gridx;
+        constraints.gridy = gridy;
+        constraints.gridwidth = (int)Math.ceil(gwidth);
+        constraints.gridheight = (int)Math.ceil(gheight);
+        constraints.fill = fill;
+        constraints.ipadx = ipadx;
+        constraints.ipady = ipady;
+        constraints.insets = insets;
+        constraints.weightx = Math.max(weightx, 0);
+        constraints.weighty = Math.max(weighty, 0);
+        layout.setConstraints(cpt,constraints);
+        add(cpt);
+    }
+
+    /**
      * Enables the timer button if the text fields are valid
      */
-    public void enableTimerButton()
+    public void enableDisableTimerButton()
     {
         logger.debug("enable timer button");
         var allValid = validateFirstTextField() && validateSecondTextField() && validateThirdTextField();
         var allNotZeroes = !ZERO.equals(hourField.getText()) && !ZERO.equals(minuteField.getText()) && !ZERO.equals(secondField.getText());
+        var someNotBlank = areSomeNotBlank();
         logger.debug("enabled?: {}", allValid && allNotZeroes);
-        timerButton.setEnabled(allValid && allNotZeroes);
+        timerButton.setEnabled(allValid && allNotZeroes && someNotBlank);
     }
 
     /**
@@ -279,8 +352,10 @@ public class TimerPanel2 extends ClockPanel
         {
             clock.entity.Timer timer = createTimer();
             logger.info("timer created: {}", timer);
+            clockFrame.getListOfTimers().add(timer);
             startTimer(timer);
             clearTextFields();
+            updateTimersTable();
             resetButton.setEnabled(true);
             timerButton.setEnabled(false);
         }
@@ -299,7 +374,7 @@ public class TimerPanel2 extends ClockPanel
         ScheduledFuture<?> future = clockFrame.getScheduler().scheduleAtFixedRate(timer::performCountDown, 0, 1, TimeUnit.SECONDS);
         timersAndFutures.put(timer, future);
         if (!activeTimers.isEmpty() && clockFrame.getCountdownFuture() == null) {
-            future = clockFrame.getScheduler().scheduleAtFixedRate(this::resetJTextArea, 0, 1, TimeUnit.SECONDS);
+            //future = clockFrame.getScheduler().scheduleAtFixedRate(this::resetJTextArea, 0, 1, TimeUnit.SECONDS);
             clockFrame.setCountdownFuture(future);
         }
         //scheduler = Executors.newScheduledThreadPool(activeTimers.size());
@@ -325,9 +400,10 @@ public class TimerPanel2 extends ClockPanel
                 if (SEC.equals(secondField.getText())) secondField.setText(ZERO);
                 timer = new clock.entity.Timer(Integer.parseInt(hourField.getText()), Integer.parseInt(minuteField.getText()), Integer.parseInt(secondField.getText()), clockFrame.getClock());
                 activeTimers.add(timer);
-                resetJTextArea();
-                resetJAlarmLabel4();
-            } else {
+                //resetJTextArea();
+                //resetJAlarmLabel4();
+            }
+            else {
                 logger.error("One of the textfields is not valid");
             }
         }
@@ -403,7 +479,7 @@ public class TimerPanel2 extends ClockPanel
             //scheduler = Executors.newScheduledThreadPool(activeTimers.size());
             activeTimers.forEach(timer -> clockFrame.getScheduler().scheduleAtFixedRate(timer::performCountDown, 0, 1, TimeUnit.SECONDS));
 
-            resetJTextArea(); // leave here
+            //resetJTextArea(); // leave here
         }
     }
 
@@ -424,10 +500,28 @@ public class TimerPanel2 extends ClockPanel
      */
     public void clearTextFields()
     {
-        hourField.setText(HOUR);
-        minuteField.setText(MIN);
-        secondField.setText(SEC);
+        nameField.setText(EMPTY);
+        hourField.setText(EMPTY);
+        minuteField.setText(EMPTY);
+        secondField.setText(EMPTY);
         timerButton.setText(SET);
+    }
+
+    public void updateTimersTable()
+    {
+        logger.info("update timers table");
+        Object[][] data = clockFrame.getListOfTimers().stream()
+                .map(timer -> new Object[] { timer.getName() != null ? timer.getName() : timer.toString(),
+                        timer.getHours(), timer.getMinutes(), timer.getSeconds() })
+                .toArray(Object[][]::new);
+        timersTable.setModel(new javax.swing.table.DefaultTableModel(data, new String[]{"Name", "Hours", "Minutes", "Seconds"}));
+        timersTable.setFillsViewportHeight(true);
+        timersTable.setFont(ClockFrame.font10);
+        timersTable.setForeground(Color.WHITE);
+        timersTable.setBackground(Color.BLACK);
+        //timersTable = new JTable(data, new String[]{"Name", "Hours", "Minutes", "Seconds"});
+        scrollTable.repaint();
+        scrollTable.updateUI();
     }
 
     /**
@@ -451,22 +545,22 @@ public class TimerPanel2 extends ClockPanel
         }
     }
 
-    /**
-     * Resets alarm label 4
-     */
-    public void resetJAlarmLabel4()
-    {
-        logger.info("reset alarm label 4");
-        if (activeTimers.isEmpty())
-        { alarmLabel4.setText(clockFrame.getClock().defaultText(10)); }// All Alarms label...
-        else
-        {
-            alarmLabel4.setText(activeTimers.size() == 1
-                            ? activeTimers.size() + SPACE+TIMER+SPACE+ADDED
-                            : activeTimers.size() + SPACE+TIMER+S.toLowerCase()+SPACE+ADDED
-            );
-        }
-    }
+//    /**
+//     * Resets alarm label 4
+//     */
+//    public void resetJAlarmLabel4()
+//    {
+//        logger.info("reset alarm label 4");
+//        if (activeTimers.isEmpty())
+//        { alarmLabel4.setText(clockFrame.getClock().defaultText(10)); }// All Alarms label...
+//        else
+//        {
+//            alarmLabel4.setText(activeTimers.size() == 1
+//                            ? activeTimers.size() + SPACE+TIMER+SPACE+ADDED
+//                            : activeTimers.size() + SPACE+TIMER+S.toLowerCase()+SPACE+ADDED
+//            );
+//        }
+//    }
 
     /**
      * Validates the first text field
@@ -475,8 +569,7 @@ public class TimerPanel2 extends ClockPanel
     public boolean validateFirstTextField()
     {
         boolean result;
-        if (HOUR.equals(hourField.getText())) { result = true; }
-        else if (!NumberUtils.isNumber(hourField.getText())) { result = false; }
+        if (EMPTY.equals(hourField.getText())) { result = true; }
         // by default, cannot be more than 23 hours or less than 0
         else {
             result = Integer.parseInt(hourField.getText()) < 24 &&
@@ -493,7 +586,7 @@ public class TimerPanel2 extends ClockPanel
     public boolean validateSecondTextField()
     {
         boolean result;
-        if (MIN.equals(minuteField.getText())) { result = true; }
+        if (EMPTY.equals(minuteField.getText())) { result = true; }
         else if (!NumberUtils.isNumber(minuteField.getText())) { result = false; }
         else {
             result = Integer.parseInt(minuteField.getText()) < 60 &&
@@ -510,7 +603,7 @@ public class TimerPanel2 extends ClockPanel
     public boolean validateThirdTextField()
     {
         boolean result;
-        if (SEC.equals(secondField.getText())) { result = true; }
+        if (EMPTY.equals(secondField.getText())) { result = true; }
         else if (!NumberUtils.isNumber(secondField.getText())) { result = false; }
         else
         {
@@ -521,8 +614,34 @@ public class TimerPanel2 extends ClockPanel
         return result;
     }
 
+    /**
+     * Checks if all text fields are not zeroes or empty
+     * @return true if all text fields are not zeroes or empty
+     */
+    public boolean areAllNotZeroes()
+    {
+        boolean allNotZero = !ZERO.equals(hourField.getText()) && !ZERO.equals(minuteField.getText()) && !ZERO.equals(secondField.getText());
+        logger.info("are all not zeroes: {}", allNotZero);
+        return allNotZero;
+    }
+
+    /**
+     * Checks if all text fields are blank or empty
+     * @return true if all text fields are blank or empty
+     */
+    public boolean areSomeNotBlank()
+    {
+        boolean someNotBlank = !StringUtils.isBlank(hourField.getText()) || !StringUtils.isBlank(minuteField.getText()) ||
+                !StringUtils.isBlank(secondField.getText());
+        logger.info("are some not blank: {}", someNotBlank);
+        return someNotBlank;
+    }
+
     public boolean validTextFields()
-    { return validateFirstTextField() && validateSecondTextField() && validateThirdTextField(); }
+    {
+        return validateFirstTextField() && validateSecondTextField() && validateThirdTextField()
+                && areAllNotZeroes() && areSomeNotBlank();
+    }
 
     // TODO: Update for Timers
     /**
@@ -557,20 +676,20 @@ public class TimerPanel2 extends ClockPanel
         logger.info("Size of viewAlarms after removal {}", clockFrame.getClockMenuBar().getAlarmFeature_Menu().getItemCount());
     }
 
-    /**
-     * Resets the text area
-     */
-    public void resetJTextArea()
-    {
-        logger.info("reset textarea");
-        textArea.setText(EMPTY);
-        for(clock.entity.Timer timer : activeTimers)
-        {
-            if (!textArea.getText().isEmpty())
-            { textArea.append(NEWLINE); }
-            textArea.append(timer+NEWLINE);
-        }
-    }
+//    /**
+//     * Resets the text area
+//     */
+//    public void resetJTextArea()
+//    {
+//        logger.info("reset textarea");
+//        textArea.setText(EMPTY);
+//        for(clock.entity.Timer timer : activeTimers)
+//        {
+//            if (!textArea.getText().isEmpty())
+//            { textArea.append(NEWLINE); }
+//            textArea.append(timer+NEWLINE);
+//        }
+//    }
 
     // TODO: Update for Timers
     /**
@@ -715,94 +834,6 @@ public class TimerPanel2 extends ClockPanel
     { printStackTrace(e, ""); }
 
     /**
-     * This method adds the components to the alarm panel
-     */
-    public void addComponentsToPanel()
-    {
-        logger.info("addComponentsToPanel");
-        addComponent(setupTimerPanel,0,0,1,1,0,0, GridBagConstraints.BOTH, new Insets(0,0,0,0)); // H
-        addComponent(alarmLabel4,0,1,1,1,0,0, GridBagConstraints.BOTH, new Insets(0,0,0,0)); // All Timers
-        constraints.weighty = 4;
-        constraints.weightx = 2;
-        // 1, 6
-        addComponent(scrollPane,1,1,2,4, 0,0, GridBagConstraints.BOTH, new Insets(1,1,1,1)); // textArea
-    }
-
-    /**
-     * This method adds the components to the timer panel
-     */
-    public void addComponentsToSetupTimerPanel()
-    {
-        logger.info("add components to setup timer panel");
-        setComponentOrientation(ComponentOrientation.LEFT_TO_RIGHT);
-        GridBagLayout layout = new GridBagLayout();
-        setupTimerPanel.setLayout(layout);
-        addComponentToSetupTimerPanel(hourField, 0,0,1,1,0,0, GridBagConstraints.HORIZONTAL); // TextField 1
-        addComponentToSetupTimerPanel(minuteField, 0,1,1,1,0,0, GridBagConstraints.HORIZONTAL); // TextField 2
-        addComponentToSetupTimerPanel(secondField, 0,2,1,1,0,0, GridBagConstraints.HORIZONTAL); // TextField 3
-        addComponentToSetupTimerPanel(resetButton, 1, 0, 3, 1, 0, 0, GridBagConstraints.HORIZONTAL); // Reset Button
-        addComponentToSetupTimerPanel(timerButton, 2,0,3,1,0,0, GridBagConstraints.HORIZONTAL); // Set Timer Button
-        addComponentToSetupTimerPanel(stopButton, 3, 0, 3, 1, 0, 0, 2); // horizontal
-    }
-
-    /**
-     * The main method used for adding components
-     * to the timer panel
-     * @param cpt       the component to add
-     * @param gridy     the y position
-     * @param gridx     the x position
-     * @param gwidth    the width
-     * @param gheight   the height
-     * @param ipadx     the x padding
-     * @param ipady     the y padding
-     * @param fill      the fill
-     */
-    public void addComponentToSetupTimerPanel(Component cpt, int gridy, int gridx, double gwidth, double gheight, int ipadx, int ipady, int fill)
-    {
-        logger.debug("add component");
-        constraints.gridx = gridx;
-        constraints.gridy = gridy;
-        constraints.gridwidth = (int)Math.ceil(gwidth);
-        constraints.gridheight = (int)Math.ceil(gheight);
-        constraints.fill = fill;
-        constraints.ipadx = ipadx;
-        constraints.ipady = ipady;
-        constraints.weightx = 0;
-        constraints.weighty = 0;
-        constraints.insets = new Insets(0,0,0,0);
-        ((GridBagLayout)setupTimerPanel.getLayout()).setConstraints(cpt, constraints);
-        setupTimerPanel.add(cpt, constraints);
-    }
-
-    /**
-     * The main method used for adding
-     * components to the setup timer panel
-     * @param cpt       the component to add
-     * @param gridy     the y position
-     * @param gridx     the x position
-     * @param gwidth    the width
-     * @param gheight   the height
-     * @param ipadx     the x padding
-     * @param ipady     the y padding
-     * @param fill      the fill
-     * @param insets    the insets
-     */
-    public void addComponent(Component cpt, int gridy, int gridx, double gwidth, double gheight,
-                      int ipadx, int ipady, int fill, Insets insets)
-    {
-        constraints.gridx = gridx;
-        constraints.gridy = gridy;
-        constraints.gridwidth = (int)Math.ceil(gwidth);
-        constraints.gridheight = (int)Math.ceil(gheight);
-        constraints.fill = fill;
-        constraints.ipadx = ipadx;
-        constraints.ipady = ipady;
-        constraints.insets = insets;
-        layout.setConstraints(cpt,constraints);
-        add(cpt);
-    }
-
-    /**
      * This method sets up the settings menu for the
      * timer panel.
      */
@@ -816,9 +847,7 @@ public class TimerPanel2 extends ClockPanel
     public GridBagLayout getGridBagLayout() { return this.layout; }
     public GridBagConstraints getGridBagConstraints() { return this.constraints; }
     public Clock getClock() { return clockFrame.getClock(); }
-    public JLabel getJAlarmLbl4() { return this.alarmLabel4; } // All alarms
-    public JScrollPane getJScrollPane() { return this.scrollPane; }
-    public JTextArea getJTextArea() { return this.textArea; }
+    //public JLabel getJAlarmLbl4() { return this.alarmLabel4; } // All alarms }
     public AdvancedPlayer getMusicPlayer() { return musicPlayer; }
     public List<clock.entity.Timer> getActiveTimers() { return activeTimers; }
     public boolean isDisableTimerFunctionality() { return disableTimerFunctionality; }
@@ -832,9 +861,7 @@ public class TimerPanel2 extends ClockPanel
     /* Setters */
     protected void setGridBagLayout(GridBagLayout layout) { this.layout = layout; }
     protected void setGridBagConstraints(GridBagConstraints constraints) { this.constraints = constraints; }
-    protected void setJAlarmLbl4(JLabel alarmLabel4) { this.alarmLabel4 = alarmLabel4; }
-    protected void setJScrollPane(JScrollPane scrollPane) { this.scrollPane = scrollPane; }
-    protected void setJTextArea(final JTextArea textArea) { this.textArea = textArea; }
+    //protected void setJAlarmLbl4(JLabel alarmLabel4) { this.alarmLabel4 = alarmLabel4; }
     protected void setMusicPlayer(AdvancedPlayer musicPlayer) { this.musicPlayer = musicPlayer; }
     public void setClock(Clock clock) { this.clockFrame.setClock(clock); }
     public void setActiveTimers(List<clock.entity.Timer> activeTimers) { this.activeTimers = activeTimers; }

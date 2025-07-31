@@ -3,12 +3,14 @@ package clock.entity;
 import clock.exception.InvalidInputException;
 import javazoom.jl.decoder.JavaLayerException;
 import javazoom.jl.player.advanced.AdvancedPlayer;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import java.io.InputStream;
 import java.io.Serial;
 import java.io.Serializable;
+import java.time.LocalTime;
 
 import static clock.util.Constants.*;
 import static java.lang.Thread.sleep;
@@ -20,21 +22,19 @@ import static java.lang.Thread.sleep;
  * @author michael ball
  *  @version 2.0
  */
-public class Timer implements Serializable, Runnable
+public class Timer  implements Serializable, Comparable<Timer>, Runnable
 {
     @Serial
     private static final long serialVersionUID = 2L;
     private static final Logger logger = LogManager.getLogger(Timer.class);
-    private int hour, minute, second;
-    private String hourAsStr, minuteAsStr, secondAsStr;
-    // ensures that all changes are immediately visible to all threads
-    private volatile boolean timerGoingOff;
-
-    private volatile boolean paused;
-    private volatile boolean hasBeenStarted;
-    private volatile boolean hasBeenTriggered;
-    private volatile boolean stopTimer;
+    private static long timersCounter = 0L;
+    private int hours, minutes, seconds;
+    private String hoursAsStr, minutesAsStr, secondsAsStr, name;
+    private boolean timerGoingOff, paused,
+            hasBeenStarted, hasBeenTriggered,
+            stopTimer;
     private Clock clock;
+    private LocalTime countDown;
     private AdvancedPlayer musicPlayer;
 
     /**
@@ -42,47 +42,87 @@ public class Timer implements Serializable, Runnable
      */
     public Timer() throws InvalidInputException
     {
-        this(0, 0, 0, false, true, false, null);
+        this(0, 0, 0, null, false, false, false, null);
     }
 
     /**
      * Creates a new Timer object with minimum values
+     * @param hours the hours for the timer
+     * @param minutes the minutes for the timer
+     * @param seconds the seconds for the timer
+     * @throws InvalidInputException if the input values are invalid
      */
-    public Timer(int hour, int minute, int second) throws InvalidInputException
+    public Timer(int hours, int minutes, int seconds) throws InvalidInputException
     {
-        this(hour, minute, second, false, true, false, null);
+        this(hours, minutes, seconds, null, false, false, false, null);
     }
 
     /**
-     * Creates a new Timer with time values and clock object
+     * Creates a new Timer with time values
+     * @param hours the hours for the timer
+     * @param minutes the minutes for the timer
+     * @param seconds the seconds for the timer
+     * @param clock the clock object associated with this timer
+     * @throws InvalidInputException if the input values are invalid
      */
-    public Timer(int hour, int minute, int second, Clock clock) throws InvalidInputException
+    public Timer(int hours, int minutes, int seconds, Clock clock) throws InvalidInputException
     {
-        this(hour, minute, second, false, true, false, clock);
+        this(hours, minutes, seconds, null, false, false, false, clock);
+    }
+
+    /**
+     * Creates a new Timer with time values and name
+     * @param hours the hours for the timer
+     * @param minutes the minutes for the timer
+     * @param seconds the seconds for the timer
+     * @param name the name of the timer
+     * @param clock the clock object associated with this timer
+     * @throws InvalidInputException if the input values are invalid
+     */
+    public Timer(int hours, int minutes, int seconds, String name, Clock clock) throws InvalidInputException
+    {
+        this(hours, minutes, seconds, name, false, false, false, clock);
     }
 
     /**
      * The main constructor for creating a Timer
+     * @param hours the hours for the timer
+     * @param minutes the minutes for the timer
+     * @param seconds the seconds for the timer
+     * @param name the name of the timer
+     * @param timerGoingOff whether the timer is going off
+     * @param paused whether the timer is paused
+     * @param hasBeenStarted whether the timer has been started
+     * @param clock the clock object associated with this timer
      */
-    public Timer(int hour, int minute, int second, boolean timerGoingOff, boolean paused, boolean hasBeenStarted, Clock clock) throws InvalidInputException
+    public Timer(int hours, int minutes, int seconds, String name,
+                 boolean timerGoingOff, boolean paused, boolean hasBeenStarted, Clock clock) throws InvalidInputException
     {
-        if (hour < 0 || hour > 12) throw new IllegalArgumentException("Hours must be between 0 and 12");
-        else setHour(hour);
-        if (minute < 0 || minute > 59) throw new IllegalArgumentException("Minutes must be between 0 and 59");
-        else setMinute(minute);
-        setSecond(second);
-        setupMusicPlayer();
+        if (hours < 0 || hours > 12) throw new IllegalArgumentException("Hours must be between 0 and 12");
+        if (minutes < 0 || minutes > 59) throw new IllegalArgumentException("Minutes must be between 0 and 59");
+        if (seconds < 0 || seconds > 59 && seconds != 60) throw new IllegalArgumentException("Seconds must be between 0 and 59");
+        setHours(hours);
+        setMinutes(minutes);
+        setSeconds(seconds);
+        countDown = LocalTime.of(getHours(), getMinutes(), getSeconds());
         this.timerGoingOff = timerGoingOff;
         this.paused = paused;
         this.hasBeenStarted = hasBeenStarted;
         this.clock = clock;
+        this.name = StringUtils.isBlank(name) ? null : name;
+        setupMusicPlayer();
+        timersCounter++;
+        logger.debug("Timer {} created", timersCounter);
         logger.info("Timer created");
     }
 
     @Override
     public String toString()
     {
-        return hourAsStr+":"+minuteAsStr+":"+secondAsStr;
+        if (name == null || name.isBlank())
+        { return hoursAsStr +":"+ minutesAsStr +":"+ secondsAsStr; }
+        else
+        { return name + SPACE + "(" + hoursAsStr +":"+ minutesAsStr +":"+ secondsAsStr + ")"; }
     }
 
     /**
@@ -107,46 +147,32 @@ public class Timer implements Serializable, Runnable
     }
 
     /**
+     * Stop the timer
+     */
+    public void stopTimer()
+    {
+        logger.info("stop timer");
+        musicPlayer = null;
+        timerGoingOff = false;
+        logger.info("{} timer turned off", this);
+    }
+
+    /**
      * Sets a timer to go off
      */
     public void triggerTimer()
     {
         logger.info("trigger timer");
-        //clock.getDigitalClockPanel().updateLabels();
-        this.setHasBeenTriggered(true);
-
         try
         {
-            logger.debug("while timer is going off, play sound");
-            musicPlayer.play(50);
+            logger.debug("playing sound");
+            setupMusicPlayer();
+            musicPlayer.play();
         }
         catch (Exception e)
         {
             logger.error(e.getCause().getClass().getName() + " - " + e.getMessage());
         }
-        //this.timerGoingOff = false; // turn it off now that method has been called
-        //clock.getDigitalClockPanel().getLabel1().setText(activeAlarm.toString());
-        //clock.getDigitalClockPanel().getLabel2().setText("is going off!");
-        // play sound
-//        Callable<String> c = () -> {
-//            try
-//            {
-//                logger.debug("while timer is going off, play sound");
-//                if (this.timerGoingOff)
-//                { musicPlayer.play(50); }
-//                logger.debug("timer has stopped");
-//                return "Timer triggered";
-//            }
-//            catch (Exception e)
-//            {
-//                logger.error(e.getCause().getClass().getName() + " - " + e.getMessage());
-//                printStackTrace(e, e.getMessage());
-//                setupMusicPlayer();
-//                musicPlayer.play(50);
-//                return "Reset music player required";
-//            }
-//        };
-//        clock.getScheduler().submit(c);
     }
 
     /**
@@ -182,50 +208,8 @@ public class Timer implements Serializable, Runnable
     public void run()
     {
         logger.info("timer ticking down...");
-        try
-        {
-            if (HOUR.equals(Integer.toString(hour))) setHour(0);
-            if (MIN.equals(Integer.toString(minute))) setMinute(0);
-            if (SEC.equals(Integer.toString(second))) setSecond(0);
-
-            if (second > 0 || minute > 0 || hour > 0 )
-            {
-                if (second >= 0)
-                {
-                    if (minute > 0 && second == 0) setSecond(59);
-                    else setSecond(second-1);
-                    //secondField.setText(Integer.toString(second));
-                    // check hours and minutes, to see if they now need to be decreased
-                    if (second < 0 && minute >= 0)
-                    {
-                        setSecond(59);
-                        setMinute(getMinute()-1);
-                        //minuteField.setText(Integer.toString(minute));
-                        if (minute < 0) //  && hour > 0
-                        {
-                            setMinute(59);
-                            setHour(getHour()-1);
-                            //hourField.setText(Integer.toString(hour));
-                        }
-                    }
-                }
-                logger.debug("hour: {} min: {} sec: {}", hour, minute, second);
-                //sleep(1000);
-            }
-            else if (ZERO.equals(Integer.toString(second)) &&
-                    ZERO.equals(Integer.toString(minute)) &&
-                    ZERO.equals(Integer.toString(hour)) && !paused )
-            {
-                //timerButton.setText(COMPLETE);
-                //timerButton.setEnabled(false);
-                //clock.setTimerActive(true);
-                setTimerGoingOff(true);
-                var future = clock.getClockFrame().getTimerPanel2().getTimersAndFutures().get(this);
-                future.cancel(true);
-            }
-        }
-        catch (Exception e)
-        { printStackTrace(e, null); }
+        countDown.minusSeconds(1);
+        logger.debug("CountDown: {}:{}:{}", countDown.getHour(), countDown.getMinute(), countDown.getSecond());
     }
 
     /**
@@ -239,13 +223,14 @@ public class Timer implements Serializable, Runnable
 
     /* Getters */
     public Clock getClock() { return clock; }
-    public int getHour() { return hour; }
-    public String getHourAsStr() { return hourAsStr; }
-    public int getMinute() { return minute; }
-    public String getMinuteAsStr() { return minuteAsStr; }
+    public int getHours() { return hours; }
+    public String getHoursAsStr() { return hoursAsStr; }
+    public int getMinutes() { return minutes; }
+    public String getMinutesAsStr() { return minutesAsStr; }
     public boolean isPaused() { return paused; }
-    public int getSecond() { return second; }
-    public String getSecondAsStr() { return secondAsStr; }
+    public int getSeconds() { return seconds; }
+    public String getSecondsAsStr() { return secondsAsStr; }
+    public String getName() { return name; }
     public boolean isTimerGoingOff() { return timerGoingOff; }
     public boolean isHasBeenStarted() { return hasBeenStarted; }
     public boolean isHasBeenTriggered() { return hasBeenTriggered; }
@@ -253,27 +238,33 @@ public class Timer implements Serializable, Runnable
 
     /* Setters */
     public void setClock(Clock clock) { this.clock = clock; }
-    public void setHour(int hour) {
-        this.hour = hour;
-        if (hour < 10) setHourAsStr(ZERO+hour);
-        else setHourAsStr(EMPTY+hour);
+    public void setHours(int hour) {
+        this.hours = hour;
+        if (hour < 10) setHoursAsStr(ZERO+hour);
+        else setHoursAsStr(EMPTY+hour);
     }
-    public void setHourAsStr(String hourAsStr) { this.hourAsStr = hourAsStr; }
-    public void setMinute(int minute) {
-        this.minute = minute;
-        if (minute < 10) setMinuteAsStr(ZERO+minute);
-        else setMinuteAsStr(EMPTY+minute);
+    public void setHoursAsStr(String hoursAsStr) { this.hoursAsStr = hoursAsStr; }
+    public void setMinutes(int minutes) {
+        this.minutes = minutes;
+        if (minutes < 10) setMinutesAsStr(ZERO+ minutes);
+        else setMinutesAsStr(EMPTY+ minutes);
     }
-    public void setMinuteAsStr(String minuteAsStr) { this.minuteAsStr = minuteAsStr; }
+    public void setMinutesAsStr(String minutesAsStr) { this.minutesAsStr = minutesAsStr; }
     public void setPaused(boolean paused) { this.paused = paused; }
-    public void setSecond(int second) {
-        this.second = second;
-        if (second < 10) setSecondAsStr(ZERO+second);
-        else setSecondAsStr(EMPTY+second);
+    public void setSeconds(int seconds) {
+        this.seconds = seconds;
+        if (seconds < 10) setSecondsAsStr(ZERO+ seconds);
+        else setSecondsAsStr(EMPTY+ seconds);
     }
-    public void setSecondAsStr(String secondAsStr) { this.secondAsStr = secondAsStr; }
+    public void setSecondsAsStr(String secondsAsStr) { this.secondsAsStr = secondsAsStr; }
+    public void setName(String name) { this.name = name; }
     public void setTimerGoingOff(boolean timerGoingOff) { this.timerGoingOff = timerGoingOff; }
     public void setHasBeenStarted(boolean hasBeenStarted) { this.hasBeenStarted = hasBeenStarted; }
     public void setHasBeenTriggered(boolean hasBeenTriggered) { this.hasBeenTriggered = hasBeenTriggered; }
     public void setStopTimer(boolean stopTimer) { this.stopTimer = stopTimer; }
+
+    @Override
+    public int compareTo(Timer o) {
+        return 0;
+    }
 }

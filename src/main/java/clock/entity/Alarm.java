@@ -32,8 +32,7 @@ public class Alarm implements Serializable, Comparable<Alarm>
     private static final Logger logger = LogManager.getLogger(Alarm.class);
     private static long alarmsCounter = 0L;
     private int hours, minutes;
-    private String name;
-    private String minutesAsStr,hoursAsStr,ampm;
+    private String minutesAsStr,hoursAsStr,ampm, name;
     private List<DayOfWeek> days;
     private boolean alarmGoingOff,updatingAlarm, triggeredToday;
     private Clock clock;
@@ -74,13 +73,13 @@ public class Alarm implements Serializable, Comparable<Alarm>
     public Alarm(String name, int hours, int minutes, String ampm,
                  boolean updatingAlarm, List<DayOfWeek> days, Clock clock)
     {
-        this.clock = clock;
         if (hours < 0 || hours > 12) throw new InvalidInputException("Hours must be between 0 and 12");
-        else setHours(hours);
         if (minutes < 0 || minutes > 59) throw new InvalidInputException("Minutes must be between 0 and 59");
-        else setMinutes(minutes);
-        if (List.of(AM,PM,AM.toLowerCase(),PM.toLowerCase()).contains(ampm)) setAMPM(ampm.toUpperCase());
-        else throw new InvalidInputException("AMPM must be 'AM' or 'PM'");
+        if (!List.of(AM,PM,AM.toLowerCase(),PM.toLowerCase()).contains(ampm)) throw new InvalidInputException("AMPM must be 'AM' or 'PM'");
+        this.clock = clock;
+        setHours(hours);
+        setMinutes(minutes);
+        setAMPM(ampm.toUpperCase());
         this.days = days;
         this.updatingAlarm = updatingAlarm;
         this.name = StringUtils.isBlank(name) ? null : name;
@@ -132,7 +131,7 @@ public class Alarm implements Serializable, Comparable<Alarm>
         {
             logger.debug("playing sound");
             setupMusicPlayer();
-            getMusicPlayer().play();
+            musicPlayer.play();
         }
         catch (Exception e)
         {

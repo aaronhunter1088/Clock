@@ -28,9 +28,13 @@ public class Constants {
     public static final String COLON = ":";
     public static final String COMMA = ",";
     public static final String NEWLINE = "\n";
+    public static final String NO = "No";
+    public static final String NAME = "Name";
     public static final String Hours = "Hours";
     public static final String Minutes = "Minutes";
     public static final String Seconds = "Seconds";
+    public static final String LABEL = "Label";
+    public static final String FIELD = "Field";
     public static final String ONE = "1";
     public static final String TWO = "2";
     public static final String THREE = "3";
