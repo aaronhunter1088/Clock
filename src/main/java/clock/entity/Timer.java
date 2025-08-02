@@ -115,17 +115,26 @@ public class Timer  implements Serializable, Comparable<Timer>
         this.name = StringUtils.isBlank(name) ? null : name;
         setupMusicPlayer();
         timersCounter++;
+        if (timersCounter == 100L) {
+            logger.info("Restarting counter for timers");
+            timersCounter = 0L;
+        }
         logger.debug("Timer {} created", timersCounter);
         logger.info("Timer created");
     }
 
+    /**
+     * Returns a string representation of the Timer object.
+     * If there is a name set, it will print the name as well
+     * @return (Name) Hours:Minutes:Seconds
+     */
     @Override
     public String toString()
     {
         if (name == null || name.isBlank())
-        { return hoursAsStr +":"+ minutesAsStr +":"+ secondsAsStr; }
+        { return getCountdown(); }
         else
-        { return name + SPACE + "(" + hoursAsStr +":"+ minutesAsStr +":"+ secondsAsStr + ")"; }
+        { return "(" + name + ")" + SPACE + getCountdown(); }
     }
 
     /**
@@ -180,12 +189,17 @@ public class Timer  implements Serializable, Comparable<Timer>
 
     public void innerCountDown()
     {
-        logger.info("timer ticking down...");
+        logger.info("{} ticking down...", this);
         countDown = countDown.minusSeconds(1);
         setHours(countDown.getHour());
         setMinutes(countDown.getMinute());
         setSeconds(countDown.getSecond());
         logger.debug("CountDown: {}:{}:{}", countDown.getHour(), countDown.getMinute(), countDown.getSecond());
+        if (countDown.getHour() == 0 && countDown.getMinute() == 0 && countDown.getSecond() == 0)
+        {
+            logger.info("{} has reached zero", this);
+            timerGoingOff = true;
+        }
     }
 
     /**
@@ -193,13 +207,13 @@ public class Timer  implements Serializable, Comparable<Timer>
      */
     public void pauseTimer()
     {
-        logger.info("pausing timer");
+        logger.info("pausing {}", this);
         paused = true;
     }
 
     public void resumeTimer()
     {
-        logger.info("resuming timer");
+        logger.info("resuming {}", this);
         paused = false;
     }
 
@@ -208,10 +222,10 @@ public class Timer  implements Serializable, Comparable<Timer>
      */
     public void stopTimer()
     {
-        logger.info("stop timer");
+        logger.info("stopping {}", this);
         musicPlayer = null;
         timerGoingOff = false;
-        logger.info("{} timer turned off", this);
+        logger.info("{} timer stopped", this);
     }
 
     /**
@@ -219,10 +233,9 @@ public class Timer  implements Serializable, Comparable<Timer>
      */
     public void triggerTimer()
     {
-        logger.info("trigger timer");
         try
         {
-            logger.debug("playing sound");
+            logger.debug("triggering timer...");
             setupMusicPlayer();
             musicPlayer.play();
         }

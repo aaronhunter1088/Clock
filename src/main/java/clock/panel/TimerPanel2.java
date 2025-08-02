@@ -136,7 +136,7 @@ public class TimerPanel2 extends ClockPanel
                     {
                         case NAME+FIELD -> {
                             if (nameField.getText().isBlank() || nameField.getText().isEmpty())
-                            { nameField.setText(NO+SPACE+NAME); }
+                            { nameField.setText(TIMER+(Timer.timersCounter+1)); }
                         }
                         case HOUR+FIELD -> {
                             try {
@@ -260,41 +260,30 @@ public class TimerPanel2 extends ClockPanel
                 JTable table = (JTable)e.getSource();
                 int modelRow = Integer.valueOf( e.getActionCommand() );
                 String buttonAction = (String) table.getModel().getValueAt(modelRow, columnIndex);
-                Window window = SwingUtilities.windowForComponent(table);
 
-                int result = JOptionPane.showConfirmDialog(
-                        window,
-                        "Are you sure you want to " + buttonAction,
-                        "buttonAction Row Confirmation",
-                        JOptionPane.YES_NO_OPTION); // Yes = 0, No = 1
-
-                if (result == JOptionPane.YES_OPTION) // == 0
-                {
-                    // find the correct timer
-                    Timer timer = clockFrame.getListOfTimers().get(modelRow);
-                    switch (buttonAction) {
-                        case "Pause" -> {
-                            logger.info("Pausing timer at row: {}", modelRow);
-                            // pause timer
-                            timer.pauseTimer();
-                            // set button text to "Resume"
-                            table.getModel().setValueAt("Resume", modelRow, columnIndex);
-                        }
-                        case "Resume" -> {
-                            logger.info("Resuming timer at row: {}", modelRow);
-                            // resume timer
-                            timer.resumeTimer();
-                            // set button text to "Pause"
-                            table.getModel().setValueAt("Pause", modelRow, columnIndex);
-                        }
-                        case "Cancel" -> {
-                            logger.info("Cancelling timer at row: {}", modelRow);
-                            stopTimer(timer);
-                            timersAndFutures.remove(timer);
-                            clockFrame.getListOfTimers().remove(timer);
-                        }
+                // find the correct timer
+                Timer timer = clockFrame.getListOfTimers().get(modelRow);
+                switch (buttonAction) {
+                    case "Pause" -> {
+                        logger.info("Pausing {} at row: {}", timer, modelRow);
+                        // pause timer
+                        timer.pauseTimer();
+                        // set button text to "Resume"
+                        table.getModel().setValueAt("Resume", modelRow, columnIndex);
                     }
-
+                    case "Resume" -> {
+                        logger.info("Resuming {} at row: {}", timer, modelRow);
+                        // resume timer
+                        timer.resumeTimer();
+                        // set button text to "Pause"
+                        table.getModel().setValueAt("Pause", modelRow, columnIndex);
+                    }
+                    case "Cancel" -> {
+                        logger.info("Cancelling timer at row: {}", modelRow);
+                        stopTimer(timer);
+                        timersAndFutures.remove(timer);
+                        clockFrame.getListOfTimers().remove(timer);
+                    }
                 }
             }
         };
@@ -445,7 +434,7 @@ public class TimerPanel2 extends ClockPanel
      */
     public void setTimer(ActionEvent action)
     {
-        logger.debug("creating a new timer");
+        logger.debug("set timer");
         clock.entity.Timer timer = createTimer();
         logger.debug("timer created: {}", timer);
         clockFrame.getListOfTimers().add(timer);
@@ -468,14 +457,16 @@ public class TimerPanel2 extends ClockPanel
      */
     public clock.entity.Timer createTimer()
     {
-        logger.info("creating timer");
+        logger.debug("creating timer");
         clock.entity.Timer timer = null;
         try
         {
             if (validTextFields()) {
+                if (EMPTY.equals(nameField.getText())) nameField.setText(TIMER+(Timer.timersCounter+1));
                 if (EMPTY.equals(hourField.getText())) hourField.setText(ZERO);
                 if (EMPTY.equals(minuteField.getText())) minuteField.setText(ZERO);
                 if (EMPTY.equals(secondField.getText())) secondField.setText(ZERO);
+
                 timer = new clock.entity.Timer(Integer.parseInt(hourField.getText()), Integer.parseInt(minuteField.getText()),
                         Integer.parseInt(secondField.getText()), nameField.getText(), clockFrame.getClock());
             }
@@ -641,7 +632,10 @@ public class TimerPanel2 extends ClockPanel
      */
     public boolean areAllNotZeroes()
     {
-        boolean allNotZero = !ZERO.equals(hourField.getText()) && !ZERO.equals(minuteField.getText()) && !ZERO.equals(secondField.getText());
+        boolean hoursIsZero = ZERO.equals(hourField.getText());
+        boolean minutesIsZero = ZERO.equals(minuteField.getText());
+        boolean secondsIsZero = ZERO.equals(secondField.getText());
+        boolean allNotZero = !(hoursIsZero && minutesIsZero && secondsIsZero);
         logger.info("are all not zeroes: {}", allNotZero);
         return allNotZero;
     }

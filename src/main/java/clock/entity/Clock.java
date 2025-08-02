@@ -771,7 +771,7 @@ public class Clock implements Serializable, Comparable<Clock>
             List<Timer> timersGoingOff = clockFrame.getListOfTimers().stream()
                     .filter(Timer::isTimerGoingOff)
                             .toList();
-            logger.info("triggering {} timers", timersGoingOff.size());
+            logger.debug("triggering {} timers", timersGoingOff.size());
             timersGoingOff.forEach(Timer::triggerTimer);
         }
         else {
