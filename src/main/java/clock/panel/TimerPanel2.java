@@ -634,6 +634,9 @@ public class TimerPanel2 extends ClockPanel implements Runnable
     {
         logger.info("reset timer fields");
         clearTextFields();
+        timersTable.setModel(new javax.swing.table.DefaultTableModel());
+        clockFrame.getListOfTimers().clear();
+        logger.info("all timers cleared");
         resetButton.setEnabled(false);
         timerButton.setEnabled(false);
     }
