@@ -12,13 +12,11 @@ import org.codehaus.plexus.util.StringUtils;
 
 import javax.swing.*;
 import javax.swing.border.LineBorder;
-import javax.swing.table.AbstractTableModel;
 import javax.swing.table.DefaultTableModel;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.FocusEvent;
 import java.awt.event.FocusListener;
-import java.awt.event.KeyEvent;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -36,12 +34,11 @@ import static clock.util.Constants.*;
  * timers, and see them executing to the right
  * similar to the Alarm Panel view.
  */
-public class TimerPanel2 extends ClockPanel implements Runnable
+public class TimerPanel2 extends ClockPanel
 {
     private static final Logger logger = LogManager.getLogger(TimerPanel2.class);
     private GridBagLayout layout;
     private GridBagConstraints constraints;
-    private Thread thread = null;
     private JLabel nameLabel,
                    hoursLabel,
                    minutesLabel,
@@ -50,9 +47,8 @@ public class TimerPanel2 extends ClockPanel implements Runnable
                        hourField,
                        minuteField,
                        secondField;
-    private JButton timerButton;
+    private JButton setTimerButton;
     private JButton resetButton;
-    private JButton stopButton;
     private boolean disableTimerFunctionality;
     private AdvancedPlayer musicPlayer;
     private Map<Timer, ScheduledFuture<?>> timersAndFutures;
@@ -79,6 +75,7 @@ public class TimerPanel2 extends ClockPanel implements Runnable
         setBackground(Color.BLACK);
         setForeground(Color.BLACK);
         setupTimerPanel2();
+        setupSettingsMenu();
         addComponentsToPanel();
         SwingUtilities.updateComponentTreeUI(this);
         logger.info("Finished creating TimerPanel2 Panel");
@@ -135,7 +132,6 @@ public class TimerPanel2 extends ClockPanel implements Runnable
                 @Override
                 public void focusLost(FocusEvent e)
                 {
-                    enableDisableTimerButton();
                     switch (e.getSource() instanceof JTextField textField ? textField.getName() : null)
                     {
                         case NAME+FIELD -> {
@@ -149,12 +145,12 @@ public class TimerPanel2 extends ClockPanel implements Runnable
                                     int hour = Integer.parseInt(hourField.getText());
                                     if (hour < 24 && hour >= 0)
                                     {
-                                        timerButton.setText(SET);
+                                        setTimerButton.setText(SET);
                                         hourField.setBorder(new LineBorder(Color.ORANGE));
                                     }
                                     else
                                     {
-                                        timerButton.setText(TIMER_HOUR_ERROR_24);
+                                        setTimerButton.setText(TIMER_HOUR_ERROR_24);
                                         hourField.setBorder(new LineBorder(Color.RED));
                                         hourField.requestFocusInWindow();
                                     }
@@ -173,12 +169,12 @@ public class TimerPanel2 extends ClockPanel implements Runnable
                                     int minute = Integer.parseInt(minuteField.getText());
                                     if (minute < 60 && minute >= 0)
                                     {
-                                        timerButton.setText(SET);
+                                        setTimerButton.setText(SET);
                                         minuteField.setBorder(new LineBorder(Color.ORANGE));
                                     }
                                     else
                                     {
-                                        timerButton.setText(TIMER_MIN_ERROR);
+                                        setTimerButton.setText(TIMER_MIN_ERROR);
                                         minuteField.setBorder(new LineBorder(Color.RED));
                                         minuteField.requestFocusInWindow();
                                     }
@@ -197,12 +193,12 @@ public class TimerPanel2 extends ClockPanel implements Runnable
                                     int second = Integer.parseInt(secondField.getText());
                                     if (second < 60 && second >= 0)
                                     {
-                                        timerButton.setText(SET);
+                                        setTimerButton.setText(SET);
                                         secondField.setBorder(new LineBorder(Color.ORANGE));
                                     }
                                     else
                                     {
-                                        timerButton.setText(TIMER_SEC_ERROR);
+                                        setTimerButton.setText(TIMER_SEC_ERROR);
                                         secondField.setBorder(new LineBorder(Color.RED));
                                         secondField.requestFocusInWindow();
                                     }
@@ -217,6 +213,7 @@ public class TimerPanel2 extends ClockPanel implements Runnable
                         case null -> logger.warn("Lost focus on a text field with no name");
                         default -> throw new InvalidInputException("Lost focus on an unknown text field: " + e.getSource());
                     }
+                    enableDisableTimerButton();
                 }
             });
         });
@@ -224,25 +221,33 @@ public class TimerPanel2 extends ClockPanel implements Runnable
             label.setFont(ClockFrame.font20);
             label.setForeground(Color.WHITE);
         });
-        timerButton = new JButton(SET);
+        setTimerButton = new JButton(SET);
         resetButton = new JButton(RESET);
-        stopButton = new JButton(STOP);
-        List.of(timerButton, resetButton).forEach(button -> {
+        List.of(setTimerButton, resetButton).forEach(button -> {
             button.setFont(ClockFrame.font20);
             button.setOpaque(true);
             button.setBackground(Color.BLACK);
             button.setForeground(Color.WHITE);
             button.setBorder(new LineBorder(Color.WHITE));
         });
-        stopButton.addActionListener(this::stopAllTimers);
-        timerButton.addActionListener(this::setTimer);
-        timerButton.setEnabled(false);
+        setTimerButton.addActionListener(this::setTimer);
+        setTimerButton.setEnabled(false);
         resetButton.addActionListener(this::resetTimerPanel);
         resetButton.setEnabled(false);
         setupTimersTableDefaults(true);
 
         //scheduler = Executors.newScheduledThreadPool(10);
         timersAndFutures = new HashMap<>();
+    }
+
+    /**
+     * This method sets up the settings menu for the
+     * timer panel.
+     */
+    public void setupSettingsMenu()
+    {
+        clockFrame.clearSettingsMenu();
+        clockFrame.getClockMenuBar().getSettingsMenu().add(clockFrame.getClockMenuBar().getPauseResumeAllTimersSetting());
     }
 
     public Action buttonAction(int columnIndex)
@@ -359,11 +364,9 @@ public class TimerPanel2 extends ClockPanel implements Runnable
     public void updateTimersTable()
     {
         logger.info("update timers table");
+        clockFrame.getListOfTimers().forEach(Timer::performCountDown);
         setupTimersTableDefaults(false);
     }
-
-    // TODO: implement
-    // public void cancelTimer(Timer timer)
 
     /**
      * This method adds the components to the alarm panel
@@ -380,7 +383,7 @@ public class TimerPanel2 extends ClockPanel implements Runnable
         addComponent(secondsLabel,0,7,1,1, 0,0, 1, 0, GridBagConstraints.NONE, new Insets(0,0,0,0)); // M
         addComponent(secondField,0,8,1,1, 0,0, 1, 0, GridBagConstraints.BOTH, new Insets(0,0,0,0)); // textField
         addComponent(resetButton,0,9,1,1, 0,0, 1, 0, GridBagConstraints.NONE, new Insets(0,0,0,0));
-        addComponent(timerButton,0,10,1,1, 0,0, 1, 0, GridBagConstraints.NONE, new Insets(0,0,0,0)); // Set Timer
+        addComponent(setTimerButton,0,10,1,1, 0,0, 1, 0, GridBagConstraints.NONE, new Insets(0,0,0,0)); // Set Timer
 
         // leaving row 1 blank for spacing
 
@@ -433,57 +436,7 @@ public class TimerPanel2 extends ClockPanel implements Runnable
         var allAreNotZeroes = !(ZERO.equals(hourField.getText()) && ZERO.equals(minuteField.getText()) && ZERO.equals(secondField.getText()));
         var someNotBlank = areSomeNotBlank();
         logger.debug("enabled?: {}", allValid && allAreNotZeroes);
-        timerButton.setEnabled(allValid && allAreNotZeroes && someNotBlank);
-    }
-
-    /**
-     * Starts the timer panel
-     */
-    public void start()
-    {
-        logger.info("starting timer panel");
-        if (thread == null)
-        {
-            thread = new Thread(this);
-            thread.start();
-        }
-    }
-
-    public boolean isRunning() {
-        if (thread != null && thread.isAlive())
-        {
-            logger.debug("Timer thread is running");
-            return true;
-        }
-        else
-        {
-            logger.debug("Timer thread is not running");
-            return false;
-        }
-    }
-
-    /**
-     * Stops the timer clock
-     */
-    public void stop()
-    {
-        logger.info("stopping timer thread");
-        thread = null;
-    }
-
-    /**
-     * Called by start
-     */
-    @Override
-    public void run()
-    {
-        logger.info("starting timer panel");
-        while (thread != null)
-        {
-            try { sleep(1000); }
-            catch (InterruptedException e) { printStackTrace(e, e.getMessage());}
-            updateTimersTable();
-        }
+        setTimerButton.setEnabled(allValid && allAreNotZeroes && someNotBlank);
     }
 
     /**
@@ -492,21 +445,13 @@ public class TimerPanel2 extends ClockPanel implements Runnable
      */
     public void setTimer(ActionEvent action)
     {
-        logger.info("run");
-        if (SET.equals(timerButton.getText()))
-        {
-            clock.entity.Timer timer = createTimer();
-            startTimer(timer);
-            logger.info("timer created: {}", timer);
-            clockFrame.getListOfTimers().add(timer);
-            clearTextFields();
-            resetButton.setEnabled(true);
-            timerButton.setEnabled(false);
-        }
-        else if (RESUME_TIMER.equals(timerButton.getText()))
-        { resumeTimer(); }
-        else
-        { pauseTimer(); }
+        logger.debug("creating a new timer");
+        clock.entity.Timer timer = createTimer();
+        logger.debug("timer created: {}", timer);
+        clockFrame.getListOfTimers().add(timer);
+        clearTextFields();
+        resetButton.setEnabled(true);
+        setTimerButton.setEnabled(false);
     }
 
     /**
@@ -515,18 +460,7 @@ public class TimerPanel2 extends ClockPanel implements Runnable
     public void startTimer(clock.entity.Timer timer)
     {
         logger.info("starting countdown");
-        ScheduledFuture<?> future = clockFrame.getScheduler().scheduleAtFixedRate(timer::performCountDown, 0, 1, TimeUnit.SECONDS);
-        timersAndFutures.put(timer, future);
-        if (!clockFrame.getListOfTimers().isEmpty() && clockFrame.getCountdownFuture() == null) {
-            //future = clockFrame.getScheduler().scheduleAtFixedRate(this::resetJTextArea, 0, 1, TimeUnit.SECONDS);
-            clockFrame.setCountdownFuture(future);
-        }
-        //scheduler = Executors.newScheduledThreadPool(activeTimers.size());
-        //scheduler.scheduleAtFixedRate(this::performCountDown, 0, 1, TimeUnit.SECONDS);
-        //if (clock.getScheduler() == null || clock.getScheduler().isShutdown())
-        //{ scheduler = Executors.newScheduledThreadPool(activeTimers.size()); }
-        //if (countdownFuture == null || countdownFuture.isCancelled())
-        //{ countdownFuture = scheduler.scheduleAtFixedRate(this::performCountDown, 0, 1, TimeUnit.SECONDS); }
+        timer.performCountDown();
     }
 
     /**
@@ -546,7 +480,7 @@ public class TimerPanel2 extends ClockPanel implements Runnable
                         Integer.parseInt(secondField.getText()), nameField.getText(), clockFrame.getClock());
             }
             else {
-                logger.error("One of the textfields is not valid");
+                logger.error("One of the text fields is not valid");
             }
         }
         catch (InvalidInputException iie)
@@ -571,13 +505,7 @@ public class TimerPanel2 extends ClockPanel implements Runnable
         //enableTimerButton();
     }
 
-    public void stopAllTimers(ActionEvent actionEvent)
-    {
-        clockFrame.getListOfTimers().stream()
-                .parallel()
-                .filter(Timer::isHasBeenTriggered)
-                .forEach(this::stopTimer);
-    }
+
 
     /**
      * Pauses the timer
@@ -585,9 +513,9 @@ public class TimerPanel2 extends ClockPanel implements Runnable
     public void pauseTimer()
     {
         logger.info("pausing timer");
-        timerButton.setText(RESUME_TIMER);
-        timerButton.repaint();
-        timerButton.updateUI();
+        setTimerButton.setText(RESUME_TIMER);
+        setTimerButton.repaint();
+        setTimerButton.updateUI();
         //paused = true;
     }
 
@@ -597,9 +525,9 @@ public class TimerPanel2 extends ClockPanel implements Runnable
     public void resumeTimer()
     {
         logger.info("resuming timer");
-        timerButton.setText(PAUSE_TIMER);
-        timerButton.repaint();
-        timerButton.updateUI();
+        setTimerButton.setText(PAUSE_TIMER);
+        setTimerButton.repaint();
+        setTimerButton.updateUI();
         //paused = false;
     }
 
@@ -638,7 +566,7 @@ public class TimerPanel2 extends ClockPanel implements Runnable
         clockFrame.getListOfTimers().clear();
         logger.info("all timers cleared");
         resetButton.setEnabled(false);
-        timerButton.setEnabled(false);
+        setTimerButton.setEnabled(false);
     }
 
     /**
@@ -646,31 +574,14 @@ public class TimerPanel2 extends ClockPanel implements Runnable
      */
     public void clearTextFields()
     {
+        logger.debug("clearing timer fields");
         nameField.setText(EMPTY);
         hourField.setText(EMPTY);
         minuteField.setText(EMPTY);
         secondField.setText(EMPTY);
-        timerButton.setText(SET);
+        logger.debug("timer button set to {}", SET);
+        setTimerButton.setText(SET);
     }
-
-
-
-//    /**
-//     * Resets alarm label 4
-//     */
-//    public void resetJAlarmLabel4()
-//    {
-//        logger.info("reset alarm label 4");
-//        if (activeTimers.isEmpty())
-//        { alarmLabel4.setText(clockFrame.getClock().defaultText(10)); }// All Alarms label...
-//        else
-//        {
-//            alarmLabel4.setText(activeTimers.size() == 1
-//                            ? activeTimers.size() + SPACE+TIMER+SPACE+ADDED
-//                            : activeTimers.size() + SPACE+TIMER+S.toLowerCase()+SPACE+ADDED
-//            );
-//        }
-//    }
 
     /**
      * Validates the first text field
@@ -777,16 +688,6 @@ public class TimerPanel2 extends ClockPanel implements Runnable
     public void printStackTrace(Exception e)
     { printStackTrace(e, ""); }
 
-    /**
-     * This method sets up the settings menu for the
-     * timer panel.
-     */
-    public void setupSettingsMenu()
-    {
-        clockFrame.clearSettingsMenu();
-        logger.info("No settings defined for the Timer Panel");
-    }
-
     /* Getters */
     public GridBagLayout getGridBagLayout() { return this.layout; }
     public GridBagConstraints getGridBagConstraints() { return this.constraints; }
@@ -796,7 +697,7 @@ public class TimerPanel2 extends ClockPanel implements Runnable
     public JTextField getMinuteField() { return minuteField; }
     public JTextField getSecondField() { return secondField; }
     public JButton getResetButton() { return resetButton; }
-    public JButton getTimerButton() { return timerButton; }
+    public JButton getSetTimerButton() { return setTimerButton; }
     public Map<clock.entity.Timer, ScheduledFuture<?>> getTimersAndFutures() { return timersAndFutures; }
 
     /* Setters */
@@ -806,6 +707,6 @@ public class TimerPanel2 extends ClockPanel implements Runnable
     public void setHourField(JTextField hourField) { this.hourField = hourField; }
     public void setMinuteField(JTextField minuteField) { this.minuteField = minuteField; }
     public void setSecondField(JTextField secondField) { this.secondField = secondField; }
-    public void setTimerButton(JButton timerButton) { this.timerButton = timerButton; }
+    public void setSetTimerButton(JButton setTimerButton) { this.setTimerButton = setTimerButton; }
     public void setResetButton(JButton resetButton) { this.resetButton = resetButton; }
 }

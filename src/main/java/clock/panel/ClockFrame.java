@@ -164,8 +164,6 @@ public class ClockFrame extends JFrame implements IClockPanel, Runnable {
             dcp.stop();
         if (currentPanel instanceof AnalogueClockPanel acp)
             acp.stop();
-        if (currentPanel instanceof TimerPanel2 tp && tp.isRunning())
-            tp.stop();
         showPanel(clockPanel, resetValues);
         repaint();
         setVisible(true);

@@ -782,9 +782,7 @@ public class Clock implements Serializable, Comparable<Clock>
     public void updateTimersTable()
     {
         logger.info("updating timers table");
-        if (!clockFrame.getTimerPanel2().isRunning()) {
-            clockFrame.getTimerPanel2().start();
-        }
+        clockFrame.getTimerPanel2().updateTimersTable();
     }
 
 

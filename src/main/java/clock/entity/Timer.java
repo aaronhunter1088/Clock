@@ -24,7 +24,7 @@ import static java.lang.Thread.sleep;
  * @author michael ball
  *  @version 2.0
  */
-public class Timer  implements Serializable, Comparable<Timer>, Runnable
+public class Timer  implements Serializable, Comparable<Timer>
 {
     @Serial
     private static final long serialVersionUID = 2L;
@@ -36,6 +36,7 @@ public class Timer  implements Serializable, Comparable<Timer>, Runnable
             hasBeenStarted, hasBeenTriggered,
             stopTimer;
     private Clock clock;
+    private Thread self;
     private LocalTime countDown;
     private AdvancedPlayer musicPlayer;
 
@@ -169,17 +170,15 @@ public class Timer  implements Serializable, Comparable<Timer>, Runnable
      */
     public void performCountDown()
     {
-        if (paused && !hasBeenStarted) {
+        if (!hasBeenStarted && !paused) { // was paused && !hasBeenStarted
             hasBeenStarted = true;
-            paused = false;
-            run();
+            innerCountDown();
         } else if (!paused) {
-            run();
+            innerCountDown();
         }
     }
 
-    @Override
-    public void run()
+    public void innerCountDown()
     {
         logger.info("timer ticking down...");
         countDown = countDown.minusSeconds(1);
