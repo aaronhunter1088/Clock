@@ -1,6 +1,5 @@
 package clock.panel;
 
-import clock.contract.IClockPanel;
 import clock.entity.Clock;
 import javazoom.jl.decoder.JavaLayerException;
 import javazoom.jl.player.advanced.AdvancedPlayer;
@@ -125,7 +124,7 @@ public class TimerPanel extends ClockPanel
                     }
                     else
                     {
-                        timerButton.setText(TIMER_HOUR_ERROR);
+                        timerButton.setText(TIMER_HOUR_ERROR_24);
                         timerButton.repaint();
                         timerButton.updateUI();
                         hourField.grabFocus();

@@ -91,6 +91,7 @@ public class ClockFrame extends JFrame implements IClockPanel, Runnable {
         final Taskbar taskbar = Taskbar.getTaskbar();
         taskbar.setIconImage(icon.getImage());
         setIconImage(icon.getImage());
+        setLocationRelativeTo(null); // loads the GUI in the center of the screen
         setVisible(true);
         setResizable(false);
         if (testing != null && testing.isTestingClock()) {
@@ -163,6 +164,8 @@ public class ClockFrame extends JFrame implements IClockPanel, Runnable {
             dcp.stop();
         if (currentPanel instanceof AnalogueClockPanel acp)
             acp.stop();
+        if (currentPanel instanceof TimerPanel2 tp && tp.isRunning())
+            tp.stop();
         showPanel(clockPanel, resetValues);
         repaint();
         setVisible(true);
@@ -181,7 +184,7 @@ public class ClockFrame extends JFrame implements IClockPanel, Runnable {
             case PANEL_DIGITAL_CLOCK -> changeToDigitalClockPanel();
             case PANEL_ANALOGUE_CLOCK -> changeToAnalogueClockPanel();
             case PANEL_ALARM -> changeToAlarmPanel(resetValues);
-            case PANEL_TIMER -> changeToTimerPanel2();
+            case PANEL_TIMER -> changeToTimerPanel();
             case PANEL_TIMER2 -> changeToTimerPanel2();
             //case PANEL_STOPWATCH -> changeToStopwatchPanel();
         }
@@ -264,8 +267,7 @@ public class ClockFrame extends JFrame implements IClockPanel, Runnable {
         currentPanel = timerPanel2;
         setSize(clockDefaultSize);
         clockPanel = PANEL_TIMER2;
-        timerPanel.setupSettingsMenu();
-        timerPanel.updateLabels();
+        timerPanel2.setupSettingsMenu();
     }
 
 //    public void changeToStopwatchPanel()
@@ -335,9 +337,8 @@ public class ClockFrame extends JFrame implements IClockPanel, Runnable {
         scheduler.scheduleAtFixedRate(taskRunner.apply(clock::tick), 0, 1, TimeUnit.SECONDS);
         scheduler.scheduleAtFixedRate(taskRunner.apply(clock::setActiveAlarms), 0, 1, TimeUnit.SECONDS);
         scheduler.scheduleAtFixedRate(taskRunner.apply(clock::triggerAlarms), 0, 1, TimeUnit.SECONDS);
-        scheduler.scheduleAtFixedRate(taskRunner.apply(clock::checkIfAnyTimersAreGoingOff), 0, 1, TimeUnit.SECONDS);
-        scheduler.scheduleAtFixedRate(taskRunner.apply(clock::checkIfItIsNewYears), 0, 1, TimeUnit.SECONDS);
-        //scheduler.scheduleAtFixedRate(taskRunner.apply(this::setTheCurrentTime), 0, 1, TimeUnit.SECONDS);
+        scheduler.scheduleAtFixedRate(taskRunner.apply(clock::updateTimersTable), 0, 1, TimeUnit.SECONDS);
+        scheduler.scheduleAtFixedRate(taskRunner.apply(clock::triggerTimers), 0, 1, TimeUnit.SECONDS);
     }
 
     /**

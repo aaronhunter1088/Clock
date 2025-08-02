@@ -1,10 +1,9 @@
 package clock.panel;
 
-import clock.entity.Alarm;
+import clock.entity.ButtonColumn;
 import clock.entity.Clock;
 import clock.entity.Timer;
 import clock.exception.InvalidInputException;
-import javazoom.jl.decoder.JavaLayerException;
 import javazoom.jl.player.advanced.AdvancedPlayer;
 import org.apache.commons.lang3.math.NumberUtils;
 import org.apache.logging.log4j.LogManager;
@@ -13,12 +12,13 @@ import org.codehaus.plexus.util.StringUtils;
 
 import javax.swing.*;
 import javax.swing.border.LineBorder;
+import javax.swing.table.AbstractTableModel;
+import javax.swing.table.DefaultTableModel;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.FocusEvent;
 import java.awt.event.FocusListener;
-import java.io.InputStream;
-import java.util.ArrayList;
+import java.awt.event.KeyEvent;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -36,11 +36,12 @@ import static clock.util.Constants.*;
  * timers, and see them executing to the right
  * similar to the Alarm Panel view.
  */
-public class TimerPanel2 extends ClockPanel
+public class TimerPanel2 extends ClockPanel implements Runnable
 {
     private static final Logger logger = LogManager.getLogger(TimerPanel2.class);
     private GridBagLayout layout;
     private GridBagConstraints constraints;
+    private Thread thread = null;
     private JLabel nameLabel,
                    hoursLabel,
                    minutesLabel,
@@ -60,8 +61,6 @@ public class TimerPanel2 extends ClockPanel
     private JTable timersTable;
     private JScrollPane scrollTable;
     private ClockFrame clockFrame;
-    //private JPanel setupTimerPanel;
-    private List<clock.entity.Timer> activeTimers;
 
     /**
      * Main constructor for creating the TimerPanel2
@@ -80,7 +79,6 @@ public class TimerPanel2 extends ClockPanel
         setBackground(Color.BLACK);
         setForeground(Color.BLACK);
         setupTimerPanel2();
-        setupMusicPlayer();
         addComponentsToPanel();
         SwingUtilities.updateComponentTreeUI(this);
         logger.info("Finished creating TimerPanel2 Panel");
@@ -149,34 +147,20 @@ public class TimerPanel2 extends ClockPanel
                                 if (StringUtils.isNotBlank(hourField.getText()) && Integer.parseInt(hourField.getText()) >= 0)
                                 {
                                     int hour = Integer.parseInt(hourField.getText());
-                                    if (clockFrame.getClock().isShowMilitaryTime()) {
-                                        if (hour < 24 && hour >= 0)
-                                        {
-                                            timerButton.setText(SET);
-                                            hourField.setBorder(new LineBorder(Color.ORANGE));
-                                        }
-                                        else
-                                        {
-                                            timerButton.setText(TIMER_HOUR_ERROR);
-                                            hourField.setBorder(new LineBorder(Color.RED));
-                                            hourField.requestFocusInWindow();
-                                        }
+                                    if (hour < 24 && hour >= 0)
+                                    {
+                                        timerButton.setText(SET);
+                                        hourField.setBorder(new LineBorder(Color.ORANGE));
                                     }
-                                    else {
-                                        if (hour < 12 && hour >= 0)
-                                        {
-                                            timerButton.setText(SET);
-                                            hourField.setBorder(new LineBorder(Color.ORANGE));
-                                        }
-                                        else
-                                        {
-                                            timerButton.setText(TIMER_HOUR_ERROR);
-                                            hourField.setBorder(new LineBorder(Color.RED));
-                                            hourField.requestFocusInWindow();
-                                        }
+                                    else
+                                    {
+                                        timerButton.setText(TIMER_HOUR_ERROR_24);
+                                        hourField.setBorder(new LineBorder(Color.RED));
+                                        hourField.requestFocusInWindow();
                                     }
                                 }
-                            } catch (NumberFormatException ignored) {
+                            }
+                            catch (NumberFormatException ignored) {
                                 logger.warn("Hour field is not a number: {}", hourField.getText());
                                 hourField.setBorder(new LineBorder(Color.RED));
                                 hourField.requestFocusInWindow();
@@ -199,7 +183,8 @@ public class TimerPanel2 extends ClockPanel
                                         minuteField.requestFocusInWindow();
                                     }
                                 }
-                            } catch (NumberFormatException ignored) {
+                            }
+                            catch (NumberFormatException ignored) {
                                 logger.warn("Minute field is not a number: {}", minuteField.getText());
                                 minuteField.setBorder(new LineBorder(Color.RED));
                                 minuteField.requestFocusInWindow();
@@ -222,7 +207,8 @@ public class TimerPanel2 extends ClockPanel
                                         secondField.requestFocusInWindow();
                                     }
                                 }
-                            } catch (NumberFormatException ignored) {
+                            }
+                            catch (NumberFormatException ignored) {
                                 logger.warn("Second field is not a number: {}", secondField.getText());
                                 secondField.setBorder(new LineBorder(Color.RED));
                                 secondField.requestFocusInWindow();
@@ -249,30 +235,135 @@ public class TimerPanel2 extends ClockPanel
             button.setBorder(new LineBorder(Color.WHITE));
         });
         stopButton.addActionListener(this::stopAllTimers);
-        timerButton.addActionListener(this::run);
+        timerButton.addActionListener(this::setTimer);
         timerButton.setEnabled(false);
         resetButton.addActionListener(this::resetTimerPanel);
         resetButton.setEnabled(false);
-        //alarmLabel4 = new JLabel(CURRENT_ALARMS, SwingConstants.CENTER); // Current Alarms
-        //alarmLabel4.setFont(ClockFrame.font20); // All Alarms
-        //alarmLabel4.setForeground(Color.WHITE);
-        Object[][] data = clockFrame.getListOfTimers().stream()
-                .map(timer -> new Object[] { timer.getName() != null ? timer.getName() : timer.toString(),
-                        timer.getHours(), timer.getMinutes(), timer.getSeconds() })
-                .toArray(Object[][]::new);
-        timersTable = new JTable(data, new String[]{"Name", "Hours", "Minutes", "Seconds"});
-        timersTable.setPreferredScrollableViewportSize(new Dimension(400, 300));
-        timersTable.setFillsViewportHeight(true);
-        timersTable.setFont(ClockFrame.font10);
-        timersTable.setForeground(Color.WHITE);
-        timersTable.setBackground(Color.BLACK);
-        scrollTable = new JScrollPane(timersTable);
+        setupTimersTableDefaults(true);
 
-        setBackground(Color.BLACK);
         //scheduler = Executors.newScheduledThreadPool(10);
         timersAndFutures = new HashMap<>();
-        activeTimers = new ArrayList<>();
     }
+
+    public Action buttonAction(int columnIndex)
+    {
+        return new AbstractAction()
+        {
+            public void actionPerformed(ActionEvent e)
+            {
+
+                JTable table = (JTable)e.getSource();
+                int modelRow = Integer.valueOf( e.getActionCommand() );
+                String buttonAction = (String) table.getModel().getValueAt(modelRow, columnIndex);
+                Window window = SwingUtilities.windowForComponent(table);
+
+                int result = JOptionPane.showConfirmDialog(
+                        window,
+                        "Are you sure you want to " + buttonAction,
+                        "buttonAction Row Confirmation",
+                        JOptionPane.YES_NO_OPTION); // Yes = 0, No = 1
+
+                if (result == JOptionPane.YES_OPTION) // == 0
+                {
+                    // find the correct timer
+                    Timer timer = clockFrame.getListOfTimers().get(modelRow);
+                    switch (buttonAction) {
+                        case "Pause" -> {
+                            logger.info("Pausing timer at row: {}", modelRow);
+                            // pause timer
+                            timer.pauseTimer();
+                            // set button text to "Resume"
+                            table.getModel().setValueAt("Resume", modelRow, columnIndex);
+                        }
+                        case "Resume" -> {
+                            logger.info("Resuming timer at row: {}", modelRow);
+                            // resume timer
+                            timer.resumeTimer();
+                            // set button text to "Pause"
+                            table.getModel().setValueAt("Pause", modelRow, columnIndex);
+                        }
+                        case "Cancel" -> {
+                            logger.info("Cancelling timer at row: {}", modelRow);
+                            stopTimer(timer);
+                            timersAndFutures.remove(timer);
+                            clockFrame.getListOfTimers().remove(timer);
+                        }
+                    }
+
+                }
+            }
+        };
+    }
+
+    /**
+     * Gets the data for the timers table
+     * @return the data for the timers table
+     */
+    public Object[][] getTimersTableData()
+    {
+        return clockFrame.getListOfTimers().stream()
+                .map(timer -> new Object[] {
+                        timer.getName() != null ? timer.getName() : timer.toString(),
+                        timer.getCountdown(),
+                        "Pause",
+                        "Cancel"
+                         })
+                .toArray(Object[][]::new);
+    }
+
+    /**
+     * Gets the column names for the timers table
+     * @return the column names for the timers table
+     */
+    public String[] getTimersTableColumnNames()
+    {
+        return new String[]{"Name", "Countdown", "Resume/Pause", "Cancel"};
+    }
+
+    /**
+     * Sets the default values for the timers table
+     */
+    public void setupTimersTableDefaults(boolean setup)
+    {
+        Object[][] data = getTimersTableData();
+        String[] columnNames = getTimersTableColumnNames();
+        if (setup) {
+            timersTable = new JTable(new DefaultTableModel(data, columnNames));
+            timersTable.setPreferredScrollableViewportSize(timersTable.getPreferredSize());//thanks mKorbel +1 http://stackoverflow.com/questions/10551995/how-to-set-jscrollpane-layout-to-be-the-same-as-jtable
+            timersTable.setFont(ClockFrame.font10);
+            timersTable.setBackground(Color.BLACK);
+            timersTable.setForeground(Color.WHITE);
+            timersTable.setFillsViewportHeight(true);
+            scrollTable = new JScrollPane(timersTable);
+        } else {
+            // only update if the timers count changes
+            if(timersTable.getModel().getRowCount() != data.length) {
+                timersTable.setModel(new javax.swing.table.DefaultTableModel(data, columnNames));
+                ButtonColumn buttonColumn = new ButtonColumn(timersTable, buttonAction(2), 2);
+                ButtonColumn buttonColumn2 = new ButtonColumn(timersTable, buttonAction(3), 3);
+            } else {
+                int tableRows = timersTable.getModel().getRowCount();
+                clockFrame.getListOfTimers().forEach(timer -> {
+                   for(int i=0; i<tableRows; i++) {
+                       String currentTimer = timersTable.getValueAt(i, 0).toString();
+                       if (currentTimer.equals(timer.getName())) {
+                           timersTable.setValueAt(timer.getCountdown(), i, 1);
+                       }
+                   }
+                });
+            }
+        }
+
+    }
+
+    public void updateTimersTable()
+    {
+        logger.info("update timers table");
+        setupTimersTableDefaults(false);
+    }
+
+    // TODO: implement
+    // public void cancelTimer(Timer timer)
 
     /**
      * This method adds the components to the alarm panel
@@ -339,27 +430,76 @@ public class TimerPanel2 extends ClockPanel
     {
         logger.debug("enable timer button");
         var allValid = validateFirstTextField() && validateSecondTextField() && validateThirdTextField();
-        var allNotZeroes = !ZERO.equals(hourField.getText()) && !ZERO.equals(minuteField.getText()) && !ZERO.equals(secondField.getText());
+        var allAreNotZeroes = !(ZERO.equals(hourField.getText()) && ZERO.equals(minuteField.getText()) && ZERO.equals(secondField.getText()));
         var someNotBlank = areSomeNotBlank();
-        logger.debug("enabled?: {}", allValid && allNotZeroes);
-        timerButton.setEnabled(allValid && allNotZeroes && someNotBlank);
+        logger.debug("enabled?: {}", allValid && allAreNotZeroes);
+        timerButton.setEnabled(allValid && allAreNotZeroes && someNotBlank);
+    }
+
+    /**
+     * Starts the timer panel
+     */
+    public void start()
+    {
+        logger.info("starting timer panel");
+        if (thread == null)
+        {
+            thread = new Thread(this);
+            thread.start();
+        }
+    }
+
+    public boolean isRunning() {
+        if (thread != null && thread.isAlive())
+        {
+            logger.debug("Timer thread is running");
+            return true;
+        }
+        else
+        {
+            logger.debug("Timer thread is not running");
+            return false;
+        }
+    }
+
+    /**
+     * Stops the timer clock
+     */
+    public void stop()
+    {
+        logger.info("stopping timer thread");
+        thread = null;
+    }
+
+    /**
+     * Called by start
+     */
+    @Override
+    public void run()
+    {
+        logger.info("starting timer panel");
+        while (thread != null)
+        {
+            try { sleep(1000); }
+            catch (InterruptedException e) { printStackTrace(e, e.getMessage());}
+            updateTimersTable();
+        }
     }
 
     /**
      * Executes when we hit the timer button
      * @param action the action event
      */
-    public void run(ActionEvent action)
+    public void setTimer(ActionEvent action)
     {
         logger.info("run");
         if (SET.equals(timerButton.getText()))
         {
             clock.entity.Timer timer = createTimer();
+            startTimer(timer);
             logger.info("timer created: {}", timer);
             clockFrame.getListOfTimers().add(timer);
-            startTimer(timer);
             clearTextFields();
-            updateTimersTable();
             resetButton.setEnabled(true);
             timerButton.setEnabled(false);
         }
@@ -377,7 +517,7 @@ public class TimerPanel2 extends ClockPanel
         logger.info("starting countdown");
         ScheduledFuture<?> future = clockFrame.getScheduler().scheduleAtFixedRate(timer::performCountDown, 0, 1, TimeUnit.SECONDS);
         timersAndFutures.put(timer, future);
-        if (!activeTimers.isEmpty() && clockFrame.getCountdownFuture() == null) {
+        if (!clockFrame.getListOfTimers().isEmpty() && clockFrame.getCountdownFuture() == null) {
             //future = clockFrame.getScheduler().scheduleAtFixedRate(this::resetJTextArea, 0, 1, TimeUnit.SECONDS);
             clockFrame.setCountdownFuture(future);
         }
@@ -404,9 +544,6 @@ public class TimerPanel2 extends ClockPanel
                 if (EMPTY.equals(secondField.getText())) secondField.setText(ZERO);
                 timer = new clock.entity.Timer(Integer.parseInt(hourField.getText()), Integer.parseInt(minuteField.getText()),
                         Integer.parseInt(secondField.getText()), nameField.getText(), clockFrame.getClock());
-                activeTimers.add(timer);
-                //resetJTextArea();
-                //resetJAlarmLabel4();
             }
             else {
                 logger.error("One of the textfields is not valid");
@@ -436,7 +573,7 @@ public class TimerPanel2 extends ClockPanel
 
     public void stopAllTimers(ActionEvent actionEvent)
     {
-        activeTimers.stream()
+        clockFrame.getListOfTimers().stream()
                 .parallel()
                 .filter(Timer::isHasBeenTriggered)
                 .forEach(this::stopTimer);
@@ -482,7 +619,8 @@ public class TimerPanel2 extends ClockPanel
 //                    .parallel()
 //                    .forEach(Timer::performCountDown);
             //scheduler = Executors.newScheduledThreadPool(activeTimers.size());
-            activeTimers.forEach(timer -> clockFrame.getScheduler().scheduleAtFixedRate(timer::performCountDown, 0, 1, TimeUnit.SECONDS));
+            clockFrame.getListOfTimers().forEach(timer -> clockFrame.getScheduler()
+                    .scheduleAtFixedRate(timer::performCountDown, 0, 1, TimeUnit.SECONDS));
 
             //resetJTextArea(); // leave here
         }
@@ -512,43 +650,7 @@ public class TimerPanel2 extends ClockPanel
         timerButton.setText(SET);
     }
 
-    public void updateTimersTable()
-    {
-        logger.info("update timers table");
-        Object[][] data = clockFrame.getListOfTimers().stream()
-                .map(timer -> new Object[] { timer.getName() != null ? timer.getName() : timer.toString(),
-                        timer.getHours(), timer.getMinutes(), timer.getSeconds() })
-                .toArray(Object[][]::new);
-        timersTable.setModel(new javax.swing.table.DefaultTableModel(data, new String[]{"Name", "Hours", "Minutes", "Seconds"}));
-        timersTable.setFillsViewportHeight(true);
-        timersTable.setFont(ClockFrame.font10);
-        timersTable.setForeground(Color.WHITE);
-        timersTable.setBackground(Color.BLACK);
-        //timersTable = new JTable(data, new String[]{"Name", "Hours", "Minutes", "Seconds"});
-        scrollTable.repaint();
-        scrollTable.updateUI();
-    }
 
-    /**
-     * Defines the music player object
-     */
-    public void setupMusicPlayer()
-    {
-        logger.info("setup music player");
-        InputStream inputStream = null;
-        try
-        {
-            inputStream = ClassLoader.getSystemResourceAsStream("sounds/alarmSound1.mp3");
-            if (null != inputStream) { musicPlayer = new AdvancedPlayer(inputStream); }
-            else throw new NullPointerException();
-        }
-        catch (NullPointerException | JavaLayerException e)
-        {
-            logger.error("Music Player not set!");
-            if (null == inputStream) printStackTrace(e, "An issue occurred while reading the alarm file.");
-            else printStackTrace(e, "A JavaLayerException occurred: " + e.getMessage());
-        }
-    }
 
 //    /**
 //     * Resets alarm label 4
@@ -648,172 +750,6 @@ public class TimerPanel2 extends ClockPanel
                 && areAllNotZeroes() && areSomeNotBlank();
     }
 
-    // TODO: Update for Timers
-    /**
-     * Adds the alarm to the menu
-     * @param alarm the alarm to set
-     */
-    public void addAlarmToAlarmMenu(Alarm alarm)
-    {
-        logger.info("adding alarm to alarm menu");
-        JMenuItem alarmItem = new JMenuItem(alarm.toString());
-        alarmItem.setForeground(Color.WHITE);
-        alarmItem.setBackground(Color.BLACK);
-        logger.info("Size of viewAlarms before adding " + clockFrame.getClockMenuBar().getAlarmFeature_Menu().getItemCount());
-        clockFrame.getClockMenuBar().getAlarmFeature_Menu().add(alarmItem);
-        logger.info("Size of viewAlarms after adding " + clockFrame.getClockMenuBar().getAlarmFeature_Menu().getItemCount());
-    }
-
-    // TODO: Update for Timers
-    /**
-     * Removes an alarm from the list in the menu
-     * @param alarm the alarm to remove
-     */
-    public void deleteAlarmMenuItemFromViewAlarms(Alarm alarm)
-    {
-        logger.info("delete alarm menu item from view alarms");
-        logger.info("Size of viewAlarms before removal {}", clockFrame.getClockMenuBar().getAlarmFeature_Menu().getItemCount());
-        for(int i=0; i<clockFrame.getClockMenuBar().getAlarmFeature_Menu().getItemCount(); i++)
-        {
-            if (clockFrame.getClockMenuBar().getAlarmFeature_Menu().getItem(i).getText().equals(alarm.toString()))
-            { clockFrame.getClockMenuBar().getAlarmFeature_Menu().remove(clockFrame.getClockMenuBar().getAlarmFeature_Menu().getItem(i)); }
-        }
-        logger.info("Size of viewAlarms after removal {}", clockFrame.getClockMenuBar().getAlarmFeature_Menu().getItemCount());
-    }
-
-//    /**
-//     * Resets the text area
-//     */
-//    public void resetJTextArea()
-//    {
-//        logger.info("reset textarea");
-//        textArea.setText(EMPTY);
-//        for(clock.entity.Timer timer : activeTimers)
-//        {
-//            if (!textArea.getText().isEmpty())
-//            { textArea.append(NEWLINE); }
-//            textArea.append(timer+NEWLINE);
-//        }
-//    }
-
-    // TODO: Update for Timers
-    /**
-     * Sets an alarm to go off
-     * @param executor the executor service
-     */
-    public void triggerAlarm(ExecutorService executor)
-    {
-        logger.info("trigger timer");
-        // TODO: Update for Timer
-        //setAlarmIsGoingOff(true);
-        //clock.getDigitalClockPanel().updateLabels();
-        //clock.getDigitalClockPanel().getLabel1().setText(activeAlarm.toString());
-        //clock.getDigitalClockPanel().getLabel2().setText("is going off!");
-        // play sound
-        Callable<String> c = () -> {
-            try
-            {
-                setupMusicPlayer();
-                logger.debug("while alarm is going off, play sound");
-                // TODO: Update for Timer
-                //while (getActiveAlarm().alarmGoingOff)
-                //{ getMusicPlayer().play(50); }
-                logger.debug("timer has stopped");
-                return "Timer triggered";
-            }
-            catch (Exception e)
-            {
-                logger.error(e.getCause().getClass().getName() + " - " + e.getMessage());
-                printStackTrace(e);
-                setupMusicPlayer();
-                getMusicPlayer().play(50);
-                return "Reset music player required";
-            }
-        };
-        executor.submit(c);
-    }
-
-    // TODO: Update for Timers
-    /**
-     * Stops an actively going off alarm
-     */
-    void stopAlarm()
-    {
-        logger.info("stop timer");
-        musicPlayer = null;
-        // TODO: Update for Timer, maybe timerIsGoingOff = false;
-        //alarmIsGoingOff = false;
-        // TODO: Update for Timer, maybe timer.toString...
-        //logger.info(alarm.toString()+" alarm turned off.");
-    }
-
-    // TODO: Update for Timers
-    /**
-     * Adds alarms created to the menu
-     */
-    public void setupAlarmsInMenuFunctionality()
-    {
-        // get the view alarms menu
-        // for each except the Set Alarms (option1)
-        // create an action listener which
-        // takes the alarmClock, set the hour, min, and ampm
-        // in the textFields, and we will set a boolean to true
-        // which will allow editing the textFields to any value
-        // changing all values to 0 or explicitly Time to 0
-        // will delete the alarm
-        // changing the values and clicking Set will save the alarm
-        //05:06:00 PM
-        logger.info("setup timers in menu functionality");
-        // TODO: Update for TimersFeature_Menu
-        for(int i=0; i<clockFrame.getClockMenuBar().getAlarmFeature_Menu().getItemCount(); i++)
-        {
-            if (!"Set Timers".equals(clockFrame.getClockMenuBar().getAlarmFeature_Menu().getItem(i).getText()))
-            {
-                JMenuItem menuItem = clockFrame.getClockMenuBar().getAlarmFeature_Menu().getItem(i);
-                menuItem.addActionListener(action -> {
-                    clockFrame.getListOfAlarms().forEach(alarm -> {
-                        // TODO: Update for Timers
-                        //if (alarm.toString().equals(menuItem.getText()))
-                        //{ this.alarm = alarm; }
-                    });
-                    if (musicPlayer == null) { setupMusicPlayer(); }
-                    // if an alarm is going off and we clicked on it in the menuBar
-//                    if (activeAlarm != null)
-//                    {
-//                        alarm = activeAlarm;
-//                        if (musicPlayer != null) { stopAlarm(); }
-//                        else { logger.warn("Music player is null!"); }
-//                        setCheckBoxesIfWasSelected(alarm);
-//                        alarm.setIsAlarmGoingOff(false);
-//                        alarm.setIsAlarmUpdating(true); // this and the boolean below we want true
-//                        updatingAlarm = true; // we want to continue with the logic that's done in the next if
-//                        activeAlarm = null;
-//                        logger.info("Size of listOfAlarms before removing {}", clock.getListOfAlarms().size());
-//                        // remove alarm from list of alarms
-//                        clock.getListOfAlarms().remove(getAlarm());
-//                        logger.info("Size of listOfAlarms after removing {}", clock.getListOfAlarms().size());
-//                        deleteAlarmMenuItemFromViewAlarms(alarm);
-//                        resetJTextArea();
-//                        clock.getAlarmPanel().getJTextField1().setText(getAlarm().getHoursAsStr());
-//                        clock.getAlarmPanel().getJTextField2().setText(getAlarm().getMinutesAsStr());
-//                        clock.getAlarmPanel().getJTextField3().setText(getAlarm().getAMPM());
-//                        alarmLabel4.setText("Alarm off.");
-//                    }
-                    // we are updating an alarm by clicking on it in the menuBar
-                    //else if (alarm != null)
-                    //{
-                        // TODO: Update for Timers
-                        //updateTheAlarm(alarm);
-                        //hourField.setText(alarm.getHoursAsStr());
-                        //minuteField.setText(alarm.getMinutesAsStr());
-                        //secondField.setText(alarm.getAMPM());
-                    //}
-                    clockFrame.changePanels(PANEL_TIMER, false);
-                });
-            }
-        }
-    }
-
     /**
      * This method prints the stack trace of an exception
      * that may occur when the digital panel is in use.
@@ -852,9 +788,6 @@ public class TimerPanel2 extends ClockPanel
     public GridBagLayout getGridBagLayout() { return this.layout; }
     public GridBagConstraints getGridBagConstraints() { return this.constraints; }
     public Clock getClock() { return clockFrame.getClock(); }
-    //public JLabel getJAlarmLbl4() { return this.alarmLabel4; } // All alarms }
-    public AdvancedPlayer getMusicPlayer() { return musicPlayer; }
-    public List<clock.entity.Timer> getActiveTimers() { return activeTimers; }
     public boolean isDisableTimerFunctionality() { return disableTimerFunctionality; }
     public JTextField getHourField() { return hourField; }
     public JTextField getMinuteField() { return minuteField; }
@@ -866,10 +799,7 @@ public class TimerPanel2 extends ClockPanel
     /* Setters */
     protected void setGridBagLayout(GridBagLayout layout) { this.layout = layout; }
     protected void setGridBagConstraints(GridBagConstraints constraints) { this.constraints = constraints; }
-    //protected void setJAlarmLbl4(JLabel alarmLabel4) { this.alarmLabel4 = alarmLabel4; }
-    protected void setMusicPlayer(AdvancedPlayer musicPlayer) { this.musicPlayer = musicPlayer; }
     public void setClock(Clock clock) { this.clockFrame.setClock(clock); }
-    public void setActiveTimers(List<clock.entity.Timer> activeTimers) { this.activeTimers = activeTimers; }
     public void setHourField(JTextField hourField) { this.hourField = hourField; }
     public void setMinuteField(JTextField minuteField) { this.minuteField = minuteField; }
     public void setSecondField(JTextField secondField) { this.secondField = secondField; }

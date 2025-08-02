@@ -1,4 +1,4 @@
-package clock;
+package clock.examples;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;

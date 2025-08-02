@@ -67,9 +67,9 @@ public class DigitalClockPanel extends ClockPanel implements Runnable
         setLayout(layout);
         setGridBagConstraints(new GridBagConstraints());
         //constraints.fill = GridBagConstraints.HORIZONTAL;
-        setBackground(Color.WHITE);
+        setBackground(Color.BLACK);
         setBorder(BorderFactory.createLineBorder(Color.BLACK));
-        setForeground(Color.BLACK);
+        setForeground(Color.WHITE);
         start(this);
     }
 
@@ -113,6 +113,7 @@ public class DigitalClockPanel extends ClockPanel implements Runnable
     /**
      * Repaints the digital clock after it has been updated
      */
+    @Override
     public void run()
     {
         logger.info("starting digital clock");
@@ -182,7 +183,7 @@ public class DigitalClockPanel extends ClockPanel implements Runnable
         // Show which timer is going off
         else if (clockFrame.getCurrentPanel() instanceof TimerPanel2 timerPanel)
         {
-            var activeTimers = timerPanel.getActiveTimers().stream().filter(Timer::isTimerGoingOff).toList();
+            var activeTimers = clockFrame.getListOfTimers().stream().filter(Timer::isTimerGoingOff).toList();
             dateStr = activeTimers.size() == 1 ? "One Timer" : "Many Timers";
             timeStr = activeTimers.size() == 1 ? is+SPACE+going_off : are+SPACE+going_off;
         }

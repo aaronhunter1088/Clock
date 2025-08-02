@@ -91,7 +91,8 @@ public class Constants {
     public static final String MIN = "Min";
     public static final String SEC = "Sec";
     public static final String ZERO = "0";
-    public static final String TIMER_HOUR_ERROR = "0 <= "+HOUR+" > 24";
+    public static final String TIMER_HOUR_ERROR_24 = "0 <= "+HOUR+" > 24";
+    public static final String TIMER_HOUR_ERROR_12 = "0 <= "+HOUR+" > 12";
     public static final String TIMER_MIN_ERROR = "0 <= "+MIN+" > 60";
     public static final String TIMER_SEC_ERROR = "0 <= "+SEC+" > 60";
     public static final String CURRENT_TIMERS = "Current Timers";

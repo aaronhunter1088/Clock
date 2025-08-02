@@ -11,6 +11,8 @@ import java.io.InputStream;
 import java.io.Serial;
 import java.io.Serializable;
 import java.time.LocalTime;
+import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutorService;
 
 import static clock.util.Constants.*;
 import static java.lang.Thread.sleep;
@@ -27,7 +29,7 @@ public class Timer  implements Serializable, Comparable<Timer>, Runnable
     @Serial
     private static final long serialVersionUID = 2L;
     private static final Logger logger = LogManager.getLogger(Timer.class);
-    private static long timersCounter = 0L;
+    public static long timersCounter = 0L;
     private int hours, minutes, seconds;
     private String hoursAsStr, minutesAsStr, secondsAsStr, name;
     private boolean timerGoingOff, paused,
@@ -147,35 +149,6 @@ public class Timer  implements Serializable, Comparable<Timer>, Runnable
     }
 
     /**
-     * Stop the timer
-     */
-    public void stopTimer()
-    {
-        logger.info("stop timer");
-        musicPlayer = null;
-        timerGoingOff = false;
-        logger.info("{} timer turned off", this);
-    }
-
-    /**
-     * Sets a timer to go off
-     */
-    public void triggerTimer()
-    {
-        logger.info("trigger timer");
-        try
-        {
-            logger.debug("playing sound");
-            setupMusicPlayer();
-            musicPlayer.play();
-        }
-        catch (Exception e)
-        {
-            logger.error(e.getCause().getClass().getName() + " - " + e.getMessage());
-        }
-    }
-
-    /**
      * This method prints the stack trace of an exception
      * that may occur when the digital panel is in use.
      * @param e the exception
@@ -205,20 +178,59 @@ public class Timer  implements Serializable, Comparable<Timer>, Runnable
         }
     }
 
+    @Override
     public void run()
     {
         logger.info("timer ticking down...");
-        countDown.minusSeconds(1);
+        countDown = countDown.minusSeconds(1);
+        setHours(countDown.getHour());
+        setMinutes(countDown.getMinute());
+        setSeconds(countDown.getSecond());
         logger.debug("CountDown: {}:{}:{}", countDown.getHour(), countDown.getMinute(), countDown.getSecond());
     }
 
     /**
      * Pauses the timer
      */
-    void pauseTimer()
+    public void pauseTimer()
     {
         logger.info("pausing timer");
         paused = true;
+    }
+
+    public void resumeTimer()
+    {
+        logger.info("resuming timer");
+        paused = false;
+    }
+
+    /**
+     * Stop the timer
+     */
+    public void stopTimer()
+    {
+        logger.info("stop timer");
+        musicPlayer = null;
+        timerGoingOff = false;
+        logger.info("{} timer turned off", this);
+    }
+
+    /**
+     * Sets a timer to go off
+     */
+    public void triggerTimer()
+    {
+        logger.info("trigger timer");
+        try
+        {
+            logger.debug("playing sound");
+            setupMusicPlayer();
+            musicPlayer.play();
+        }
+        catch (Exception e)
+        {
+            logger.error(e.getCause().getClass().getName() + " - " + e.getMessage());
+        }
     }
 
     /* Getters */
@@ -226,6 +238,9 @@ public class Timer  implements Serializable, Comparable<Timer>, Runnable
     public int getHours() { return hours; }
     public String getHoursAsStr() { return hoursAsStr; }
     public int getMinutes() { return minutes; }
+    public String getCountdown() {
+        return String.format("%s:%s:%s", hoursAsStr, minutesAsStr, secondsAsStr);
+    }
     public String getMinutesAsStr() { return minutesAsStr; }
     public boolean isPaused() { return paused; }
     public int getSeconds() { return seconds; }

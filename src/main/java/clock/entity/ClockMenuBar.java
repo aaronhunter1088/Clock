@@ -200,7 +200,7 @@ public class ClockMenuBar extends JMenuBar
         getDigitalClockFeature().addActionListener(action -> clockFrame.changePanels(PANEL_DIGITAL_CLOCK, false));
         getAnalogueClockFeature().addActionListener(action -> clockFrame.changePanels(PANEL_ANALOGUE_CLOCK, false));
         getSetAlarms().addActionListener(action -> clockFrame.changePanels(PANEL_ALARM, true));
-        getTimerFeature().addActionListener(action -> clockFrame.changePanels(PANEL_TIMER, false));
+        getTimerFeature().addActionListener(action -> clockFrame.changePanels(PANEL_TIMER2, false));
         // Add both menus to main menu
         add(getSettingsMenu());
         add(getFeaturesMenu());

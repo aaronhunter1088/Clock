@@ -1,26 +1,16 @@
 package clock.entity;
 
-import javax.swing.*;
-import java.awt.*;
 import java.io.Serial;
 import java.io.Serializable;
-import java.net.URL;
 import java.time.*;
 import java.time.format.DateTimeFormatter;
 import java.time.format.TextStyle;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.ScheduledFuture;
-import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
-import java.util.function.Function;
 
 import clock.exception.InvalidInputException;
 import clock.panel.*;
-import clock.panel.Panel;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -28,7 +18,6 @@ import static java.lang.Thread.sleep;
 import static java.time.Month.*;
 import static java.time.DayOfWeek.*;
 import static clock.util.Constants.*;
-import static clock.panel.Panel.*;
 
 /**
  * The clock object is capable of showing the date and time.
@@ -187,7 +176,8 @@ public class Clock implements Serializable, Comparable<Clock>
     public void setTheCurrentTime()
     {
         setDate(LocalDate.of(year, month, dayOfMonth));
-        setTime(LocalTime.of(hours, minutes, seconds));
+        if (ampm.equals(PM)) setTime(LocalTime.of((hours+12), minutes, seconds));
+        else setTime(LocalTime.of(hours, minutes, seconds));
         setCurrentDateTime(LocalDateTime.of(date, time));
         setDaylightSavingsTimeDates();
         if (isTodayDaylightSavingsTime()) { setTodayMatchesDSTDate(true); }
@@ -452,6 +442,7 @@ public class Clock implements Serializable, Comparable<Clock>
     {
         logger.info("tick rate: sec: {} min: {} hrs: {}", seconds, minutes, hours);
         performTick(seconds, minutes, hours);
+        checkIfItIsNewYears();
         updateTimeIfMidnight();
         setAlarmsNotTriggered();
         setTheCurrentTime();
@@ -683,10 +674,7 @@ public class Clock implements Serializable, Comparable<Clock>
         if ((MIDNIGHT_STANDARD_TIME.equals(getTimeAsStr()) || MIDNIGHT_MILITARY_TIME.equals(getMilitaryTimeAsStr()))
             && !testingClock) {
             logger.info("midnight daily clock update");
-            setSeconds(0);
-            setMinutes(0);
-            if (!showMilitaryTime) setHours(12);
-            else setHours(0);
+            setTheTime(LocalDateTime.now());
         }
     }
 
@@ -698,11 +686,11 @@ public class Clock implements Serializable, Comparable<Clock>
      */
     private void setAlarmsNotTriggered()
     {
-        logger.info("updating alarms");
         if (clockFrame.getListOfAlarms().isEmpty()) {
             logger.info("no alarms to update");
         } else {
             if (dateChanged) {
+                logger.info("setting all alarms to not triggered today");
                 clockFrame.getListOfAlarms().forEach(alarm -> alarm.setTriggeredToday(false));
             }
         }
@@ -775,33 +763,27 @@ public class Clock implements Serializable, Comparable<Clock>
     /**
      * Checks if the timer has concluded
      */
-    public void checkIfAnyTimersAreGoingOff()
+    public void triggerTimers()
     {
         boolean anyTimerIsGoingOff = clockFrame.getListOfTimers().stream().anyMatch(Timer::isTimerGoingOff);
         if (anyTimerIsGoingOff)
         {
-            logger.info("activating timers that should be going off");
-            //List<Timer> toBeRemoved = new ArrayList<>();
-            //timer.setTimerGoingOff(false);
-            //toBeRemoved.add(timer);
-            //clock.getTimerPanel2().stopTimer(timer);
-            //ScheduledFuture<?> future = clock.getScheduler().scheduleAtFixedRate(timer::performCountDown, 0, 1, TimeUnit.SECONDS);
-
-            clockFrame.getListOfTimers().stream()
-                    .parallel()
+            List<Timer> timersGoingOff = clockFrame.getListOfTimers().stream()
                     .filter(Timer::isTimerGoingOff)
-                    .filter(Timer::isHasBeenTriggered)
-                    .forEach(timer -> {
-                        //if (timersAndFutures.get(timer) == null) {
-                        //    logger.info("timer does not exist in timersAndFutures");
-                        //    var future = clock.getScheduler().scheduleAtFixedRate(timer::triggerTimer, 0, 1, TimeUnit.SECONDS);
-                        //    clock.getTimerPanel2().getTimersAndFutures().put(timer, future);
-                        //}
-                    });
-            //activeTimers.removeAll(toBeRemoved);
+                            .toList();
+            logger.info("triggering {} timers", timersGoingOff.size());
+            timersGoingOff.forEach(Timer::triggerTimer);
         }
         else {
             logger.info("no timers are going off");
+        }
+    }
+
+    public void updateTimersTable()
+    {
+        logger.info("updating timers table");
+        if (!clockFrame.getTimerPanel2().isRunning()) {
+            clockFrame.getTimerPanel2().start();
         }
     }
 
