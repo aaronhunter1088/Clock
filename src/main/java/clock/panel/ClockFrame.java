@@ -42,7 +42,7 @@ public class ClockFrame extends JFrame implements IClockPanel, Runnable {
     public final static Font font20 = new Font("Courier New", Font.BOLD, 20);
     public final static Font font10 = new Font("Courier New", Font.BOLD, 10);
     public final static Font analogueFont = new Font("TimesRoman", Font.BOLD, 20);
-    private Panel panelType;
+    private Panel panelType = PANEL_DIGITAL_CLOCK; // Default panel type
     private ClockPanel currentPanel;
     private ClockMenuBar menuBar;
     private DigitalClockPanel digitalClockPanel;
@@ -103,7 +103,7 @@ public class ClockFrame extends JFrame implements IClockPanel, Runnable {
         analogueClockPanel = new AnalogueClockPanel(this);
         alarmPanel = new AlarmPanel(this);
         timerPanel2 = new TimerPanel2(this);
-        changePanels(PANEL_DIGITAL_CLOCK, false);
+        addComponentsToPanel();
     }
 
     /**

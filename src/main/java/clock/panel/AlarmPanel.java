@@ -71,7 +71,7 @@ public class AlarmPanel extends ClockPanel
     {
         super();
         this.clockFrame = clockFrame;
-        clockFrame.setPanelType(PANEL_ALARM);
+        //clockFrame.setPanelType(PANEL_ALARM);
         this.clock = clockFrame.getClock();
         setMaximumSize(ClockFrame.alarmSize);
         setGridBagLayout(new GridBagLayout());

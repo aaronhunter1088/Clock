@@ -51,7 +51,7 @@ public class AnalogueClockPanel extends ClockPanel implements Runnable
     {
         logger.debug("setup default actions with clock");
         this.clockFrame = clockFrame;
-        this.clockFrame.setPanelType(PANEL_ANALOGUE_CLOCK);
+        //this.clockFrame.setPanelType(PANEL_ANALOGUE_CLOCK);
         this.clock = clockFrame.getClock();
         setClockText(clock.getTimeAsStr());
         setupSettingsMenu();

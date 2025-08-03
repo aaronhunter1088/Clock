@@ -61,7 +61,7 @@ public class TimerPanel2 extends ClockPanel
     {
         super();
         logger.info("Creating TimerPanel2");
-        clockFrame.setPanelType(PANEL_TIMER2);
+        //clockFrame.setPanelType(PANEL_TIMER2);
         this.clockFrame = clockFrame;
         this.clock = clockFrame.getClock();
         setSize(ClockFrame.panelSize);
