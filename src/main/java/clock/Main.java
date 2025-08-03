@@ -1,21 +1,16 @@
 package clock;
 
-import javax.swing.*;
-
 import clock.entity.Clock;
-import clock.exception.InvalidInputException;
 import clock.panel.ClockFrame;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import java.util.concurrent.TimeUnit;
-import java.util.function.Function;
+import javax.swing.*;
 
 import static clock.util.Constants.AM;
 import static clock.util.Constants.PM;
-import static java.time.DayOfWeek.SUNDAY;
-import static java.time.DayOfWeek.WEDNESDAY;
-import static java.time.Month.JULY;
+import static java.time.DayOfWeek.*;
+import static java.time.Month.*;
 
 /**
  * Main application to start Clock
@@ -30,22 +25,14 @@ public class Main
     /**
      * Main method to start the Clock
      * @param args command line arguments
-     * @throws InvalidInputException if there is an invalid input
      */
-    public static void main(String[] args) throws InvalidInputException {
-        logger.info("Starting Clock...");
+    public static void main(String[] args)
+    {
         // Start the clock application
-        ClockFrame finalFrame = new ClockFrame();
+        SwingUtilities.invokeLater(ClockFrame::createAndShowGUI);
         // Start the clock at a specific time
-        //ClockFrame finalFrame = new ClockFrame(new Clock(8, 59, 50, JULY, WEDNESDAY, 30, 2025, PM));
-        SwingUtilities.invokeLater(() -> {
-            try {
-                finalFrame.start();
-            } catch (Exception e) {
-                logger.error("Error scheduling tasks in Clock", e);
-            }
-        });
+        //Clock testClock = new Clock(8, 59, 50, JULY, WEDNESDAY, 30, 2025, PM);
+        //SwingUtilities.invokeLater(() -> ClockFrame.createAndShowGUI(testClock));
         Runtime.getRuntime().addShutdownHook(new Thread(() -> logger.info("Closing Clock")));
     }
-
 }
