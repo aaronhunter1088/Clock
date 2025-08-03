@@ -1,6 +1,5 @@
 package clock.panel;
 
-import clock.contract.IClockPanel;
 import clock.entity.Alarm;
 import clock.entity.Clock;
 import clock.entity.Timer;
@@ -58,7 +57,7 @@ public class DigitalClockPanel extends ClockPanel implements Runnable
         logger.debug("setup default actions with clock");
         clock = clockFrame.getClock();
         this.clockFrame = clockFrame;
-        clockFrame.setClockPanel(PANEL_DIGITAL_CLOCK);
+        clockFrame.setPanelType(PANEL_DIGITAL_CLOCK);
         row1 = clock.defaultText(1);
         row2 = clock.defaultText(2);
         setupSettingsMenu();

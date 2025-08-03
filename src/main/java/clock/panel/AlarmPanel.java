@@ -2,7 +2,6 @@ package clock.panel;
 
 import clock.entity.Alarm;
 import clock.entity.Clock;
-import clock.contract.IClockPanel;
 import clock.exception.InvalidInputException;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.LogManager;
@@ -72,7 +71,7 @@ public class AlarmPanel extends ClockPanel
     {
         super();
         this.clockFrame = clockFrame;
-        clockFrame.setClockPanel(PANEL_ALARM);
+        clockFrame.setPanelType(PANEL_ALARM);
         this.clock = clockFrame.getClock();
         setMaximumSize(ClockFrame.alarmSize);
         setGridBagLayout(new GridBagLayout());

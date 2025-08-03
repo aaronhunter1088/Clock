@@ -2,6 +2,7 @@ package clock;
 
 import clock.entity.Clock;
 import clock.panel.ClockFrame;
+import clock.panel.Panel;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -30,6 +31,8 @@ public class Main
     {
         // Start the clock application
         SwingUtilities.invokeLater(ClockFrame::createAndShowGUI);
+        // Start the clock with a specific panel
+        //SwingUtilities.invokeLater(() -> ClockFrame.createAndShowGUI(Panel.PANEL_ANALOGUE_CLOCK));
         // Start the clock at a specific time
         //Clock testClock = new Clock(23, 59, 55, JULY, WEDNESDAY, 30, 2025, PM);
         //SwingUtilities.invokeLater(() -> ClockFrame.createAndShowGUI(testClock));
