@@ -30,7 +30,7 @@ public class Constants {
     public static final String Hours = "Hours";
     public static final String is = "is";
     public static final String LABEL = "Label";
-    public static final String MIDNIGHT_MILITARY_TIME = "2400 hours 00"; // check on 0000 hours 00
+    public static final String MIDNIGHT_MILITARY_TIME = "0000 hours 00";
     public static final String MIDNIGHT_STANDARD_TIME = "12:00:00 AM";
     public static final String MILITARY_TIME_SETTING = "military time";
     public static final String Minutes = "Minutes";

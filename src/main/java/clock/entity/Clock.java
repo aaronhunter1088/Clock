@@ -11,7 +11,6 @@ import java.util.Locale;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import clock.exception.InvalidInputException;
-import clock.panel.*;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -51,12 +50,11 @@ public class Clock implements Serializable, Comparable<Clock>
     private LocalDateTime currentDateTime;
     private List<Alarm> listOfAlarms;
     private List<Timer> listOfTimers;
-    private boolean leapYear, todayMatchesDSTDate,
+    private boolean isLeapYear, todayMatchesDSTDate,
             dateChanged, isNewYear,
-            alarmActive, timerActive,
-            updateAlarm, showFullDate,
+            showFullDate,
             showPartialDate, showMilitaryTime,
-            showDigitalTimeOnAnalogueClock, testingClock,
+            testingClock,
             daylightSavingsTimeEnabled;
 
 
@@ -124,11 +122,10 @@ public class Clock implements Serializable, Comparable<Clock>
         setTheCurrentTime();
         setDaylightSavingsTimeDates();
         if (isTodayDaylightSavingsTime()) { todayMatchesDSTDate = true; }
-        leapYear = date.isLeapYear();
+        isLeapYear = date.isLeapYear();
         listOfAlarms = new ArrayList<>();
         listOfTimers = new ArrayList<>();
         daylightSavingsTimeEnabled = true;
-        //this.clockFrame = new ClockFrame(this);
     }
 
     /**
@@ -138,12 +135,11 @@ public class Clock implements Serializable, Comparable<Clock>
      */
     private void initialize()
     {
-        if (testingClock) { logger.info("Initializing Test Clock"); }
-        else logger.info("Initializing Clock");
+        logger.info("Initializing {} Clock", testingClock ? "Test" : "");
         setTheTime(LocalDateTime.now());
         setDaylightSavingsTimeDates();
         if (isTodayDaylightSavingsTime()) { todayMatchesDSTDate = true; }
-        leapYear = date.isLeapYear();
+        isLeapYear = date.isLeapYear();
         listOfAlarms = new ArrayList<>();
         listOfTimers = new ArrayList<>();
         daylightSavingsTimeEnabled = true;
@@ -162,7 +158,7 @@ public class Clock implements Serializable, Comparable<Clock>
         logger.info("Setting the time");
         setSeconds(dateTime.getSecond());
         setMinutes(dateTime.getMinute());
-        setHours(dateTime.getHour()==0 ? 12 : dateTime.getHour());
+        setHours(dateTime.getHour()==0 && !showMilitaryTime ? 12 : dateTime.getHour());
         setAMPM(dateTime.getHour()<12?AM:PM);
         setMonth(dateTime.getMonth());
         setDayOfWeek(dateTime.getDayOfWeek());
@@ -177,7 +173,7 @@ public class Clock implements Serializable, Comparable<Clock>
      * Sets and logs the new time value from the hours, minutes, and seconds
      * Sets the currentTime value from the LocalDate and LocalTime
      */
-    public void setTheCurrentTime()
+    protected void setTheCurrentTime()
     {
         setTimeZone(ZoneId.systemDefault());
         setDate(LocalDate.of(year, month, dayOfMonth));
@@ -194,7 +190,7 @@ public class Clock implements Serializable, Comparable<Clock>
      * Beginning date is always the second Sunday
      * Ending date is always the first Sunday
      */
-    public void setDaylightSavingsTimeDates()
+    private void setDaylightSavingsTimeDates()
     {
         logger.debug("setting begin and end daylight savings dates");
         int sundayCount = 0;
@@ -219,35 +215,10 @@ public class Clock implements Serializable, Comparable<Clock>
                 sundayCount++;
                 firstOfMonth -= 1;
             }
-            endDate = LocalDate.of(year, 11, firstOfMonth++);
+            endDate = LocalDate.of(year, 11, ++firstOfMonth);
         }
         setEndDaylightSavingsTimeDate(endDate);
         logger.info("daylight savings dates set");
-    }
-
-    /**
-     * Returns the current time in the selected timezone
-     * @return LocalDateTime the currentTime in the selected timezone
-     */
-    public LocalDateTime getCurrentDateTime()
-    { return currentDateTime; }
-
-    /**
-     * Returns the timezone from the selected timezone button text
-     * @param btnText the text from the timezone button
-     * @return ZoneId the timezone from the selected timezone button text
-     */
-    public ZoneId getZoneIdFromTimezoneButtonText(String btnText)
-    {
-        logger.debug("btnText: {}", btnText);
-        return switch (btnText) {
-            case HAWAII -> ZoneId.of(PACIFIC_HONOLULU);
-            case ALASKA -> ZoneId.of(AMERICA_ANCHORAGE);
-            case PACIFIC -> ZoneId.of(AMERICA_LOS_ANGELES);
-            case CENTRAL -> ZoneId.of(AMERICA_CHICAGO);
-            case EASTERN -> ZoneId.of(AMERICA_NEW_YORK);
-            default -> ZoneId.systemDefault();
-        };
     }
 
     /**
@@ -256,7 +227,7 @@ public class Clock implements Serializable, Comparable<Clock>
      * @param timezone the selected ZoneId
      * @return String the plain timezone from the selected ZoneId
      */
-    public String getPlainTimezoneFromZoneId(ZoneId timezone)
+    protected String getPlainTimezoneFromZoneId(ZoneId timezone)
     {
         logger.debug("timezone: {} or {}", timezone, timezone.getDisplayName(TextStyle.FULL, Locale.ENGLISH));
         return switch (timezone.getId()) {
@@ -265,7 +236,7 @@ public class Clock implements Serializable, Comparable<Clock>
             case AMERICA_LOS_ANGELES -> PACIFIC;
             case AMERICA_CHICAGO -> CENTRAL;
             case AMERICA_NEW_YORK -> EASTERN;
-            default -> CENTRAL;
+            default -> ZoneId.systemDefault().getId();
         };
     }
 
@@ -312,7 +283,7 @@ public class Clock implements Serializable, Comparable<Clock>
      * Returns the AMPM from the current time
      * @return String the AMPM from the current time
      */
-    public String getAMPMFromTime(LocalDateTime now)
+    protected String getAMPMFromTime(LocalDateTime now)
     {
         ZonedDateTime zonedDateTime = getZonedDateTimeFromLocalDateTime(now);
         String ampm = zonedDateTime.format(DateTimeFormatter.ofPattern("a"));
@@ -325,7 +296,7 @@ public class Clock implements Serializable, Comparable<Clock>
      * @param now the local date time
      * @return ZonedDateTime the zoned date time
      */
-    public ZonedDateTime getZonedDateTimeFromLocalDateTime(LocalDateTime now)
+    protected ZonedDateTime getZonedDateTimeFromLocalDateTime(LocalDateTime now)
     { return now == null ? ZonedDateTime.now(timezone) : ZonedDateTime.of(now, timezone); }
 
     /**
@@ -335,7 +306,7 @@ public class Clock implements Serializable, Comparable<Clock>
      * than 12.
      * @return LocalDateTime the current time in non-military time
      */
-    public LocalDateTime formatCurrentTimeToNonMilitaryTime(LocalDateTime now)
+    protected LocalDateTime formatCurrentTimeToNonMilitaryTime(LocalDateTime now)
     {
         logger.debug("now: {}", now);
         ZonedDateTime zonedDateTime = getZonedDateTimeFromLocalDateTime(now);
@@ -385,7 +356,7 @@ public class Clock implements Serializable, Comparable<Clock>
      * of the predetermined daylight savings time
      * @return boolean if today is daylight savings time
      */
-    public boolean isTodayDaylightSavingsTime()
+    protected boolean isTodayDaylightSavingsTime()
     {
         return date.isEqual(beginDaylightSavingsTimeDate) ||
                 date.isEqual(endDaylightSavingsTimeDate);
@@ -461,7 +432,7 @@ public class Clock implements Serializable, Comparable<Clock>
      * @param minutes, the amount of time to increase or decrease minutes when time to roll over
      * @param hours,   the amount of time to increase or decrease hours when time to roll over
      */
-    public void performTick(Integer seconds, Integer minutes, Integer hours)
+    private void performTick(Integer seconds, Integer minutes, Integer hours)
     {
         logger.info("performing tick...");
         setSeconds(this.seconds+seconds);
@@ -512,7 +483,7 @@ public class Clock implements Serializable, Comparable<Clock>
             }
         }
         else { setDateChanged(false); }
-        updateHourValueAndHourString();
+        //updateHourValueAndHourString();
         if (!showMilitaryTime) { logger.info(getTimeAsStr()); }
         else { logger.info(getMilitaryTimeAsStr()); }
 
@@ -542,12 +513,12 @@ public class Clock implements Serializable, Comparable<Clock>
                 }
                 case FEBRUARY ->
                 {
-                    if (!leapYear && dayOfMonth == 29 || leapYear && dayOfMonth == 30)
+                    if (!isLeapYear && dayOfMonth == 29 || isLeapYear && dayOfMonth == 30)
                     {
                         setDayOfMonth(1);
                         setMonth(MARCH);
                     }
-                    else if (leapYear && dayOfMonth == 29)
+                    else if (isLeapYear && dayOfMonth == 29)
                     { logger.info("happy leap day"); }
                 }
                 case MARCH ->
@@ -629,6 +600,7 @@ public class Clock implements Serializable, Comparable<Clock>
                         setDayOfMonth(1);
                         setMonth(JANUARY);
                         setYear(year+1);
+                        setDate(LocalDate.of(getYear(), getMonth(), getDayOfMonth()));
                         setLeapYear(date.isLeapYear());
                         setIsNewYear(true);
                         setDaylightSavingsTimeDates();
@@ -673,12 +645,24 @@ public class Clock implements Serializable, Comparable<Clock>
      * to ensure that the clock is always up to date and accurate
      * by chance that it has gotten out of sync.
      */
-    public void updateTimeIfMidnight()
+    private void updateTimeIfMidnight()
     {
-        if ((MIDNIGHT_STANDARD_TIME.equals(getTimeAsStr()) || MIDNIGHT_MILITARY_TIME.equals(getMilitaryTimeAsStr()))
-            && !testingClock) {
+        if ((MIDNIGHT_STANDARD_TIME.equals(getTimeAsStr()) || MIDNIGHT_MILITARY_TIME.equals(getMilitaryTimeAsStr()))) {
             logger.info("midnight daily clock update");
-            setTheTime(LocalDateTime.now());
+            setTheTime(LocalDateTime.of(
+                    LocalDate.of(getYear(), getMonth(), getDayOfMonth()),
+                    LocalTime.of(0, 0, 0))
+            );
+        }
+    }
+
+    private void checkIfItIsNewYears()
+    {
+        logger.info("is today new years: {}", isNewYear);
+        if (isNewYear())
+        {
+            logger.info("Happy New Year. Here's wishing you a healthy, productive {}.", year);
+            setIsNewYear(false);
         }
     }
 
@@ -697,20 +681,6 @@ public class Clock implements Serializable, Comparable<Clock>
                 logger.info("setting all alarms to not triggered today");
                 getListOfAlarms().forEach(alarm -> alarm.setTriggeredToday(false));
             }
-        }
-    }
-
-
-
-
-
-    public void checkIfItIsNewYears()
-    {
-        logger.info("is today new years: {}", isNewYear);
-        if (isNewYear)
-        {
-            setIsNewYear(false);
-            logger.info("Happy New Year. Here's wishing you a healthy, productive {}.", year);
         }
     }
 
@@ -748,6 +718,9 @@ public class Clock implements Serializable, Comparable<Clock>
         // if any alarm matches clock's time, an alarm should be going off
     }
 
+    /**
+     * Triggers all alarms that are currently going off.
+     */
     public void triggerAlarms()
     {
         List<Alarm> alarmsToTrigger = getListOfAlarms().stream()
@@ -761,9 +734,6 @@ public class Clock implements Serializable, Comparable<Clock>
         }
     }
 
-        /* TODO: Update! Rework. Logic should be as follows:
-    ?? What happens when two timers are going off at the same time?
-     */
     /**
      * Checks if the timer has concluded
      */
@@ -783,8 +753,6 @@ public class Clock implements Serializable, Comparable<Clock>
         }
     }
 
-
-
     /* Getters */
     public LocalDate getDate() { return date; }
     public LocalTime getTime() { return time; }
@@ -802,6 +770,11 @@ public class Clock implements Serializable, Comparable<Clock>
     public String getHoursAsStr() { return hoursAsStr; }
     public String getMinutesAsStr() { return minutesAsStr; }
     public String getSecondsAsStr() { return secondsAsStr; }
+    /**
+     * Returns the current time in the selected timezone
+     * @return LocalDateTime the currentTime in the selected timezone
+     */
+    public LocalDateTime getCurrentDateTime() { return currentDateTime; }
     /**
      * This method returns the clock's current hour, minute, second, and time.
      * It can also be used to get the alarm's time set value
@@ -832,24 +805,32 @@ public class Clock implements Serializable, Comparable<Clock>
     public String getFullDateAsStr() { return dayOfWeek+SPACE+month+SPACE+dayOfMonth+COMMA+SPACE+year; }
     public String getMilitaryTimeAsStr() { return hoursAsStr+minutesAsStr+SPACE+Hours.toLowerCase()+SPACE+secondsAsStr; }
     public String getPartialDateAsStr() { return dayOfWeek.toString().substring(0,3)+SPACE+month.toString().substring(0,3)+SPACE+dayOfMonth+COMMA+SPACE+year; }
-    public boolean isLeapYear() { return leapYear; }
+    public boolean isLeapYear() { return isLeapYear; }
     public boolean isTodayMatchesDSTDate() { return todayMatchesDSTDate; }
     public boolean isDateChanged() { return dateChanged; }
     public boolean isNewYear() { return isNewYear; }
-    public boolean isAlarmActive() { return alarmActive; }
-    public boolean isUpdateAlarm() { return updateAlarm; }
-    public boolean isTimerActive() { return timerActive; }
     public boolean isShowFullDate() { return showFullDate; }
     public boolean isShowPartialDate() { return showPartialDate; }
     public boolean isShowMilitaryTime() { return showMilitaryTime; }
-    public boolean isShowDigitalTimeOnAnalogueClock() { return showDigitalTimeOnAnalogueClock; }
     public boolean isTestingClock() { return testingClock; }
     public boolean isDaylightSavingsTimeEnabled() { return daylightSavingsTimeEnabled; }
-    public List<Alarm> getListOfAlarms() {
-        return listOfAlarms;
-    }
-    public List<Timer> getListOfTimers() {
-        return listOfTimers;
+    public List<Alarm> getListOfAlarms() { return listOfAlarms; }
+    public List<Timer> getListOfTimers() { return listOfTimers; }
+    /**
+     * Returns the timezone from the selected timezone button text
+     * @param btnText the text from the timezone button
+     * @return ZoneId the timezone from the selected timezone button text
+     */
+    public ZoneId getZoneIdFromTimezoneButtonText(String btnText) {
+        logger.debug("btnText: {}", btnText);
+        return switch (btnText) {
+            case HAWAII -> ZoneId.of(PACIFIC_HONOLULU);
+            case ALASKA -> ZoneId.of(AMERICA_ANCHORAGE);
+            case PACIFIC -> ZoneId.of(AMERICA_LOS_ANGELES);
+            case CENTRAL -> ZoneId.of(AMERICA_CHICAGO);
+            case EASTERN -> ZoneId.of(AMERICA_NEW_YORK);
+            default -> ZoneId.systemDefault();
+        };
     }
 
     /* Setters */
@@ -858,7 +839,7 @@ public class Clock implements Serializable, Comparable<Clock>
      * Also sets secondsAsStr
      * @param seconds the new seconds value
      */
-    public void setSeconds(int seconds) {
+    protected void setSeconds(int seconds) {
         this.seconds = seconds;
         if (this.seconds <= 9) secondsAsStr = "0"+this.seconds;
         else secondsAsStr = Integer.toString(this.seconds);
@@ -869,7 +850,7 @@ public class Clock implements Serializable, Comparable<Clock>
      * Also sets minutesAsStr
      * @param minutes the new minutes value
      */
-    public void setMinutes(int minutes) {
+    protected void setMinutes(int minutes) {
         this.minutes = minutes;
         if (this.minutes <= 9) minutesAsStr = "0"+this.minutes;
         else minutesAsStr = Integer.toString(this.minutes);
@@ -880,8 +861,9 @@ public class Clock implements Serializable, Comparable<Clock>
      * Also sets hoursAsStr
      * @param hours the new hours value
      */
-    public void setHours(int hours) {
+    protected void setHours(int hours) {
         if (hours > 12 && !showMilitaryTime) { hours-=12; }
+        else if (showMilitaryTime && hours == 24) { hours = 0; }
         this.hours = hours;
         if (this.hours < 10) this.hoursAsStr = "0"+hours;
         else this.hoursAsStr = Integer.toString(this.hours);
@@ -891,7 +873,7 @@ public class Clock implements Serializable, Comparable<Clock>
      * Sets and logs the new AMPM value
      * @param ampm the new AMPM value
      */
-    public void setAMPM(String ampm) { this.ampm = ampm; logger.debug("ampm: {}", this.ampm); }
+    protected void setAMPM(String ampm) { this.ampm = ampm; logger.debug("ampm: {}", this.ampm); }
     /**
      * Sets and logs the new timezone value
      * @param timezone the new timezone value
@@ -900,81 +882,73 @@ public class Clock implements Serializable, Comparable<Clock>
     /** Sets and logs the new time value
      * @param time the new time value
      */
-    public void setTime(LocalTime time) { this.time = time; logger.debug("time: {}", getTimeAsStr()); }
+    private void setTime(LocalTime time) { this.time = time; logger.debug("time: {}", getTimeAsStr()); }
     /**
      * Sets and logs the new dayOfWeek value
      * @param dayOfWeek the new dayOfWeek value
      */
-    public void setDayOfWeek(DayOfWeek dayOfWeek) { this.dayOfWeek = dayOfWeek; logger.debug("dayOfWeek: {}", dayOfWeek); }
+    protected void setDayOfWeek(DayOfWeek dayOfWeek) { this.dayOfWeek = dayOfWeek; logger.debug("dayOfWeek: {}", dayOfWeek); }
     /**
      * Sets and logs the new dayOfMonth value
      * @param dayOfMonth the new dayOfMonth value
      */
-    public void setDayOfMonth(int dayOfMonth) { this.dayOfMonth = dayOfMonth; logger.debug("dayOfMonth: {}", dayOfMonth); }
+    protected void setDayOfMonth(int dayOfMonth) { this.dayOfMonth = dayOfMonth; logger.debug("dayOfMonth: {}", dayOfMonth); }
     /**
      * Sets and logs the new month value
      * @param month the new month value
      */
-    public void setMonth(Month month) { this.month = month; logger.debug("month: {}", month); }
+    protected void setMonth(Month month) { this.month = month; logger.debug("month: {}", month); }
     /**
      * Sets and logs the new year value
      * @param year the new year value
      */
-    public void setYear(int year) { this.year = year; logger.debug("year: {}", year); }
+    protected void setYear(int year) { this.year = year; logger.debug("year: {}", year); }
     /**
      * Sets and logs the new date value
      * Example log: FRIDAY MAY 4, 2000
      * @param date the new date value
      */
-    public void setDate(LocalDate date) { this.date = date; logger.debug("date: {} {}", dayOfWeek!=null?dayOfWeek.toString():"DayOfWeekUnset", getDateAsStr()); }
+    protected void setDate(LocalDate date) { this.date = date; logger.debug("date: {} {}", dayOfWeek!=null?dayOfWeek.toString():"DayOfWeekUnset", getDateAsStr()); }
     /**
      * Sets and logs the new current time
      * @param currentDateTime the new current time
      */
-    public void setCurrentDateTime(LocalDateTime currentDateTime) { this.currentDateTime = currentDateTime; logger.debug("currentTime: {}", DateTimeFormatter.ofPattern("dd-MM-yyyy hh:mm:ss a").format(currentDateTime)); }
+    protected void setCurrentDateTime(LocalDateTime currentDateTime) { this.currentDateTime = currentDateTime; logger.debug("currentTime: {}", DateTimeFormatter.ofPattern("dd-MM-yyyy hh:mm:ss a").format(currentDateTime)); }
     /**
      * Sets and logs the new begin dst date value
      * @param beginDaylightSavingsTimeDate the new begin dst date value
      */
-    public void setBeginDaylightSavingsTimeDate(LocalDate beginDaylightSavingsTimeDate) { this.beginDaylightSavingsTimeDate = beginDaylightSavingsTimeDate; logger.debug("begin dst: {} {} {}, {}",beginDaylightSavingsTimeDate.getDayOfWeek(), beginDaylightSavingsTimeDate.getMonth(), beginDaylightSavingsTimeDate.getDayOfMonth(), beginDaylightSavingsTimeDate.getYear()); }
+    protected void setBeginDaylightSavingsTimeDate(LocalDate beginDaylightSavingsTimeDate) { this.beginDaylightSavingsTimeDate = beginDaylightSavingsTimeDate; logger.debug("begin dst: {} {} {}, {}",beginDaylightSavingsTimeDate.getDayOfWeek(), beginDaylightSavingsTimeDate.getMonth(), beginDaylightSavingsTimeDate.getDayOfMonth(), beginDaylightSavingsTimeDate.getYear()); }
     /**
      * Sets and logs the new end dst date value
      * @param endDaylightSavingsTimeDate the new end dst date value
      */
-    public void setEndDaylightSavingsTimeDate(LocalDate endDaylightSavingsTimeDate) { this.endDaylightSavingsTimeDate = endDaylightSavingsTimeDate; logger.debug("end dst: {} {} {}, {}", endDaylightSavingsTimeDate.getDayOfWeek(), endDaylightSavingsTimeDate.getMonth(), endDaylightSavingsTimeDate.getDayOfMonth(), endDaylightSavingsTimeDate.getYear()); }
-    public void setUpdateAlarm(boolean updateAlarm) { this.updateAlarm = updateAlarm;}
-    public void setLeapYear(boolean leapYear) { this.leapYear = leapYear; }
+    protected void setEndDaylightSavingsTimeDate(LocalDate endDaylightSavingsTimeDate) { this.endDaylightSavingsTimeDate = endDaylightSavingsTimeDate; logger.debug("end dst: {} {} {}, {}", endDaylightSavingsTimeDate.getDayOfWeek(), endDaylightSavingsTimeDate.getMonth(), endDaylightSavingsTimeDate.getDayOfMonth(), endDaylightSavingsTimeDate.getYear()); }
+    protected void setLeapYear(boolean leapYear) { this.isLeapYear = leapYear; }
     /**
      * When the clock starts and the date matches a daylight savings
      * date, this value is set. It is also set after the date updates,
      * and that new date matches a daylight savings date.
      * @param todayMatchesDSTDate if today is daylight savings day
      */
-    public void setTodayMatchesDSTDate(boolean todayMatchesDSTDate) { this.todayMatchesDSTDate = todayMatchesDSTDate; logger.debug("today is dst? {}", todayMatchesDSTDate); }
+    protected void setTodayMatchesDSTDate(boolean todayMatchesDSTDate) { this.todayMatchesDSTDate = todayMatchesDSTDate; logger.debug("today is dst? {}", todayMatchesDSTDate); }
     /**
      * Sets and logs the new dateChanged value
      * @param isDateChanged the dateChanged value to set
      */
-    public void setDateChanged(boolean isDateChanged) { this.dateChanged = isDateChanged; logger.debug("dateChanged: {}", dateChanged); }
+    protected void setDateChanged(boolean isDateChanged) { this.dateChanged = isDateChanged; logger.debug("dateChanged: {}", dateChanged); }
     /**
      * Sets and logs the new isNewYear value
      * @param isNewYear the isNewYear value to set
      */
-    public void setIsNewYear(boolean isNewYear) { this.isNewYear = isNewYear; logger.debug("isNewYear: {}", isNewYear); }
-    public void setAlarmActive(boolean alarmActive) { this.alarmActive = alarmActive; }
-    public void setTimerActive(boolean timerActive) { this.timerActive = timerActive; }
-    public void setShowFullDate(boolean showFullDate) { this.showFullDate = showFullDate; }
-    public void setShowPartialDate(boolean showPartialDate) { this.showPartialDate = showPartialDate; }
-    public void setShowMilitaryTime(boolean showMilitaryTime) { this.showMilitaryTime = showMilitaryTime; }
-    public void setShowDigitalTimeOnAnalogueClock(boolean showDigitalTimeOnAnalogueClock) { this.showDigitalTimeOnAnalogueClock = showDigitalTimeOnAnalogueClock; }
+    protected void setIsNewYear(boolean isNewYear) { this.isNewYear = isNewYear; logger.debug("isNewYear: {}", isNewYear); }
+    protected void setShowFullDate(boolean showFullDate) { this.showFullDate = showFullDate; }
+    protected void setShowPartialDate(boolean showPartialDate) { this.showPartialDate = showPartialDate; }
+    protected void setShowMilitaryTime(boolean showMilitaryTime) { this.showMilitaryTime = showMilitaryTime; }
     private void setTestingClock(boolean testingClock) { this.testingClock = testingClock; }
-    public void setDaylightSavingsTimeEnabled(boolean daylightSavingsTimeEnabled) { this.daylightSavingsTimeEnabled = daylightSavingsTimeEnabled; }
-    public void setListOfAlarms(List<Alarm> listOfAlarms) {
-        this.listOfAlarms = listOfAlarms;
-    }
-    public void setListOfTimers(List<Timer> listOfTimers) {
-        this.listOfTimers = listOfTimers;
-    }
+    protected void setDaylightSavingsTimeEnabled(boolean daylightSavingsTimeEnabled) { this.daylightSavingsTimeEnabled = daylightSavingsTimeEnabled; }
+    protected void setListOfAlarms(List<Alarm> listOfAlarms) { this.listOfAlarms = listOfAlarms; }
+    protected void setListOfTimers(List<Timer> listOfTimers) { this.listOfTimers = listOfTimers; }
 
     @Override
     public int compareTo(Clock o) {

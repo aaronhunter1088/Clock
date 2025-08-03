@@ -53,7 +53,7 @@ public class ClockFrame extends JFrame implements IClockPanel, Runnable {
     private DigitalClockPanel digitalClockPanel;
     private AnalogueClockPanel analogueClockPanel;
     private AlarmPanel alarmPanel;
-    private TimerPanel timerPanel;
+    //private TimerPanel timerPanel;
     private TimerPanel2 timerPanel2;
 //    private StopwatchPanel stopwatchPanel;
     private Clock clock;
@@ -98,15 +98,14 @@ public class ClockFrame extends JFrame implements IClockPanel, Runnable {
         } else {
             createClock();
         }
+        //this.clock.setClockFrame(this);
         scheduler = Executors.newScheduledThreadPool(25);
         setupMenuBar(); // daylightSavingsTimeEnabled directly influences menu bar setup
-        if (this.clock.isTodayDaylightSavingsTime()) { this.clock.setTodayMatchesDSTDate(true); }
         digitalClockPanel = new DigitalClockPanel(this);
         analogueClockPanel = new AnalogueClockPanel(this);
         alarmPanel = new AlarmPanel(this);
-        timerPanel = new TimerPanel(this);
+        //timerPanel = new TimerPanel(this);
         timerPanel2 = new TimerPanel2(this);
-        this.clock.setLeapYear(this.clock.getDate().isLeapYear());
         changePanels(PANEL_DIGITAL_CLOCK, false);
     }
 
@@ -188,7 +187,7 @@ public class ClockFrame extends JFrame implements IClockPanel, Runnable {
             case PANEL_DIGITAL_CLOCK -> changeToDigitalClockPanel();
             case PANEL_ANALOGUE_CLOCK -> changeToAnalogueClockPanel();
             case PANEL_ALARM -> changeToAlarmPanel(resetValues);
-            case PANEL_TIMER -> changeToTimerPanel();
+            //case PANEL_TIMER -> changeToTimerPanel();
             case PANEL_TIMER2 -> changeToTimerPanel2();
             //case PANEL_STOPWATCH -> changeToStopwatchPanel();
         }
@@ -247,19 +246,19 @@ public class ClockFrame extends JFrame implements IClockPanel, Runnable {
         alarmPanel.setupSettingsMenu();
     }
 
-    /**
-     * Changes the panel to the timer panel
-     */
-    public void changeToTimerPanel()
-    {
-        logger.info("change to timer panel");
-        add(timerPanel);
-        currentPanel = timerPanel;
-        setSize(clockDefaultSize);
-        clockPanel = PANEL_TIMER;
-        timerPanel.setupSettingsMenu();
-        timerPanel.updateLabels();
-    }
+//    /**
+//     * Changes the panel to the timer panel
+//     */
+//    public void changeToTimerPanel()
+//    {
+//        logger.info("change to timer panel");
+//        add(timerPanel);
+//        currentPanel = timerPanel;
+//        setSize(clockDefaultSize);
+//        clockPanel = PANEL_TIMER;
+//        timerPanel.setupSettingsMenu();
+//        timerPanel.updateLabels();
+//    }
 
     /**
      * Changes the panel to the timer panel
@@ -318,7 +317,7 @@ public class ClockFrame extends JFrame implements IClockPanel, Runnable {
             case PACIFIC -> LocalDateTime.now(ZoneId.of(AMERICA_LOS_ANGELES));
             case CENTRAL -> LocalDateTime.now(ZoneId.of(AMERICA_CHICAGO));
             case EASTERN -> LocalDateTime.now(ZoneId.of(AMERICA_NEW_YORK));
-            default -> LocalDateTime.now();
+            default -> LocalDateTime.now(ZoneId.systemDefault());
         };
     }
 
@@ -434,17 +433,17 @@ public class ClockFrame extends JFrame implements IClockPanel, Runnable {
         this.alarmPanel = alarmPanel;
     }
 
-    public TimerPanel getTimerPanel() {
-        return timerPanel;
-    }
+//    public TimerPanel getTimerPanel() {
+//        return timerPanel;
+//    }
 
     public ClockMenuBar getClockMenuBar() {
         return menuBar;
     }
 
-    public void setTimerPanel(TimerPanel timerPanel) {
-        this.timerPanel = timerPanel;
-    }
+//    public void setTimerPanel(TimerPanel timerPanel) {
+//        this.timerPanel = timerPanel;
+//    }
 
     public TimerPanel2 getTimerPanel2() {
         return timerPanel2;

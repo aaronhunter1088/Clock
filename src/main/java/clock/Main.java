@@ -31,7 +31,7 @@ public class Main
         // Start the clock application
         SwingUtilities.invokeLater(ClockFrame::createAndShowGUI);
         // Start the clock at a specific time
-        //Clock testClock = new Clock(8, 59, 50, JULY, WEDNESDAY, 30, 2025, PM);
+        //Clock testClock = new Clock(23, 59, 55, JULY, WEDNESDAY, 30, 2025, PM);
         //SwingUtilities.invokeLater(() -> ClockFrame.createAndShowGUI(testClock));
         Runtime.getRuntime().addShutdownHook(new Thread(() -> logger.info("Closing Clock")));
     }

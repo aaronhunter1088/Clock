@@ -32,6 +32,7 @@ public class AnalogueClockPanel extends ClockPanel implements Runnable
     private ClockFrame clockFrame;
     private Clock clock;
     private String clockText = EMPTY;
+    private boolean showDigitalTimeOnAnalogueClock;
 
     /**
      * Default constructor
@@ -74,8 +75,8 @@ public class AnalogueClockPanel extends ClockPanel implements Runnable
         clockFrame.getClockMenuBar().getSettingsMenu().add(clockFrame.getClockMenuBar().getShowDigitalTimeOnAnalogueClockSetting());
         clockFrame.getClockMenuBar().getSettingsMenu().add(clockFrame.getClockMenuBar().getToggleDSTSetting());
         clockFrame.getClockMenuBar().getSettingsMenu().add(clockFrame.getClockMenuBar().getChangeTimeZoneMenu());
-        clock.setShowDigitalTimeOnAnalogueClock(true);
         clockFrame.getClockMenuBar().getShowDigitalTimeOnAnalogueClockSetting().setText(HIDE+SPACE+DIGITAL_TIME);
+        setShowDigitalTimeOnAnalogueClock(true);
     }
 
     /**
@@ -125,7 +126,7 @@ public class AnalogueClockPanel extends ClockPanel implements Runnable
         logger.info("painting analogue clock panel");
         int xhour, yhour, xminute, yminute, xsecond, ysecond, second, minute, hour;
 
-        if (clock.isShowDigitalTimeOnAnalogueClock())
+        if (isShowDigitalTimeOnAnalogueClock())
         { setClockText(clock.getTimeAsStr()); }
         drawStructure(g);
         second = clock.getTime().getSecond();
@@ -193,7 +194,7 @@ public class AnalogueClockPanel extends ClockPanel implements Runnable
         g.setColor(Color.BLACK);
         g.fillOval(xcenter - 150, ycenter - 150, 300, 300);
 
-        if (clock.isShowDigitalTimeOnAnalogueClock())
+        if (isShowDigitalTimeOnAnalogueClock())
         {
             g.setColor(Color.WHITE);
             g.drawString(clockText, xcenter - 50, ycenter + 90); // 170
@@ -244,10 +245,12 @@ public class AnalogueClockPanel extends ClockPanel implements Runnable
     GridBagLayout getGridBagLayout() { return this.layout; }
     GridBagConstraints getGridBagConstraints() { return this.constraints; }
     String getClockText() { return this.clockText; }
+    public boolean isShowDigitalTimeOnAnalogueClock() { return showDigitalTimeOnAnalogueClock; }
 
     /* Setters */
     private void setGridBagLayout(GridBagLayout layout) { this.layout = layout; }
     private void setGridBagConstraints(GridBagConstraints constraints) { this.constraints = constraints; }
     private void setClockText(String clockText) { this.clockText = clockText; }
     public void setClock(Clock clock) { this.clock = clock; }
+    public void setShowDigitalTimeOnAnalogueClock(boolean showDigitalTimeOnAnalogueClock)  { this.showDigitalTimeOnAnalogueClock = showDigitalTimeOnAnalogueClock; }
 }

@@ -128,21 +128,14 @@ public class ClockMenuBar extends JMenuBar
         getShowDigitalTimeOnAnalogueClockSetting().setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_E, InputEvent.CTRL_DOWN_MASK));
         getShowDigitalTimeOnAnalogueClockSetting().setForeground(Color.WHITE);
         getShowDigitalTimeOnAnalogueClockSetting().addActionListener(action -> {
+            boolean showingDigitalTime = clockFrame.getAnalogueClockPanel().isShowDigitalTimeOnAnalogueClock();
             logger.info("clicked show digital time or hide on analogue clock");
-            logger.info("show digital time: {}", clock.isShowDigitalTimeOnAnalogueClock());
-            if (clock.isShowDigitalTimeOnAnalogueClock())
-            {
-                //clock.getAnalogueClockPanel().setClockText(EMPTY);
-
-                clock.setShowDigitalTimeOnAnalogueClock(false);
-                getShowDigitalTimeOnAnalogueClockSetting().setText(SHOW+SPACE+DIGITAL_TIME);
-            } else
-            {
-                //clock.getAnalogueClockPanel().setClockText(clock.getTimeAsStr());
-                //clock.getAnalogueClockPanel().repaint();
-                clock.setShowDigitalTimeOnAnalogueClock(true);
-                getShowDigitalTimeOnAnalogueClockSetting().setText(HIDE+SPACE+DIGITAL_TIME);
-            }
+            logger.info("show digital time: {}", showingDigitalTime);
+            if (showingDigitalTime)
+            { getShowDigitalTimeOnAnalogueClockSetting().setText(SHOW+SPACE+DIGITAL_TIME); }
+            else
+            { getShowDigitalTimeOnAnalogueClockSetting().setText(HIDE+SPACE+DIGITAL_TIME); }
+            clockFrame.getAnalogueClockPanel().setShowDigitalTimeOnAnalogueClock(!showingDigitalTime);
             clockFrame.getAnalogueClockPanel().repaint();
         });
 

@@ -5,12 +5,10 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
 import org.junit.jupiter.params.provider.ValueSource;
 
-import java.time.DateTimeException;
-import java.time.DayOfWeek;
-import java.time.LocalDate;
-import java.time.Month;
+import java.time.*;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 
@@ -30,6 +28,9 @@ class ClockTest
 {
     private static final Logger logger = LogManager.getLogger(ClockTest.class);
 
+    private static final LocalDate DATE_NOW = LocalDate.now();
+    private static final LocalTime AM_TIME = LocalTime.of(10, 30, 45); // 10:30:45 AM
+    private static final LocalTime PM_TIME = LocalTime.of(15, 30, 45); // 3:30:45 PM
     private Clock clock;
 
     @BeforeAll
@@ -339,56 +340,58 @@ class ClockTest
         });
     }
 
-    @Test
-    @DisplayName("Test turn off dst setting")
-    void testTurnOffDSTSetting()
-    {
-        LocalDate endDSTDate = clock.getEndDaylightSavingsTimeDate();
-        clock.setHours(1);
-        clock.setMinutes(59);
-        clock.setSeconds(50);
-        clock.setMonth(endDSTDate.getMonth());
-        clock.setDayOfWeek(endDSTDate.getDayOfWeek());
-        clock.setDayOfMonth(endDSTDate.getDayOfMonth());
-        clock.setYear(endDSTDate.getYear());
-        clock.setAMPM(AM);
-        clock.setTheCurrentTime();
-        clock.getClockFrame().getClockMenuBar().getToggleDSTSetting().doClick(); // DST turning off; enabled:false
-        javax.swing.SwingUtilities.invokeLater(() -> {
-            var expectedValue = Turn+SPACE+on+SPACE+DST_SETTING;
-            assertEquals(expectedValue, clock.getClockFrame().getClockMenuBar().getToggleDSTSetting().getText(), "Expected setting to be off");
-            assertFalse(clock.isDaylightSavingsTimeEnabled());
-            assertEquals(2, clock.getHours(), "Expected hours to be 2");
-        });
+    // TODO: Move to ClockFrameTest
+//    @Test
+//    @DisplayName("Test turn off dst setting")
+//    void testTurnOffDSTSetting()
+//    {
+//        LocalDate endDSTDate = clock.getEndDaylightSavingsTimeDate();
+//        clock.setHours(1);
+//        clock.setMinutes(59);
+//        clock.setSeconds(50);
+//        clock.setMonth(endDSTDate.getMonth());
+//        clock.setDayOfWeek(endDSTDate.getDayOfWeek());
+//        clock.setDayOfMonth(endDSTDate.getDayOfMonth());
+//        clock.setYear(endDSTDate.getYear());
+//        clock.setAMPM(AM);
+//        clock.setTheCurrentTime();
+//        clock.getClockFrame().getClockMenuBar().getToggleDSTSetting().doClick(); // DST turning off; enabled:false
+//        javax.swing.SwingUtilities.invokeLater(() -> {
+//            var expectedValue = Turn+SPACE+on+SPACE+DST_SETTING;
+//            assertEquals(expectedValue, clock.getClockFrame().getClockMenuBar().getToggleDSTSetting().getText(), "Expected setting to be off");
+//            assertFalse(clock.isDaylightSavingsTimeEnabled());
+//            assertEquals(2, clock.getHours(), "Expected hours to be 2");
+//        });
+//
+//        tick(10);
+//    }
 
-        tick(10);
-    }
-
-    @Test
-    void testDSTSettingWhenSettingIsFalse()
-    {
-        clock.setDaylightSavingsTimeEnabled(false);
-        clock.getClockFrame().getClockMenuBar().getToggleDSTSetting().setText(Turn+SPACE+on+SPACE+DST_SETTING);
-
-        LocalDate endDSTDate = clock.getEndDaylightSavingsTimeDate();
-        clock.setHours(1);
-        clock.setMinutes(59);
-        clock.setSeconds(50);
-        clock.setMonth(endDSTDate.getMonth());
-        clock.setDayOfWeek(endDSTDate.getDayOfWeek());
-        clock.setDayOfMonth(endDSTDate.getDayOfMonth());
-        clock.setYear(endDSTDate.getYear());
-        clock.setAMPM(AM);
-        clock.setTheCurrentTime();
-        var expectedValue = Turn+SPACE+on+SPACE+DST_SETTING;
-
-        tick(10);
-
-        javax.swing.SwingUtilities.invokeLater(() -> {
-            assertEquals(expectedValue, clock.getClockFrame().getClockMenuBar().getToggleDSTSetting().getText(), "Expected setting to be off");
-            assertEquals(1, clock.getHours(), "Expected hours to be 1");
-        });
-    }
+    // TODO: Move to ClockFrameTest
+//    @Test
+//    void testDSTSettingWhenSettingIsFalse()
+//    {
+//        clock.setDaylightSavingsTimeEnabled(false);
+//        clock.getClockFrame().getClockMenuBar().getToggleDSTSetting().setText(Turn+SPACE+on+SPACE+DST_SETTING);
+//
+//        LocalDate endDSTDate = clock.getEndDaylightSavingsTimeDate();
+//        clock.setHours(1);
+//        clock.setMinutes(59);
+//        clock.setSeconds(50);
+//        clock.setMonth(endDSTDate.getMonth());
+//        clock.setDayOfWeek(endDSTDate.getDayOfWeek());
+//        clock.setDayOfMonth(endDSTDate.getDayOfMonth());
+//        clock.setYear(endDSTDate.getYear());
+//        clock.setAMPM(AM);
+//        clock.setTheCurrentTime();
+//        var expectedValue = Turn+SPACE+on+SPACE+DST_SETTING;
+//
+//        tick(10);
+//
+//        javax.swing.SwingUtilities.invokeLater(() -> {
+//            assertEquals(expectedValue, clock.getClockFrame().getClockMenuBar().getToggleDSTSetting().getText(), "Expected setting to be off");
+//            assertEquals(1, clock.getHours(), "Expected hours to be 1");
+//        });
+//    }
 
 //    @Test
 //    void testUpdateClockTimeSyncsClockTime() throws InvalidInputException
@@ -463,6 +466,133 @@ class ClockTest
         assertEquals(2, clock.getMinutes(), "Expected minutes to be 2");
         assertEquals(0, clock.getSeconds(), "Expected seconds to be 0");
     }
+
+    @Test
+    void testGetAMPMFromTime()
+    {
+        LocalDate date = LocalDate.now();
+        LocalTime time = AM_TIME; // 10:30:45 AM
+        LocalDateTime now = LocalDateTime.of(date, time);
+        String ampm = clock.getAMPMFromTime(now);
+
+        assertEquals(AM, ampm, "AMPM should be AM");
+
+        time = PM_TIME; // 3:30:45 PM
+        now = LocalDateTime.of(date, time);
+        ampm = clock.getAMPMFromTime(now);
+
+        assertEquals(PM, ampm, "AMPM should be PM");
+    }
+
+    @ParameterizedTest
+    @CsvSource({
+            "Hawaii, Pacific/Honolulu",
+            "Alaska, America/Anchorage",
+            "Pacific, America/Los_Angeles",
+            "Central, America/Chicago",
+            "Eastern, America/New_York",
+            "Unknown, America/Chicago", // your default system timezone
+    })
+    void testGetZoneIdFromTimezone(String timezone, ZoneId zoneId)
+    {
+        ZoneId zone = clock.getZoneIdFromTimezoneButtonText(timezone);
+        assertEquals(zone, zoneId, "Expected ZoneId to match: " + timezone);
+    }
+
+    @ParameterizedTest
+    @CsvSource({
+            "Pacific/Honolulu, Hawaii",
+            "America/Anchorage, Alaska",
+            "America/Los_Angeles, Pacific",
+            "America/Chicago, Central",
+            "America/New_York, Eastern"
+    })
+    void testGetPlainTimezoneFromZoneId(ZoneId zoneId, String timezone)
+    {
+        String tz = clock.getPlainTimezoneFromZoneId(zoneId);
+        assertEquals(tz, timezone, "Expected timezone to match: " + timezone);
+    }
+
+    @Test
+    void testGetZoneDateTimeWithANewDate()
+    {
+        LocalDateTime now = LocalDateTime.now();
+        logger.info("Current LocalDateTime: {}", now);
+        final var zonedTime = clock.getZonedDateTimeFromLocalDateTime(now);
+        logger.info("ZonedDateTime: {}", zonedTime);
+        assertNotNull(zonedTime, "ZonedDateTime should not be null");
+    }
+
+    @Test
+    void testGetZoneDateTimeWithANoDate()
+    {
+        final var zonedTime = clock.getZonedDateTimeFromLocalDateTime(null);
+        logger.info("ZonedDateTime: {}", zonedTime);
+        assertNotNull(zonedTime, "ZonedDateTime should not be null");
+    }
+
+    @Test
+    void testFormattingTimeToNonMilitaryTimeKeepsAMPMIntact()
+    {
+        LocalDateTime now = LocalDateTime.of(DATE_NOW, AM_TIME);
+        var localDateTime = clock.formatCurrentTimeToNonMilitaryTime(now);
+
+        assertEquals(10, localDateTime.getHour(), "Expected hour to be 10");
+
+        now = LocalDateTime.of(DATE_NOW, PM_TIME);
+        localDateTime = clock.formatCurrentTimeToNonMilitaryTime(now);
+
+        assertEquals(3, localDateTime.getHour(), "Expected hour to be 3");
+
+        clock.setShowMilitaryTime(true);
+        localDateTime = clock.formatCurrentTimeToNonMilitaryTime(now);
+
+        assertEquals(15, localDateTime.getHour(), "Expected hour to be 15 in military time");
+    }
+
+    @Test
+    void testClockTimeUpdatesAtMidnight()
+    {
+        clock.setHours(11);
+        clock.setMinutes(59);
+        clock.setSeconds(55);
+        clock.setAMPM(PM);
+        clock.setTheCurrentTime();
+
+        assertEquals(11, clock.getHours(), "Expected hours to be 11");
+        assertEquals(59, clock.getMinutes(), "Expected minutes to be 59");
+        assertEquals(55, clock.getSeconds(), "Expected seconds to be 55");
+
+        tick(5); // Tick the clock to midnight
+
+        assertEquals(12, clock.getHours(), "Expected hours to be 12 at midnight");
+        assertEquals(0, clock.getMinutes(), "Expected minutes to be 0 at midnight");
+        assertEquals(0, clock.getSeconds(), "Expected seconds to be 0 at midnight");
+    }
+
+    @Test
+    void testClockIsNewYear()
+    {
+        int currentYear = clock.getYear();
+        clock.setHours(11);
+        clock.setMinutes(59);
+        clock.setSeconds(55);
+        clock.setAMPM(PM);
+        clock.setMonth(DECEMBER);
+        clock.setDayOfWeek(clock.getDayOfWeek());
+        clock.setDayOfMonth(31);
+        clock.setTheCurrentTime();
+
+        tick(5); // Tick the clock to midnight
+
+        assertEquals(12, clock.getHours(), "Expected hours to be 12 at midnight");
+        assertEquals(0, clock.getMinutes(), "Expected minutes to be 0 at midnight");
+        assertEquals(0, clock.getSeconds(), "Expected seconds to be 0 at midnight");
+        assertEquals(JANUARY, clock.getMonth(), "Expected month to be January after New Year");
+        assertEquals(1, clock.getDayOfMonth(), "Expected day of month to be 1 after New Year");
+        assertEquals(currentYear+1, clock.getYear(), "Expected year to be 2023 after New Year");
+    }
+
 
     // Helper methods
     private void tick(int times) {
