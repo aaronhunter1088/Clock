@@ -66,7 +66,7 @@ public class ClockFrame extends JFrame implements IClockPanel, Runnable {
      * Initializes the clock with default settings
      */
     public ClockFrame() {
-        super();
+        super(CLOCK);
         initialize(null);
     }
 
@@ -75,12 +75,13 @@ public class ClockFrame extends JFrame implements IClockPanel, Runnable {
      * @param testClock the clock to use for testing
      */
     public ClockFrame(Clock testClock) {
-        super();
+        super(CLOCK);
         logger.info("Creating ClockFrame with test clock");
         initialize(testClock);
     }
 
-    private void initialize(Clock testing) {
+    private void initialize(Clock testing)
+    {
         logger.info("Initializing ClockFrame");
         getContentPane().setBackground(Color.BLACK);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -130,6 +131,16 @@ public class ClockFrame extends JFrame implements IClockPanel, Runnable {
             else { logger.error("The path '" + path + "' you provided cannot find a resource. Returning null"); }
         }
         return retImageIcon;
+    }
+
+    public static void createAndShowGUI(Clock clock) {
+        ClockFrame clockFrame = new ClockFrame(clock);
+        clockFrame.start();
+    }
+
+    public static void createAndShowGUI() {
+        logger.info("Starting Clock...");
+        createAndShowGUI(null);
     }
 
     private void createClock() {
