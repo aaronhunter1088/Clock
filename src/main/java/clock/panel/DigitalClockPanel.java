@@ -170,6 +170,13 @@ public class DigitalClockPanel extends ClockPanel implements Runnable
         String dateStr = clock.defaultText(1);
         String timeStr = clock.defaultText(2);
         // Adjust as needed
+        java.util.List<Alarm> clockAlarms = clockFrame.getListOfAlarms();
+        java.util.List<Timer> clockTimers = clockFrame.getListOfTimers();
+        boolean alarmsGoingOff = clockAlarms.stream().anyMatch(Alarm::isAlarmGoingOff);
+        long alarmsGoingOffCount = clockAlarms.stream().filter(Alarm::isAlarmGoingOff).count();
+        boolean timersGoingOff = clockTimers.stream().anyMatch(Timer::isTimerGoingOff);
+        long timersGoingOffCount = clockTimers.stream().filter(Timer::isTimerGoingOff).count();
+        // TODO: Combine with variables above. This should be so that we display appropriate message
         if (clockFrame.getListOfAlarms().stream().anyMatch(Alarm::isAlarmGoingOff))
         {
             var activeAlarms = clockFrame.getListOfAlarms().stream().filter(Alarm::isAlarmGoingOff).toList();

@@ -59,7 +59,6 @@ public class ClockFrame extends JFrame implements IClockPanel, Runnable {
     private Clock clock;
     private List<Alarm> listOfAlarms;
     private List<Timer> listOfTimers;
-    private ScheduledFuture<?> countdownFuture;
     private ScheduledExecutorService scheduler;
 
     /**
@@ -468,14 +467,6 @@ public class ClockFrame extends JFrame implements IClockPanel, Runnable {
 
     public void setListOfTimers(List<Timer> listOfTimers) {
         this.listOfTimers = listOfTimers;
-    }
-
-    public ScheduledFuture<?> getCountdownFuture() {
-        return countdownFuture;
-    }
-
-    public void setCountdownFuture(ScheduledFuture<?> countdownFuture) {
-        this.countdownFuture = countdownFuture;
     }
 
     public ScheduledExecutorService getScheduler() {

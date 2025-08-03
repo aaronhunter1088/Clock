@@ -4,7 +4,6 @@ import clock.entity.ButtonColumn;
 import clock.entity.Clock;
 import clock.entity.Timer;
 import clock.exception.InvalidInputException;
-import javazoom.jl.player.advanced.AdvancedPlayer;
 import org.apache.commons.lang3.math.NumberUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -17,10 +16,8 @@ import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.FocusEvent;
 import java.awt.event.FocusListener;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
-import java.util.concurrent.*;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import static clock.panel.Panel.*;
 import static java.lang.Thread.sleep;
@@ -50,9 +47,6 @@ public class TimerPanel2 extends ClockPanel
     private JButton setTimerButton;
     private JButton resetButton;
     private boolean disableTimerFunctionality;
-    private AdvancedPlayer musicPlayer;
-    private Map<Timer, ScheduledFuture<?>> timersAndFutures;
-    //private ScheduledExecutorService scheduler;
 
     private JTable timersTable;
     private JScrollPane scrollTable;
@@ -235,9 +229,6 @@ public class TimerPanel2 extends ClockPanel
         resetButton.addActionListener(this::resetTimerPanel);
         resetButton.setEnabled(false);
         setupTimersTableDefaults(true);
-
-        //scheduler = Executors.newScheduledThreadPool(10);
-        timersAndFutures = new HashMap<>();
     }
 
     /**
@@ -264,6 +255,11 @@ public class TimerPanel2 extends ClockPanel
                 // find the correct timer
                 Timer timer = clockFrame.getListOfTimers().get(modelRow);
                 switch (buttonAction) {
+                    case "Reset" -> {
+                        // set button text to "Pause"
+                        table.getModel().setValueAt("Pause", modelRow, columnIndex);
+                        timer.resetTimer();
+                    }
                     case "Pause" -> {
                         logger.info("Pausing {} at row: {}", timer, modelRow);
                         // pause timer
@@ -278,13 +274,29 @@ public class TimerPanel2 extends ClockPanel
                         // set button text to "Pause"
                         table.getModel().setValueAt("Pause", modelRow, columnIndex);
                     }
-                    case "Cancel" -> {
-                        logger.info("Cancelling timer at row: {}", modelRow);
+                    case "Remove" -> {
+                        logger.info("Removing {} at row: {}", timer, modelRow);
                         stopTimer(timer);
-                        timersAndFutures.remove(timer);
                         clockFrame.getListOfTimers().remove(timer);
+                        ((DefaultTableModel)table.getModel()).removeRow(modelRow);
                     }
                 }
+            }
+        };
+    }
+
+    public Action resetAction(int columnIndex)
+    {
+        return new AbstractAction()
+        {
+            public void actionPerformed(ActionEvent e)
+            {
+                JTable table = (JTable)e.getSource();
+                int modelRow = Integer.valueOf( e.getActionCommand() );
+                String buttonAction = (String) table.getModel().getValueAt(modelRow, columnIndex);
+                timersTable.getModel().setValueAt("Pause", modelRow, 2);
+                Timer timer = clockFrame.getListOfTimers().get(modelRow);
+                timer.resetTimer();
             }
         };
     }
@@ -300,7 +312,7 @@ public class TimerPanel2 extends ClockPanel
                         timer.getName() != null ? timer.getName() : timer.toString(),
                         timer.getCountdown(),
                         "Pause",
-                        "Cancel"
+                        "Remove"
                          })
                 .toArray(Object[][]::new);
     }
@@ -311,7 +323,7 @@ public class TimerPanel2 extends ClockPanel
      */
     public String[] getTimersTableColumnNames()
     {
-        return new String[]{"Name", "Countdown", "Resume/Pause", "Cancel"};
+        return new String[]{"Name", "Countdown", "Resume/Pause/Reset", "Remove"};
     }
 
     /**
@@ -336,14 +348,26 @@ public class TimerPanel2 extends ClockPanel
                 ButtonColumn buttonColumn = new ButtonColumn(timersTable, buttonAction(2), 2);
                 ButtonColumn buttonColumn2 = new ButtonColumn(timersTable, buttonAction(3), 3);
             } else {
-                int tableRows = timersTable.getModel().getRowCount();
+                AtomicInteger rowIndex = new AtomicInteger();
                 clockFrame.getListOfTimers().forEach(timer -> {
-                   for(int i=0; i<tableRows; i++) {
-                       String currentTimer = timersTable.getValueAt(i, 0).toString();
-                       if (currentTimer.equals(timer.getName())) {
-                           timersTable.setValueAt(timer.getCountdown(), i, 1);
-                       }
-                   }
+                    String currentTimer = timersTable.getValueAt(rowIndex.get(), 0).toString();
+                    if (currentTimer.equals(timer.getName())) {
+                        timersTable.setValueAt(timer.getCountdown(), rowIndex.get(), 1);
+                    }
+                    // update buttons to show restart or remove
+                    if (timer.isTimerGoingOff()) {
+                        //timersTable.setValueAt(timer.getCountdown(), rowIndex, 1);
+                        timersTable.getModel().setValueAt("Reset", rowIndex.get(), 2);
+                        new ButtonColumn(timersTable, resetAction(2), 2);
+                    }
+                    else if (timer.isPaused()) {
+                        timersTable.getModel().setValueAt("Resume", rowIndex.get(), 2);
+                        new ButtonColumn(timersTable, buttonAction(2), 2);
+                    } else {
+                        timersTable.getModel().setValueAt("Pause", rowIndex.get(), 2);
+                        new ButtonColumn(timersTable, buttonAction(2), 2);
+                    }
+                    rowIndex.getAndIncrement();
                 });
             }
         }
@@ -487,13 +511,8 @@ public class TimerPanel2 extends ClockPanel
     public void stopTimer(clock.entity.Timer timer)
     {
         logger.info("stopping timer");
-        if (clockFrame.getCountdownFuture() != null && !clockFrame.getCountdownFuture().isCancelled())
-        { clockFrame.getCountdownFuture().cancel(true); }
         timer.setTimerGoingOff(false);
         timer.setStopTimer(true);
-        //if (clock.getScheduler() != null && !clock.getScheduler().isShutdown())
-        //{ clock.getScheduler().shutdown(); }
-        //enableTimerButton();
     }
 
 
@@ -527,23 +546,23 @@ public class TimerPanel2 extends ClockPanel
      * If disableTimerFunctionality is true, then we will
      * not countdown any timers.
      */
-    public void performCountDown()
-    {
-        if (disableTimerFunctionality) return;
-        else
-        {
-            logger.info("performing countdown");
-            //ScheduledExecutorService executor = Executors.newScheduledThreadPool(activeTimers.size());
-//            activeTimers.stream()
-//                    .parallel()
-//                    .forEach(Timer::performCountDown);
-            //scheduler = Executors.newScheduledThreadPool(activeTimers.size());
-            clockFrame.getListOfTimers().forEach(timer -> clockFrame.getScheduler()
-                    .scheduleAtFixedRate(timer::performCountDown, 0, 1, TimeUnit.SECONDS));
-
-            //resetJTextArea(); // leave here
-        }
-    }
+//    public void performCountDown()
+//    {
+//        if (disableTimerFunctionality) return;
+//        else
+//        {
+//            logger.info("performing countdown");
+//            //ScheduledExecutorService executor = Executors.newScheduledThreadPool(activeTimers.size());
+////            activeTimers.stream()
+////                    .parallel()
+////                    .forEach(Timer::performCountDown);
+//            //scheduler = Executors.newScheduledThreadPool(activeTimers.size());
+//            clockFrame.getListOfTimers().forEach(timer -> clockFrame.getScheduler()
+//                    .scheduleAtFixedRate(timer::performCountDown, 0, 1, TimeUnit.SECONDS));
+//
+//            //resetJTextArea(); // leave here
+//        }
+//    }
 
     /**
      * Resets the timer panel
@@ -692,7 +711,6 @@ public class TimerPanel2 extends ClockPanel
     public JTextField getSecondField() { return secondField; }
     public JButton getResetButton() { return resetButton; }
     public JButton getSetTimerButton() { return setTimerButton; }
-    public Map<clock.entity.Timer, ScheduledFuture<?>> getTimersAndFutures() { return timersAndFutures; }
 
     /* Setters */
     protected void setGridBagLayout(GridBagLayout layout) { this.layout = layout; }

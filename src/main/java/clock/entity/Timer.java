@@ -190,10 +190,10 @@ public class Timer  implements Serializable, Comparable<Timer>
     public void innerCountDown()
     {
         logger.info("{} ticking down...", this);
-        countDown = countDown.minusSeconds(1);
-        setHours(countDown.getHour());
-        setMinutes(countDown.getMinute());
-        setSeconds(countDown.getSecond());
+        if (countDown.getSecond() > 0 || countDown.getMinute() > 0 || countDown.getHour() > 0)
+        {
+            countDown = countDown.minusSeconds(1);
+        }
         logger.debug("CountDown: {}:{}:{}", countDown.getHour(), countDown.getMinute(), countDown.getSecond());
         if (countDown.getHour() == 0 && countDown.getMinute() == 0 && countDown.getSecond() == 0)
         {
@@ -217,6 +217,20 @@ public class Timer  implements Serializable, Comparable<Timer>
         paused = false;
     }
 
+    public void resetTimer()
+    {
+        logger.info("resetting {}", this);
+        paused = false;
+        hasBeenStarted = false;
+        hasBeenTriggered = false;
+        setHoursAsStr(ZERO + getHours());
+        setMinutesAsStr(ZERO + getMinutes());
+        setSecondsAsStr(ZERO + getSeconds());
+        countDown = LocalTime.of(getHours(), getMinutes(), getSeconds());
+        timerGoingOff = false;
+        logger.info("{} timer reset", this);
+    }
+
     /**
      * Stop the timer
      */
@@ -235,9 +249,11 @@ public class Timer  implements Serializable, Comparable<Timer>
     {
         try
         {
-            logger.debug("triggering timer...");
-            setupMusicPlayer();
-            musicPlayer.play();
+            if (!paused) {
+                logger.debug("triggering timer...");
+                setupMusicPlayer();
+                musicPlayer.play();
+            }
         }
         catch (Exception e)
         {
@@ -251,7 +267,10 @@ public class Timer  implements Serializable, Comparable<Timer>
     public String getHoursAsStr() { return hoursAsStr; }
     public int getMinutes() { return minutes; }
     public String getCountdown() {
-        return String.format("%s:%s:%s", hoursAsStr, minutesAsStr, secondsAsStr);
+        String countdownHours = countDown.getHour() < 10 ? ZERO + countDown.getHour() : String.valueOf(countDown.getHour());
+        String countdownMinutes = countDown.getMinute() < 10 ? ZERO + countDown.getMinute() : String.valueOf(countDown.getMinute());
+        String countdownSeconds = countDown.getSecond() < 10 ? ZERO + countDown.getSecond() : String.valueOf(countDown.getSecond());
+        return String.format("%s:%s:%s", countdownHours, countdownMinutes, countdownSeconds);
     }
     public String getMinutesAsStr() { return minutesAsStr; }
     public boolean isPaused() { return paused; }

@@ -161,7 +161,7 @@ public class ButtonColumn extends AbstractCellEditor
         else
         {
             renderButton.setForeground(Color.BLACK);
-            renderButton.setBackground(Color.GREEN);
+            renderButton.setBackground(Color.WHITE);
         }
 
         if (hasFocus)
