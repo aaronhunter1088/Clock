@@ -19,7 +19,6 @@ import java.awt.event.FocusListener;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import static clock.panel.Panel.*;
 import static java.lang.Thread.sleep;
 import static clock.util.Constants.*;
 
@@ -312,7 +311,7 @@ public class TimerPanel2 extends ClockPanel
         return clock.getListOfTimers().stream()
                 .map(timer -> new Object[] {
                         timer.getName() != null ? timer.getName() : timer.toString(),
-                        timer.getCountdown(),
+                        timer.getCountdownString(),
                         "Pause",
                         "Remove"
                          })
@@ -354,7 +353,7 @@ public class TimerPanel2 extends ClockPanel
                 clock.getListOfTimers().forEach(timer -> {
                     String currentTimer = timersTable.getValueAt(rowIndex.get(), 0).toString();
                     if (currentTimer.equals(timer.getName())) {
-                        timersTable.setValueAt(timer.getCountdown(), rowIndex.get(), 1);
+                        timersTable.setValueAt(timer.getCountdownString(), rowIndex.get(), 1);
                     }
                     // update buttons to show restart or remove
                     if (timer.isTimerGoingOff()) {
@@ -376,10 +375,15 @@ public class TimerPanel2 extends ClockPanel
 
     }
 
+    /**
+     * This method updates the timers and then
+     * updates the timers table to reflect the
+     * changes.
+     */
     public void updateTimersTable()
     {
         logger.info("update timers table");
-        clock.getListOfTimers().forEach(Timer::performCountDown);
+        clock.getListOfTimers().forEach(Timer::startTimer);
         setupTimersTableDefaults(false);
     }
 
@@ -475,7 +479,7 @@ public class TimerPanel2 extends ClockPanel
     public void startTimer(clock.entity.Timer timer)
     {
         logger.info("starting countdown");
-        timer.performCountDown();
+        timer.startTimer();
     }
 
     /**

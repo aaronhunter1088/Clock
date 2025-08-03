@@ -7,6 +7,7 @@ import java.time.DayOfWeek;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.concurrent.ScheduledExecutorService;
 
 import clock.exception.InvalidInputException;
 import javazoom.jl.decoder.JavaLayerException;
@@ -37,6 +38,7 @@ public class Alarm implements Serializable, Comparable<Alarm>
     private boolean alarmGoingOff,updatingAlarm, triggeredToday;
     private Clock clock;
     private AdvancedPlayer musicPlayer;
+    private ScheduledExecutorService scheduler;
 
     /**
      * Creates a new Alarm object with default values
@@ -126,7 +128,7 @@ public class Alarm implements Serializable, Comparable<Alarm>
      */
     public void triggerAlarm()
     {
-        logger.debug("trigger alarm");
+        logger.debug("trigger {}", this);
         try
         {
             logger.debug("playing sound");
@@ -197,13 +199,34 @@ public class Alarm implements Serializable, Comparable<Alarm>
         return shortenedDays;
     }
 
+    /**
+     * Scheduled to run once every second.
+     * For each alarm, check if the alarm's
+     * time and day matches the clocks current
+     * time and day. And, if the alarm is not
+     * already going off, set it to going off.
+     */
+    public void activateAlarm()
+    {
+        if (getAlarmAsString().equals(clock.getClockTimeAsAlarmString())
+                && this.getDays().contains(clock.getDayOfWeek()))
+        {
+            setIsAlarmGoingOff(true);
+            setTriggeredToday(true);
+            logger.info("Alarm {} matches clock's time. Activating alarm", this);
+        }
+        // alarm has reference to time
+        // check all alarms
+        // if any alarm matches clock's time, an alarm should be going off
+    }
+
     @Override
     public String toString()
     {
         if (name == null || name.isBlank())
-        { return hoursAsStr+COLON+minutesAsStr+SPACE+ampm; }
+        { return getAlarmAsString(); }
         else
-        { return name + SPACE + "(" + hoursAsStr+COLON+minutesAsStr+SPACE+ampm + ")"; }
+        { return "(" + name + ")" + SPACE + getAlarmAsString(); }
     }
 
     /* Getters */

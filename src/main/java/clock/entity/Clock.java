@@ -11,6 +11,7 @@ import java.util.Locale;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import clock.exception.InvalidInputException;
+import clock.panel.ClockFrame;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -50,6 +51,7 @@ public class Clock implements Serializable, Comparable<Clock>
     private LocalDateTime currentDateTime;
     private List<Alarm> listOfAlarms;
     private List<Timer> listOfTimers;
+    public ClockFrame clockFrame;
     private boolean isLeapYear, todayMatchesDSTDate,
             dateChanged, isNewYear,
             showFullDate,
@@ -182,6 +184,7 @@ public class Clock implements Serializable, Comparable<Clock>
         setDaylightSavingsTimeDates();
         if (isTodayDaylightSavingsTime()) { setTodayMatchesDSTDate(true); }
         setLeapYear(date.isLeapYear());
+        setDateChanged(false);
     }
 
     /**
@@ -419,7 +422,9 @@ public class Clock implements Serializable, Comparable<Clock>
         performTick(seconds, minutes, hours);
         checkIfItIsNewYears();
         updateTimeIfMidnight();
-        setAlarmsNotTriggered();
+        setActiveAlarms();
+        setActiveTimers();
+        setTriggeredAlarms();
         setTheCurrentTime();
     }
 
@@ -666,56 +671,39 @@ public class Clock implements Serializable, Comparable<Clock>
         }
     }
 
+    private void setActiveAlarms()
+    {
+        getListOfAlarms().forEach(Alarm::activateAlarm);
+        getListOfAlarms().stream().filter(Alarm::isAlarmGoingOff).forEach(Alarm::triggerAlarm);
+    }
+
+    private void setActiveTimers()
+    {
+        List<Timer> timersGoingOff = getListOfTimers().stream()
+                .filter(Timer::isTimerGoingOff)
+                .toList();
+        logger.debug("triggering {} timers", timersGoingOff.size());
+        timersGoingOff.forEach(Timer::triggerTimer);
+        getListOfTimers().forEach(Timer::startTimer);
+        clockFrame.getTimerPanel2().setupTimersTableDefaults(false);
+    }
+
     /**
      * Resets the alarms that were triggered today.
      * This will allow alarms to be reset and not triggered
      * again while the current time is still the same as
      * when the alarm should triggered.
      */
-    private void setAlarmsNotTriggered()
+    public void setTriggeredAlarms()
     {
-        if (getListOfAlarms().isEmpty()) {
-            logger.info("no alarms to update");
-        } else {
-            if (dateChanged) {
-                logger.info("setting all alarms to not triggered today");
-                getListOfAlarms().forEach(alarm -> alarm.setTriggeredToday(false));
-            }
+        if (dateChanged) {
+            AtomicInteger total = new AtomicInteger();
+            getListOfAlarms().forEach(alarm -> {
+                alarm.setTriggeredToday(false);
+                total.getAndIncrement();
+            });
+            logger.info("setting {} alarms to not triggered today", total.get());
         }
-    }
-
-    /**
-     * Scheduled to run once every second.
-     * For each alarm, check if the alarm's
-     * time and day matches the clocks current
-     * time and day. And, if the alarm is not
-     * already going off, set it to going off.
-     */
-    public void setActiveAlarms()
-    {
-        AtomicInteger total = new AtomicInteger();
-        getListOfAlarms().forEach((alarm) -> {
-            if (!alarm.isTriggeredToday()) {
-                for(DayOfWeek day : alarm.getDays()) {
-                    if (alarm.getAlarmAsString().equals(getClockTimeAsAlarmString())
-                            && day == getDayOfWeek()
-                    ) {
-                        alarm.setIsAlarmGoingOff(true);
-                        alarm.setTriggeredToday(true);
-                        total.getAndIncrement();
-                        logger.info("Alarm " + alarm + " matches clock's time. Activating alarm");
-                    }
-                }
-            }
-        });
-        if (total.get() == 0) {
-            logger.info("no alarms are active");
-        } else {
-            logger.info("{} alarms are active", total.get());
-        }
-        // alarm has reference to time
-        // check all alarms
-        // if any alarm matches clock's time, an alarm should be going off
     }
 
     /**
@@ -727,9 +715,9 @@ public class Clock implements Serializable, Comparable<Clock>
             .filter(Alarm::isAlarmGoingOff)
                 .toList();
         if (alarmsToTrigger.isEmpty()) {
-            logger.info("no alarms are going off");
+            logger.debug("no alarms are going off");
         } else {
-            logger.info("triggering {} alarms", alarmsToTrigger.size());
+            logger.debug("triggering {} alarms", alarmsToTrigger.size());
             alarmsToTrigger.forEach(Alarm::triggerAlarm);
         }
     }
@@ -739,18 +727,7 @@ public class Clock implements Serializable, Comparable<Clock>
      */
     public void triggerTimers()
     {
-        boolean anyTimerIsGoingOff = getListOfTimers().stream().anyMatch(Timer::isTimerGoingOff);
-        if (anyTimerIsGoingOff)
-        {
-            List<Timer> timersGoingOff = getListOfTimers().stream()
-                    .filter(Timer::isTimerGoingOff)
-                            .toList();
-            logger.debug("triggering {} timers", timersGoingOff.size());
-            timersGoingOff.forEach(Timer::triggerTimer);
-        }
-        else {
-            logger.info("no timers are going off");
-        }
+
     }
 
     /* Getters */

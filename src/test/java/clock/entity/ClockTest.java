@@ -19,7 +19,7 @@ import static java.time.Month.*;
 import static org.junit.jupiter.api.Assertions.*;
 
 /**
- * Tests for the Clock class
+ * Tests for the {@link Clock} class
  *
  * @author Michael Ball
  * @version 1.0
@@ -36,7 +36,7 @@ class ClockTest
     @BeforeAll
     static void beforeClass()
     {
-        logger.info("Starting ClockTest...");
+        logger.info("Starting {}...", ClockTest.class.getSimpleName());
     }
 
     @BeforeEach
@@ -48,6 +48,9 @@ class ClockTest
     @AfterEach
     void afterEach()
     {}
+
+    @AfterAll
+    static void afterAll() { logger.info("Concluding {}", ClockTest.class.getSimpleName()); }
 
     @Test
     void testDefaultClock()

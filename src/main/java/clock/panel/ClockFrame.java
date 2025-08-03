@@ -27,7 +27,7 @@ import static clock.util.Constants.*;
  * @author michael ball
  *  @version 2.9
  */
-public class ClockFrame extends JFrame implements IClockPanel, Runnable {
+public class ClockFrame extends JFrame implements IClockPanel {
 
     @Serial
     private static final long serialVersionUID = 2L;
@@ -146,6 +146,7 @@ public class ClockFrame extends JFrame implements IClockPanel, Runnable {
     {
         logger.info("Starting Clock...");
         ClockFrame clockFrame = new ClockFrame();
+        clockFrame.getClock().clockFrame = clockFrame;
         clockFrame.start();
     }
 
@@ -341,19 +342,6 @@ public class ClockFrame extends JFrame implements IClockPanel, Runnable {
         };
 
         scheduler.scheduleAtFixedRate(taskRunner.apply(clock::tick), 0, 1, TimeUnit.SECONDS);
-        scheduler.scheduleAtFixedRate(taskRunner.apply(clock::setActiveAlarms), 0, 1, TimeUnit.SECONDS);
-        scheduler.scheduleAtFixedRate(taskRunner.apply(clock::triggerAlarms), 0, 1, TimeUnit.SECONDS);
-        scheduler.scheduleAtFixedRate(taskRunner.apply(this::updateTimersTable), 0, 1, TimeUnit.SECONDS);
-        scheduler.scheduleAtFixedRate(taskRunner.apply(clock::triggerTimers), 0, 1, TimeUnit.SECONDS);
-    }
-
-    /**
-     * Updates the timers table in the timer panel.
-     */
-    private void updateTimersTable()
-    {
-        logger.debug("updating timers table");
-        timerPanel2.updateTimersTable();
     }
 
     /**
@@ -377,18 +365,12 @@ public class ClockFrame extends JFrame implements IClockPanel, Runnable {
 
     @Override
     public void setupSettingsMenu() {
-
+        // handled in the panel
     }
 
     @Override
-    public void printStackTrace(Exception e, String message) {
-
-    }
-
-    @Override
-    public void run() {
-
-    }
+    public void printStackTrace(Exception e, String message)
+    {}
 
     public Panel getPanelType() {
         return panelType;

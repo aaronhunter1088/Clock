@@ -1,5 +1,6 @@
 package clock.exception;
 
+import clock.entity.Clock;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.junit.jupiter.api.AfterEach;
@@ -12,6 +13,12 @@ import java.time.Month;
 import static java.time.Month.*;
 import static org.junit.jupiter.api.Assertions.*;
 
+/**
+ * Tests for the {@link InvalidInputException} class
+ *
+ * @author Michael Ball
+ * @version 2.0
+ */
 class InvalidInputExceptionTest
 {
     private static final Logger logger = LogManager.getLogger(InvalidInputExceptionTest.class);
