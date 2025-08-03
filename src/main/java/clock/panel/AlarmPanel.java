@@ -59,6 +59,7 @@ public class AlarmPanel extends ClockPanel
     private JTextArea textArea; // displays all alarms
     private JScrollPane scrollPane; // scrollable textarea
     private ClockFrame clockFrame; // the clockFrame
+    private Clock clock;
     private Alarm alarm;
     private boolean updatingAlarm;
     //private AdvancedPlayer musicPlayer;
@@ -72,6 +73,7 @@ public class AlarmPanel extends ClockPanel
         super();
         this.clockFrame = clockFrame;
         clockFrame.setClockPanel(PANEL_ALARM);
+        this.clock = clockFrame.getClock();
         setMaximumSize(ClockFrame.alarmSize);
         setGridBagLayout(new GridBagLayout());
         setLayout(layout);
@@ -173,14 +175,14 @@ public class AlarmPanel extends ClockPanel
     void resetJAlarmLabel4()
     {
         logger.info("reset alarm label 4");
-        if (clockFrame.getListOfAlarms().isEmpty())
+        if (clock.getListOfAlarms().isEmpty())
         { alarmLabel4.setText(clockFrame.getClock().defaultText(6)); }// All Alarms label...
         else
         {
             alarmLabel4.setText(
-                clockFrame.getListOfAlarms().size() == 1
-                    ? clockFrame.getListOfAlarms().size() + SPACE+ALARM+SPACE+ADDED
-                    : clockFrame.getListOfAlarms().size() + SPACE+ALARM+S.toLowerCase()+SPACE+ADDED
+                clock.getListOfAlarms().size() == 1
+                    ? clock.getListOfAlarms().size() + SPACE+ALARM+SPACE+ADDED
+                    : clock.getListOfAlarms().size() + SPACE+ALARM+S.toLowerCase()+SPACE+ADDED
             );
         }
     }
@@ -326,10 +328,10 @@ public class AlarmPanel extends ClockPanel
                 updatingAlarm = true; // we want to continue with the logic that's done in the next if
                 this.alarm = alarm;
                 //activeAlarm = null;
-                logger.info("Size of listOfAlarms before removing {}", clockFrame.getListOfAlarms().size());
+                logger.info("Size of listOfAlarms before removing {}", clock.getListOfAlarms().size());
                 // remove alarm from list of alarms
-                clockFrame.getListOfAlarms().remove(alarm);
-                logger.info("Size of listOfAlarms after removing {}", clockFrame.getListOfAlarms().size());
+                clock.getListOfAlarms().remove(alarm);
+                logger.info("Size of listOfAlarms after removing {}", clock.getListOfAlarms().size());
                 deleteAlarmMenuItemFromViewAlarms(alarm);
                 resetJTextArea();
                 clockFrame.getAlarmPanel().getJTextField1().setText(alarm.getHoursAsStr());
@@ -376,7 +378,7 @@ public class AlarmPanel extends ClockPanel
     {
         logger.info("reset textarea");
         textArea.setText(EMPTY);
-        for(Alarm alarm : clockFrame.getListOfAlarms())
+        for(Alarm alarm : clock.getListOfAlarms())
         {
             if (!textArea.getText().isEmpty())
             { textArea.append(NEWLINE); }
@@ -414,9 +416,9 @@ public class AlarmPanel extends ClockPanel
                         alarm = createAlarm();
                     }
                     // checks equality
-                    if (!clockFrame.getListOfAlarms().contains(alarm)) {
+                    if (!clock.getListOfAlarms().contains(alarm)) {
                         addAlarmToAlarmMenu(alarm);
-                        clockFrame.getListOfAlarms().add(alarm);
+                        clock.getListOfAlarms().add(alarm);
                         // display list of alarms below All Alarms
                         resetJTextArea();
                     }
@@ -507,9 +509,9 @@ public class AlarmPanel extends ClockPanel
         }
         // remove alarm from list of alarms
         deleteAlarmMenuItemFromViewAlarms(alarmToUpdate);
-        logger.info("Size of listOfAlarms before removing {}", clockFrame.getListOfAlarms().size());
-        clockFrame.getListOfAlarms().remove(alarmToUpdate);
-        logger.info("Size of listOfAlarms after removing {}", clockFrame.getListOfAlarms().size());
+        logger.info("Size of listOfAlarms before removing {}", clock.getListOfAlarms().size());
+        clock.getListOfAlarms().remove(alarmToUpdate);
+        logger.info("Size of listOfAlarms after removing {}", clock.getListOfAlarms().size());
         resetJTextArea();
         alarmLabel4.setText("Updating alarm");
     }

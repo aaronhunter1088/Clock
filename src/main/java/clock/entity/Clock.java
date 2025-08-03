@@ -5,6 +5,7 @@ import java.io.Serializable;
 import java.time.*;
 import java.time.format.DateTimeFormatter;
 import java.time.format.TextStyle;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -34,7 +35,6 @@ public class Clock implements Serializable, Comparable<Clock>
     @Serial
     private static final long serialVersionUID = 2L;
     private static final Logger logger = LogManager.getLogger(Clock.class);
-    private ClockFrame clockFrame;
 
     private LocalDate date;
     private DayOfWeek dayOfWeek;
@@ -49,7 +49,8 @@ public class Clock implements Serializable, Comparable<Clock>
     private LocalDate beginDaylightSavingsTimeDate,
                       endDaylightSavingsTimeDate;
     private LocalDateTime currentDateTime;
-
+    private List<Alarm> listOfAlarms;
+    private List<Timer> listOfTimers;
     private boolean leapYear, todayMatchesDSTDate,
             dateChanged, isNewYear,
             alarmActive, timerActive,
@@ -64,27 +65,26 @@ public class Clock implements Serializable, Comparable<Clock>
      */
     public Clock()
     {
-        super();
-        initialize(null);
+        this(false);
     }
 
     /**
      * Creates a new Clock object with the testing flag set.
      * @param testing if the clock is for testing purposes
      */
-    public Clock(ClockFrame clockFrame, boolean testing)
+    public Clock(boolean testing)
     {
         super();
         setTestingClock(testing);
-        initialize(clockFrame);
+        initialize();
     }
 
     /**
      * Custom constructor which takes in values for all Clock
-     * parameters and sets them based on those inputs. Expects
-     * non-military time values. Also is the default constructor
-     * for a test clock.
-     * @param hours      the hours to set
+     * parameters and sets them based on those inputs.
+     * If the hours provided is greater than 12, the clock
+     * will assume military time.
+     * @param hours      the hours to set, 0-12/23, depending
      * @param minutes    the minutes to set
      * @param seconds    the seconds to set
      * @param month      the month to set
@@ -98,22 +98,20 @@ public class Clock implements Serializable, Comparable<Clock>
     public Clock(int hours, int minutes, int seconds, Month month, DayOfWeek dayOfWeek,
                  int dayOfMonth, int year, String ampm) throws InvalidInputException
     {
-        this(null, true);
+        logger.info("Initializing Test Clock");
+        setTestingClock(true);
         // Validate the inputs
-        if (!showMilitaryTime) {
-            if (hours < 0 || hours > 12) throw new IllegalArgumentException("Hours must be between 0 and 12");
+        if (hours < 0 || hours > 23) {
+            if (hours > 12) throw new IllegalArgumentException("Hours must be between 0 and 23");
+            else throw new IllegalArgumentException("Hours must be between 0 and 12");
         }
-        else {
-            if (hours < 0 || hours > 23) throw new IllegalArgumentException("Hours must be between 0 and 23");
-        }
-        if (minutes < 0 || minutes > 59 && minutes != 60) throw new IllegalArgumentException("Minutes must be between 0 and 59");
-        if (seconds < 0 || seconds > 59 && seconds != 60) throw new IllegalArgumentException("Seconds must be between 0 and 59");
-        if (!List.of(Month.values()).contains(month)) throw new InvalidInputException("Invalid month '"+month+"'");
-        if (!List.of(DayOfWeek.values()).contains(dayOfWeek)) throw new InvalidInputException("Invalid day of week '"+dayOfWeek+"'");
+        if (minutes < 0 || minutes > 59) throw new IllegalArgumentException("Minutes must be between 0 and 59");
+        if (seconds < 0 || seconds > 59) throw new IllegalArgumentException("Seconds must be between 0 and 59");
         // TODO: Enhance by first checking what month it is. Then determine exactly what values are acceptable for that month and display proper IllegalArgumentException message. Ex: Feb would say between 1 and 28 or even 29 if it is a leap year
         if (dayOfMonth < 1 || dayOfMonth > 31) throw new IllegalArgumentException("The day of month must be between 1 and 31");
         // TODO: May want to think about but for now, the year must be 4 digits long and at least 1000 or more
         if (year < 1000) throw new IllegalArgumentException("Year must be greater than 1000");
+        if (hours > 12) setShowMilitaryTime(true);
         setSeconds(seconds);
         setMinutes(minutes);
         setHours(hours);
@@ -124,6 +122,13 @@ public class Clock implements Serializable, Comparable<Clock>
         setYear(year);
         setTimeZone(getZoneIdFromTimezoneButtonText(EMPTY));
         setTheCurrentTime();
+        setDaylightSavingsTimeDates();
+        if (isTodayDaylightSavingsTime()) { todayMatchesDSTDate = true; }
+        leapYear = date.isLeapYear();
+        listOfAlarms = new ArrayList<>();
+        listOfTimers = new ArrayList<>();
+        daylightSavingsTimeEnabled = true;
+        //this.clockFrame = new ClockFrame(this);
     }
 
     /**
@@ -131,16 +136,16 @@ public class Clock implements Serializable, Comparable<Clock>
      * configuring the menu bar, setting up daylight savings time dates, and creating
      * various clock panels. It also sets the clock's size, location, and icon.
      */
-    public void initialize(ClockFrame clockFrame)
+    private void initialize()
     {
-        logger.info("Initializing Clock");
-        this.clockFrame = clockFrame;
-        if (!testingClock) {
-            setTheTime(LocalDateTime.now());
-            setDaylightSavingsTimeDates();
-            if (isTodayDaylightSavingsTime()) { todayMatchesDSTDate = true; }
-            leapYear = date.isLeapYear();
-        }
+        if (testingClock) { logger.info("Initializing Test Clock"); }
+        else logger.info("Initializing Clock");
+        setTheTime(LocalDateTime.now());
+        setDaylightSavingsTimeDates();
+        if (isTodayDaylightSavingsTime()) { todayMatchesDSTDate = true; }
+        leapYear = date.isLeapYear();
+        listOfAlarms = new ArrayList<>();
+        listOfTimers = new ArrayList<>();
         daylightSavingsTimeEnabled = true;
     }
 
@@ -157,7 +162,7 @@ public class Clock implements Serializable, Comparable<Clock>
         logger.info("Setting the time");
         setSeconds(dateTime.getSecond());
         setMinutes(dateTime.getMinute());
-        setHours(dateTime.getHour()==0 && !showMilitaryTime ? 12 : dateTime.getHour());
+        setHours(dateTime.getHour()==0 ? 12 : dateTime.getHour());
         setAMPM(dateTime.getHour()<12?AM:PM);
         setMonth(dateTime.getMonth());
         setDayOfWeek(dateTime.getDayOfWeek());
@@ -685,12 +690,12 @@ public class Clock implements Serializable, Comparable<Clock>
      */
     private void setAlarmsNotTriggered()
     {
-        if (clockFrame.getListOfAlarms().isEmpty()) {
+        if (getListOfAlarms().isEmpty()) {
             logger.info("no alarms to update");
         } else {
             if (dateChanged) {
                 logger.info("setting all alarms to not triggered today");
-                clockFrame.getListOfAlarms().forEach(alarm -> alarm.setTriggeredToday(false));
+                getListOfAlarms().forEach(alarm -> alarm.setTriggeredToday(false));
             }
         }
     }
@@ -719,7 +724,7 @@ public class Clock implements Serializable, Comparable<Clock>
     public void setActiveAlarms()
     {
         AtomicInteger total = new AtomicInteger();
-        clockFrame.getListOfAlarms().forEach((alarm) -> {
+        getListOfAlarms().forEach((alarm) -> {
             if (!alarm.isTriggeredToday()) {
                 for(DayOfWeek day : alarm.getDays()) {
                     if (alarm.getAlarmAsString().equals(getClockTimeAsAlarmString())
@@ -745,7 +750,7 @@ public class Clock implements Serializable, Comparable<Clock>
 
     public void triggerAlarms()
     {
-        List<Alarm> alarmsToTrigger = clockFrame.getListOfAlarms().stream()
+        List<Alarm> alarmsToTrigger = getListOfAlarms().stream()
             .filter(Alarm::isAlarmGoingOff)
                 .toList();
         if (alarmsToTrigger.isEmpty()) {
@@ -764,10 +769,10 @@ public class Clock implements Serializable, Comparable<Clock>
      */
     public void triggerTimers()
     {
-        boolean anyTimerIsGoingOff = clockFrame.getListOfTimers().stream().anyMatch(Timer::isTimerGoingOff);
+        boolean anyTimerIsGoingOff = getListOfTimers().stream().anyMatch(Timer::isTimerGoingOff);
         if (anyTimerIsGoingOff)
         {
-            List<Timer> timersGoingOff = clockFrame.getListOfTimers().stream()
+            List<Timer> timersGoingOff = getListOfTimers().stream()
                     .filter(Timer::isTimerGoingOff)
                             .toList();
             logger.debug("triggering {} timers", timersGoingOff.size());
@@ -776,12 +781,6 @@ public class Clock implements Serializable, Comparable<Clock>
         else {
             logger.info("no timers are going off");
         }
-    }
-
-    public void updateTimersTable()
-    {
-        logger.info("updating timers table");
-        clockFrame.getTimerPanel2().updateTimersTable();
     }
 
 
@@ -846,7 +845,12 @@ public class Clock implements Serializable, Comparable<Clock>
     public boolean isShowDigitalTimeOnAnalogueClock() { return showDigitalTimeOnAnalogueClock; }
     public boolean isTestingClock() { return testingClock; }
     public boolean isDaylightSavingsTimeEnabled() { return daylightSavingsTimeEnabled; }
-    public ClockFrame getClockFrame() { return clockFrame; }
+    public List<Alarm> getListOfAlarms() {
+        return listOfAlarms;
+    }
+    public List<Timer> getListOfTimers() {
+        return listOfTimers;
+    }
 
     /* Setters */
     /**
@@ -963,9 +967,14 @@ public class Clock implements Serializable, Comparable<Clock>
     public void setShowPartialDate(boolean showPartialDate) { this.showPartialDate = showPartialDate; }
     public void setShowMilitaryTime(boolean showMilitaryTime) { this.showMilitaryTime = showMilitaryTime; }
     public void setShowDigitalTimeOnAnalogueClock(boolean showDigitalTimeOnAnalogueClock) { this.showDigitalTimeOnAnalogueClock = showDigitalTimeOnAnalogueClock; }
-    public void setTestingClock(boolean testingClock) { this.testingClock = testingClock; }
+    private void setTestingClock(boolean testingClock) { this.testingClock = testingClock; }
     public void setDaylightSavingsTimeEnabled(boolean daylightSavingsTimeEnabled) { this.daylightSavingsTimeEnabled = daylightSavingsTimeEnabled; }
-    public void setClockFrame(ClockFrame clockFrame) { this.clockFrame = clockFrame; logger.debug("clock frame set"); }
+    public void setListOfAlarms(List<Alarm> listOfAlarms) {
+        this.listOfAlarms = listOfAlarms;
+    }
+    public void setListOfTimers(List<Timer> listOfTimers) {
+        this.listOfTimers = listOfTimers;
+    }
 
     @Override
     public int compareTo(Clock o) {

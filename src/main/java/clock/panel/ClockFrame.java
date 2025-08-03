@@ -57,8 +57,7 @@ public class ClockFrame extends JFrame implements IClockPanel, Runnable {
     private TimerPanel2 timerPanel2;
 //    private StopwatchPanel stopwatchPanel;
     private Clock clock;
-    private List<Alarm> listOfAlarms;
-    private List<Timer> listOfTimers;
+
     private ScheduledExecutorService scheduler;
 
     /**
@@ -71,16 +70,16 @@ public class ClockFrame extends JFrame implements IClockPanel, Runnable {
     }
 
     /**
-     * Constructor for ClockFrame with a test clock
-     * @param testClock the clock to use for testing
+     * Constructor for ClockFrame with a clock
+     * @param clock the clock to use
      */
-    public ClockFrame(Clock testClock) {
-        super(CLOCK);
+    public ClockFrame(Clock clock) {
+        super("Test" + SPACE + CLOCK);
         logger.info("Creating ClockFrame with test clock");
-        initialize(testClock);
+        initialize(clock);
     }
 
-    private void initialize(Clock testing)
+    private void initialize(Clock clock)
     {
         logger.info("Initializing ClockFrame");
         getContentPane().setBackground(Color.BLACK);
@@ -94,23 +93,20 @@ public class ClockFrame extends JFrame implements IClockPanel, Runnable {
         setLocationRelativeTo(null); // loads the GUI in the center of the screen
         setVisible(true);
         setResizable(false);
-        if (testing != null && testing.isTestingClock()) {
-            clock = testing;
+        if (clock != null) {
+            this.clock = clock;
         } else {
             createClock();
         }
-        clock.setClockFrame(this);
-        listOfAlarms = new ArrayList<>();
-        listOfTimers = new ArrayList<>();
         scheduler = Executors.newScheduledThreadPool(25);
         setupMenuBar(); // daylightSavingsTimeEnabled directly influences menu bar setup
-        if (clock.isTodayDaylightSavingsTime()) { clock.setTodayMatchesDSTDate(true); }
+        if (this.clock.isTodayDaylightSavingsTime()) { this.clock.setTodayMatchesDSTDate(true); }
         digitalClockPanel = new DigitalClockPanel(this);
         analogueClockPanel = new AnalogueClockPanel(this);
         alarmPanel = new AlarmPanel(this);
         timerPanel = new TimerPanel(this);
         timerPanel2 = new TimerPanel2(this);
-        clock.setLeapYear(clock.getDate().isLeapYear());
+        this.clock.setLeapYear(this.clock.getDate().isLeapYear());
         changePanels(PANEL_DIGITAL_CLOCK, false);
     }
 
@@ -134,13 +130,15 @@ public class ClockFrame extends JFrame implements IClockPanel, Runnable {
     }
 
     public static void createAndShowGUI(Clock clock) {
+        logger.info("Starting TestClock...");
         ClockFrame clockFrame = new ClockFrame(clock);
         clockFrame.start();
     }
 
     public static void createAndShowGUI() {
         logger.info("Starting Clock...");
-        createAndShowGUI(null);
+        ClockFrame clockFrame = new ClockFrame();
+        clockFrame.start();
     }
 
     private void createClock()
@@ -276,6 +274,12 @@ public class ClockFrame extends JFrame implements IClockPanel, Runnable {
         timerPanel2.setupSettingsMenu();
     }
 
+    public void updateTimersTable()
+    {
+        logger.info("updating timers table");
+        timerPanel2.updateTimersTable();
+    }
+
 //    public void changeToStopwatchPanel()
 //    {
 //        logger.debug("change to stopwatch panel");
@@ -343,7 +347,7 @@ public class ClockFrame extends JFrame implements IClockPanel, Runnable {
         scheduler.scheduleAtFixedRate(taskRunner.apply(clock::tick), 0, 1, TimeUnit.SECONDS);
         scheduler.scheduleAtFixedRate(taskRunner.apply(clock::setActiveAlarms), 0, 1, TimeUnit.SECONDS);
         scheduler.scheduleAtFixedRate(taskRunner.apply(clock::triggerAlarms), 0, 1, TimeUnit.SECONDS);
-        scheduler.scheduleAtFixedRate(taskRunner.apply(clock::updateTimersTable), 0, 1, TimeUnit.SECONDS);
+        scheduler.scheduleAtFixedRate(taskRunner.apply(this::updateTimersTable), 0, 1, TimeUnit.SECONDS);
         scheduler.scheduleAtFixedRate(taskRunner.apply(clock::triggerTimers), 0, 1, TimeUnit.SECONDS);
     }
 
@@ -460,22 +464,6 @@ public class ClockFrame extends JFrame implements IClockPanel, Runnable {
 
     public Clock getClock() {
         return clock;
-    }
-
-    public List<Alarm> getListOfAlarms() {
-        return listOfAlarms;
-    }
-
-    public void setListOfAlarms(List<Alarm> listOfAlarms) {
-        this.listOfAlarms = listOfAlarms;
-    }
-
-    public List<Timer> getListOfTimers() {
-        return listOfTimers;
-    }
-
-    public void setListOfTimers(List<Timer> listOfTimers) {
-        this.listOfTimers = listOfTimers;
     }
 
     public ScheduledExecutorService getScheduler() {

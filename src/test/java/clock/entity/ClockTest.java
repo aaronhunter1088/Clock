@@ -1,22 +1,23 @@
 package clock.entity;
 
 import clock.exception.InvalidInputException;
-import clock.panel.ClockFrame;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.junit.jupiter.api.*;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 
-import java.lang.reflect.InvocationTargetException;
+import java.time.DateTimeException;
+import java.time.DayOfWeek;
 import java.time.LocalDate;
+import java.time.Month;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
-import java.util.List;
 
+import static clock.util.Constants.*;
 import static java.lang.Thread.sleep;
 import static java.time.DayOfWeek.*;
 import static java.time.Month.*;
-import static clock.util.Constants.*;
-import static javax.swing.WindowConstants.DISPOSE_ON_CLOSE;
 import static org.junit.jupiter.api.Assertions.*;
 
 /**
@@ -33,19 +34,136 @@ class ClockTest
 
     @BeforeAll
     static void beforeClass()
-    { logger.info("Starting ClockTest..."); }
+    {
+        logger.info("Starting ClockTest...");
+    }
 
     @BeforeEach
     void beforeEach()
     {
-        ClockFrame clockFrame = new ClockFrame();
-        clock = new Clock(clockFrame, true);
-        clockFrame.setClock(clock);
+        clock = new Clock(true);
     }
 
     @AfterEach
     void afterEach()
     {}
+
+    @Test
+    void testDefaultClock()
+    {
+        clock = new Clock();
+
+        assertNotNull(clock.getCurrentDateTime(), "The current time should not be null");
+    }
+
+    @Test
+    void testProvidedValuesClockStandardTime()
+    {
+        int hours = 10;
+        int minutes = 30;
+        int seconds = 45;
+        Month month = AUGUST;
+        DayOfWeek dayOfWeek = SATURDAY;
+        int dayOfMonth = 15;
+        int year = 2023;
+        String ampm = AM;
+        clock = new Clock(hours, minutes, seconds, month, dayOfWeek, dayOfMonth, year, ampm);
+
+        assertNotNull(clock.getCurrentDateTime(), "The current time should not be null");
+        assertEquals(hours, clock.getHours(), "Hours should match");
+        assertEquals(minutes, clock.getMinutes(), "Minutes should match");
+        assertEquals(seconds, clock.getSeconds(), "Seconds should match");
+        assertEquals(month, clock.getMonth(), "Month should match");
+        assertEquals(dayOfWeek, clock.getDayOfWeek(), "Day of week should match");
+        assertEquals(dayOfMonth, clock.getDayOfMonth(), "Day of month should match");
+        assertEquals(year, clock.getYear(), "Year should match");
+        assertEquals(ampm, clock.getAMPM(), "AM/PM should match");
+        assertFalse(clock.isShowMilitaryTime(), "Military time should be off");
+        assertTrue(clock.isDaylightSavingsTimeEnabled(), "Daylight savings time should be on");
+    }
+
+    @Test
+    void testProvidedValuesClockMilitaryTime()
+    {
+        int hours = 13; // 1 PM in military time
+        int minutes = 30;
+        int seconds = 45;
+        Month month = AUGUST;
+        DayOfWeek dayOfWeek = SATURDAY;
+        int dayOfMonth = 15;
+        int year = 2023;
+        String ampm = PM;
+        clock = new Clock(hours, minutes, seconds, month, dayOfWeek, dayOfMonth, year, ampm);
+
+        assertNotNull(clock.getCurrentDateTime(), "The current time should not be null");
+        assertEquals(hours, clock.getHours(), "Hours should match");
+        assertEquals(minutes, clock.getMinutes(), "Minutes should match");
+        assertEquals(seconds, clock.getSeconds(), "Seconds should match");
+        assertEquals(month, clock.getMonth(), "Month should match");
+        assertEquals(dayOfWeek, clock.getDayOfWeek(), "Day of week should match");
+        assertEquals(dayOfMonth, clock.getDayOfMonth(), "Day of month should match");
+        assertEquals(year, clock.getYear(), "Year should match");
+        assertEquals(ampm, clock.getAMPM(), "AM/PM should match");
+        assertTrue(clock.isShowMilitaryTime(), "Military time should be on");
+        assertTrue(clock.isDaylightSavingsTimeEnabled(), "Daylight savings time should be on");
+    }
+
+    @ParameterizedTest
+    @ValueSource(ints = {-1, 24})
+    void testProvidedInvalidHoursThrowsIllegalArgumentException(int hours)
+    {
+        final var exception = assertThrows(IllegalArgumentException.class, () -> new Clock(hours, 0, 0, JANUARY, MONDAY, 1, 2022, AM),
+                "Expected IllegalArgumentException for invalid hours: " + hours);
+        if (hours < 0) {
+            assertEquals("Hours must be between 0 and 12", exception.getMessage(), "Expected message for hours < 0");
+        } else {
+            assertEquals("Hours must be between 0 and 23", exception.getMessage(), "Expected message for hours > 23");
+        }
+    }
+
+    @ParameterizedTest
+    @ValueSource(ints = {-1, 60})
+    void testProvidedInvalidMinutesThrowsIllegalArgumentException(int minutes)
+    {
+        final var exception = assertThrows(IllegalArgumentException.class, () -> new Clock(10, minutes, 0, JANUARY, MONDAY, 1, 2022, AM),
+                "Expected IllegalArgumentException for invalid minutes: " + minutes);
+        if (minutes < 0) {
+            assertEquals("Minutes must be between 0 and 59", exception.getMessage(), "Expected message for minutes < 0");
+        } else {
+            assertEquals("Minutes must be between 0 and 59", exception.getMessage(), "Expected message for minutes > 59");
+        }
+    }
+
+    @ParameterizedTest
+    @ValueSource(ints = {-1, 60})
+    void testProvidedInvalidSecondsThrowsIllegalArgumentException(int seconds)
+    {
+        final var exception = assertThrows(IllegalArgumentException.class, () -> new Clock(10, 0, seconds, JANUARY, MONDAY, 1, 2022, AM),
+                "Expected IllegalArgumentException for invalid seconds: " + seconds);
+        if (seconds < 0) {
+            assertEquals("Seconds must be between 0 and 59", exception.getMessage(), "Expected message for seconds < 0");
+        } else {
+            assertEquals("Seconds must be between 0 and 59", exception.getMessage(), "Expected message for seconds > 59");
+        }
+    }
+
+    @ParameterizedTest
+    @ValueSource(ints = {-1, 32})
+    void testProvidedInvalidDayOfMonthThrowsIllegalArgumentException(int dayOfMonth)
+    {
+        final var exception = assertThrows(IllegalArgumentException.class, () -> new Clock(10, 0, 0, JANUARY, MONDAY, dayOfMonth, 2022, AM),
+                "Expected IllegalArgumentException for invalid dayOfMonth: " + dayOfMonth);
+        assertEquals("The day of month must be between 1 and 31", exception.getMessage(), "Expected message for invalid dayOfMonth");
+    }
+
+    @ParameterizedTest
+    @ValueSource(ints = {-1, 999})
+    void testProvidedInvalidYearThrowsIllegalArgumentException(int year)
+    {
+        final var exception = assertThrows(IllegalArgumentException.class, () -> new Clock(10, 0, 0, JANUARY, MONDAY, 1, year, AM),
+                "Expected IllegalArgumentException for invalid year: " + year);
+        assertEquals("Year must be greater than 1000", exception.getMessage(), "Expected message for invalid year");
+    }
 
     @Test
     void testBeginningDayLightSavingsTimeIsProperlySet()
@@ -93,7 +211,6 @@ class ClockTest
     @Test
     void testLocalDatesAreCompared()
     {
-        clock = new Clock(); // default constructor sets current time
         LocalDate today = LocalDate.now();
         assertEquals(clock.getDate(), today, "Dates should be equal");
 
@@ -212,23 +329,20 @@ class ClockTest
         clock.setAMPM(PM);
         clock.setTheCurrentTime();
         Alarm alarm = new Alarm("Test", 1, 1, PM, false, new ArrayList<>(){{add(SATURDAY);}}, clock);
-        clock.getClockFrame().getListOfAlarms().add(alarm);
+        clock.getListOfAlarms().add(alarm);
 
-        assertEquals(1, clock.getClockFrame().getListOfAlarms().size());
+        assertEquals(1, clock.getListOfAlarms().size());
 
         tick(4);
         javax.swing.SwingUtilities.invokeLater(() -> {
-            assertTrue(clock.getClockFrame().getListOfAlarms().getFirst().isAlarmGoingOff());
+            assertTrue(clock.getListOfAlarms().getFirst().isAlarmGoingOff());
         });
     }
 
     @Test
     @DisplayName("Test turn off dst setting")
-    void testTurnOffDSTSetting() {
-        clock = new Clock(); // isDaylightSavingsTimeEnabled is true by default
-        ClockFrame clockFrame = new ClockFrame(clock);
-        clock.setTestingClock(true);
-        clock.setClockFrame(clockFrame);
+    void testTurnOffDSTSetting()
+    {
         LocalDate endDSTDate = clock.getEndDaylightSavingsTimeDate();
         clock.setHours(1);
         clock.setMinutes(59);
@@ -253,10 +367,6 @@ class ClockTest
     @Test
     void testDSTSettingWhenSettingIsFalse()
     {
-        clock = new Clock();
-        clock.setTestingClock(true);
-        ClockFrame clockFrame = new ClockFrame();
-        clock.setClockFrame(clockFrame);
         clock.setDaylightSavingsTimeEnabled(false);
         clock.getClockFrame().getClockMenuBar().getToggleDSTSetting().setText(Turn+SPACE+on+SPACE+DST_SETTING);
 
@@ -324,9 +434,9 @@ class ClockTest
         clock.setYear(2024);
         clock.setAMPM(PM);
         clock.tick(2,1,1);
-        assertEquals("07", clock.getHoursAsStr(), "Expected hoursAsStr to be 07");
-        assertEquals("00", clock.getMinutesAsStr(), "Expected minutesAsStr to be 00");
-        assertEquals("08", clock.getSecondsAsStr(), "Expected secondsAsStr to be 08");
+        assertEquals(ZERO+SEVEN, clock.getHoursAsStr(), "Expected hoursAsStr to be 07");
+        assertEquals(ZERO+ZERO, clock.getMinutesAsStr(), "Expected minutesAsStr to be 00");
+        assertEquals(ZERO+EIGHT, clock.getSecondsAsStr(), "Expected secondsAsStr to be 08");
         assertEquals(7, clock.getHours(), "Expected hours to be 7");
         assertEquals(0, clock.getMinutes(), "Expected minutes to be 0");
         assertEquals(8, clock.getSeconds(), "Expected seconds to be 8");
@@ -346,14 +456,13 @@ class ClockTest
         sleep(2000); // needed because it wasn't displaying immediately
         clock.tick(2,3,4);
         sleep(2000); // needed because it needed a second to refresh
-        assertEquals("11", clock.getHoursAsStr(), "Expected hoursAsStr to be 11");
-        assertEquals("02", clock.getMinutesAsStr(), "Expected minutesAsStr to be 02");
-        assertEquals("00", clock.getSecondsAsStr(), "Expected secondsAsStr to be 00");
+        assertEquals(ONE+ONE, clock.getHoursAsStr(), "Expected hoursAsStr to be 11");
+        assertEquals(ZERO+TWO, clock.getMinutesAsStr(), "Expected minutesAsStr to be 02");
+        assertEquals(ZERO+ZERO, clock.getSecondsAsStr(), "Expected secondsAsStr to be 00");
         assertEquals(11, clock.getHours(), "Expected hours to be 11");
         assertEquals(2, clock.getMinutes(), "Expected minutes to be 2");
         assertEquals(0, clock.getSeconds(), "Expected seconds to be 0");
     }
-
 
     // Helper methods
     private void tick(int times) {

@@ -159,11 +159,11 @@ public class ClockMenuBar extends JMenuBar
         getPauseResumeAllTimersSetting().addActionListener(action -> {
             logger.info("clicked pause/resume all timers setting");
             if (getPauseResumeAllTimersSetting().getText().equals("Pause All Timers")) {
-                clockFrame.getListOfTimers().forEach(Timer::pauseTimer);
+                clock.getListOfTimers().forEach(Timer::pauseTimer);
                 getPauseResumeAllTimersSetting().setText("Resume All Timers");
                 getPauseResumeAllTimersSetting().setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_R, InputEvent.CTRL_DOWN_MASK));
             } else {
-                clockFrame.getListOfTimers().forEach(Timer::resumeTimer);
+                clock.getListOfTimers().forEach(Timer::resumeTimer);
                 getPauseResumeAllTimersSetting().setText("Pause All Timers");
                 getPauseResumeAllTimersSetting().setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_P, InputEvent.CTRL_DOWN_MASK));
             }
@@ -184,7 +184,7 @@ public class ClockMenuBar extends JMenuBar
         getSetAlarms().setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_A, InputEvent.CTRL_DOWN_MASK));
         getSetAlarms().addActionListener(action -> clockFrame.changePanels(PANEL_ALARM, true));
 
-        setTimerFeature(new JMenuItem(VIEW_TIMER));
+        setTimerFeature(new JMenuItem(VIEW_TIMERS));
         getTimerFeature().setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_T, InputEvent.CTRL_DOWN_MASK));
         getTimerFeature().addActionListener(action -> clockFrame.changePanels(PANEL_TIMER2, false));
 

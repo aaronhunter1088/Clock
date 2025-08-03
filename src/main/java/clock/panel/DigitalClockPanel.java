@@ -170,16 +170,16 @@ public class DigitalClockPanel extends ClockPanel implements Runnable
         String dateStr = clock.defaultText(1);
         String timeStr = clock.defaultText(2);
         // Adjust as needed
-        java.util.List<Alarm> clockAlarms = clockFrame.getListOfAlarms();
-        java.util.List<Timer> clockTimers = clockFrame.getListOfTimers();
+        java.util.List<Alarm> clockAlarms = clock.getListOfAlarms();
+        java.util.List<Timer> clockTimers = clock.getListOfTimers();
         boolean alarmsGoingOff = clockAlarms.stream().anyMatch(Alarm::isAlarmGoingOff);
         long alarmsGoingOffCount = clockAlarms.stream().filter(Alarm::isAlarmGoingOff).count();
         boolean timersGoingOff = clockTimers.stream().anyMatch(Timer::isTimerGoingOff);
         long timersGoingOffCount = clockTimers.stream().filter(Timer::isTimerGoingOff).count();
         // TODO: Combine with variables above. This should be so that we display appropriate message
-        if (clockFrame.getListOfAlarms().stream().anyMatch(Alarm::isAlarmGoingOff))
+        if (clock.getListOfAlarms().stream().anyMatch(Alarm::isAlarmGoingOff))
         {
-            var activeAlarms = clockFrame.getListOfAlarms().stream().filter(Alarm::isAlarmGoingOff).toList();
+            var activeAlarms = clock.getListOfAlarms().stream().filter(Alarm::isAlarmGoingOff).toList();
             dateStr = activeAlarms.size() == 1
                     ? (activeAlarms.getFirst().getName() != null)
                         ? activeAlarms.getFirst().getName()
@@ -190,7 +190,7 @@ public class DigitalClockPanel extends ClockPanel implements Runnable
         // Show which timer is going off
         else if (clockFrame.getCurrentPanel() instanceof TimerPanel2 timerPanel)
         {
-            var activeTimers = clockFrame.getListOfTimers().stream().filter(Timer::isTimerGoingOff).toList();
+            var activeTimers = clock.getListOfTimers().stream().filter(Timer::isTimerGoingOff).toList();
             dateStr = activeTimers.size() == 1 ? "One Timer" : "Many Timers";
             timeStr = activeTimers.size() == 1 ? is+SPACE+going_off : are+SPACE+going_off;
         }
@@ -241,7 +241,7 @@ public class DigitalClockPanel extends ClockPanel implements Runnable
 
     private void updateAlarms()
     {
-        clockFrame.getListOfAlarms().forEach((alarm) -> {
+        clock.getListOfAlarms().forEach((alarm) -> {
             for(DayOfWeek day : alarm.getDays()) {
                 if (alarm.getAlarmAsString().equals(clock.getClockTimeAsAlarmString())
                         &&
