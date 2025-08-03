@@ -14,7 +14,6 @@ import clock.panel.*;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import static java.lang.Thread.sleep;
 import static java.time.Month.*;
 import static java.time.DayOfWeek.*;
 import static clock.util.Constants.*;
@@ -63,10 +62,10 @@ public class Clock implements Serializable, Comparable<Clock>
     /**
      * Default constructor for the Clock class.
      */
-    public Clock(ClockFrame clockFrame)
+    public Clock()
     {
         super();
-        initialize(clockFrame);
+        initialize(null);
     }
 
     /**
@@ -141,8 +140,8 @@ public class Clock implements Serializable, Comparable<Clock>
             setDaylightSavingsTimeDates();
             if (isTodayDaylightSavingsTime()) { todayMatchesDSTDate = true; }
             leapYear = date.isLeapYear();
-            daylightSavingsTimeEnabled = true;
         }
+        daylightSavingsTimeEnabled = true;
     }
 
     /**
@@ -158,7 +157,7 @@ public class Clock implements Serializable, Comparable<Clock>
         logger.info("Setting the time");
         setSeconds(dateTime.getSecond());
         setMinutes(dateTime.getMinute());
-        setHours(dateTime.getHour());
+        setHours(dateTime.getHour()==0 && !showMilitaryTime ? 12 : dateTime.getHour());
         setAMPM(dateTime.getHour()<12?AM:PM);
         setMonth(dateTime.getMonth());
         setDayOfWeek(dateTime.getDayOfWeek());
@@ -175,9 +174,9 @@ public class Clock implements Serializable, Comparable<Clock>
      */
     public void setTheCurrentTime()
     {
+        setTimeZone(ZoneId.systemDefault());
         setDate(LocalDate.of(year, month, dayOfMonth));
-        if (ampm.equals(PM)) setTime(LocalTime.of((hours+12), minutes, seconds));
-        else setTime(LocalTime.of(hours, minutes, seconds));
+        setTime(LocalTime.of(hours, minutes, seconds));
         setCurrentDateTime(LocalDateTime.of(date, time));
         setDaylightSavingsTimeDates();
         if (isTodayDaylightSavingsTime()) { setTodayMatchesDSTDate(true); }

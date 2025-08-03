@@ -113,14 +113,14 @@ public class ClockMenuBar extends JMenuBar
             getFullTimeSetting().setText(SHOW+SPACE+FULL_TIME_SETTING);
         });
 
-        setToggleDSTSetting(new JMenuItem(Turn+SPACE+(clock.isDaylightSavingsTimeEnabled()?off:on)+SPACE+DST_SETTING));
+        setToggleDSTSetting(new JMenuItem(Turn+SPACE+off+SPACE+DST_SETTING));
         getToggleDSTSetting().setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_T, InputEvent.CTRL_DOWN_MASK));
         getToggleDSTSetting().setForeground(Color.WHITE);
         getToggleDSTSetting().addActionListener(action -> {
             var isEnabled = clock.isDaylightSavingsTimeEnabled();
             logger.debug("toggling dst to be {}", !isEnabled);
             clock.setDaylightSavingsTimeEnabled(!isEnabled);
-            getToggleDSTSetting().setText(Turn+SPACE+(clock.isDaylightSavingsTimeEnabled()?on:off)+SPACE+DST_SETTING);
+            getToggleDSTSetting().setText(Turn+SPACE+(clock.isDaylightSavingsTimeEnabled()?off:on)+SPACE+DST_SETTING);
             logger.debug("setting text: '{}'", getToggleDSTSetting().getText());
         });
 

@@ -96,10 +96,10 @@ public class ClockFrame extends JFrame implements IClockPanel, Runnable {
         setResizable(false);
         if (testing != null && testing.isTestingClock()) {
             clock = testing;
-            clock.setClockFrame(this);
         } else {
             createClock();
         }
+        clock.setClockFrame(this);
         listOfAlarms = new ArrayList<>();
         listOfTimers = new ArrayList<>();
         scheduler = Executors.newScheduledThreadPool(25);
@@ -143,12 +143,10 @@ public class ClockFrame extends JFrame implements IClockPanel, Runnable {
         createAndShowGUI(null);
     }
 
-    private void createClock() {
+    private void createClock()
+    {
         logger.info("Creating Clock");
-        clock = new Clock(this);
-        clock.setTimeZone(clock.getZoneIdFromTimezoneButtonText(EMPTY));
-        clock.setDaylightSavingsTimeEnabled(false);
-        clock.setShowDigitalTimeOnAnalogueClock(true);
+        clock = new Clock();
     }
 
     /**

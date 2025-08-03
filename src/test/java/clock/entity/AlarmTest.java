@@ -15,7 +15,7 @@ import static javax.swing.WindowConstants.DISPOSE_ON_CLOSE;
  * @author Michael Ball
  * @version 2.9
  */
-public class AlarmTest {
+class AlarmTest {
 
     private static final Logger logger = LogManager.getLogger();
 
@@ -29,7 +29,6 @@ public class AlarmTest {
     void beforeEach()
     {
         clock = new Clock();
-        clock.setDefaultCloseOperation(DISPOSE_ON_CLOSE);
     }
 
     @AfterEach
