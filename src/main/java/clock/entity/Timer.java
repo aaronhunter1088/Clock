@@ -114,11 +114,11 @@ public class Timer implements Serializable, Comparable<Timer>, Runnable
         this.name = StringUtils.isBlank(name) ? null : name;
         setupMusicPlayer();
         timersCounter++;
+        logger.debug("Total timers created: {}", timersCounter);
         if (timersCounter == 100L) {
             logger.info("Restarting counter for timers");
             timersCounter = 0L;
         }
-        logger.debug("Timer {} created", timersCounter);
         logger.info("Timer created");
     }
 

@@ -43,14 +43,20 @@ public class Alarm implements Serializable, Comparable<Alarm>, Runnable
 
     /**
      * Creates a new Alarm object with default values
+     * Needed for testing purposes. When using
+     * @InjectMocks in tests, a default constructor
+     * is required. Otherwise you will see a
+     * MockitoException: Cannot instantiate @InjectMocks
+     * named 'some alarm' Cause: the type 'Alarm' has
+     * not default constructor.
      * @throws InvalidInputException thrown when invalid input is given
      */
     public Alarm() throws InvalidInputException
     {
         this("Alarm"+(Alarm.alarmsCounter+1), 0, 0, AM, new ArrayList<>(), false, null);
-        logger.debug("Alarm created");
+        logger.debug("Default alarm created");
     }
-
+//
 //    /**
 //     * @param clock the clock object
 //     * @param isUpdateAlarm if the alarm is being updated
@@ -85,14 +91,14 @@ public class Alarm implements Serializable, Comparable<Alarm>, Runnable
         setDays(days);
         setUpdatingAlarm(updatingAlarm);
         setName(name);
-        setupMusicPlayer();
+        //setupMusicPlayer();
         alarmsCounter++;
+        logger.debug("Total alarms created: {}", alarmsCounter);
         if (alarmsCounter == 100L) {
             logger.info("Restarting counter for alarms");
             alarmsCounter = 0L;
         }
-        logger.debug("Alarm {} created", alarmsCounter);
-        logger.info("Alarm created with specific times");
+        logger.info("Alarm created");
     }
 
     /**
@@ -124,6 +130,7 @@ public class Alarm implements Serializable, Comparable<Alarm>, Runnable
         logger.info("stop alarm");
         musicPlayer = null;
         alarmGoingOff = false;
+        selfThread = null;
         logger.info("{} alarm turned off", this);
     }
 
@@ -213,14 +220,6 @@ public class Alarm implements Serializable, Comparable<Alarm>, Runnable
     }
 
     /**
-     * This method prints the stack trace of an exception
-     * that may occur when the digital panel is in use.
-     * @param e the exception
-     */
-    void printStackTrace(Exception e)
-    { printStackTrace(e, ""); }
-
-    /**
      * Returns a shortened version of the day
      * @return a string representing the day
      */
@@ -230,10 +229,17 @@ public class Alarm implements Serializable, Comparable<Alarm>, Runnable
         List<String> shortenedDays = new ArrayList<>();
         shortenedDays.add("Days: ");
         if (days.contains(MONDAY) && days.contains(TUESDAY) &&
-            days.contains(WEDNESDAY) && days.contains(THURSDAY) && days.contains(FRIDAY))
+            days.contains(WEDNESDAY) && days.contains(THURSDAY) && days.contains(FRIDAY)
+            && !days.contains(SATURDAY) && !days.contains(SUNDAY))
         { shortenedDays.add("Weekdays "); }
-        else if (days.contains(SATURDAY) && days.contains(SUNDAY))
+        else if (!days.contains(MONDAY) && !days.contains(TUESDAY) &&
+                !days.contains(WEDNESDAY) && !days.contains(THURSDAY) && !days.contains(FRIDAY)
+                && days.contains(SATURDAY) && days.contains(SUNDAY))
         { shortenedDays.add("Weekends "); }
+        else if (days.contains(MONDAY) && days.contains(TUESDAY) &&
+                days.contains(WEDNESDAY) && days.contains(THURSDAY) && days.contains(FRIDAY)
+                && days.contains(SATURDAY) && days.contains(SUNDAY))
+        { shortenedDays.add("Every day "); }
         else
         {
             for(DayOfWeek day : days)

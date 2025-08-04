@@ -1,19 +1,30 @@
 package clock.entity;
 
 import clock.exception.InvalidInputException;
+import javazoom.jl.decoder.JavaLayerException;
+import javazoom.jl.player.advanced.AdvancedPlayer;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.MockitoAnnotations;
 
 import java.time.DayOfWeek;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
+import java.time.temporal.ChronoField;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import static clock.util.Constants.*;
 import static java.lang.Thread.sleep;
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.Mockito.*;
 
 /**
  * Tests for the {@link Alarm} class
@@ -26,10 +37,13 @@ class AlarmTest {
     private static final Logger logger = LogManager.getLogger();
 
     private Clock clock;
-    private List<DayOfWeek> weekDays = List.of(DayOfWeek.MONDAY, DayOfWeek.TUESDAY, DayOfWeek.WEDNESDAY, DayOfWeek.THURSDAY, DayOfWeek.FRIDAY),
+    private final List<DayOfWeek> weekDays = List.of(DayOfWeek.MONDAY, DayOfWeek.TUESDAY, DayOfWeek.WEDNESDAY, DayOfWeek.THURSDAY, DayOfWeek.FRIDAY),
             weekendDays = List.of(DayOfWeek.SATURDAY, DayOfWeek.SUNDAY);
-    private Alarm alarm1, alarm2,
-            morningAlarm = new Alarm("Morning Alarm", 7, 30, AM, weekDays, false, clock);
+    @InjectMocks
+    private Alarm alarm1, alarm2, weekDays730AmAlarm, weekend10AmAlarm;
+
+    @Mock
+    private AdvancedPlayer musicPlayerMock;
 
     private List<Alarm> alarms = new ArrayList<>();
 
@@ -40,7 +54,10 @@ class AlarmTest {
     @BeforeEach
     void beforeEach()
     {
+        MockitoAnnotations.initMocks(this);
         clock = new Clock();
+        weekDays730AmAlarm = new Alarm("Weekday Alarm", 7, 30, AM, weekDays, false, clock);
+        weekend10AmAlarm = new Alarm("Weekend Alarm", 10, 0, AM, weekendDays, false, clock);
     }
 
     @AfterEach
@@ -80,7 +97,8 @@ class AlarmTest {
     @ParameterizedTest
     @ValueSource(ints = {-1, 25})
     @DisplayName("Test Creating Alarm with Invalid Hours")
-    void testCreateAlarmWithInvalidHours(int hours) {
+    void testCreateAlarmWithInvalidHours(int hours)
+    {
         final var exception = assertThrows(InvalidInputException.class, () -> new Alarm("Invalid", hours, 0, AM, List.of(DayOfWeek.MONDAY), false, clock),
                 "Creating an alarm with invalid hours should throw an exception");
         assertEquals("Hours must be between 0 and 12", exception.getMessage(), "Exception message should indicate invalid hours");
@@ -89,7 +107,8 @@ class AlarmTest {
     @ParameterizedTest
     @ValueSource(ints = {-1, 60})
     @DisplayName("Test Creating Alarm with Invalid Minutes")
-    void testCreateAlarmWithInvalidMinutes(int minutes) {
+    void testCreateAlarmWithInvalidMinutes(int minutes)
+    {
         final var exception = assertThrows(InvalidInputException.class, () -> new Alarm("Invalid", 1, minutes, AM, List.of(DayOfWeek.MONDAY), false, clock),
                 "Creating an alarm with invalid hours should throw an exception");
         assertEquals("Minutes must be between 0 and 59", exception.getMessage(), "Exception message should indicate invalid hours");
@@ -97,16 +116,198 @@ class AlarmTest {
 
     @Test
     @DisplayName("Activate An Alarm")
-    void testActivateAnAlarm() {
-        alarm1 = morningAlarm;
+    void testActivateAnAlarm()
+    {
+        alarm1 = weekDays730AmAlarm;
         alarm1.startAlarm();
 
         sleep(1000);
 
-        assertNotNull(alarm1.getSelfThread(), "Alarm should be active after activation");
-        assertFalse(alarm1.isUpdatingAlarm(), "Alarm should not be updating after activation");
+        assertNotNull(alarm1.getSelfThread(), "Alarm should be active");
+        assertFalse(alarm1.isUpdatingAlarm(), "Alarm should not be in update mode");
+        assertFalse(alarm1.isAlarmGoingOff(), "Alarm should not be going off");
     }
 
+    @Test
+    @DisplayName("Activate An Alarm that is already active does nothing")
+    void testActivateAnAlarmThatIsAlreadyActive()
+    {
+        alarm1 = weekDays730AmAlarm;
+        alarm1.startAlarm();
+
+        sleep(1000);
+
+        assertNotNull(alarm1.getSelfThread(), "Alarm should be active");
+        assertFalse(alarm1.isUpdatingAlarm(), "Alarm should not be in update mode");
+        assertFalse(alarm1.isAlarmGoingOff(), "Alarm should not be going off");
+
+        // Attempt to start the alarm again
+        alarm1.startAlarm();
+
+        assertNotNull(alarm1.getSelfThread(), "Alarm should still be active");
+        assertFalse(alarm1.isUpdatingAlarm(), "Alarm should not be in update mode");
+        assertFalse(alarm1.isAlarmGoingOff(), "Alarm should not be going off");
+    }
+
+    @Test
+    @DisplayName("Deactivate An Alarm")
+    void testDeactivateAnAlarm()
+    {
+        alarm1 = weekDays730AmAlarm;
+        alarm1.startAlarm();
+
+        sleep(1000);
+
+        assertNotNull(alarm1.getSelfThread(), "Alarm should be active");
+        assertFalse(alarm1.isUpdatingAlarm(), "Alarm should not be in update mode");
+        assertFalse(alarm1.isAlarmGoingOff(), "Alarm should not be going off");
+
+        alarm1.stopAlarm();
+
+        assertNull(alarm1.getSelfThread(), "Alarm should be inactive");
+        assertFalse(alarm1.isUpdatingAlarm(), "Alarm should not be in update mode");
+        assertFalse(alarm1.isAlarmGoingOff(), "Alarm should not be going off");
+    }
+
+    @Test
+    @DisplayName("Test Alarm Is Triggered")
+    void testTriggerAnAlarm()
+    {
+        alarm1 = weekDays730AmAlarm;
+
+        // Simulate the clock reaching the alarm time
+        LocalDate date = LocalDateTime.now().toLocalDate().with(ChronoField.DAY_OF_WEEK, DayOfWeek.MONDAY.getValue());
+        LocalTime time = LocalDateTime.now().toLocalTime().withHour(7).withMinute(30);
+        LocalDateTime dateTime = LocalDateTime.of(date, time);
+        clock.setTheTime(dateTime);
+
+        alarm1.startAlarm();
+        sleep(1000); // Allow time for the alarm to trigger
+
+        javax.swing.SwingUtilities.invokeLater(() -> {
+            assertTrue(alarm1.isAlarmGoingOff(), "Alarm should be going off");
+            assertTrue(alarm1.isTriggeredToday(), "Alarm should be triggered today");
+            assertNotNull(alarm1.getMusicPlayer(), "Music player should be set");
+        });
+    }
+
+    @Test
+    @DisplayName("Checking An Alarm when not equal to current time does nothing")
+    void testCheckingAnAlarmWhenNotEqualToCurrentTimeDoesNothing()
+    {
+        alarm1 = weekDays730AmAlarm;
+
+        // Simulate the clock not reaching the alarm time
+        LocalDate date = LocalDateTime.now().toLocalDate().with(ChronoField.DAY_OF_WEEK, DayOfWeek.MONDAY.getValue());
+        LocalTime time = LocalDateTime.now().toLocalTime().withHour(6).withMinute(30);
+        LocalDateTime dateTime = LocalDateTime.of(date, time);
+        clock.setTheTime(dateTime);
+
+        alarm1.startAlarm();
+        sleep(1000);
+
+        javax.swing.SwingUtilities.invokeLater(() -> {
+            assertNull(alarm1.getMusicPlayer(), "Music player should not be set yet");
+        });
+    }
+
+    @Test
+    @DisplayName("Trigger An Alarm Throws An Exception But Is Handled")
+    void testTriggerAnAlarmThrowsExceptionButIsHandled() throws JavaLayerException
+    {
+        alarm1 = spy(weekDays730AmAlarm);
+        alarm1.setMusicPlayer(musicPlayerMock);
+
+        // Simulate the clock reaching the alarm time
+        LocalDate date = LocalDateTime.now().toLocalDate();
+        LocalTime time = LocalDateTime.now().toLocalTime().withHour(7).withMinute(30);
+        LocalDateTime dateTime = LocalDateTime.of(date, time);
+        clock.setTheTime(dateTime);
+
+        doNothing().when(alarm1).setupMusicPlayer();
+        doThrow(new RuntimeException("Mocked Music player error"))
+            .when(musicPlayerMock).play();
+
+        assertDoesNotThrow(() -> alarm1.triggerAlarm(), "An exception was thrown");
+    }
+
+    @Test
+    @DisplayName("Test Get Shortened Days For Weekdays Alarm")
+    void testGetShortenedDaysForWeekdaysAlarm()
+    {
+        alarm1 = weekDays730AmAlarm;
+        List<String> expectedShortenedDays = new ArrayList<>() {{
+            add("Days: "); add("Weekdays "); add("\n------");
+        }};
+        List<String> actualShortenedDays = alarm1.getDaysShortened();
+
+        assertIterableEquals(expectedShortenedDays, actualShortenedDays, "Shortened days should match the expected format for weekdays");
+    }
+
+    @Test
+    @DisplayName("Test Get Shortened Days For Weekend Alarm")
+    void testGetShortenedDaysForWeekendAlarm()
+    {
+        alarm1 = weekend10AmAlarm;
+        List<String> expectedShortenedDays = new ArrayList<>() {{
+            add("Days: "); add("Weekends "); add("\n------");
+        }};
+        List<String> actualShortenedDays = alarm1.getDaysShortened();
+
+        assertIterableEquals(expectedShortenedDays, actualShortenedDays, "Shortened days should match the expected format for weekdays");
+    }
+
+    @Test
+    @DisplayName("Test Get Shortened Days For Random Days Alarm")
+    void testGetShortenedDaysForRandomDaysAlarm()
+    {
+        alarm1 = new Alarm("Random Days Alarm", 8, 0, AM,
+                List.of(DayOfWeek.MONDAY,
+                        DayOfWeek.WEDNESDAY,
+                        DayOfWeek.FRIDAY,
+                        DayOfWeek.SUNDAY
+                ), false, clock);
+        List<String> expectedShortenedDays = new ArrayList<>() {{
+            add("Days: "); add("M "); add("W ");
+            add("F "); add("Su "); add("\n------");
+        }};
+        List<String> actualShortenedDays = alarm1.getDaysShortened();
+
+        assertIterableEquals(expectedShortenedDays, actualShortenedDays, "Shortened days should match the expected format for weekdays");
+    }
+
+    @Test
+    @DisplayName("Test Get Shortened Days For All Days Alarm")
+    void testGetShortenedDaysForAllDaysAlarm()
+    {
+        alarm1 = new Alarm("All Days Alarm", 8, 0, AM,
+                List.of(DayOfWeek.MONDAY,
+                        DayOfWeek.TUESDAY,
+                        DayOfWeek.WEDNESDAY,
+                        DayOfWeek.THURSDAY,
+                        DayOfWeek.FRIDAY,
+                        DayOfWeek.SATURDAY,
+                        DayOfWeek.SUNDAY
+                ), false, clock);
+        List<String> expectedShortenedDays = new ArrayList<>() {{
+            add("Days: "); add("Every day "); add("\n------");
+        }};
+        List<String> actualShortenedDays = alarm1.getDaysShortened();
+
+        assertIterableEquals(expectedShortenedDays, actualShortenedDays, "Shortened days should match the expected format for weekdays");
+    }
+
+    @Test
+    @DisplayName("Alarm Names Are As Expected")
+    void testAlarmNamesAreAsExpected()
+    {
+        alarm1 = new Alarm("Alarm3", 7, 0, AM, weekDays, false, clock);
+        alarm2 = new Alarm("", 6, 0, PM, weekendDays, false, clock);
+
+        long currentAlarmsCounter = Alarm.alarmsCounter-1; // Subtract 1
+        assertEquals("Alarm3", alarm1.getName(), "Alarm1 name should match");
+        assertEquals("Alarm"+currentAlarmsCounter, alarm2.getName(), "Alarm2 name should match");
+    }
     // Helper methods
     private void sleep(int time)
     {
