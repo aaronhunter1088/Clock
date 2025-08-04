@@ -16,6 +16,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import static java.lang.Thread.sleep;
 import static java.time.DayOfWeek.*;
 import static clock.util.Constants.*;
 
@@ -26,19 +27,19 @@ import static clock.util.Constants.*;
  * @author michael ball
 *  @version 2.0
  */
-public class Alarm implements Serializable, Comparable<Alarm>
+public class Alarm implements Serializable, Comparable<Alarm>, Runnable
 {
     @Serial
     private static final long serialVersionUID = 2L;
     private static final Logger logger = LogManager.getLogger(Alarm.class);
-    private static long alarmsCounter = 0L;
+    public static long alarmsCounter = 0L;
     private int hours, minutes;
     private String minutesAsStr,hoursAsStr,ampm, name;
     private List<DayOfWeek> days;
     private boolean alarmGoingOff,updatingAlarm, triggeredToday;
     private Clock clock;
+    private Thread selfThread;
     private AdvancedPlayer musicPlayer;
-    private ScheduledExecutorService scheduler;
 
     /**
      * Creates a new Alarm object with default values
@@ -46,20 +47,20 @@ public class Alarm implements Serializable, Comparable<Alarm>
      */
     public Alarm() throws InvalidInputException
     {
-        this("Alarm", 0, 0, AM, false, new ArrayList<>(), null);
+        this("Alarm"+(Alarm.alarmsCounter+1), 0, 0, AM, new ArrayList<>(), false, null);
         logger.debug("Alarm created");
     }
 
-    /**
-     * @param clock the clock object
-     * @param isUpdateAlarm if the alarm is being updated
-     * @throws InvalidInputException thrown when invalid input is given
-     */
-    public Alarm(Clock clock, boolean isUpdateAlarm) throws InvalidInputException
-    {
-        this("Alarm", clock.getHours(), 0, clock.getAMPM(), isUpdateAlarm, List.of(clock.getDayOfWeek()), clock);
-        logger.debug("Alarm created from clock values");
-    }
+//    /**
+//     * @param clock the clock object
+//     * @param isUpdateAlarm if the alarm is being updated
+//     * @throws InvalidInputException thrown when invalid input is given
+//     */
+//    public Alarm(Clock clock, boolean isUpdateAlarm) throws InvalidInputException
+//    {
+//        this("Alarm"+(Alarm.alarmsCounter+1), clock.getHours(), 0, clock.getAMPM(), List.of(clock.getDayOfWeek()), isUpdateAlarm, clock);
+//        logger.debug("Alarm created from clock values");
+//    }
 
     /**
      * Main constructor for creating alarms
@@ -72,21 +73,24 @@ public class Alarm implements Serializable, Comparable<Alarm>
      * @throws InvalidInputException thrown when invalid input is given
      * @see InvalidInputException
      */
-    public Alarm(String name, int hours, int minutes, String ampm,
-                 boolean updatingAlarm, List<DayOfWeek> days, Clock clock)
+    public Alarm(String name, int hours, int minutes, String ampm, List<DayOfWeek> days,
+                 boolean updatingAlarm, Clock clock)
     {
         if (hours < 0 || hours > 12) throw new InvalidInputException("Hours must be between 0 and 12");
         if (minutes < 0 || minutes > 59) throw new InvalidInputException("Minutes must be between 0 and 59");
-        if (!List.of(AM,PM,AM.toLowerCase(),PM.toLowerCase()).contains(ampm)) throw new InvalidInputException("AMPM must be 'AM' or 'PM'");
-        this.clock = clock;
+        setClock(clock);
         setHours(hours);
         setMinutes(minutes);
         setAMPM(ampm.toUpperCase());
-        this.days = days;
-        this.updatingAlarm = updatingAlarm;
-        this.name = StringUtils.isBlank(name) ? null : name;
+        setDays(days);
+        setUpdatingAlarm(updatingAlarm);
+        setName(name);
         setupMusicPlayer();
         alarmsCounter++;
+        if (alarmsCounter == 100L) {
+            logger.info("Restarting counter for alarms");
+            alarmsCounter = 0L;
+        }
         logger.debug("Alarm {} created", alarmsCounter);
         logger.info("Alarm created with specific times");
     }
@@ -139,6 +143,57 @@ public class Alarm implements Serializable, Comparable<Alarm>
         {
             printStackTrace(e, e.getMessage());
         }
+    }
+
+    /**
+     * This method begins the thread
+     * that runs the alarm.
+     */
+    public void startAlarm()
+    {
+        if (selfThread == null)
+        {
+            selfThread = new Thread(this);
+            selfThread.start();
+        }
+    }
+
+    /**
+     * This method starts the alarm
+     * @throws InvalidInputException if the input values are invalid
+     */
+    @Override
+    public void run() throws InvalidInputException
+    {
+        while (selfThread != null)
+        {
+            try {
+                sleep(1000);
+                activateAlarm();
+            }
+            catch (InterruptedException e) { printStackTrace(e, e.getMessage());}
+        }
+    }
+
+    /**
+     * Scheduled to run once every second.
+     * For each alarm, check if the alarm's
+     * time and day matches the clocks current
+     * time and day. And, if the alarm is not
+     * already going off, set it to going off.
+     */
+    private void activateAlarm()
+    {
+        if (getAlarmAsString().equals(clock.getClockTimeAsAlarmString())
+                && this.getDays().contains(clock.getDayOfWeek()))
+        {
+            setIsAlarmGoingOff(true);
+            setTriggeredToday(true);
+            logger.info("Alarm {} matches clock's time. Activating alarm", this);
+        }
+        // alarm has reference to time
+        // check all alarms
+        // if any alarm matches clock's time, an alarm should be going off
     }
 
     /**
@@ -199,27 +254,6 @@ public class Alarm implements Serializable, Comparable<Alarm>
         return shortenedDays;
     }
 
-    /**
-     * Scheduled to run once every second.
-     * For each alarm, check if the alarm's
-     * time and day matches the clocks current
-     * time and day. And, if the alarm is not
-     * already going off, set it to going off.
-     */
-    public void activateAlarm()
-    {
-        if (getAlarmAsString().equals(clock.getClockTimeAsAlarmString())
-                && this.getDays().contains(clock.getDayOfWeek()))
-        {
-            setIsAlarmGoingOff(true);
-            setTriggeredToday(true);
-            logger.info("Alarm {} matches clock's time. Activating alarm", this);
-        }
-        // alarm has reference to time
-        // check all alarms
-        // if any alarm matches clock's time, an alarm should be going off
-    }
-
     @Override
     public String toString()
     {
@@ -241,10 +275,9 @@ public class Alarm implements Serializable, Comparable<Alarm>
     public String getAMPM() { return this.ampm; }
     public String getName() { return this.name; }
     public AdvancedPlayer getMusicPlayer() { return this.musicPlayer; }
-    public String getAlarmAsString() {
-        return hoursAsStr+COLON+minutesAsStr+SPACE+ampm;
-    }
+    public String getAlarmAsString() { return hoursAsStr+COLON+minutesAsStr+SPACE+ampm; }
     public boolean isTriggeredToday() { return triggeredToday; }
+    public Thread getSelfThread() { return selfThread; }
 
     /* Setters */
     public void setClock(Clock clock) { this.clock = clock; }
@@ -269,13 +302,12 @@ public class Alarm implements Serializable, Comparable<Alarm>
             this.name = name;
         }
     }
-    public void setMusicPlayer(AdvancedPlayer musicPlayer) {
-        this.musicPlayer = musicPlayer;
-    }
+    public void setMusicPlayer(AdvancedPlayer musicPlayer) { this.musicPlayer = musicPlayer; }
     public void setTriggeredToday(boolean triggeredToday) {
         logger.debug("{} triggered today set to {}", this, triggeredToday);
         this.triggeredToday = triggeredToday;
     }
+    public void setSelfThread(Thread selfThread) { this.selfThread = selfThread; }
 
     @Override
     public int compareTo(Alarm o) {

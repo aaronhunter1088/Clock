@@ -673,7 +673,7 @@ public class Clock implements Serializable, Comparable<Clock>
 
     private void setActiveAlarms()
     {
-        getListOfAlarms().forEach(Alarm::activateAlarm);
+        getListOfAlarms().forEach(Alarm::startAlarm);
         getListOfAlarms().stream().filter(Alarm::isAlarmGoingOff).forEach(Alarm::triggerAlarm);
     }
 
@@ -731,6 +731,7 @@ public class Clock implements Serializable, Comparable<Clock>
     }
 
     /* Getters */
+    public ClockFrame getClockFrame() { return clockFrame; }
     public LocalDate getDate() { return date; }
     public LocalTime getTime() { return time; }
     public LocalDate getBeginDaylightSavingsTimeDate() { return this.beginDaylightSavingsTimeDate; }
@@ -811,6 +812,7 @@ public class Clock implements Serializable, Comparable<Clock>
     }
 
     /* Setters */
+    protected void setClockFrame(ClockFrame clockFrame) { this.clockFrame = clockFrame; }
     /**
      * Sets and logs the new second value
      * Also sets secondsAsStr

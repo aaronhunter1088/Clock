@@ -33,9 +33,7 @@ class TimerTest
 
     @BeforeAll
     static void beforeClass()
-    {
-        logger.info("Starting {}...", TimerTest.class.getSimpleName());
-    }
+    { logger.info("Starting {}...", TimerTest.class.getSimpleName()); }
 
     @BeforeEach
     void beforeEach()

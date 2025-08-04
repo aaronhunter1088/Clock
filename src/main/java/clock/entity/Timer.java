@@ -203,7 +203,7 @@ public class Timer implements Serializable, Comparable<Timer>, Runnable
         }
     }
 
-    public void performCountdown()
+    private void performCountdown()
     {
         if (!hasBeenStarted || !paused) {
             hasBeenStarted = true;

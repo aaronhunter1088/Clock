@@ -9,6 +9,8 @@ import org.apache.logging.log4j.Logger;
 
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.FocusEvent;
+import java.awt.event.FocusListener;
 import java.time.DayOfWeek;
 import java.util.ArrayList;
 import java.util.List;
@@ -108,6 +110,24 @@ public class AlarmPanel extends ClockPanel
         textField3.setSize(new Dimension(50,50));
         textField4 = new JTextField(2); // Name textField
         textField4.setSize(new Dimension(50,50));
+        textField4.addFocusListener(new FocusListener() {
+            @Override
+            public void focusGained(FocusEvent e) {
+                logger.info("focus gained on name field");
+            }
+
+            @Override
+            public void focusLost(FocusEvent e) {
+                if (StringUtils.isBlank(textField4.getText()))
+                {
+                    textField4.setText(ALARM+(Alarm.alarmsCounter+1));
+                }
+                else if (textField4.getText().length() > 10)
+                {
+                    textField4.setText(textField4.getText().substring(0, 10));
+                }
+            }
+        });
         alarmLabel4 = new JLabel(CURRENT_ALARMS, SwingConstants.CENTER); // Current Alarms
         alarmLabel5 = new JLabel("Name", SwingConstants.CENTER);
         setupOptionsSelection();
@@ -460,7 +480,7 @@ public class AlarmPanel extends ClockPanel
         String alarmName = textField4.getText();
         List<DayOfWeek> days = getDaysChecked();
         logger.info("create alarm");
-        Alarm alarm = new Alarm(alarmName, hour, minutes, ampm, false, days, getClock());
+        Alarm alarm = new Alarm(alarmName, hour, minutes, ampm, days, false, getClock());
         StringBuilder daysStr = new StringBuilder();
         daysStr.append("days: ");
         for(DayOfWeek day: days)
