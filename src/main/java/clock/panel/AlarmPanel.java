@@ -36,7 +36,7 @@ import static clock.panel.Panel.PANEL_ALARM;
  * and an alarm will be created.
  *
  * @author michael ball
-*  @version 2.0
+ * @version 2.0
  */
 public class AlarmPanel extends ClockPanel
 {

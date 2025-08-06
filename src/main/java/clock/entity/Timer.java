@@ -20,7 +20,7 @@ import static java.lang.Thread.sleep;
  * after a specific amount of time
  *
  * @author michael ball
- *  @version 2.0
+ * @version 2.0
  */
 public class Timer implements Serializable, Comparable<Timer>, Runnable
 {

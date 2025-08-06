@@ -23,7 +23,7 @@ import static java.lang.Thread.sleep;
  * look.
  *
  * @author michael ball
-*  @version 1.0
+ * @version 1.0
  */
 public class DigitalClockPanel extends ClockPanel implements Runnable
 {

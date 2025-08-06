@@ -20,13 +20,19 @@
 //import static org.junit.jupiter.api.Assertions.*;
 //import static org.mockito.Mockito.mock;
 //
+///**
+// * Tests for the {@link TimerPanel2} class
+// *
+// * @author Michael Ball
+// * @version 2.9
+// */
 //class TimerPanelTest
 //{
 //    private static final Logger logger = LogManager.getLogger(TimerPanelTest.class);
 //
 //    Clock clock;
 //
-//    TimerPanel timerPanel;
+//    TimerPanel2 timerPanel;
 //    @Mock
 //    ActionEvent action;
 //
@@ -38,29 +44,12 @@
 //    void beforeEach()
 //    {
 //        clock = new Clock();
-//        clock.setDefaultCloseOperation(DISPOSE_ON_CLOSE);
-//        timerPanel = clock.getTimerPanel();
-//        //MockitoAnnotations.initMocks(this);
+//        timerPanel = new TimerPanel2(new ClockFrame(clock));
 //    }
 //
 //    @AfterEach
 //    void afterEach()
-//    {
-//        if (clock != null) {
-//            logger.info("Test complete. Closing the clock...");
-//            // Create a WindowEvent with WINDOW_CLOSING event type
-//            WindowEvent windowClosing = new WindowEvent(clock, WindowEvent.WINDOW_CLOSING);
-//
-//            // Dispatch the event to the JFrame instance
-//            clock.dispatchEvent(windowClosing);
-//
-//            // Ensure the clock is no longer visible
-//            assertFalse(clock.isVisible());
-//
-//            // Dispose of the JFrame to release resources
-//            clock.dispose();
-//        }
-//    }
+//    {}
 //
 //    @Test
 //    void validateFirstTextField()

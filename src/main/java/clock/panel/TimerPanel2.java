@@ -29,6 +29,9 @@ import static clock.util.Constants.*;
  * This panel will allow you to create multiple
  * timers, and see them executing to the right
  * similar to the Alarm Panel view.
+ *
+ * @author Michael Ball
+ * @version since 2.9
  */
 public class TimerPanel2 extends ClockPanel implements Runnable
 {

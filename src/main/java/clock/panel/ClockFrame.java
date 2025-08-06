@@ -25,7 +25,7 @@ import static clock.util.Constants.*;
  * the clock and its various components.
  *
  * @author michael ball
- *  @version 2.9
+ * @version 2.9
  */
 public class ClockFrame extends JFrame implements IClockPanel {
 

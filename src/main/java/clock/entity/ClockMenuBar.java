@@ -17,6 +17,7 @@ import static clock.panel.Panel.*;
 
 /**
  * The menu bar for the Clock.
+ *
  * @author Michael Ball
 *  @version 1.0
  */

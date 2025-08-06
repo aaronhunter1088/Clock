@@ -4,7 +4,7 @@ package clock.util;
  * Constants for Clock application
  *
  * @author Michael Ball
- *  @version 2.0
+ * @version 2.0
  */
 public class Constants {
 

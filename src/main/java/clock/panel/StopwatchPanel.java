@@ -1,14 +1,11 @@
 package clock.panel;
 
-import clock.contract.IClockPanel;
 import clock.entity.Clock;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import javax.swing.*;
 import java.awt.*;
-
-import static clock.panel.Panel.PANEL_STOPWATCH;
 
 /**
  * This is the Stopwatch panel.

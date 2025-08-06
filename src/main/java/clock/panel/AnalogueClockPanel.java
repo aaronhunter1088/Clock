@@ -17,7 +17,7 @@ import static clock.panel.Panel.PANEL_ANALOGUE_CLOCK;
  * to hide this, the settings allows for that.
  *
  * @author michael ball
-*  @version 2.6
+ * @version 2.6
  */
 public class AnalogueClockPanel extends ClockPanel implements Runnable
 {

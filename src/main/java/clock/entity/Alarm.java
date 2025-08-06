@@ -45,7 +45,7 @@ public class Alarm implements Serializable, Comparable<Alarm>, Runnable
     /**
      * Creates a new Alarm object with default values
      * Needed for testing purposes. When using
-     * @InjectMocks in tests, a default constructor
+     * '@InjectMocks' in tests, a default constructor
      * is required. Otherwise you will see a
      * MockitoException: Cannot instantiate @InjectMocks
      * named 'some alarm' Cause: the type 'Alarm' has
@@ -57,17 +57,6 @@ public class Alarm implements Serializable, Comparable<Alarm>, Runnable
         this("Alarm"+(Alarm.alarmsCounter+1), 0, 0, AM, new ArrayList<>(), false, null);
         logger.debug("Default alarm created");
     }
-//
-//    /**
-//     * @param clock the clock object
-//     * @param isUpdateAlarm if the alarm is being updated
-//     * @throws InvalidInputException thrown when invalid input is given
-//     */
-//    public Alarm(Clock clock, boolean isUpdateAlarm) throws InvalidInputException
-//    {
-//        this("Alarm"+(Alarm.alarmsCounter+1), clock.getHours(), 0, clock.getAMPM(), List.of(clock.getDayOfWeek()), isUpdateAlarm, clock);
-//        logger.debug("Alarm created from clock values");
-//    }
 
     /**
      * Main constructor for creating alarms

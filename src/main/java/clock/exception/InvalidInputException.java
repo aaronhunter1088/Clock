@@ -21,8 +21,9 @@ import java.io.Serializable;
  * the hour by 1. During initialization, none of the logic
  * which determines whether or not to increase any hour
  * value (in this example) executes.
+ *
  * @author michael ball
-*  @version 2.0
+ * @version 2.0
  */
 public class InvalidInputException extends RuntimeException implements Serializable
 {

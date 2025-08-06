@@ -28,7 +28,7 @@ import static clock.util.Constants.*;
  * (DAY_OF_WEEK MONTH DATE, YEAR).
  * 
  * @author Michael Ball 
-*  @version since 1.0
+ * @version since 1.0
  */
 public class Clock implements Serializable, Comparable<Clock>, Runnable
 {

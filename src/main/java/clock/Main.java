@@ -17,7 +17,7 @@ import java.util.List;
  * Main application to start Clock
  *
  * @author Michael Ball
-*  @version 1.0
+ * @version 1.0
  */
 public class Main {
     private final static Logger logger = LogManager.getLogger();

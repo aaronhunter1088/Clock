@@ -24,6 +24,12 @@
 //import static java.time.DayOfWeek.*;
 //import static org.junit.jupiter.api.Assertions.*;
 //
+///**
+// * Tests for the {@link AlarmPanel} class
+// *
+// * @author Michael Ball
+// * @version 2.9
+// */
 //class AlarmPanelTest
 //{
 //    private static final Logger logger = LogManager.getLogger(AlarmPanelTest.class);

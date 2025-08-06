@@ -13,6 +13,12 @@ import java.util.List;
 import static clock.panel.Panel.*;
 import static org.junit.jupiter.api.Assertions.*;
 
+/**
+ * Tests for the {@link Panel} class
+ *
+ * @author Michael Ball
+ * @version 2.9
+ */
 class PanelTypeTest
 {
     private static final Logger logger = LogManager.getLogger(PanelTypeTest.class);
