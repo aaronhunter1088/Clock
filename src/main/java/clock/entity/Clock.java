@@ -8,13 +8,13 @@ import java.time.format.TextStyle;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
-import java.util.concurrent.atomic.AtomicInteger;
 
 import clock.exception.InvalidInputException;
 import clock.panel.ClockFrame;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import static java.lang.Thread.sleep;
 import static java.time.Month.*;
 import static java.time.DayOfWeek.*;
 import static clock.util.Constants.*;
@@ -30,7 +30,7 @@ import static clock.util.Constants.*;
  * @author Michael Ball 
 *  @version since 1.0
  */
-public class Clock implements Serializable, Comparable<Clock>
+public class Clock implements Serializable, Comparable<Clock>, Runnable
 {
     @Serial
     private static final long serialVersionUID = 2L;
@@ -112,6 +112,7 @@ public class Clock implements Serializable, Comparable<Clock>
         // TODO: May want to think about but for now, the year must be 4 digits long and at least 1000 or more
         if (year < 1000) throw new IllegalArgumentException("Year must be greater than 1000");
         if (hours > 12) setShowMilitaryTime(true);
+        setDaylightSavingsTimeDates();
         setSeconds(seconds);
         setMinutes(minutes);
         setHours(hours);
@@ -122,7 +123,6 @@ public class Clock implements Serializable, Comparable<Clock>
         setYear(year);
         setTimeZone(getZoneIdFromTimezoneButtonText(EMPTY));
         setTheCurrentTime();
-        setDaylightSavingsTimeDates();
         if (isTodayDaylightSavingsTime()) { todayMatchesDSTDate = true; }
         isLeapYear = date.isLeapYear();
         listOfAlarms = new ArrayList<>();
@@ -138,8 +138,8 @@ public class Clock implements Serializable, Comparable<Clock>
     private void initialize()
     {
         logger.info("Initializing {} Clock", testingClock ? "Test" : "");
-        setTheTime(LocalDateTime.now());
         setDaylightSavingsTimeDates();
+        setTheTime(LocalDateTime.now());
         if (isTodayDaylightSavingsTime()) { todayMatchesDSTDate = true; }
         isLeapYear = date.isLeapYear();
         listOfAlarms = new ArrayList<>();
@@ -175,13 +175,16 @@ public class Clock implements Serializable, Comparable<Clock>
      * Sets and logs the new time value from the hours, minutes, and seconds
      * Sets the currentTime value from the LocalDate and LocalTime
      */
-    protected void setTheCurrentTime()
+    public void setTheCurrentTime()
     {
         setTimeZone(ZoneId.systemDefault());
         setDate(LocalDate.of(year, month, dayOfMonth));
         setTime(LocalTime.of(hours, minutes, seconds));
         setCurrentDateTime(LocalDateTime.of(date, time));
-        setDaylightSavingsTimeDates();
+        if (isNewYear) {
+            setDaylightSavingsTimeDates();
+            setIsNewYear(false);
+        }
         if (isTodayDaylightSavingsTime()) { setTodayMatchesDSTDate(true); }
         setLeapYear(date.isLeapYear());
         setDateChanged(false);
@@ -193,7 +196,7 @@ public class Clock implements Serializable, Comparable<Clock>
      * Beginning date is always the second Sunday
      * Ending date is always the first Sunday
      */
-    private void setDaylightSavingsTimeDates()
+    protected void setDaylightSavingsTimeDates()
     {
         logger.debug("setting begin and end daylight savings dates");
         int sundayCount = 0;
@@ -322,39 +325,6 @@ public class Clock implements Serializable, Comparable<Clock>
     }
 
     /**
-     * Updates the hours and hoursAsStr values based
-     * upon the current AMPM value and if we should
-     * display time using military hours or not
-     */
-    public void updateHourValueAndHourString()
-    {
-        if (AM.equals(ampm)) {
-            // Daytime and we show Military Time
-            if (showMilitaryTime) {
-                if (hours > 12) setHours(0);
-                else setHours(hours);
-            }
-            // DayTime and we do not show Military Time
-            else {
-                if (hours == 0) setHours(12);
-                else setHours(hours);
-            }
-        }
-        else {
-            // NightTime and we show Military Time
-            if (showMilitaryTime) {
-                if (hours == 24) setHours(0);
-                else if (hours < 12 && hours >= 0) setHours(hours+12);
-                else setHours(hours);
-            }
-            // NightTime and we do not show Military Time
-            else {
-                if (hours > 12) setHours(hours-12);
-            }
-        }
-    }
-
-    /**
      * Determines if today's date is equal to one
      * of the predetermined daylight savings time
      * @return boolean if today is daylight savings time
@@ -399,6 +369,91 @@ public class Clock implements Serializable, Comparable<Clock>
     }
 
     /**
+     * Updates the time if the clock is at midnight. This helps
+     * to ensure that the clock is always up to date and accurate
+     * by chance that it has gotten out of sync.
+     */
+    private void updateTimeIfMidnight()
+    {
+        if ((MIDNIGHT_STANDARD_TIME.equals(getTimeAsStr()) || MIDNIGHT_MILITARY_TIME.equals(getMilitaryTimeAsStr()))) {
+            logger.info("midnight daily clock update");
+            setTheTime(LocalDateTime.of(
+                    LocalDate.of(getYear(), getMonth(), getDayOfMonth()),
+                    LocalTime.of(0, 0, 0))
+            );
+        }
+    }
+
+    /**
+     * Checks if today is New Year's Day.
+     * If it is, it will log a message wishing
+     * the user a happy new year.
+     */
+    private void checkIfItIsNewYears()
+    {
+        logger.info("is today new years: {}", isNewYear);
+        if (isNewYear())
+        {
+            logger.info("Happy New Year. Here's wishing you a healthy, productive {}.", year);
+            //setIsNewYear(false); reset later
+        }
+    }
+
+    /**
+     * Starts all alarms, if any have not yet started.
+     * If the date has changed and there are still alarms,
+     * it will reset the alarms to have not yet been
+     * triggered.
+     */
+    private void setActiveAlarms()
+    {
+        getListOfAlarms().forEach(Alarm::startAlarm);
+        resetTriggeredAlarms();
+    }
+
+    /**
+     * Starts all timers, if any have not yet started.
+     * This will start the timers and allow them to
+     * run until they are stopped or concluded.
+     */
+    private void setActiveTimers()
+    {
+        getListOfTimers().forEach(Timer::startTimer);
+    }
+
+    /**
+     * Resets the alarms that were triggered today.
+     * This will allow alarms to be reset and not triggered
+     * again while the current time is still the same as
+     * when the alarm should triggered.
+     */
+    private void resetTriggeredAlarms()
+    {
+        if (dateChanged && !getListOfAlarms().isEmpty()) {
+            getListOfAlarms().forEach(alarm -> {
+                alarm.setTriggeredToday(false);
+            });
+            logger.info("Setting {} alarms to not triggered today", Alarm.alarmsCounter);
+        }
+    }
+
+    @Override
+    public void run()
+    {
+        logger.info("Clock is running");
+        while (true) {
+            try {
+                tick();
+                sleep(1000); // Sleep for 1 second
+            } catch (InterruptedException e) {
+                logger.error("Clock thread interrupted", e);
+                Thread.currentThread().interrupt(); // Restore the interrupted status
+                break; // Exit the loop if interrupted
+            }
+        }
+    }
+
+    /**
      * A default tick of the clock
      */
     public void tick()
@@ -424,7 +479,6 @@ public class Clock implements Serializable, Comparable<Clock>
         updateTimeIfMidnight();
         setActiveAlarms();
         setActiveTimers();
-        setTriggeredAlarms();
         setTheCurrentTime();
     }
 
@@ -488,7 +542,6 @@ public class Clock implements Serializable, Comparable<Clock>
             }
         }
         else { setDateChanged(false); }
-        //updateHourValueAndHourString();
         if (!showMilitaryTime) { logger.info(getTimeAsStr()); }
         else { logger.info(getMilitaryTimeAsStr()); }
 
@@ -643,91 +696,6 @@ public class Clock implements Serializable, Comparable<Clock>
             else
             { logger.debug("!! today is not dst !!"); }
         }
-    }
-
-    /**
-     * Updates the time if the clock is at midnight. This helps
-     * to ensure that the clock is always up to date and accurate
-     * by chance that it has gotten out of sync.
-     */
-    private void updateTimeIfMidnight()
-    {
-        if ((MIDNIGHT_STANDARD_TIME.equals(getTimeAsStr()) || MIDNIGHT_MILITARY_TIME.equals(getMilitaryTimeAsStr()))) {
-            logger.info("midnight daily clock update");
-            setTheTime(LocalDateTime.of(
-                    LocalDate.of(getYear(), getMonth(), getDayOfMonth()),
-                    LocalTime.of(0, 0, 0))
-            );
-        }
-    }
-
-    private void checkIfItIsNewYears()
-    {
-        logger.info("is today new years: {}", isNewYear);
-        if (isNewYear())
-        {
-            logger.info("Happy New Year. Here's wishing you a healthy, productive {}.", year);
-            setIsNewYear(false);
-        }
-    }
-
-    private void setActiveAlarms()
-    {
-        getListOfAlarms().forEach(Alarm::startAlarm);
-        getListOfAlarms().stream().filter(Alarm::isAlarmGoingOff).forEach(Alarm::triggerAlarm);
-    }
-
-    private void setActiveTimers()
-    {
-        List<Timer> timersGoingOff = getListOfTimers().stream()
-                .filter(Timer::isTimerGoingOff)
-                .toList();
-        logger.debug("triggering {} timers", timersGoingOff.size());
-        timersGoingOff.forEach(Timer::triggerTimer);
-        getListOfTimers().forEach(Timer::startTimer);
-        clockFrame.getTimerPanel2().setupTimersTableDefaults(false);
-    }
-
-    /**
-     * Resets the alarms that were triggered today.
-     * This will allow alarms to be reset and not triggered
-     * again while the current time is still the same as
-     * when the alarm should triggered.
-     */
-    public void setTriggeredAlarms()
-    {
-        if (dateChanged) {
-            AtomicInteger total = new AtomicInteger();
-            getListOfAlarms().forEach(alarm -> {
-                alarm.setTriggeredToday(false);
-                total.getAndIncrement();
-            });
-            logger.info("setting {} alarms to not triggered today", total.get());
-        }
-    }
-
-    /**
-     * Triggers all alarms that are currently going off.
-     */
-    public void triggerAlarms()
-    {
-        List<Alarm> alarmsToTrigger = getListOfAlarms().stream()
-            .filter(Alarm::isAlarmGoingOff)
-                .toList();
-        if (alarmsToTrigger.isEmpty()) {
-            logger.debug("no alarms are going off");
-        } else {
-            logger.debug("triggering {} alarms", alarmsToTrigger.size());
-            alarmsToTrigger.forEach(Alarm::triggerAlarm);
-        }
-    }
-
-    /**
-     * Checks if the timer has concluded
-     */
-    public void triggerTimers()
-    {
-
     }
 
     /* Getters */

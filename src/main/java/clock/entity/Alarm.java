@@ -8,6 +8,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 
 import clock.exception.InvalidInputException;
 import javazoom.jl.decoder.JavaLayerException;
@@ -167,16 +168,19 @@ public class Alarm implements Serializable, Comparable<Alarm>, Runnable
 
     /**
      * This method starts the alarm
-     * @throws InvalidInputException if the input values are invalid
      */
     @Override
-    public void run() throws InvalidInputException
+    public void run()
     {
         while (selfThread != null)
         {
             try {
+                if (!alarmGoingOff) {
+                    activateAlarm();
+                } else { // if (alarmGoingOff) {
+                    triggerAlarm();
+                }
                 sleep(1000);
-                activateAlarm();
             }
             catch (InterruptedException e) { printStackTrace(e, e.getMessage());}
         }

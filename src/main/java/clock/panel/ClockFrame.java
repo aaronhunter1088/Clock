@@ -14,6 +14,7 @@ import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Function;
 
@@ -185,6 +186,8 @@ public class ClockFrame extends JFrame implements IClockPanel {
             dcp.stop();
         if (currentPanel instanceof AnalogueClockPanel acp)
             acp.stop();
+        if (currentPanel instanceof TimerPanel2 tp)
+            tp.stop();
         showPanel(clockPanel, resetValues);
         repaint();
         setVisible(true);
@@ -221,7 +224,6 @@ public class ClockFrame extends JFrame implements IClockPanel {
         setSize(clockDefaultSize);
         setBackground(Color.BLACK);
         panelType = DigitalClockPanel.PANEL;
-        repaint();
     }
 
     /**
@@ -338,10 +340,15 @@ public class ClockFrame extends JFrame implements IClockPanel {
                 task.run();
             } catch (Exception e) {
                 logger.error("Scheduled task failed: {}", task, e);
+                logger.warn("""
+                        Because the schedule task failed, the application will now exit.
+                        Please check the logs for more information.
+                        """);
+                System.exit(1);
             }
         };
 
-        scheduler.scheduleAtFixedRate(taskRunner.apply(clock::tick), 0, 1, TimeUnit.SECONDS);
+        scheduler.schedule(taskRunner.apply(clock), 0, TimeUnit.SECONDS);
     }
 
     /**

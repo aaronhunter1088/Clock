@@ -83,7 +83,7 @@ public class AnalogueClockPanel extends ClockPanel implements Runnable
      */
     public void start(AnalogueClockPanel panel)
     {
-        logger.info("starting analogue clock");
+        logger.info("starting analogue clock panel");
         if (thread == null)
         {
             thread = new Thread(panel);
@@ -96,7 +96,7 @@ public class AnalogueClockPanel extends ClockPanel implements Runnable
      */
     public void stop()
     {
-        logger.info("stopping analogue thread");
+        logger.info("stopping analogue clock panel");
         thread = null;
     }
 

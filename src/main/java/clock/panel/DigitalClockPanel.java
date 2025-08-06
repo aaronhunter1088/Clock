@@ -92,7 +92,7 @@ public class DigitalClockPanel extends ClockPanel implements Runnable
      */
     public void start(DigitalClockPanel panel)
     {
-        logger.info("starting digital clock");
+        logger.info("starting digital panel");
         if (thread == null)
         {
             thread = new Thread(panel);
@@ -105,7 +105,7 @@ public class DigitalClockPanel extends ClockPanel implements Runnable
      */
     public void stop()
     {
-        logger.info("stopping digital thread");
+        logger.info("stopping digital panel");
         thread = null;
     }
 

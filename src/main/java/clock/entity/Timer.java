@@ -196,13 +196,24 @@ public class Timer implements Serializable, Comparable<Timer>, Runnable
         while (selfThread != null)
         {
             try {
+                if (!timerGoingOff) {
+                    performCountdown();
+                } else {
+                    triggerTimer();
+                }
                 sleep(1000);
-                performCountdown();
+
             }
             catch (InterruptedException e) { printStackTrace(e, e.getMessage());}
         }
     }
 
+    /**
+     * This method performs the countdown
+     * by reducing the seconds, minutes and hours
+     * accordingly. If the timer reaches zero,
+     * it will set the timerGoingOff flag to true.
+     */
     private void performCountdown()
     {
         if (!hasBeenStarted || !paused) {
@@ -267,6 +278,8 @@ public class Timer implements Serializable, Comparable<Timer>, Runnable
         timerGoingOff = false;
         hasBeenStarted = false;
         hasBeenTriggered = false;
+        stopTimer = true;
+        clock.getListOfTimers().remove(this);
         logger.info("{} timer stopped", this);
     }
 

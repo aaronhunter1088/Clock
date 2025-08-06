@@ -182,6 +182,7 @@ class ClockTest
         clock.setDayOfMonth(2);
         clock.setYear(2021);
         clock.setAMPM(PM);
+        clock.setDaylightSavingsTimeDates();
         clock.setTheCurrentTime();
         assertEquals(14, clock.getBeginDaylightSavingsTimeDate().getDayOfMonth(), "For 2021, Beginning DST Day should be 14th");
         assertEquals(7, clock.getEndDaylightSavingsTimeDate().getDayOfMonth(), "For 2021, Ending DST Day should be 7th");
@@ -194,6 +195,7 @@ class ClockTest
         clock.setDayOfMonth(3);
         clock.setYear(2022);
         clock.setAMPM(PM);
+        clock.setDaylightSavingsTimeDates();
         clock.setTheCurrentTime();
         assertEquals(13, clock.getBeginDaylightSavingsTimeDate().getDayOfMonth(), "For 2022, Beginning DST Day should be 13th");
         assertEquals(6, clock.getEndDaylightSavingsTimeDate().getDayOfMonth(), "For 2022, Ending DST Day should be 6th");
@@ -251,6 +253,7 @@ class ClockTest
         clock.setDayOfMonth(13);
         clock.setYear(2022);
         clock.setAMPM(PM);
+        clock.setDaylightSavingsTimeDates();
         clock.setTheCurrentTime();
         assertTrue(clock.isTodayDaylightSavingsTime());
     }
@@ -266,6 +269,7 @@ class ClockTest
         clock.setDayOfMonth(6);
         clock.setYear(2022);
         clock.setAMPM(PM);
+        clock.setDaylightSavingsTimeDates();
         clock.setTheCurrentTime();
         assertTrue(clock.isTodayDaylightSavingsTime());
     }

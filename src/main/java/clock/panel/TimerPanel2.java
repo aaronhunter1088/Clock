@@ -30,9 +30,10 @@ import static clock.util.Constants.*;
  * timers, and see them executing to the right
  * similar to the Alarm Panel view.
  */
-public class TimerPanel2 extends ClockPanel
+public class TimerPanel2 extends ClockPanel implements Runnable
 {
     private static final Logger logger = LogManager.getLogger(TimerPanel2.class);
+    private Thread thread = null;
     private GridBagLayout layout;
     private GridBagConstraints constraints;
     private JLabel nameLabel,
@@ -230,6 +231,7 @@ public class TimerPanel2 extends ClockPanel
         resetButton.addActionListener(this::resetTimerPanel);
         resetButton.setEnabled(false);
         setupTimersTableDefaults(true);
+        start(this);
     }
 
     /**
@@ -277,7 +279,7 @@ public class TimerPanel2 extends ClockPanel
                     }
                     case "Remove" -> {
                         logger.info("Removing {} at row: {}", timer, modelRow);
-                        stopTimer(timer);
+                        timer.stopTimer();
                         clock.getListOfTimers().remove(timer);
                         ((DefaultTableModel)table.getModel()).removeRow(modelRow);
                     }
@@ -474,15 +476,6 @@ public class TimerPanel2 extends ClockPanel
     }
 
     /**
-     * Starts the timer
-     */
-    public void startTimer(clock.entity.Timer timer)
-    {
-        logger.info("starting countdown");
-        timer.startTimer();
-    }
-
-    /**
      * Creates a new Timer
      */
     public clock.entity.Timer createTimer()
@@ -511,64 +504,6 @@ public class TimerPanel2 extends ClockPanel
         return timer;
     }
 
-    /**
-     * Stops a Timer. Currently only the Timer can call this
-     */
-    public void stopTimer(clock.entity.Timer timer)
-    {
-        logger.info("stopping timer");
-        timer.setTimerGoingOff(false);
-        timer.setStopTimer(true);
-    }
-
-
-
-    /**
-     * Pauses the timer
-     */
-    public void pauseTimer()
-    {
-        logger.info("pausing timer");
-        setTimerButton.setText(RESUME_TIMER);
-        setTimerButton.repaint();
-        setTimerButton.updateUI();
-        //paused = true;
-    }
-
-    /**
-     * Resumes an active timer
-     */
-    public void resumeTimer()
-    {
-        logger.info("resuming timer");
-        setTimerButton.setText(PAUSE_TIMER);
-        setTimerButton.repaint();
-        setTimerButton.updateUI();
-        //paused = false;
-    }
-
-    /**
-     * This method performs the countdown for each timer
-     * If disableTimerFunctionality is true, then we will
-     * not countdown any timers.
-     */
-//    public void performCountDown()
-//    {
-//        if (disableTimerFunctionality) return;
-//        else
-//        {
-//            logger.info("performing countdown");
-//            //ScheduledExecutorService executor = Executors.newScheduledThreadPool(activeTimers.size());
-////            activeTimers.stream()
-////                    .parallel()
-////                    .forEach(Timer::performCountDown);
-//            //scheduler = Executors.newScheduledThreadPool(activeTimers.size());
-//            clock.getListOfTimers().forEach(timer -> clockFrame.getScheduler()
-//                    .scheduleAtFixedRate(timer::performCountDown, 0, 1, TimeUnit.SECONDS));
-//
-//            //resetJTextArea(); // leave here
-//        }
-//    }
 
     /**
      * Resets the timer panel
@@ -706,6 +641,43 @@ public class TimerPanel2 extends ClockPanel
      */
     public void printStackTrace(Exception e)
     { printStackTrace(e, ""); }
+
+    /**
+     * Starts the analogue clock
+     * @param panel the analogue clock panel
+     */
+    public void start(TimerPanel2 panel)
+    {
+        logger.info("starting timer panel");
+        if (thread == null)
+        {
+            thread = new Thread(panel);
+            thread.start();
+        }
+    }
+
+    /**
+     * Stops the timer panel
+     */
+    public void stop()
+    {
+        logger.info("stopping timer panel thread");
+        thread = null;
+    }
+
+    @Override
+    public void run()
+    {
+        logger.info("running timer panel");
+        while (thread != null)
+        {
+            try {
+                setupTimersTableDefaults(false);
+                sleep(1000);
+            }
+            catch (InterruptedException e) { printStackTrace(e, e.getMessage());}
+        }
+    }
 
     /* Getters */
     public GridBagLayout getGridBagLayout() { return this.layout; }
