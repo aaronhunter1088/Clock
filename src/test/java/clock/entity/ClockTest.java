@@ -1,7 +1,6 @@
 package clock.entity;
 
 import clock.exception.InvalidInputException;
-import clock.panel.ClockFrame;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.junit.jupiter.api.*;
@@ -44,7 +43,6 @@ class ClockTest
     void beforeEach()
     {
         clock = new Clock(true);
-        clock.setClockFrame(new ClockFrame(clock));
     }
 
     @AfterEach

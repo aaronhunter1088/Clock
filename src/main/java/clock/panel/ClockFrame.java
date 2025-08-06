@@ -14,7 +14,6 @@ import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Function;
 
@@ -96,7 +95,7 @@ public class ClockFrame extends JFrame implements IClockPanel {
         setLocationRelativeTo(null); // loads the GUI in the center of the screen
         setVisible(true);
         setResizable(false);
-        logger.info("Creating {} Clock", clock != null ? "Test" : "");
+        logger.info("Creating {} Clock", clock != null ? "Test" : "Regular");
         setClock(clock != null ? clock : new Clock());
         scheduler = Executors.newScheduledThreadPool(25);
         setupMenuBar(); // daylightSavingsTimeEnabled directly influences menu bar setup
@@ -147,7 +146,6 @@ public class ClockFrame extends JFrame implements IClockPanel {
     {
         logger.info("Starting Clock...");
         ClockFrame clockFrame = new ClockFrame();
-        clockFrame.getClock().clockFrame = clockFrame;
         clockFrame.start();
     }
 
