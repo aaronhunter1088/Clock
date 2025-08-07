@@ -28,7 +28,6 @@ import static java.lang.Thread.sleep;
 public class DigitalClockPanel extends ClockPanel implements Runnable
 {
     private static final Logger logger = LogManager.getLogger(DigitalClockPanel.class);
-    public static final Panel PANEL = PANEL_DIGITAL_CLOCK;
     private GridBagLayout layout;
     private GridBagConstraints constraints;
     private Thread thread = null;

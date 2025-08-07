@@ -217,7 +217,7 @@ public class ClockFrame extends JFrame
         digitalClockPanel.setupDefaultActions(this);
         setSize(clockDefaultSize);
         setBackground(Color.BLACK);
-        panelType = DigitalClockPanel.PANEL;
+        panelType = PANEL_DIGITAL_CLOCK;
     }
 
     /**
@@ -231,7 +231,7 @@ public class ClockFrame extends JFrame
         analogueClockPanel.setupDefaultActions(this);
         setSize(analogueClockPanel.getMaximumSize());
         setBackground(Color.BLACK);
-        panelType = AnalogueClockPanel.PANEL;
+        panelType = PANEL_ANALOGUE_CLOCK;
         analogueClockPanel.setupSettingsMenu();
     }
 
