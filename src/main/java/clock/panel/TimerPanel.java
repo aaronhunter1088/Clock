@@ -696,7 +696,7 @@ public class TimerPanel extends ClockPanel implements Runnable
     private void setClockFrame(ClockFrame clockFrame) { this.clockFrame = clockFrame; logger.debug("clockFrame set"); }
     protected void setGridBagLayout(GridBagLayout layout) { this.layout = layout; logger.debug("layout set"); }
     protected void setGridBagConstraints(GridBagConstraints constraints) { this.constraints = constraints; logger.debug("constraints set"); }
-    public void setClock(Clock clock) { this.clockFrame.setClock(clock); logger.debug("Clock set in TimerPanel"); }
+    public void setClock(Clock clock) { this.clock = clock; logger.debug("Clock set in TimerPanel"); }
     public void setHourField(JTextField hourField) { this.hourField = hourField; }
     public void setMinuteField(JTextField minuteField) { this.minuteField = minuteField; }
     public void setSecondField(JTextField secondField) { this.secondField = secondField; }

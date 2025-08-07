@@ -848,7 +848,7 @@ public class AlarmPanel extends ClockPanel
     protected void setSundayCheckBox(JCheckBox sundayCheckBox) { this.sundayCheckBox = sundayCheckBox; }
     protected void setWeekCheckBox(JCheckBox weekCheckBox) { this.weekCheckBox = weekCheckBox; }
     protected void setWeekendCheckBox(JCheckBox weekendCheckBox) { this.weekendCheckBox = weekendCheckBox; }
-    public void setClock(Clock clock) { this.clockFrame.setClock(clock); logger.info("Clock set in AlarmPanel"); }
+    public void setClock(Clock clock) { this.clock = clock; logger.info("Clock set in AlarmPanel"); }
     private void setDateOperationsDropdown(JComboBox<String> ampmDropDown) { this.ampmDropDown = ampmDropDown; }
 
 }

@@ -56,7 +56,7 @@ public class DigitalClockPanel extends ClockPanel implements Runnable
     {
         logger.debug("setup default actions with clock");
         setClockFrame(clockFrame);
-        setClock(getClockFrame().getClock());
+        setClock(clockFrame.getClock());
         row1 = clock.defaultText(1);
         row2 = clock.defaultText(2);
         setupSettingsMenu();
