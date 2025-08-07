@@ -1,16 +1,31 @@
 # Clock v2.9
 
 This is a Java Swing GUI project which displays the date and time to the user in both
-digital and analogue modes. It also has the ability to set multiple alarms however just
-one timer.
+digital and analogue modes. It also has the ability to set multiple alarms and, with
+this release, multiple timers. You can also start the clock specifying a panel or a
+specific date and time. Following is the default command to run the clock:
 
-The clock starts up in Digital Mode, displaying the current date like July 24, 2025 and
-the current time below as 10:30:45 AM. The clock is updated every second.
+```
+# Both commands achieve the same result:
+java -jar Clock-2.9-jar-with-dependencies.jar
+or
+java -jar Clock-2.9-jar-with-dependencies.jar 0
+
+# Start the jar file with a specific panel:
+java -jar Clock-2.9-jar-with-dependencies.jar 1,panel_alarm
+
+# Start the jar file with a specific date and time:
+java -jar Clock-2.9-jar-with-dependencies.jar 2,7,50,0,august,wednesday,6,2025,pm
+```
+
+The clock starts on the DigitalClock panel, displaying the current date like July 24, 2025
+and the current time below as 10:30:45 AM. The clock is updated every second.
 You can switch between modes at any time by clicking on Features --> View Digital Clock,
-View Analogue Clock, View Alarms or View Timers. View alarms is another menu option used
-to set or update alarms.
+View Analogue Clock, View Alarms or View Timers, or clicking on the corresponding keyboard
+shortcut: Ctrl + D for Digital Clock, Ctrl + C for Analogue Clock, Ctrl + A for Alarms, and
+Ctrl + T for Timers. View alarms is another menu option used to set or update alarms.
 
-Starting on the Digital Clock mode, you can change the following settings:
+On the DigitalClock panel, you can change the following settings:
 You can show the time in military time, or not, expand to show the full date, or not,
 and show the partial date, which displays less of the day and month on the screen while
 still displaying enough to the user to tell the date and time. You can turn on or off
@@ -32,13 +47,14 @@ up in the panel. Here you can then update the time and click Set, simply click S
 to the clock panel of your choice. Returning to the clock panel without resetting the alarm 
 deletes the alarm.
 
-You can set a Timer. Click Features --> View Timer (or click Ctrl + T).
+You can set multiple Timers. Click Features --> View Timer (or click Ctrl + T).
 Here you can enter the Hours, Minutes, and Seconds of the Timer.
-When the Timer is finished, a sound is triggered. It will play once and stop. Right now, only
-one Timer can be created at a Time.
+When the Timer is finished, a sound is triggered. It will play until it is stopped by the user.
+You can reset the Timer while it is going off, or cancel it. 
+The TimerPanel has a single setting that quickly toggles all Timers, pausing or resuming them.
 
 # History
-v2.9 Updated to use my parent pom.
+v2.9 Updated to use my parent pom. Multiple timers. Multiple ways to start the application.
 
 v2.8 Added Javadocs and cleaned up the code quite a bit. When running the application, you
 can set this envVar: logLevel to be DEBUG, or INFO depending on how much info you want.
