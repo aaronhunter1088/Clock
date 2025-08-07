@@ -63,13 +63,12 @@ public class TimerPanel extends ClockPanel implements Runnable
     {
         super();
         logger.info("Creating TimerPanel");
-        //clockFrame.setPanelType(PANEL_TIMER2);
-        this.clockFrame = clockFrame;
-        this.clock = clockFrame.getClock();
+        setClockFrame(clockFrame);
+        setClock(clockFrame.getClock());
         setSize(ClockFrame.panelSize);
-        this.layout = new GridBagLayout();
+        setGridBagLayout(new GridBagLayout());
         setLayout(layout);
-        this.constraints = new GridBagConstraints();
+        setGridBagConstraints(new GridBagConstraints());
         setBackground(Color.BLACK);
         setForeground(Color.BLACK);
         setupTimerPanel();
@@ -682,6 +681,7 @@ public class TimerPanel extends ClockPanel implements Runnable
     }
 
     /* Getters */
+    public ClockFrame getClockFrame() { return this.clockFrame; }
     public GridBagLayout getGridBagLayout() { return this.layout; }
     public GridBagConstraints getGridBagConstraints() { return this.constraints; }
     public Clock getClock() { return clockFrame.getClock(); }
@@ -693,9 +693,10 @@ public class TimerPanel extends ClockPanel implements Runnable
     public JButton getSetTimerButton() { return setTimerButton; }
 
     /* Setters */
-    protected void setGridBagLayout(GridBagLayout layout) { this.layout = layout; }
-    protected void setGridBagConstraints(GridBagConstraints constraints) { this.constraints = constraints; }
-    public void setClock(Clock clock) { this.clockFrame.setClock(clock); }
+    private void setClockFrame(ClockFrame clockFrame) { this.clockFrame = clockFrame; logger.debug("clockFrame set"); }
+    protected void setGridBagLayout(GridBagLayout layout) { this.layout = layout; logger.debug("layout set"); }
+    protected void setGridBagConstraints(GridBagConstraints constraints) { this.constraints = constraints; logger.debug("constraints set"); }
+    public void setClock(Clock clock) { this.clockFrame.setClock(clock); logger.debug("Clock set in TimerPanel"); }
     public void setHourField(JTextField hourField) { this.hourField = hourField; }
     public void setMinuteField(JTextField minuteField) { this.minuteField = minuteField; }
     public void setSecondField(JTextField secondField) { this.secondField = secondField; }

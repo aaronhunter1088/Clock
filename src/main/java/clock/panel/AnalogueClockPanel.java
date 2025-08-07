@@ -50,9 +50,8 @@ public class AnalogueClockPanel extends ClockPanel implements Runnable
     public void setupDefaultActions(ClockFrame clockFrame)
     {
         logger.debug("setup default actions with clock");
-        this.clockFrame = clockFrame;
-        //this.clockFrame.setPanelType(PANEL_ANALOGUE_CLOCK);
-        this.clock = clockFrame.getClock();
+        setClockFrame(clockFrame);
+        setClock(clockFrame.getClock());
         setClockText(clock.getTimeAsStr());
         setupSettingsMenu();
         setMaximumSize(new Dimension(350, 400));
@@ -239,16 +238,18 @@ public class AnalogueClockPanel extends ClockPanel implements Runnable
     }
 
     /* Getters */
-    Clock getClock() { return this.clock; }
-    GridBagLayout getGridBagLayout() { return this.layout; }
-    GridBagConstraints getGridBagConstraints() { return this.constraints; }
-    String getClockText() { return this.clockText; }
+    public ClockFrame getClockFrame() { return this.clockFrame; }
+    public Clock getClock() { return this.clock; }
+    public GridBagLayout getGridBagLayout() { return this.layout; }
+    public GridBagConstraints getGridBagConstraints() { return this.constraints; }
+    public String getClockText() { return this.clockText; }
     public boolean isShowDigitalTimeOnAnalogueClock() { return showDigitalTimeOnAnalogueClock; }
 
     /* Setters */
+    private void setClockFrame(ClockFrame clockFrame) { this.clockFrame = clockFrame; logger.debug("clockFrame set"); }
     private void setGridBagLayout(GridBagLayout layout) { this.layout = layout; }
     private void setGridBagConstraints(GridBagConstraints constraints) { this.constraints = constraints; }
     private void setClockText(String clockText) { this.clockText = clockText; }
-    public void setClock(Clock clock) { this.clock = clock; }
+    public void setClock(Clock clock) { this.clock = clock; logger.debug("Clock set in AnalogueClockPanel"); }
     public void setShowDigitalTimeOnAnalogueClock(boolean showDigitalTimeOnAnalogueClock)  { this.showDigitalTimeOnAnalogueClock = showDigitalTimeOnAnalogueClock; }
 }

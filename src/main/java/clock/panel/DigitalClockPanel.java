@@ -55,9 +55,8 @@ public class DigitalClockPanel extends ClockPanel implements Runnable
     public void setupDefaultActions(ClockFrame clockFrame)
     {
         logger.debug("setup default actions with clock");
-        clock = clockFrame.getClock();
-        this.clockFrame = clockFrame;
-        //clockFrame.setPanelType(PANEL_DIGITAL_CLOCK);
+        setClockFrame(clockFrame);
+        setClock(getClockFrame().getClock());
         row1 = clock.defaultText(1);
         row2 = clock.defaultText(2);
         setupSettingsMenu();
@@ -319,12 +318,14 @@ public class DigitalClockPanel extends ClockPanel implements Runnable
     }
 
     /* Getters */
-    GridBagLayout getGridBagLayout() { return this.layout; }
-    GridBagConstraints getGridBagConstraints() { return this.constraints; }
-    Clock getClock() { return this.clock; }
+    public ClockFrame getClockFrame() { return this.clockFrame; }
+    public GridBagLayout getGridBagLayout() { return this.layout; }
+    public GridBagConstraints getGridBagConstraints() { return this.constraints; }
+    public Clock getClock() { return this.clock; }
 
     /* Setters */
+    private void setClockFrame(ClockFrame clockFrame) { this.clockFrame = clockFrame; logger.debug("clockFrame set"); }
     protected void setGridBagLayout(GridBagLayout layout) { this.layout = layout; }
     protected void setGridBagConstraints(GridBagConstraints constraints) { this.constraints = constraints; }
-    public void setClock(Clock clock) { this.clock = clock; }
+    public void setClock(Clock clock) { this.clock = clock; logger.debug("clock set in DigitalClockPanel"); }
 }

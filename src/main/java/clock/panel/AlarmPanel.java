@@ -72,9 +72,8 @@ public class AlarmPanel extends ClockPanel
     public AlarmPanel(ClockFrame clockFrame)
     {
         super();
-        this.clockFrame = clockFrame;
-        //clockFrame.setPanelType(PANEL_ALARM);
-        this.clock = clockFrame.getClock();
+        setClockFrame(clockFrame);
+        setClock(clockFrame.getClock());
         setMaximumSize(ClockFrame.alarmSize);
         setGridBagLayout(new GridBagLayout());
         setLayout(layout);
@@ -431,6 +430,7 @@ public class AlarmPanel extends ClockPanel
                         updateTheAlarm(this.alarm);
                         alarm = this.alarm;
                         this.alarm = null;
+                        updatingAlarm = false;
                     } else {
                         alarm = createAlarm();
                     }
@@ -800,6 +800,7 @@ public class AlarmPanel extends ClockPanel
     }
 
     /* Getters */
+    public ClockFrame getClockFrame() { return this.clockFrame; }
     public GridBagLayout getGridBagLayout() { return this.layout; }
     public GridBagConstraints getGridBagConstraints() { return this.constraints; }
     public Clock getClock() { return this.clockFrame.getClock(); }
@@ -825,6 +826,7 @@ public class AlarmPanel extends ClockPanel
     public JComboBox<String> getJComboBox() { return this.ampmDropDown; }
 
     /* Setters */
+    private void setClockFrame(ClockFrame clockFrame) { this.clockFrame = clockFrame; logger.debug("clockFrame set"); }
     protected void setGridBagLayout(GridBagLayout layout) { this.layout = layout; }
     protected void setGridBagConstraints(GridBagConstraints constraints) { this.constraints = constraints; }
     protected void setJAlarmLbl1(JLabel alarmLabel1) { this.alarmLabel1 = alarmLabel1; }
@@ -846,7 +848,7 @@ public class AlarmPanel extends ClockPanel
     protected void setSundayCheckBox(JCheckBox sundayCheckBox) { this.sundayCheckBox = sundayCheckBox; }
     protected void setWeekCheckBox(JCheckBox weekCheckBox) { this.weekCheckBox = weekCheckBox; }
     protected void setWeekendCheckBox(JCheckBox weekendCheckBox) { this.weekendCheckBox = weekendCheckBox; }
-    public void setClock(Clock clock) { this.clockFrame.setClock(clock); }
+    public void setClock(Clock clock) { this.clockFrame.setClock(clock); logger.info("Clock set in AlarmPanel"); }
     private void setDateOperationsDropdown(JComboBox<String> ampmDropDown) { this.ampmDropDown = ampmDropDown; }
 
 }
