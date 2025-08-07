@@ -32,10 +32,8 @@ public class DigitalClockPanel extends ClockPanel implements Runnable
     private GridBagLayout layout;
     private GridBagConstraints constraints;
     private Thread thread = null;
-    private int xcenter = ClockFrame.clockDefaultSize.height/2;
     private Clock clock;
     private ClockFrame clockFrame;
-    private String row1 = EMPTY, row2 = EMPTY;
 
     /**
      * The main constructor for the digital clock panel
@@ -57,14 +55,11 @@ public class DigitalClockPanel extends ClockPanel implements Runnable
         logger.debug("setup default actions with clock");
         setClockFrame(clockFrame);
         setClock(clockFrame.getClock());
-        row1 = clock.defaultText(1);
-        row2 = clock.defaultText(2);
         setupSettingsMenu();
         setMaximumSize(ClockFrame.clockDefaultSize);
         setGridBagLayout(new GridBagLayout()); // sets layout
         setLayout(layout);
         setGridBagConstraints(new GridBagConstraints());
-        //constraints.fill = GridBagConstraints.HORIZONTAL;
         setBackground(Color.BLACK);
         setBorder(BorderFactory.createLineBorder(Color.BLACK));
         setForeground(Color.WHITE);

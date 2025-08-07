@@ -23,11 +23,14 @@ import static java.lang.Thread.sleep;
 import static clock.util.Constants.*;
 
 /**
- * The New Timer Panel
+ * Timer Panel
  *
  * This panel will allow you to create multiple
- * timers, and see them executing to the right
- * similar to the Alarm Panel view.
+ * timers, and see them displayed in a table
+ * below the timer creation fields. Each timer
+ * will have a name, hours, minutes, and seconds.
+ * Once it reaches zero, it will sound an alarm
+ * until the user turns it off.
  *
  * @author Michael Ball
  * @version since 2.9
@@ -48,7 +51,6 @@ public class TimerPanel extends ClockPanel implements Runnable
             secondField;
     private JButton setTimerButton;
     private JButton resetButton;
-    private boolean disableTimerFunctionality;
 
     private JTable timersTable;
     private JScrollPane scrollTable;
@@ -685,7 +687,6 @@ public class TimerPanel extends ClockPanel implements Runnable
     public GridBagLayout getGridBagLayout() { return this.layout; }
     public GridBagConstraints getGridBagConstraints() { return this.constraints; }
     public Clock getClock() { return clockFrame.getClock(); }
-    public boolean isDisableTimerFunctionality() { return disableTimerFunctionality; }
     public JTextField getHourField() { return hourField; }
     public JTextField getMinuteField() { return minuteField; }
     public JTextField getSecondField() { return secondField; }

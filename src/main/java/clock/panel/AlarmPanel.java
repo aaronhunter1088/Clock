@@ -21,7 +21,9 @@ import static java.time.DayOfWeek.*;
 import static clock.panel.Panel.PANEL_ALARM;
 
 /**
- * The AlarmPanel is used to set and view alarms. The
+ * Alarm Panel
+ *
+ * Used to set and view alarms. The
  * alarms can be viewed in the textarea and in the
  * menu (if you CTRL+A into the panel).
  * Clicking on an alarm in the View Alarms menu will
@@ -63,7 +65,6 @@ public class AlarmPanel extends ClockPanel
     private Clock clock;
     private Alarm alarm;
     private boolean updatingAlarm;
-    //private AdvancedPlayer musicPlayer;
 
     /**
      * Main constructor for creating the AlarmPanel
@@ -82,7 +83,6 @@ public class AlarmPanel extends ClockPanel
         setForeground(Color.BLACK);
         setupAlarmPanel();
         setupAlarmButton();
-        //setupMusicPlayer();
         addComponentsToPanel();
         SwingUtilities.updateComponentTreeUI(this);
         logger.info("Finished creating Alarm Panel");
