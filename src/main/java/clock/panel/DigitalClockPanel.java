@@ -2,15 +2,15 @@ package clock.panel;
 
 import clock.entity.Alarm;
 import clock.entity.Clock;
+import clock.entity.Panel;
 import clock.entity.Timer;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import javax.swing.*;
 import java.awt.*;
-import java.time.DayOfWeek;
 
-import static clock.panel.Panel.PANEL_DIGITAL_CLOCK;
+import static clock.entity.Panel.PANEL_DIGITAL_CLOCK;
 import static clock.util.Constants.*;
 import static java.lang.Thread.sleep;
 
@@ -63,7 +63,7 @@ public class DigitalClockPanel extends ClockPanel implements Runnable
         setBackground(Color.BLACK);
         setBorder(BorderFactory.createLineBorder(Color.BLACK));
         setForeground(Color.WHITE);
-        start(this);
+        start();
     }
 
     /**
@@ -81,25 +81,23 @@ public class DigitalClockPanel extends ClockPanel implements Runnable
     }
 
     /**
-     * Starts the analogue clock
-     * @param panel the analogue clock panel
+     * Starts the digital clock panel thread
+     * and internally calls the run method.
      */
-    public void start(DigitalClockPanel panel)
+    public void start()
     {
-        logger.info("starting digital panel");
+        logger.debug("starting digital panel");
         if (thread == null)
         {
-            thread = new Thread(panel);
+            thread = new Thread(this);
             thread.start();
         }
     }
 
-    /**
-     * Stops the digital clock
-     */
+    /** Stops the timer panel thread. */
     public void stop()
     {
-        logger.info("stopping digital panel");
+        logger.debug("stopping digital panel");
         thread = null;
     }
 
@@ -109,19 +107,20 @@ public class DigitalClockPanel extends ClockPanel implements Runnable
     @Override
     public void run()
     {
-        logger.info("starting digital clock");
+        logger.debug("starting digital clock");
         while (thread != null)
         {
             try {
+                repaint(); // goes to paint
                 sleep(1000);
             }
             catch (InterruptedException e) { printStackTrace(e, e.getMessage());}
-            repaint(); // goes to paint
+
         }
     }
 
     /**
-     * Paints the analogue clock panel
+     * Paints the digital clock panel
      * @param g the graphics object
      */
     @Override
@@ -143,7 +142,7 @@ public class DigitalClockPanel extends ClockPanel implements Runnable
     }
 
     /**
-     * Draws the analogue clock
+     * Draws the digital clock
      * @param g the graphics object
      */
     public void drawStructure(Graphics g)
@@ -156,23 +155,30 @@ public class DigitalClockPanel extends ClockPanel implements Runnable
         g.fillRect(0, 0, ClockFrame.clockDefaultSize.width, ClockFrame.clockDefaultSize.height);
 
         g.setColor(Color.WHITE);
-        // Get FontMetrics for string width calculation
-        FontMetrics fm = g.getFontMetrics(g.getFont());
+        FontMetrics fm = g.getFontMetrics(g.getFont()); // Get FontMetrics for string width calculation
 
         // Strings to draw
-        String dateStr = clock.defaultText(1);
-        String timeStr = clock.defaultText(2);
-        // Adjust as needed
+        String dateStr;
+        String timeStr;
+
         java.util.List<Alarm> clockAlarms = clock.getListOfAlarms();
         java.util.List<Timer> clockTimers = clock.getListOfTimers();
-        boolean alarmsGoingOff = clockAlarms.stream().anyMatch(Alarm::isAlarmGoingOff);
         long alarmsGoingOffCount = clockAlarms.stream().filter(Alarm::isAlarmGoingOff).count();
-        boolean timersGoingOff = clockTimers.stream().anyMatch(Timer::isTimerGoingOff);
+        boolean alarmsGoingOff = alarmsGoingOffCount > 0;
         long timersGoingOffCount = clockTimers.stream().filter(Timer::isTimerGoingOff).count();
-        // TODO: Combine with variables above. This should be so that we display appropriate message
-        if (clock.getListOfAlarms().stream().anyMatch(Alarm::isAlarmGoingOff))
+        boolean timersGoingOff = timersGoingOffCount > 0;
+
+        // If we have no Alarms or Timers going off
+        if (!alarmsGoingOff && !timersGoingOff)
+        {
+            dateStr = clock.defaultText(1);
+            timeStr = clock.defaultText(2);
+        }
+        // If we have only Alarms going off
+        else if (alarmsGoingOff && !timersGoingOff)
         {
             var activeAlarms = clock.getListOfAlarms().stream().filter(Alarm::isAlarmGoingOff).toList();
+            // Display Alarm Name or "Many Alarms" if more than one
             dateStr = activeAlarms.size() == 1
                     ? (activeAlarms.getFirst().getName() != null)
                         ? activeAlarms.getFirst().getName()
@@ -180,14 +186,31 @@ public class DigitalClockPanel extends ClockPanel implements Runnable
                     : "Many Alarms";
             timeStr = clock.defaultText(9);
         }
-        // Show which timer is going off
-        else if (clockFrame.getCurrentPanel() instanceof TimerPanel timerPanel)
+        // If we have only Timers going off
+        else if (timersGoingOff && !alarmsGoingOff)
         {
             var activeTimers = clock.getListOfTimers().stream().filter(Timer::isTimerGoingOff).toList();
-            dateStr = activeTimers.size() == 1 ? "One Timer" : "Many Timers";
+            // Display Timer Name or "Many Timers" if more than one
+            dateStr = activeTimers.size() == 1
+                    ? (activeTimers.getFirst().getName() != null)
+                        ? activeTimers.getFirst().getName()
+                        : activeTimers.toString()
+                    : "Many Timers";
             timeStr = activeTimers.size() == 1 ? is+SPACE+going_off : are+SPACE+going_off;
         }
+        // If we have both Alarms and Timers going off
+        else
+        {
+            var activeAlarms = clock.getListOfAlarms().stream().filter(Alarm::isAlarmGoingOff).toList();
+            var activeTimers = clock.getListOfTimers().stream().filter(Timer::isTimerGoingOff).toList();
 
+            g.setFont(ClockFrame.font40);
+            fm = g.getFontMetrics(g.getFont());
+            String alarmVerb = activeAlarms.size() == 1 ? is : are;
+            String timerVerb = activeTimers.size() == 1 ? is : are;
+            dateStr = activeAlarms.size() + SPACE + ALARM + SPACE + alarmVerb + SPACE + going_off;
+            timeStr = activeTimers.size() + SPACE + TIMER + SPACE + timerVerb + SPACE + going_off;
+        }
         // Calculate centered x positions
         int dateWidth = fm.stringWidth(dateStr);
         int timeWidth = fm.stringWidth(timeStr);
@@ -222,94 +245,6 @@ public class DigitalClockPanel extends ClockPanel implements Runnable
         else logger.error(e.getMessage());
         for(StackTraceElement ste : e.getStackTrace())
         { logger.error(ste.toString()); }
-    }
-
-    /**
-     * This method prints the stack trace of an exception
-     * that may occur when the digital panel is in use.
-     * @param e the exception
-     */
-    void printStackTrace(Exception e)
-    { printStackTrace(e, EMPTY); }
-
-    private void updateAlarms()
-    {
-        clock.getListOfAlarms().forEach((alarm) -> {
-            for(DayOfWeek day : alarm.getDays()) {
-                if (alarm.getAlarmAsString().equals(clock.getClockTimeAsAlarmString())
-                        &&
-                        clock.getSeconds() == 0
-                        &&
-                        day == clock.getDayOfWeek()) {
-                    // time for alarm to be triggered
-                    alarm.setIsAlarmGoingOff(true);
-                    //alarm.triggerAlarm(getScheduler());
-                    alarm.setIsAlarmGoingOff(true);
-                    //setActiveAlarm(alarm);
-                    //setAlarmIsGoingOff(true);
-                    logger.info("Alarm " + alarm + " matches clock's time. ");
-                    logger.info("Sounding alarm...");
-                }
-        /* TODO: Check if this is still necessary
-           Above should match alarm.toString() to clock.getClockTimeAsAlarmString()
-           So if alarm time is same as clock's time (as shown as alarm string)
-         */
-                else if (clock.isShowMilitaryTime()) { // if in military time, change clocks hours back temporarily
-                    if (clock.getHours() > 12) {
-                        int tempHour = clock.getHours()-12;
-                        String tempHourAsStr = (tempHour < 10) ? "0"+tempHour : String.valueOf(tempHour);
-                        if (alarm.toString().equals(tempHourAsStr+":"+clock.getMinutesAsStr()+" "+clock.getAMPM())
-                                &&
-                                day == clock.getDayOfWeek()) {
-                            // time for alarm to be triggered on
-                            //setActiveAlarm(alarm);
-                            alarm.setIsAlarmGoingOff(true);
-                            //setAlarmIsGoingOff(true);
-                            logger.info("Alarm " + alarm + " matches clock's time. ");
-                            logger.info("Sounding alarm...");
-                        }
-                    }
-                    else {
-                        if (alarm.toString().equals(clock.getHoursAsStr()+":"+clock.getMinutesAsStr()+" "+clock.getAMPM())
-                                &&
-                                day == clock.getDayOfWeek()) {
-                            // time for alarm to be triggered on
-                            //setActiveAlarm(alarm);
-                            alarm.setIsAlarmGoingOff(true);
-                            //setAlarmIsGoingOff(true);
-                            logger.info("Alarm " + alarm + " matches clock's time. ");
-                            logger.info("Sounding alarm...");
-                        }
-                    }
-                }
-            }
-        });
-    }
-
-    /**
-     * The main method used for adding components
-     * to a panel
-     * @param cpt       the component to add
-     * @param gridy     the y position
-     * @param gridx     the x position
-     * @param gwidth    the width
-     * @param gheight   the height
-     * @param ipadx     the x padding
-     * @param ipady     the y padding
-     */
-    void addComponent(Component cpt, int gridy, int gridx, double gwidth, double gheight, int ipadx, int ipady)
-    {
-        logger.info("addComponent");
-        getGridBagConstraints().gridx = gridx;
-        getGridBagConstraints().gridy = gridy;
-        getGridBagConstraints().gridwidth = (int)Math.ceil(gwidth);
-        getGridBagConstraints().gridheight = (int)Math.ceil(gheight);
-        getGridBagConstraints().ipadx = ipadx;
-        getGridBagConstraints().ipady = ipady;
-        getGridBagConstraints().fill = GridBagConstraints.NONE;
-        getGridBagConstraints().insets = new Insets(0,0,0,0);
-        getGridBagLayout().setConstraints(cpt, getGridBagConstraints());
-        add(cpt);
     }
 
     /* Getters */

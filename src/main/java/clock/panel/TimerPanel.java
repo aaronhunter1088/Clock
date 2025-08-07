@@ -234,7 +234,7 @@ public class TimerPanel extends ClockPanel implements Runnable
         resetButton.addActionListener(this::resetTimerPanel);
         resetButton.setEnabled(false);
         setupTimersTableDefaults(true);
-        start(this);
+        start();
     }
 
     /**
@@ -507,7 +507,6 @@ public class TimerPanel extends ClockPanel implements Runnable
         return timer;
     }
 
-
     /**
      * Resets the timer panel
      * @param action the action event
@@ -637,41 +636,29 @@ public class TimerPanel extends ClockPanel implements Runnable
         { logger.error(ste.toString()); }
     }
 
-    /**
-     * This method prints the stack trace of an exception
-     * that may occur when the digital panel is in use.
-     * @param e the exception
-     */
-    public void printStackTrace(Exception e)
-    { printStackTrace(e, ""); }
-
-    /**
-     * Starts the analogue clock
-     * @param panel the analogue clock panel
-     */
-    public void start(TimerPanel panel)
+    /** Starts the timer clock panel thread and internally calls the run method. */
+    public void start()
     {
-        logger.info("starting timer panel");
+        logger.debug("starting timer panel");
         if (thread == null)
         {
-            thread = new Thread(panel);
+            thread = new Thread(this);
             thread.start();
         }
     }
 
-    /**
-     * Stops the timer panel
-     */
+    /** Stops the timer panel thread. */
     public void stop()
     {
-        logger.info("stopping timer panel thread");
+        logger.debug("stopping timer panel");
         thread = null;
     }
 
+    /** This method runs the timer panel thread and updates the timers table every second. */
     @Override
     public void run()
     {
-        logger.info("running timer panel");
+        logger.debug("running timer panel");
         while (thread != null)
         {
             try {

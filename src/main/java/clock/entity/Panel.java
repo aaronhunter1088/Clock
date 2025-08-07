@@ -1,4 +1,4 @@
-package clock.panel;
+package clock.entity;
 
 /**
  * Used to distinguish which panel the Clock is using

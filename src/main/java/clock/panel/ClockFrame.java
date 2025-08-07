@@ -1,8 +1,8 @@
 package clock.panel;
 
-import clock.contract.IClockPanel;
 import clock.entity.Clock;
 import clock.entity.ClockMenuBar;
+import clock.entity.Panel;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -17,7 +17,7 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Function;
 
-import static clock.panel.Panel.*;
+import static clock.entity.Panel.*;
 import static clock.util.Constants.*;
 
 /**
@@ -27,8 +27,8 @@ import static clock.util.Constants.*;
  * @author michael ball
  * @version 2.9
  */
-public class ClockFrame extends JFrame implements IClockPanel {
-
+public class ClockFrame extends JFrame
+{
     @Serial
     private static final long serialVersionUID = 2L;
     private static final Logger logger = LogManager.getLogger(ClockFrame.class);
@@ -42,17 +42,15 @@ public class ClockFrame extends JFrame implements IClockPanel {
     public final static Font font20 = new Font("Courier New", Font.BOLD, 20);
     public final static Font font10 = new Font("Courier New", Font.BOLD, 10);
     public final static Font analogueFont = new Font("TimesRoman", Font.BOLD, 20);
-    private Panel panelType = PANEL_DIGITAL_CLOCK; // Default panel type
+    private clock.entity.Panel panelType = PANEL_DIGITAL_CLOCK; // Default panel type
     private ClockPanel currentPanel;
     private ClockMenuBar menuBar;
     private DigitalClockPanel digitalClockPanel;
     private AnalogueClockPanel analogueClockPanel;
     private AlarmPanel alarmPanel;
-    //private TimerPanel timerPanel;
     private TimerPanel timerPanel;
     private StopwatchPanel stopwatchPanel;
     private Clock clock;
-
     private ScheduledExecutorService scheduler;
 
     /**
@@ -64,11 +62,10 @@ public class ClockFrame extends JFrame implements IClockPanel {
         initialize(null);
     }
 
-    public ClockFrame(Panel panelType) {
+    public ClockFrame(clock.entity.Panel panelType) {
         super(CLOCK);
-        initialize(null);
         this.panelType = panelType;
-        addComponentsToPanel();
+        initialize(null);
     }
 
     /**
@@ -96,14 +93,14 @@ public class ClockFrame extends JFrame implements IClockPanel {
         setVisible(true);
         setResizable(false);
         logger.info("Creating {} Clock", clock != null ? "Test" : "Regular");
-        setClock(clock != null ? clock : new Clock());
+        this.clock = clock != null ? clock : new Clock();
         scheduler = Executors.newScheduledThreadPool(25);
         setupMenuBar(); // daylightSavingsTimeEnabled directly influences menu bar setup
         digitalClockPanel = new DigitalClockPanel(this);
         analogueClockPanel = new AnalogueClockPanel(this);
         alarmPanel = new AlarmPanel(this);
         timerPanel = new TimerPanel(this);
-        addComponentsToPanel();
+        changePanels(panelType, false);
     }
 
     /**
@@ -154,7 +151,7 @@ public class ClockFrame extends JFrame implements IClockPanel {
      * with a specific panel type.
      * @param panelType the panel type to display
      */
-    public static void createAndShowGUI(Panel panelType)
+    public static void createAndShowGUI(clock.entity.Panel panelType)
     {
         logger.info("Starting Clock with panel type: {}", panelType);
         ClockFrame clockFrame = new ClockFrame(panelType);
@@ -176,7 +173,7 @@ public class ClockFrame extends JFrame implements IClockPanel {
      * Changes the panels based on the provided clockPanel value
      * @param clockPanel the panel to change to
      */
-    public void changePanels(Panel clockPanel, boolean resetValues)
+    public void changePanels(clock.entity.Panel clockPanel, boolean resetValues)
     {
         logger.info("change panels");
         if (currentPanel != null) remove(currentPanel);
@@ -196,7 +193,7 @@ public class ClockFrame extends JFrame implements IClockPanel {
      * based on the provided clockPanel value.
      * @param clockPanel the panel to update to
      */
-    public void showPanel(Panel clockPanel, boolean resetValues)
+    public void showPanel(clock.entity.Panel clockPanel, boolean resetValues)
     {
         logger.debug("updating to {}", clockPanel);
         switch (clockPanel)
@@ -272,6 +269,7 @@ public class ClockFrame extends JFrame implements IClockPanel {
         setSize(clockDefaultSize);
         panelType = PANEL_TIMER;
         timerPanel.setupSettingsMenu();
+        timerPanel.start();
     }
 
     /**
@@ -357,26 +355,7 @@ public class ClockFrame extends JFrame implements IClockPanel {
         }
     }
 
-    @Override
-    public void addComponentsToPanel() {
-        changePanels(panelType, false);
-    }
-
-    @Override
-    public void setClock(Clock clock) {
-        this.clock = clock;
-    }
-
-    @Override
-    public void setupSettingsMenu() {
-        // handled in the panel
-    }
-
-    @Override
-    public void printStackTrace(Exception e, String message)
-    {}
-
-    public Panel getPanelType() {
+    public clock.entity.Panel getPanelType() {
         return panelType;
     }
 

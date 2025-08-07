@@ -3,7 +3,7 @@ package clock;
 import clock.entity.Clock;
 import clock.exception.InvalidInputException;
 import clock.panel.ClockFrame;
-import clock.panel.Panel;
+import clock.entity.Panel;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 

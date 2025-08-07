@@ -2,6 +2,7 @@ package clock.panel;
 
 import clock.entity.Alarm;
 import clock.entity.Clock;
+import clock.entity.Panel;
 import clock.exception.InvalidInputException;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.LogManager;
@@ -18,7 +19,7 @@ import java.util.Objects;
 
 import static clock.util.Constants.*;
 import static java.time.DayOfWeek.*;
-import static clock.panel.Panel.PANEL_ALARM;
+import static clock.entity.Panel.PANEL_ALARM;
 
 /**
  * Alarm Panel

@@ -3,12 +3,13 @@ package clock.panel;
 import java.awt.*;
 
 import clock.entity.Clock;
+import clock.entity.Panel;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import static clock.util.Constants.*;
 import static java.lang.Thread.sleep;
-import static clock.panel.Panel.PANEL_ANALOGUE_CLOCK;
+import static clock.entity.Panel.PANEL_ANALOGUE_CLOCK;
 
 /**
  * The AnalogueClockPanel is used to view the time
@@ -60,7 +61,7 @@ public class AnalogueClockPanel extends ClockPanel implements Runnable
         setGridBagConstraints(new GridBagConstraints());
         setBackground(Color.BLACK);
         setForeground(Color.BLACK);
-        start(this);
+        start();
     }
 
     /**
@@ -77,25 +78,23 @@ public class AnalogueClockPanel extends ClockPanel implements Runnable
     }
 
     /**
-     * Starts the analogue clock
-     * @param panel the analogue clock panel
+     * Starts the analogue clock panel thread
+     * and internally calls the run method.
      */
-    public void start(AnalogueClockPanel panel)
+    public void start()
     {
-        logger.info("starting analogue clock panel");
+        logger.debug("starting analogue clock panel");
         if (thread == null)
         {
-            thread = new Thread(panel);
+            thread = new Thread(this);
             thread.start();
         }
     }
 
-    /**
-     * Stops the analogue clock
-     */
+    /** Stops the timer panel thread. */
     public void stop()
     {
-        logger.info("stopping analogue clock panel");
+        logger.debug("stopping analogue clock panel");
         thread = null;
     }
 
@@ -104,12 +103,14 @@ public class AnalogueClockPanel extends ClockPanel implements Runnable
      */
     public void run()
     {
-        logger.info("starting analogue clock");
+        logger.debug("starting analogue clock");
         while (thread != null)
         {
-            try { sleep(1000); }
-            catch (InterruptedException e) { printStackTrace(e, e.getMessage());}
-            repaint();
+            try {
+                repaint(); // goes to paint
+                sleep(1000);
+            }
+            catch (InterruptedException e) { printStackTrace(e, e.getMessage()); }
         }
     }
 

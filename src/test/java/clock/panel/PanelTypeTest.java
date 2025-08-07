@@ -1,5 +1,6 @@
 package clock.panel;
 
+import clock.entity.Panel;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.junit.jupiter.api.AfterEach;
@@ -10,7 +11,7 @@ import org.junit.jupiter.api.Test;
 import java.util.ArrayList;
 import java.util.List;
 
-import static clock.panel.Panel.*;
+import static clock.entity.Panel.*;
 import static org.junit.jupiter.api.Assertions.*;
 
 /**

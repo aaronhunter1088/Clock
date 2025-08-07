@@ -13,7 +13,7 @@ import java.util.Arrays;
 import java.util.List;
 
 import static clock.util.Constants.*;
-import static clock.panel.Panel.*;
+import static clock.entity.Panel.*;
 
 /**
  * The menu bar for the Clock.
