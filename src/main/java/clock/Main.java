@@ -20,7 +20,7 @@ import java.util.List;
  * @version 1.0
  */
 public class Main {
-    private final static Logger logger = LogManager.getLogger();
+    private final static Logger logger = LogManager.getLogger(Main.class);
 
     /**
      * Main method to start the Clock
