@@ -180,7 +180,7 @@ public class ClockMenuBar extends JMenuBar
 
         setTimerFeature(new JMenuItem(VIEW_TIMERS));
         getTimerFeature().setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_T, InputEvent.CTRL_DOWN_MASK));
-        getTimerFeature().addActionListener(action -> clockFrame.changePanels(PANEL_TIMER2, false));
+        getTimerFeature().addActionListener(action -> clockFrame.changePanels(PANEL_TIMER, false));
 
         setStopwatchFeature(new JMenuItem(VIEW_STOPWATCH));
         getStopwatchFeature().setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_S, InputEvent.CTRL_DOWN_MASK));
@@ -218,14 +218,6 @@ public class ClockMenuBar extends JMenuBar
         getAnalogueClockFeature().setForeground(Color.WHITE);
         getTimerFeature().setForeground(Color.WHITE);
         getStopwatchFeature().setForeground(Color.WHITE);
-        // Set functionality for Settings menu
-
-
-
-
-
-        // Set functionality for Features menu
-
         // Add both menus to main menu
         add(getSettingsMenu());
         add(getFeaturesMenu());

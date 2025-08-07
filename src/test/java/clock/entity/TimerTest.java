@@ -223,7 +223,7 @@ class TimerTest
         });
     }
 
-    // TODO: Move to TimerPanel2Test
+    // TODO: Move to TimerPanelTest
 //    @Test
 //    @DisplayName("Create 2 Timers Using GUI")
 //    void testCreateTwoTimersUsingGUI() throws InvalidInputException, InterruptedException, InvocationTargetException
@@ -234,19 +234,19 @@ class TimerTest
 //        openTimerPanel();
 //
 //        SwingUtilities.invokeLater(() -> {
-//            clock.getTimerPanel2().getHourField().grabFocus();
-//            clock.getTimerPanel2().getHourField().setText(Integer.toString(timer1.get().getHours()));
+//            clock.getTimerPanel().getHourField().grabFocus();
+//            clock.getTimerPanel().getHourField().setText(Integer.toString(timer1.get().getHours()));
 //            //sleep(2000);
-//            clock.getTimerPanel2().getMinuteField().grabFocus();
-//            clock.getTimerPanel2().getMinuteField().setText(Integer.toString(timer1.get().getMinutes()));
+//            clock.getTimerPanel().getMinuteField().grabFocus();
+//            clock.getTimerPanel().getMinuteField().setText(Integer.toString(timer1.get().getMinutes()));
 //            //sleep(2000);
-//            clock.getTimerPanel2().getSecondField().grabFocus();
-//            clock.getTimerPanel2().getTimerButton().setEnabled(clock.getTimerPanel2().validTextFields());
+//            clock.getTimerPanel().getSecondField().grabFocus();
+//            clock.getTimerPanel().getTimerButton().setEnabled(clock.getTimerPanel().validTextFields());
 //            //sleep(2000);
-//            clock.getTimerPanel2().getTimerButton().doClick();
+//            clock.getTimerPanel().getTimerButton().doClick();
 //
-//            clock.getTimerPanel2().getHourField().grabFocus();
-//            clock.getTimerPanel2().getHourField().setText(Integer.toString(timer2.get().getHours()));
+//            clock.getTimerPanel().getHourField().grabFocus();
+//            clock.getTimerPanel().getHourField().setText(Integer.toString(timer2.get().getHours()));
 //            //sleep(2000);
 //            clock.getTimerPanel2().getMinuteField().grabFocus();
 //            clock.getTimerPanel2().getMinuteField().setText(Integer.toString(timer2.get().getMinutes()));

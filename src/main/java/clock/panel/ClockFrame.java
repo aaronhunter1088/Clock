@@ -49,7 +49,7 @@ public class ClockFrame extends JFrame implements IClockPanel {
     private AnalogueClockPanel analogueClockPanel;
     private AlarmPanel alarmPanel;
     //private TimerPanel timerPanel;
-    private TimerPanel2 timerPanel2;
+    private TimerPanel timerPanel;
     private StopwatchPanel stopwatchPanel;
     private Clock clock;
 
@@ -102,7 +102,7 @@ public class ClockFrame extends JFrame implements IClockPanel {
         digitalClockPanel = new DigitalClockPanel(this);
         analogueClockPanel = new AnalogueClockPanel(this);
         alarmPanel = new AlarmPanel(this);
-        timerPanel2 = new TimerPanel2(this);
+        timerPanel = new TimerPanel(this);
         addComponentsToPanel();
     }
 
@@ -184,7 +184,7 @@ public class ClockFrame extends JFrame implements IClockPanel {
             dcp.stop();
         if (currentPanel instanceof AnalogueClockPanel acp)
             acp.stop();
-        if (currentPanel instanceof TimerPanel2 tp)
+        if (currentPanel instanceof TimerPanel tp)
             tp.stop();
         showPanel(clockPanel, resetValues);
         repaint();
@@ -204,8 +204,7 @@ public class ClockFrame extends JFrame implements IClockPanel {
             case PANEL_DIGITAL_CLOCK -> changeToDigitalClockPanel();
             case PANEL_ANALOGUE_CLOCK -> changeToAnalogueClockPanel();
             case PANEL_ALARM -> changeToAlarmPanel(resetValues);
-            //case PANEL_TIMER -> changeToTimerPanel();
-            case PANEL_TIMER2 -> changeToTimerPanel2();
+            case PANEL_TIMER -> changeToTimerPanel();
             //case PANEL_STOPWATCH -> changeToStopwatchPanel();
         }
     }
@@ -265,14 +264,14 @@ public class ClockFrame extends JFrame implements IClockPanel {
     /**
      * Changes the panel to the timer panel
      */
-    public void changeToTimerPanel2()
+    public void changeToTimerPanel()
     {
         logger.info("change to timer panel");
-        add(timerPanel2);
-        currentPanel = timerPanel2;
+        add(timerPanel);
+        currentPanel = timerPanel;
         setSize(clockDefaultSize);
-        panelType = PANEL_TIMER2;
-        timerPanel2.setupSettingsMenu();
+        panelType = PANEL_TIMER;
+        timerPanel.setupSettingsMenu();
     }
 
     /**
@@ -429,12 +428,12 @@ public class ClockFrame extends JFrame implements IClockPanel {
 //        this.timerPanel = timerPanel;
 //    }
 
-    public TimerPanel2 getTimerPanel2() {
-        return timerPanel2;
+    public TimerPanel getTimerPanel() {
+        return timerPanel;
     }
 
-    public void setTimerPanel2(TimerPanel2 timerPanel2) {
-        this.timerPanel2 = timerPanel2;
+    public void setTimerPanel(TimerPanel timerPanel) {
+        this.timerPanel = timerPanel;
     }
 
     public StopwatchPanel getStopwatchPanel() {
