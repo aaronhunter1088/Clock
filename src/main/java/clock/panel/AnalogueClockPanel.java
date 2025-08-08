@@ -82,6 +82,7 @@ public class AnalogueClockPanel extends ClockPanel implements Runnable
         setMaximumSize(ClockFrame.analogueSize);
         setBackground(Color.BLACK);
         setForeground(Color.BLACK);
+        clockFrame.setTitle("Analogue Clock");
         start();
     }
 

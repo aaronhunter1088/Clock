@@ -248,6 +248,7 @@ public class TimerPanel extends ClockPanel implements Runnable
     public void setupDefaultValues()
     {
         setupSettingsMenu();
+        clockFrame.setTitle("Timer Panel");
         start();
     }
 

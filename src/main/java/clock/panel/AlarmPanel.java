@@ -198,6 +198,7 @@ public class AlarmPanel extends ClockPanel implements Runnable
         minutesTextField.setText(EMPTY);
         resetJCheckBoxes();
         setupSettingsMenu();
+        clockFrame.setTitle("Alarm Panel");
         start();
     }
 
