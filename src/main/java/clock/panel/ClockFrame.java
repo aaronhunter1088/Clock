@@ -34,8 +34,10 @@ public class ClockFrame extends JFrame
     private static final Logger logger = LogManager.getLogger(ClockFrame.class);
 
     public final static Dimension clockDefaultSize = new Dimension(700, 300);
+    public final static Dimension analogueSize = new Dimension(350, 400);
     public final static Dimension panelSize = new Dimension(400, 300);
     public final static Dimension alarmSize = new Dimension(200,100);
+    public final static Dimension timerSize = new Dimension(400, 300);
     public final static Font font60 = new Font("Courier New", Font.BOLD, 60);
     public final static Font font50 = new Font("Courier New", Font.BOLD, 50);
     public final static Font font40 = new Font("Courier New", Font.BOLD, 40);
@@ -202,7 +204,7 @@ public class ClockFrame extends JFrame
         {
             case PANEL_DIGITAL_CLOCK -> changeToDigitalClockPanel();
             case PANEL_ANALOGUE_CLOCK -> changeToAnalogueClockPanel();
-            case PANEL_ALARM -> changeToAlarmPanel(resetValues);
+            case PANEL_ALARM -> changeToAlarmPanel();
             case PANEL_TIMER -> changeToTimerPanel();
             //case PANEL_STOPWATCH -> changeToStopwatchPanel();
         }
@@ -216,7 +218,7 @@ public class ClockFrame extends JFrame
         logger.info("change to digital clock");
         add(digitalClockPanel);
         currentPanel = digitalClockPanel;
-        digitalClockPanel.setupDefaultActions(this);
+        digitalClockPanel.setupDefaultValues();
         setSize(clockDefaultSize);
         setBackground(Color.BLACK);
         panelType = PANEL_DIGITAL_CLOCK;
@@ -230,7 +232,7 @@ public class ClockFrame extends JFrame
         logger.info("change to analogue clock");
         add(analogueClockPanel);
         currentPanel = analogueClockPanel;
-        analogueClockPanel.setupDefaultActions(this);
+        analogueClockPanel.setupDefaultValues();
         setSize(analogueClockPanel.getMaximumSize());
         setBackground(Color.BLACK);
         panelType = PANEL_ANALOGUE_CLOCK;
@@ -239,23 +241,15 @@ public class ClockFrame extends JFrame
 
     /**
      * Changes the panel to the alarm panel
-     * @param resetValues if the values should be reset
      */
-    public void changeToAlarmPanel(boolean resetValues)
+    public void changeToAlarmPanel()
     {
-        logger.info("change to alarm panel. reset values: {}", resetValues);
+        logger.info("change to alarm panel.");
         add(alarmPanel);
         currentPanel = alarmPanel;
-        if (resetValues)
-        {
-            alarmPanel.getJTextField1().setText(EMPTY);
-            alarmPanel.getJTextField2().setText(EMPTY);
-            alarmPanel.resetJCheckBoxes();
-            //alarmPanel.resetJTextArea(); // so error alarms don't show up after navigating out and back in
-        }
+        alarmPanel.setupDefaultValues();
         setSize(clockDefaultSize);
         panelType = PANEL_ALARM;
-        alarmPanel.setupSettingsMenu();
         alarmPanel.start();
     }
 

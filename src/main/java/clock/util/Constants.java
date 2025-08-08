@@ -21,7 +21,7 @@ public class Constants {
     public static final String EIGHT = "8";
     public static final String ELEVEN = "11";
     public static final String EMPTY = "";
-    public static final String FIELD = "Field";
+    public static final String TEXT_FIELD = "TextField";
     public static final String FIVE = "5";
     public static final String FOUR = "4";
     public static final String FULL_TIME_SETTING = "full date";
@@ -103,6 +103,7 @@ public class Constants {
     // Alarm
     public static final String ADDED = "Added";
     public static final String ALARM = "Alarm";
+    public static final String ALARM_ERROR = "Alarm Error";
     public static final String AMPM = "AM/PM";
     public static final String CURRENT_ALARMS = "Current Alarms";
     public static final String DAYS = "Days";

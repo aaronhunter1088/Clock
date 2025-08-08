@@ -40,7 +40,7 @@ public class AnalogueClockPanel extends ClockPanel implements Runnable
     public AnalogueClockPanel(ClockFrame clockFrame)
     {
         super();
-        setupDefaultActions(clockFrame);
+        initialize(clockFrame);
         logger.info("Finished creating AnalogueClock Panel");
     }
 
@@ -48,19 +48,16 @@ public class AnalogueClockPanel extends ClockPanel implements Runnable
      * Sets up the default actions for the analogue clock panel
      * @param clockFrame the clockFrame reference
      */
-    public void setupDefaultActions(ClockFrame clockFrame)
+    public void initialize(ClockFrame clockFrame)
     {
         logger.debug("setup default actions with clock");
         setClockFrame(clockFrame);
         setClock(clockFrame.getClock());
         setClockText(clock.getTimeAsStr());
-        setupSettingsMenu();
-        setMaximumSize(new Dimension(350, 400));
         setGridBagLayout(new GridBagLayout()); // sets layout
         setLayout(layout);
         setGridBagConstraints(new GridBagConstraints());
-        setBackground(Color.BLACK);
-        setForeground(Color.BLACK);
+        setupDefaultValues();
         start();
     }
 
@@ -77,6 +74,16 @@ public class AnalogueClockPanel extends ClockPanel implements Runnable
         setShowDigitalTimeOnAnalogueClock(true);
     }
 
+    /**
+     * Sets up the default values for the analogue clock panel
+     */
+    public void setupDefaultValues()
+    {
+        setupSettingsMenu();
+        setMaximumSize(ClockFrame.analogueSize);
+        setBackground(Color.BLACK);
+        setForeground(Color.BLACK);
+    }
     /**
      * Starts the analogue clock panel thread
      * and internally calls the run method.

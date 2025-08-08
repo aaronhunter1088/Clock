@@ -2,7 +2,6 @@ package clock.panel;
 
 import clock.entity.Alarm;
 import clock.entity.Clock;
-import clock.entity.Panel;
 import clock.entity.Timer;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -10,7 +9,6 @@ import org.apache.logging.log4j.Logger;
 import javax.swing.*;
 import java.awt.*;
 
-import static clock.entity.Panel.PANEL_DIGITAL_CLOCK;
 import static clock.util.Constants.*;
 import static java.lang.Thread.sleep;
 
@@ -41,7 +39,7 @@ public class DigitalClockPanel extends ClockPanel implements Runnable
     public DigitalClockPanel(ClockFrame clockFrame)
     {
         super();
-        setupDefaultActions(clockFrame);
+        initialize(clockFrame);
         logger.info("Finished creating DigitalClock Panel");
     }
 
@@ -49,20 +47,25 @@ public class DigitalClockPanel extends ClockPanel implements Runnable
      * Sets up the default actions for the digital clock panel
      * @param clockFrame the clockFrame reference
      */
-    public void setupDefaultActions(ClockFrame clockFrame)
+    public void initialize(ClockFrame clockFrame)
     {
         logger.debug("setup default actions with clock");
         setClockFrame(clockFrame);
         setClock(clockFrame.getClock());
-        setupSettingsMenu();
-        setMaximumSize(ClockFrame.clockDefaultSize);
         setGridBagLayout(new GridBagLayout()); // sets layout
         setLayout(layout);
         setGridBagConstraints(new GridBagConstraints());
+        setupDefaultValues();
+        start();
+    }
+
+    public void setupDefaultValues()
+    {
+        setMaximumSize(ClockFrame.clockDefaultSize);
+        setupSettingsMenu();
         setBackground(Color.BLACK);
         setBorder(BorderFactory.createLineBorder(Color.BLACK));
         setForeground(Color.WHITE);
-        start();
     }
 
     /**
