@@ -39,10 +39,11 @@ public class Alarm implements Serializable, Comparable<Alarm>, Runnable
     private static final long serialVersionUID = 2L;
     private static final Logger logger = LogManager.getLogger(Alarm.class);
     public static long alarmsCounter = 0L;
+    public static final long SNOOZE_TIME = 7 * 60 * 1000; // 7 minutes in milliseconds
     private int hours, minutes;
     private String minutesAsStr,hoursAsStr,ampm, name;
     private List<DayOfWeek> days;
-    private boolean alarmGoingOff,updatingAlarm, triggeredToday;
+    private boolean alarmGoingOff, updatingAlarm, triggeredToday, isSnoozing;
     private Clock clock;
     private Thread selfThread;
     private AdvancedPlayer musicPlayer;
@@ -166,12 +167,21 @@ public class Alarm implements Serializable, Comparable<Alarm>, Runnable
         while (selfThread != null)
         {
             try {
-                if (!alarmGoingOff) {
+                if (!alarmGoingOff && !triggeredToday) {
                     activateAlarm();
-                } else { // if (alarmGoingOff) {
-                    triggerAlarm();
+                    sleep(1000);
                 }
-                sleep(1000);
+                else if (isSnoozing) {
+                    sleep(SNOOZE_TIME);
+                }
+                else if (alarmGoingOff) {
+                    triggerAlarm();
+                    sleep(1000);
+                }
+                else {
+                    // do nothing
+                    sleep(1000);
+                }
             }
             catch (InterruptedException e) { printStackTrace(e, e.getMessage());}
         }
@@ -193,17 +203,17 @@ public class Alarm implements Serializable, Comparable<Alarm>, Runnable
             setTriggeredToday(true);
             logger.info("Alarm {} matches clock's time. Activating alarm", this);
         }
-        // alarm has reference to time
-        // check all alarms
-        // if any alarm matches clock's time, an alarm should be going off
     }
 
     /**
-     * Snoozing.... TODO: Implement this method
+     * Snoozing this alarm will stop the alarm
+     * from playing its sound for 7 minutes.
      */
     public void snooze()
     {
-        logger.warn("IMPLEMENT");
+        logger.info("snoozing for {} minutes", SNOOZE_TIME / 60000);
+        setIsSnoozing(true);
+        setIsAlarmGoingOff(false);
     }
 
     /**
@@ -274,6 +284,7 @@ public class Alarm implements Serializable, Comparable<Alarm>, Runnable
     public Clock getClock() { return this.clock; }
     public boolean isAlarmGoingOff() { return alarmGoingOff; }
     public boolean isUpdatingAlarm() { return updatingAlarm; }
+    public boolean isSnoozing() { return isSnoozing; }
     public List<DayOfWeek> getDays() { return this.days; }
     public int getHours() { return this.hours; }
     public String getHoursAsStr() { return this.hoursAsStr; }
@@ -287,34 +298,33 @@ public class Alarm implements Serializable, Comparable<Alarm>, Runnable
     public Thread getSelfThread() { return selfThread; }
 
     /* Setters */
-    public void setClock(Clock clock) { this.clock = clock; }
-    public void setIsAlarmGoingOff(boolean alarmGoingOff) { this.alarmGoingOff = alarmGoingOff; }
-    public void setIsAlarmUpdating(boolean updatingAlarm) { this.updatingAlarm = updatingAlarm; }
-    public void setAlarmGoingOff(boolean alarmGoingOff) { this.alarmGoingOff = alarmGoingOff; }
-    public void setUpdatingAlarm(boolean updatingAlarm) { this.updatingAlarm = updatingAlarm; }
-    public void setDays(List<DayOfWeek> days) { this.days = days; }
+    public void setClock(Clock clock) { this.clock = clock; logger.debug("clock set to: {}", clock); }
+    public void setIsAlarmGoingOff(boolean alarmGoingOff) { this.alarmGoingOff = alarmGoingOff; logger.debug("alarmGoingOff: {}", alarmGoingOff); }
+    public void setUpdatingAlarm(boolean updatingAlarm) { this.updatingAlarm = updatingAlarm; logger.debug("updatingAlarm: {}", updatingAlarm); }
+    public void setIsSnoozing(boolean isSnoozing) { this.isSnoozing = isSnoozing; logger.debug("isSnoozing: {}", isSnoozing); }
+    public void setDays(List<DayOfWeek> days) { this.days = days; logger.debug("days: {}", days); }
     public void setHours(int hours) {
         this.hours = hours;
         this.hoursAsStr = (hours < 10) ? "0"+this.hours : String.valueOf(this.hours);
+        logger.debug("hours: {}", hours);
     }
     public void setMinutes(int minutes) {
         this.minutes = minutes;
         this.minutesAsStr = (minutes < 10) ? "0"+this.minutes : String.valueOf(this.minutes);
+        logger.debug("minutes: {}", minutes);
     }
-    public void setAMPM(String ampm) { this.ampm = ampm; }
+    public void setAMPM(String ampm) { this.ampm = ampm; logger.debug("ampm: {}", ampm); }
     public void setName(String name) {
         if (name == null || name.isBlank()) {
             this.name = "Alarm" + alarmsCounter;
         } else {
             this.name = name;
         }
+        logger.debug("name: {}", this.name);
     }
-    public void setMusicPlayer(AdvancedPlayer musicPlayer) { this.musicPlayer = musicPlayer; }
-    public void setTriggeredToday(boolean triggeredToday) {
-        logger.debug("{} triggered today set to {}", this, triggeredToday);
-        this.triggeredToday = triggeredToday;
-    }
-    public void setSelfThread(Thread selfThread) { this.selfThread = selfThread; }
+    public void setMusicPlayer(AdvancedPlayer musicPlayer) { this.musicPlayer = musicPlayer; logger.debug("musicPlayer set"); }
+    public void setTriggeredToday(boolean triggeredToday) { this.triggeredToday = triggeredToday; logger.debug("triggeredToday: {}", triggeredToday); }
+    public void setSelfThread(Thread selfThread) { this.selfThread = selfThread; logger.debug("selfThread set"); }
 
     @Override
     public int compareTo(Alarm o) {

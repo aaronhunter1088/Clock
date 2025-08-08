@@ -27,19 +27,21 @@ import static java.time.DayOfWeek.*;
 /**
  * Alarm Panel
  * <p>
- * Used to set and view alarms. The
- * alarms can be viewed in the textarea and in the
- * menu (if you CTRL+A into the panel).
- * Clicking on an alarm in the View Alarms menu will
- * remove it from the menu and from the textarea inside
- * the AlarmPanel. However it will be visible on the panel
- * itself. Update as needed, or click set to save it.
- * Going away from the alarm panel without clicking Set will
- * delete that selected alarm permanently.
- * To set an alarm, you must enter an Hour, some minutes,
- * and the time, AM or PM, case insensitive. The alarm accepts
- * military time format. Just make sure the value makes sense
- * and an alarm will be created.
+ * Used to set and view alarms. The alarms are displayed
+ * in a table below where they're created.
+ * To set an alarm, you must enter an Hour, minutes,
+ * and the time, AM or PM, case insensitive. A name can
+ * also be given but it is not required. You must also
+ * provide some combination of day or days the alarm will
+ * sound off on.
+ * Once created, the alarm will be displayed in the table,
+ * most likely currently sleeping. You can edit the sleeping
+ * alarm by clicking on the Sleeping button. This will remove
+ * the alarm from the table.
+ * Once the alarm goes off, a sound will play and you can click
+ * snooze or stop. Snoozing will stop the alarm for 7 more
+ * minutes and then it will sound off again. Stopping the alarm
+ * will stop the sound but the alarm will remain on the table.
  *
  * @author michael ball
  * @version 2.0
@@ -432,11 +434,15 @@ public class AlarmPanel extends ClockPanel implements Runnable
                         setCheckBoxesIfWasSelected(alarm);
                         clock.getListOfAlarms().remove(alarm);
                     }
+                    case STOP -> {
+                        logger.info("Stopping alarm");
+                        alarm.stopAlarm();
+                    }
                     case REMOVE -> {
                         logger.info("Removing {} at row: {}", alarm, modelRow);
                         alarm.stopAlarm();
                         clock.getListOfAlarms().remove(alarm);
-                        ((DefaultTableModel)alarmsTable.getModel()).removeRow(modelRow);
+                        //((DefaultTableModel)alarmsTable.getModel()).removeRow(modelRow);
                     }
                 }
             }
@@ -454,12 +460,12 @@ public class AlarmPanel extends ClockPanel implements Runnable
         {
             public void actionPerformed(ActionEvent e)
             {
-                JTable table = (JTable)e.getSource();
                 int modelRow = Integer.valueOf( e.getActionCommand() );
-                String buttonAction = (String) table.getModel().getValueAt(modelRow, columnIndex);
-                alarmsTable.getModel().setValueAt(SLEEPING, modelRow, 2);
+                String buttonAction = (String) alarmsTable.getModel().getValueAt(modelRow, columnIndex);
+                alarmsTable.getModel().setValueAt(SLEEPING, modelRow, 3);
                 Alarm alarm = clock.getListOfAlarms().get(modelRow);
                 alarm.snooze();
+                clock.getListOfAlarms().set(modelRow, alarm);
             }
         };
     }
@@ -487,7 +493,7 @@ public class AlarmPanel extends ClockPanel implements Runnable
      */
     public String[] getAlarmsTableColumnNames()
     {
-        return new String[]{NAME, ALARM, DAYS, SLEEPING+'/'+SNOOZE, REMOVE};
+        return new String[]{NAME, ALARM, DAYS, SLEEPING+SLASH+SNOOZE, REMOVE+SLASH+STOP};
     }
 
     /**
@@ -520,13 +526,17 @@ public class AlarmPanel extends ClockPanel implements Runnable
                         alarmsTable.setValueAt(alarm.getAlarmAsString(), rowIndex.get(), 1);
                     }
                     // update buttons to show restart or remove
-                    if (alarm.isAlarmGoingOff()) {
+                    if (alarm.isAlarmGoingOff() && !alarm.isSnoozing()) {
                         alarmsTable.getModel().setValueAt(SNOOZE, rowIndex.get(), 3);
+                        alarmsTable.getModel().setValueAt(STOP, rowIndex.get(), 4);
                         new ButtonColumn(alarmsTable, snoozeAction(3), 3);
+                        new ButtonColumn(alarmsTable, buttonAction(4), 4);
                     }
                     else {
                         alarmsTable.getModel().setValueAt(SLEEPING, rowIndex.get(), 3);
+                        alarmsTable.getModel().setValueAt(REMOVE, rowIndex.get(), 4);
                         new ButtonColumn(alarmsTable, buttonAction(3), 3);
+                        new ButtonColumn(alarmsTable, buttonAction(4), 4);
                     }
                     rowIndex.getAndIncrement();
                 });

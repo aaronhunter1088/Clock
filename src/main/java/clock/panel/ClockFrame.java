@@ -110,8 +110,7 @@ public class ClockFrame extends JFrame
         setAnalogueClockPanel(new AnalogueClockPanel(this));
         setAlarmPanel(new AlarmPanel(this));
         setTimerPanel(new TimerPanel(this));
-        setPanelType(PANEL_DIGITAL_CLOCK); // default panel type
-        changePanels(panelType);
+        changePanels(PANEL_DIGITAL_CLOCK);
     }
 
     /**
@@ -181,24 +180,27 @@ public class ClockFrame extends JFrame
     }
 
     /**
-     * Changes the panels based on the provided clockPanel value
-     * @param clockPanel the panel to change to
+     * Changes the panel based on the provided value
+     * @param changePanelType the panel to change to
      */
-    public void changePanels(clock.entity.Panel clockPanel)
+    public void changePanels(clock.entity.Panel changePanelType)
     {
-        logger.info("change panels");
-        if (currentPanel != null) remove(currentPanel);
-        if (currentPanel instanceof DigitalClockPanel dcp)
-            dcp.stop();
-        if (currentPanel instanceof AnalogueClockPanel acp)
-            acp.stop();
-        if (currentPanel instanceof TimerPanel tp)
-            tp.stop();
-        if (currentPanel instanceof AlarmPanel ap)
-            ap.stop();
-        showPanel(clockPanel);
-        repaint();
-        setVisible(true);
+        if (changePanelType != panelType)
+        {
+            logger.info("change panels");
+            if (currentPanel != null) remove(currentPanel);
+            if (currentPanel instanceof DigitalClockPanel dcp)
+                dcp.stop();
+            if (currentPanel instanceof AnalogueClockPanel acp)
+                acp.stop();
+            if (currentPanel instanceof TimerPanel tp)
+                tp.stop();
+            if (currentPanel instanceof AlarmPanel ap)
+                ap.stop();
+            showPanel(changePanelType);
+            repaint();
+            setVisible(true);
+        }
     }
 
     /**

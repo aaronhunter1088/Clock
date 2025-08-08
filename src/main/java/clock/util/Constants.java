@@ -116,6 +116,7 @@ public class Constants {
     public static final String TH = "Th";
     public static final String SLEEPING = "Sleeping .zZ";
     public static final String SNOOZE = "Snooze";
+    public static final String STOP = "Stop";
     public static final String SU = "Su";
     public static final String SET_ALARMS = "Set Alarms";
     public static final String VIEW_ALARMS = "View Alarms";
