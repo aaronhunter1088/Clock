@@ -211,7 +211,7 @@ public class AnalogueClockPanel extends ClockPanel implements Runnable
         g.drawString(TWO, xcenter + 110, ycenter - 60);
         g.drawString(THREE, xcenter + 135, ycenter);
         g.drawString(FOUR, xcenter + 110, ycenter + 60);
-        g.drawString(FIVE, xcenter + 60, ycenter + 110);
+        g.drawString(FIVE, xcenter + 70, ycenter + 110);
         g.drawString(SIX, xcenter - 10, ycenter + 145);
         g.drawString(SEVEN, xcenter - 80, ycenter + 110);
         g.drawString(EIGHT, xcenter - 120, ycenter + 60);
