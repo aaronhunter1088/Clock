@@ -1,6 +1,5 @@
 package clock.entity;
 
-import clock.exception.InvalidInputException;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.junit.jupiter.api.*;
@@ -181,7 +180,7 @@ class ClockTest
         clock.setYear(2021);
         clock.setAMPM(PM);
         clock.setDaylightSavingsTimeDates();
-        clock.setTheCurrentTime();
+        clock.setTheDateAndTime();
         assertEquals(14, clock.getBeginDaylightSavingsTimeDate().getDayOfMonth(), "For 2021, Beginning DST Day should be 14th");
         assertEquals(7, clock.getEndDaylightSavingsTimeDate().getDayOfMonth(), "For 2021, Ending DST Day should be 7th");
 
@@ -194,7 +193,7 @@ class ClockTest
         clock.setYear(2022);
         clock.setAMPM(PM);
         clock.setDaylightSavingsTimeDates();
-        clock.setTheCurrentTime();
+        clock.logIsNewYear();
         assertEquals(13, clock.getBeginDaylightSavingsTimeDate().getDayOfMonth(), "For 2022, Beginning DST Day should be 13th");
         assertEquals(6, clock.getEndDaylightSavingsTimeDate().getDayOfMonth(), "For 2022, Ending DST Day should be 6th");
     }
@@ -210,7 +209,7 @@ class ClockTest
         clock.setDayOfMonth(3);
         clock.setYear(2022);
         clock.setAMPM(PM);
-        clock.setTheCurrentTime();
+        clock.logIsNewYear();
         assertFalse(clock.isTodayDaylightSavingsTime());
     }
 
@@ -236,7 +235,7 @@ class ClockTest
         clock.setYear(2022);
         clock.setAMPM(PM);
         // needed to update certain values now that we reset clock time and date
-        clock.setTheCurrentTime();
+        clock.logIsNewYear();
         assertFalse(clock.isTodayDaylightSavingsTime());
     }
 
@@ -252,7 +251,7 @@ class ClockTest
         clock.setYear(2022);
         clock.setAMPM(PM);
         clock.setDaylightSavingsTimeDates();
-        clock.setTheCurrentTime();
+        clock.setTheDateAndTime();
         assertTrue(clock.isTodayDaylightSavingsTime());
     }
 
@@ -268,7 +267,7 @@ class ClockTest
         clock.setYear(2022);
         clock.setAMPM(PM);
         clock.setDaylightSavingsTimeDates();
-        clock.setTheCurrentTime();
+        clock.setTheDateAndTime();
         assertTrue(clock.isTodayDaylightSavingsTime());
     }
 
@@ -284,7 +283,7 @@ class ClockTest
         clock.setDayOfMonth(today.getDayOfMonth());
         clock.setYear(today.getYear());
         clock.setAMPM(AM);
-        clock.setTheCurrentTime();
+        clock.logIsNewYear();
         boolean actual = clock.isTodayMatchesDSTDate();
         boolean expected = clock.getBeginDaylightSavingsTimeDate().format(DateTimeFormatter.ofPattern("MM-dd-yyyy")).equals(today.format(DateTimeFormatter.ofPattern("MM-dd-yyyy"))) ||
                 clock.getEndDaylightSavingsTimeDate().format(DateTimeFormatter.ofPattern("MM-dd-yyyy")).equals(today.format(DateTimeFormatter.ofPattern("MM-dd-yyyy")));
@@ -311,7 +310,7 @@ class ClockTest
         clock.setDayOfMonth(21);
         clock.setYear(2021);
         clock.setAMPM(PM);
-        clock.setTheCurrentTime();
+        clock.logIsNewYear();
         tick(3);
         assertEquals(12, clock.getHours(), "Hours should be 12");
         assertEquals(0, clock.getMinutes(), "Minutes should be 0");
@@ -335,7 +334,7 @@ class ClockTest
         clock.setDayOfMonth(6);
         clock.setYear(2021);
         clock.setAMPM(PM);
-        clock.setTheCurrentTime();
+        clock.logIsNewYear();
         Alarm alarm = new Alarm("Test", 1, 1, PM, new ArrayList<>(){{add(SATURDAY);}}, false, clock);
         clock.getListOfAlarms().add(alarm);
 
@@ -564,7 +563,7 @@ class ClockTest
         clock.setMinutes(59);
         clock.setSeconds(55);
         clock.setAMPM(PM);
-        clock.setTheCurrentTime();
+        clock.logIsNewYear();
 
         assertEquals(11, clock.getHours(), "Expected hours to be 11");
         assertEquals(59, clock.getMinutes(), "Expected minutes to be 59");
@@ -588,7 +587,7 @@ class ClockTest
         clock.setMonth(DECEMBER);
         clock.setDayOfWeek(clock.getDayOfWeek());
         clock.setDayOfMonth(31);
-        clock.setTheCurrentTime();
+        clock.logIsNewYear();
 
         tick(5); // Tick the clock to midnight
 

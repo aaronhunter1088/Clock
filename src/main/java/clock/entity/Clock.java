@@ -9,8 +9,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 
-import clock.exception.InvalidInputException;
-import clock.panel.ClockFrame;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -114,7 +112,8 @@ public class Clock implements Serializable, Comparable<Clock>, Runnable
         setDayOfMonth(dayOfMonth);
         setYear(year);
         setTimeZone(getZoneIdFromTimezoneButtonText(EMPTY));
-        setTheCurrentTime();
+        setTheDateAndTime();
+        setDateChanged(false);
         setDaylightSavingsTimeDates();
         setLeapYear(date.isLeapYear());
         setListOfAlarms(new ArrayList<>());
@@ -158,7 +157,22 @@ public class Clock implements Serializable, Comparable<Clock>, Runnable
         setDayOfMonth(dateTime.getDayOfMonth());
         setYear(dateTime.getYear());
         setTimeZone(getZoneIdFromTimezoneButtonText(EMPTY));
-        setTheCurrentTime();
+        setDateChanged(false);
+        setTheDateAndTime();
+    }
+
+    /**
+     * Sets the date and time based on the current values
+     * of the clock. This method is called after setting
+     * the time to ensure that the date and time are in sync.
+     */
+    public void setTheDateAndTime()
+    {
+        setDateChanged(false);
+        setDate(LocalDate.of(year, month, dayOfMonth));
+        setTime(LocalTime.of(this.hours, this.minutes, this.seconds));
+        setLeapYear(date.isLeapYear());
+        setCurrentDateTime(LocalDateTime.of(date, time));
     }
 
     /**
@@ -166,21 +180,12 @@ public class Clock implements Serializable, Comparable<Clock>, Runnable
      * Sets and logs the new time value from the hours, minutes, and seconds
      * Sets the currentTime value from the LocalDate and LocalTime
      */
-    public void setTheCurrentTime()
+    public void logIsNewYear()
     {
-        setTimeZone(ZoneId.systemDefault());
-        setDate(LocalDate.of(year, month, dayOfMonth));
-        setTime(LocalTime.of(hours, minutes, seconds));
-        setCurrentDateTime(LocalDateTime.of(date, time));
-        logger.debug("Time set");
         if (isNewYear) {
-            logger.debug("New year, updating dst dates");
-            setDaylightSavingsTimeDates();
+            logger.info("Happy New Year. Here's wishing you a healthy, productive {}.", year);
             setIsNewYear(false);
         }
-        setLeapYear(date.isLeapYear());
-        setDateChanged(false);
-
     }
 
     /**
@@ -367,7 +372,7 @@ public class Clock implements Serializable, Comparable<Clock>, Runnable
      * to ensure that the clock is always up to date and accurate
      * by chance that it has gotten out of sync.
      */
-    private void updateTimeIfMidnight()
+    private void refreshClockTimeIfMidnight()
     {
         if ((MIDNIGHT_STANDARD_TIME.equals(getTimeAsStr()) || MIDNIGHT_MILITARY_TIME.equals(getMilitaryTimeAsStr()))) {
             logger.info("midnight daily clock update");
@@ -375,21 +380,6 @@ public class Clock implements Serializable, Comparable<Clock>, Runnable
                     LocalDate.of(getYear(), getMonth(), getDayOfMonth()),
                     LocalTime.of(0, 0, 0))
             );
-        }
-    }
-
-    /**
-     * Checks if today is New Year's Day.
-     * If it is, it will log a message wishing
-     * the user a happy new year.
-     */
-    private void checkIfItIsNewYears()
-    {
-        logger.info("is today new years: {}", isNewYear);
-        if (isNewYear())
-        {
-            logger.info("Happy New Year. Here's wishing you a healthy, productive {}.", year);
-            //setIsNewYear(false); reset later
         }
     }
 
@@ -431,15 +421,28 @@ public class Clock implements Serializable, Comparable<Clock>, Runnable
         }
     }
 
+    /**
+     * The run method is the main loop of the clock.
+     * It should run indefinitely, updating the clock
+     * every second, and then sleeping for 1 second.
+     * There are specifics tasks that should also
+     * occur during each tick. We activate alarms,
+     * and timers, if any, and refresh the clock time
+     * if it is midnight.
+     */
     @Override
     public void run()
     {
         logger.info("Clock is running");
-        while (true) {
-            try {
+        while (true)
+        {
+            try
+            {
                 tick();
-                sleep(1000); // Sleep for 1 second
-            } catch (InterruptedException e) {
+                sleep(1000);
+            }
+            catch (InterruptedException e)
+            {
                 logger.error("Clock thread interrupted", e);
                 Thread.currentThread().interrupt(); // Restore the interrupted status
                 break; // Exit the loop if interrupted
@@ -469,11 +472,9 @@ public class Clock implements Serializable, Comparable<Clock>, Runnable
     {
         logger.info("tick rate: sec: {} min: {} hrs: {}", seconds, minutes, hours);
         performTick(seconds, minutes, hours);
-        checkIfItIsNewYears();
-        updateTimeIfMidnight();
         setActiveAlarms();
         setActiveTimers();
-        setTheCurrentTime();
+        refreshClockTimeIfMidnight();
     }
 
     /**
@@ -652,14 +653,11 @@ public class Clock implements Serializable, Comparable<Clock>, Runnable
                         setDayOfMonth(1);
                         setMonth(JANUARY);
                         setYear(year+1);
-                        setDate(LocalDate.of(getYear(), getMonth(), getDayOfMonth()));
-                        setLeapYear(date.isLeapYear());
                         setIsNewYear(true);
                         setDaylightSavingsTimeDates();
-                        logger.info("new year!");
+                        logIsNewYear();
                     }
                 }
-                default -> logger.error("Unknown Month: {}", month);
             }
             setDate(LocalDate.of(year, month, dayOfMonth));
             if (isTodayDaylightSavingsTime()) { setTodayMatchesDSTDate(true); }
@@ -681,7 +679,8 @@ public class Clock implements Serializable, Comparable<Clock>, Runnable
             }
             logger.debug("setting doesTodayMatchDSTDate to {}", todayMatchesDSTDate);
         }
-        else {
+        else
+        {
             if (!daylightSavingsTimeEnabled)
             {
                 logger.debug("daylight savings time not enabled");
@@ -690,6 +689,7 @@ public class Clock implements Serializable, Comparable<Clock>, Runnable
             else
             { logger.debug("!! today is not dst !!"); }
         }
+        setTheDateAndTime();
     }
 
     /* Getters */

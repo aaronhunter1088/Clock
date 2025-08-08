@@ -61,7 +61,7 @@ public class ClockMenuBar extends JMenuBar
         settingsMenu = new JMenu(SETTINGS);
         featuresMenu = new JMenu(FEATURES) ;
         // Settings menu choices
-        setMilitaryTimeSetting(new JMenuItem(SHOW+SPACE+MILITARY_TIME_SETTING));
+        setMilitaryTimeSetting(new JMenuItem(clock.isShowMilitaryTime()?HIDE+SPACE+MILITARY_TIME_SETTING:SHOW+SPACE+MILITARY_TIME_SETTING));
         getMilitaryTimeSetting().setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_M, InputEvent.CTRL_DOWN_MASK));
         getMilitaryTimeSetting().setForeground(Color.WHITE);
         getMilitaryTimeSetting().addActionListener(action -> {
