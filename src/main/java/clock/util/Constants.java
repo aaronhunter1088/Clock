@@ -105,11 +105,14 @@ public class Constants {
     public static final String ALARM = "Alarm";
     public static final String AMPM = "AM/PM";
     public static final String CURRENT_ALARMS = "Current Alarms";
+    public static final String DAYS = "Days";
     public static final String EVERY_DAY = "Every Day";
     public static final String F = "F";
     public static final String M = "M";
     public static final String T = "T";
     public static final String TH = "Th";
+    public static final String SLEEPING = "Sleeping .zZ";
+    public static final String SNOOZE = "Snooze";
     public static final String SU = "Su";
     public static final String SET_ALARMS = "Set Alarms";
     public static final String VIEW_ALARMS = "View Alarms";

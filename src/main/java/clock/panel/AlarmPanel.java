@@ -393,38 +393,22 @@ public class AlarmPanel extends ClockPanel implements Runnable
         {
             public void actionPerformed(ActionEvent e)
             {
-
-                JTable table = (JTable)e.getSource();
+                //JTable table = (JTable)e.getSource();
                 int modelRow = Integer.valueOf( e.getActionCommand() );
-                String buttonAction = (String) table.getModel().getValueAt(modelRow, columnIndex);
+                String buttonAction = (String) alarmsTable.getModel().getValueAt(modelRow, columnIndex);
 
-                // find the correct timer
-                clock.entity.Timer timer = clock.getListOfTimers().get(modelRow);
+                // find the correct alarm
+                Alarm alarm = clock.getListOfAlarms().get(modelRow);
                 switch (buttonAction) {
-                    case "Reset" -> {
-                        // set button text to "Pause"
-                        table.getModel().setValueAt("Pause", modelRow, columnIndex);
-                        timer.resetTimer();
+                    case SNOOZE -> {
+                        alarmsTable.getModel().setValueAt(SLEEPING, modelRow, columnIndex);
+                        alarm.startAlarm();
                     }
-                    case "Pause" -> {
-                        logger.info("Pausing {} at row: {}", timer, modelRow);
-                        // pause timer
-                        timer.pauseTimer();
-                        // set button text to "Resume"
-                        table.getModel().setValueAt("Resume", modelRow, columnIndex);
-                    }
-                    case "Resume" -> {
-                        logger.info("Resuming {} at row: {}", timer, modelRow);
-                        // resume timer
-                        timer.resumeTimer();
-                        // set button text to "Pause"
-                        table.getModel().setValueAt("Pause", modelRow, columnIndex);
-                    }
-                    case "Remove" -> {
-                        logger.info("Removing {} at row: {}", timer, modelRow);
-                        timer.stopTimer();
-                        clock.getListOfTimers().remove(timer);
-                        ((DefaultTableModel)table.getModel()).removeRow(modelRow);
+                    case REMOVE -> {
+                        logger.info("Removing {} at row: {}", alarm, modelRow);
+                        alarm.stopAlarm();
+                        clock.getListOfAlarms().remove(alarm);
+                        ((DefaultTableModel)alarmsTable.getModel()).removeRow(modelRow);
                     }
                 }
             }
@@ -440,7 +424,7 @@ public class AlarmPanel extends ClockPanel implements Runnable
                 JTable table = (JTable)e.getSource();
                 int modelRow = Integer.valueOf( e.getActionCommand() );
                 String buttonAction = (String) table.getModel().getValueAt(modelRow, columnIndex);
-                alarmsTable.getModel().setValueAt("Snoozing", modelRow, 2);
+                alarmsTable.getModel().setValueAt(SLEEPING, modelRow, 2);
                 Alarm alarm = clock.getListOfAlarms().get(modelRow);
                 alarm.snooze();
             }
@@ -458,8 +442,8 @@ public class AlarmPanel extends ClockPanel implements Runnable
                         alarm.getName() != null ? alarm.getName() : alarm.toString(),
                         alarm.getAlarmAsString(),
                         String.join(COMMA+SPACE, alarm.getDaysShortened()),
-                        "Snooze",
-                        "Remove"
+                        SLEEPING,
+                        REMOVE
                 })
                 .toArray(Object[][]::new);
     }
@@ -470,7 +454,7 @@ public class AlarmPanel extends ClockPanel implements Runnable
      */
     public String[] getAlarmsTableColumnNames()
     {
-        return new String[]{"Name", "Alarm", "Days", "Snooze", "Remove"};
+        return new String[]{NAME, ALARM, DAYS, SLEEPING+'/'+SNOOZE, REMOVE};
     }
 
     /**
@@ -493,7 +477,8 @@ public class AlarmPanel extends ClockPanel implements Runnable
             // only update if the timers count changes
             if(alarmsTable.getModel().getRowCount() != data.length) {
                 alarmsTable.setModel(new javax.swing.table.DefaultTableModel(data, columnNames));
-                ButtonColumn buttonColumn = new ButtonColumn(alarmsTable, snoozeAction(3), 3);
+                new ButtonColumn(alarmsTable, snoozeAction(3), 3);
+                new ButtonColumn(alarmsTable, buttonAction(4), 4);
             } else {
                 AtomicInteger rowIndex = new AtomicInteger();
                 clock.getListOfAlarms().forEach(alarm -> {
