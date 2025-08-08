@@ -41,11 +41,9 @@ public class ClockMenuBar extends JMenuBar
     // Options for Features
     private JMenuItem digitalClockFeature;
     private JMenuItem analogueClockFeature;
-    private JMenu alarmFeature_Menu;
+    private JMenuItem alarmsFeature;
     private JMenuItem timerFeature;
     private JMenuItem stopwatchFeature;
-    // Options for alarmFeature_Menu
-    private JMenuItem setAlarms;
 
     /**
      * The main constructor for the clock menu bar.
@@ -166,21 +164,19 @@ public class ClockMenuBar extends JMenuBar
         // Features menu choices
         setDigitalClockFeature(new JMenuItem(VIEW_DIGITAL_CLOCK));
         getDigitalClockFeature().setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_D, InputEvent.CTRL_DOWN_MASK));
-        getDigitalClockFeature().addActionListener(action -> clockFrame.changePanels(PANEL_DIGITAL_CLOCK, false));
+        getDigitalClockFeature().addActionListener(action -> clockFrame.changePanels(PANEL_DIGITAL_CLOCK));
 
         setAnalogueClockFeature(new JMenuItem(VIEW_ANALOGUE_CLOCK));
         getAnalogueClockFeature().setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_C, InputEvent.CTRL_DOWN_MASK));
-        getAnalogueClockFeature().addActionListener(action -> clockFrame.changePanels(PANEL_ANALOGUE_CLOCK, false));
+        getAnalogueClockFeature().addActionListener(action -> clockFrame.changePanels(PANEL_ANALOGUE_CLOCK));
 
-        setAlarmFeature_Menu(new JMenu(VIEW_ALARMS));
-        setSetAlarms(new JMenuItem(SET_ALARMS));
-        getAlarmFeature_Menu().add(getSetAlarms());
-        getSetAlarms().setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_A, InputEvent.CTRL_DOWN_MASK));
-        getSetAlarms().addActionListener(action -> clockFrame.changePanels(PANEL_ALARM, true));
+        setAlarmsFeature(new JMenuItem(VIEW_ALARMS));
+        getAlarmsFeature().setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_A, InputEvent.CTRL_DOWN_MASK));
+        getAlarmsFeature().addActionListener(action -> clockFrame.changePanels(PANEL_ALARM));
 
         setTimerFeature(new JMenuItem(VIEW_TIMERS));
         getTimerFeature().setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_T, InputEvent.CTRL_DOWN_MASK));
-        getTimerFeature().addActionListener(action -> clockFrame.changePanels(PANEL_TIMER, false));
+        getTimerFeature().addActionListener(action -> clockFrame.changePanels(PANEL_TIMER));
 
         setStopwatchFeature(new JMenuItem(VIEW_STOPWATCH));
         getStopwatchFeature().setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_S, InputEvent.CTRL_DOWN_MASK));
@@ -196,7 +192,8 @@ public class ClockMenuBar extends JMenuBar
         // Add options to Features Menu
         getFeaturesMenu().add(getDigitalClockFeature());
         getFeaturesMenu().add(getAnalogueClockFeature());
-        getFeaturesMenu().add(getAlarmFeature_Menu());
+        //getFeaturesMenu().add(getAlarmFeature_Menu());
+        getFeaturesMenu().add(getAlarmsFeature());
         getFeaturesMenu().add(getTimerFeature());
         getFeaturesMenu().add(getStopwatchFeature());
 
@@ -205,15 +202,14 @@ public class ClockMenuBar extends JMenuBar
         getSettingsMenu().setBackground(Color.BLACK);
         getChangeTimeZoneMenu().setForeground(Color.WHITE);
         getChangeTimeZoneMenu().setBackground(Color.BLACK);
-        getSetAlarms().setForeground(Color.WHITE);
-        getSetAlarms().setBackground(Color.BLACK);
+        getAlarmsFeature().setForeground(Color.WHITE);
+        getAlarmsFeature().setBackground(Color.BLACK);
         getFeaturesMenu().setOpaque(false);
         getFeaturesMenu().setForeground(Color.WHITE);
         getFeaturesMenu().setBackground(Color.BLACK);
         // Menu Items for Settings and Features
-        getAlarmFeature_Menu().setOpaque(true);
-        getAlarmFeature_Menu().setForeground(Color.WHITE);
-        getAlarmFeature_Menu().setBackground(Color.BLACK);
+        getAlarmsFeature().setForeground(Color.WHITE);
+        getAlarmsFeature().setBackground(Color.BLACK);
         getDigitalClockFeature().setForeground(Color.WHITE);
         getAnalogueClockFeature().setForeground(Color.WHITE);
         getTimerFeature().setForeground(Color.WHITE);
@@ -286,7 +282,7 @@ public class ClockMenuBar extends JMenuBar
     /* Getters */
     public JMenu getSettingsMenu() { return this.settingsMenu; }
     public JMenu getFeaturesMenu() { return this.featuresMenu; }
-    public JMenu getAlarmFeature_Menu() { return this.alarmFeature_Menu; }
+    public JMenuItem getAlarmsFeature() { return this.alarmsFeature; }
     public JMenuItem getMilitaryTimeSetting() { return this.militaryTimeSetting; }
     public JMenuItem getFullTimeSetting() { return this.fullTimeSetting; }
     public JMenuItem getPartialTimeSetting() { return this.partialTimeSetting; }
@@ -297,14 +293,13 @@ public class ClockMenuBar extends JMenuBar
     public java.util.List<JMenuItem> getTimezones() { return this.timezones; }
     public JMenuItem getDigitalClockFeature() { return this.digitalClockFeature; }
     public JMenuItem getAnalogueClockFeature() { return this.analogueClockFeature; }
-    public JMenuItem getSetAlarms() { return this.setAlarms; }
     public JMenuItem getTimerFeature() { return this.timerFeature; }
     public JMenuItem getStopwatchFeature() { return this.stopwatchFeature; }
 
     /* Setters */
     protected void setSettingsMenu(JMenu settingsMenu) { this.settingsMenu = settingsMenu; }
     protected void setFeaturesMenu(JMenu featuresMenu) { this.featuresMenu = featuresMenu; }
-    protected void setAlarmFeature_Menu(JMenu alarmsMenu) { this.alarmFeature_Menu = alarmsMenu; }
+    protected void setAlarmsFeature(JMenuItem alarmsFeature) { this.alarmsFeature = alarmsFeature; }
     protected void setMilitaryTimeSetting(JMenuItem militaryTimeSetting) { this.militaryTimeSetting = militaryTimeSetting; }
     protected void setFullTimeSetting(JMenuItem fullTimeSetting) { this.fullTimeSetting = fullTimeSetting; }
     protected void setPartialTimeSetting(JMenuItem partialTimeSetting) { this.partialTimeSetting = partialTimeSetting; }
@@ -315,7 +310,6 @@ public class ClockMenuBar extends JMenuBar
     protected void setDigitalClockFeature(JMenuItem digitalClockFeature) { this.digitalClockFeature = digitalClockFeature; }
     protected void setAnalogueClockFeature(JMenuItem analogueClockFeature) { this.analogueClockFeature = analogueClockFeature; }
     protected void setTimeZones(java.util.List<JMenuItem> timezones) { this.timezones = timezones;}
-    protected void setSetAlarms(JMenuItem setAlarms) { this.setAlarms = setAlarms; }
     protected void setTimerFeature(JMenuItem timerFeature) { this.timerFeature = timerFeature; }
     protected void setStopwatchFeature(JMenuItem stopwatchFeature) { this.stopwatchFeature = stopwatchFeature; }
 }
