@@ -236,7 +236,6 @@ public class ClockFrame extends JFrame
         setSize(analogueClockPanel.getMaximumSize());
         setBackground(Color.BLACK);
         panelType = PANEL_ANALOGUE_CLOCK;
-        analogueClockPanel.setupSettingsMenu();
     }
 
     /**

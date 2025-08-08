@@ -58,7 +58,6 @@ public class AnalogueClockPanel extends ClockPanel implements Runnable
         setLayout(layout);
         setGridBagConstraints(new GridBagConstraints());
         setupDefaultValues();
-        start();
     }
 
     /**
@@ -83,7 +82,9 @@ public class AnalogueClockPanel extends ClockPanel implements Runnable
         setMaximumSize(ClockFrame.analogueSize);
         setBackground(Color.BLACK);
         setForeground(Color.BLACK);
+        start();
     }
+
     /**
      * Starts the analogue clock panel thread
      * and internally calls the run method.

@@ -56,7 +56,6 @@ public class DigitalClockPanel extends ClockPanel implements Runnable
         setLayout(layout);
         setGridBagConstraints(new GridBagConstraints());
         setupDefaultValues();
-        start();
     }
 
     public void setupDefaultValues()
@@ -66,6 +65,7 @@ public class DigitalClockPanel extends ClockPanel implements Runnable
         setBackground(Color.BLACK);
         setBorder(BorderFactory.createLineBorder(Color.BLACK));
         setForeground(Color.WHITE);
+        start();
     }
 
     /**
