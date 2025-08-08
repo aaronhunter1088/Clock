@@ -113,7 +113,7 @@ public class ClockMenuBar extends JMenuBar
         });
 
         setToggleDSTSetting(new JMenuItem(Turn+SPACE+off+SPACE+DST_SETTING));
-        getToggleDSTSetting().setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_T, InputEvent.CTRL_DOWN_MASK));
+        getToggleDSTSetting().setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_T, InputEvent.SHIFT_DOWN_MASK));
         getToggleDSTSetting().setForeground(Color.WHITE);
         getToggleDSTSetting().addActionListener(action -> {
             var isEnabled = clock.isDaylightSavingsTimeEnabled();
