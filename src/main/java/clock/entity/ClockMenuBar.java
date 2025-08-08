@@ -192,7 +192,6 @@ public class ClockMenuBar extends JMenuBar
         // Add options to Features Menu
         getFeaturesMenu().add(getDigitalClockFeature());
         getFeaturesMenu().add(getAnalogueClockFeature());
-        //getFeaturesMenu().add(getAlarmFeature_Menu());
         getFeaturesMenu().add(getAlarmsFeature());
         getFeaturesMenu().add(getTimerFeature());
         getFeaturesMenu().add(getStopwatchFeature());

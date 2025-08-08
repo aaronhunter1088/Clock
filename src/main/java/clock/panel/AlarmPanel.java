@@ -84,7 +84,6 @@ public class AlarmPanel extends ClockPanel implements Runnable
         setBackground(Color.BLACK);
         setForeground(Color.BLACK);
         setupAlarmPanel();
-        setupSettingsMenu();
         addComponentsToPanel();
         SwingUtilities.updateComponentTreeUI(this);
         logger.info("Finished creating Alarm Panel");
@@ -185,9 +184,8 @@ public class AlarmPanel extends ClockPanel implements Runnable
         setAlarmButton.addActionListener(this::setAlarm);
         // setup checkboxes
         setupCheckBoxes();
-        setupDefaultValues();
         setupAlarmsTableDefaults(true);
-        start();
+        setupDefaultValues();
     }
 
     /**
@@ -200,6 +198,7 @@ public class AlarmPanel extends ClockPanel implements Runnable
         minutesTextField.setText(EMPTY);
         resetJCheckBoxes();
         setupSettingsMenu();
+        start();
     }
 
     /**
