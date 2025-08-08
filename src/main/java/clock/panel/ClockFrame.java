@@ -102,7 +102,7 @@ public class ClockFrame extends JFrame
         analogueClockPanel = new AnalogueClockPanel(this);
         alarmPanel = new AlarmPanel(this);
         timerPanel = new TimerPanel(this);
-        changePanels(panelType, false);
+        changePanels(panelType);
     }
 
     /**
@@ -175,7 +175,7 @@ public class ClockFrame extends JFrame
      * Changes the panels based on the provided clockPanel value
      * @param clockPanel the panel to change to
      */
-    public void changePanels(clock.entity.Panel clockPanel, boolean resetValues)
+    public void changePanels(clock.entity.Panel clockPanel)
     {
         logger.info("change panels");
         if (currentPanel != null) remove(currentPanel);
@@ -187,7 +187,7 @@ public class ClockFrame extends JFrame
             tp.stop();
         if (currentPanel instanceof AlarmPanel ap)
             ap.stop();
-        showPanel(clockPanel, resetValues);
+        showPanel(clockPanel);
         repaint();
         setVisible(true);
     }
@@ -197,7 +197,7 @@ public class ClockFrame extends JFrame
      * based on the provided clockPanel value.
      * @param clockPanel the panel to update to
      */
-    public void showPanel(clock.entity.Panel clockPanel, boolean resetValues)
+    public void showPanel(clock.entity.Panel clockPanel)
     {
         logger.debug("updating to {}", clockPanel);
         switch (clockPanel)
