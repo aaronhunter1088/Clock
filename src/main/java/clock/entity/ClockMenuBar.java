@@ -138,7 +138,7 @@ public class ClockMenuBar extends JMenuBar
             clockFrame.getAnalogueClockPanel().repaint();
         });
 
-        setChangeTimeZoneMenu(new JMenu(SHOW+SPACE+TIME_ZONES));
+        setChangeTimeZoneMenu(new JMenu(CHANGE+SPACE+TIME_ZONES));
         setTimeZones(Arrays.asList(new JMenuItem(HAWAII), new JMenuItem(ALASKA),
                 new JMenuItem(PACIFIC), new JMenuItem(CENTRAL), new JMenuItem(EASTERN) ));
         getTimezones().forEach(this::setupTimezone);
