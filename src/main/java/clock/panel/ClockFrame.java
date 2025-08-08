@@ -87,7 +87,7 @@ public class ClockFrame extends JFrame
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setBounds(200, 200, clockDefaultSize.width, clockDefaultSize.height);
         setSize(clockDefaultSize);
-        ImageIcon icon = createImageIcon("src/main/resources/images/clockImageIcon.png");
+        ImageIcon icon = createImageIcon("src/main/resources/images/clockIcon.png");
         final Taskbar taskbar = Taskbar.getTaskbar();
         taskbar.setIconImage(icon.getImage());
         setIconImage(icon.getImage());
