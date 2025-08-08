@@ -45,7 +45,7 @@ public class ClockFrame extends JFrame
     public final static Font font20 = new Font("Courier New", Font.BOLD, 20);
     public final static Font font10 = new Font("Courier New", Font.BOLD, 10);
     public final static Font analogueFont = new Font("TimesRoman", Font.BOLD, 20);
-    private clock.entity.Panel panelType = PANEL_DIGITAL_CLOCK; // Default panel type
+    private clock.entity.Panel panelType;
     private ClockPanel currentPanel;
     private ClockMenuBar menuBar;
     private DigitalClockPanel digitalClockPanel;
@@ -103,13 +103,14 @@ public class ClockFrame extends JFrame
         setVisible(true);
         setResizable(false);
         logger.info("Creating {} Clock", clock != null ? "Test" : "Regular");
-        this.clock = clock != null ? clock : new Clock();
-        scheduler = Executors.newScheduledThreadPool(25);
+        setClock(clock != null ? clock : new Clock());
+        setScheduler(Executors.newScheduledThreadPool(25));
         setupMenuBar(); // daylightSavingsTimeEnabled directly influences menu bar setup
-        digitalClockPanel = new DigitalClockPanel(this);
-        analogueClockPanel = new AnalogueClockPanel(this);
-        alarmPanel = new AlarmPanel(this);
-        timerPanel = new TimerPanel(this);
+        setDigitalClockPanel(new DigitalClockPanel(this));
+        setAnalogueClockPanel(new AnalogueClockPanel(this));
+        setAlarmPanel(new AlarmPanel(this));
+        setTimerPanel(new TimerPanel(this));
+        setPanelType(PANEL_DIGITAL_CLOCK); // default panel type
         changePanels(panelType);
     }
 
@@ -225,11 +226,11 @@ public class ClockFrame extends JFrame
     {
         logger.info("change to digital clock");
         add(digitalClockPanel);
-        currentPanel = digitalClockPanel;
+        setCurrentPanel(digitalClockPanel);
         digitalClockPanel.setupDefaultValues();
         setSize(clockDefaultSize);
         setBackground(Color.BLACK);
-        panelType = PANEL_DIGITAL_CLOCK;
+        setPanelType(PANEL_DIGITAL_CLOCK);
     }
 
     /**
@@ -239,11 +240,11 @@ public class ClockFrame extends JFrame
     {
         logger.info("change to analogue clock");
         add(analogueClockPanel);
-        currentPanel = analogueClockPanel;
+        setCurrentPanel(analogueClockPanel);
         analogueClockPanel.setupDefaultValues();
         setSize(analogueClockPanel.getMaximumSize());
         setBackground(Color.BLACK);
-        panelType = PANEL_ANALOGUE_CLOCK;
+        setPanelType(PANEL_ANALOGUE_CLOCK);
     }
 
     /**
@@ -253,10 +254,10 @@ public class ClockFrame extends JFrame
     {
         logger.info("change to alarm panel.");
         add(alarmPanel);
-        currentPanel = alarmPanel;
+        setCurrentPanel(alarmPanel);
         alarmPanel.setupDefaultValues();
         setSize(clockDefaultSize);
-        panelType = PANEL_ALARM;
+        setPanelType(PANEL_ALARM);
     }
 
     /**
@@ -266,10 +267,10 @@ public class ClockFrame extends JFrame
     {
         logger.info("change to timer panel");
         add(timerPanel);
-        currentPanel = timerPanel;
+        setCurrentPanel(timerPanel);
         timerPanel.setupDefaultValues();
         setSize(clockDefaultSize);
-        panelType = PANEL_TIMER;
+        setPanelType(PANEL_TIMER);
     }
 
     /**
@@ -279,10 +280,10 @@ public class ClockFrame extends JFrame
     {
         logger.debug("change to stopwatch panel");
         add(stopwatchPanel);
-        currentPanel = stopwatchPanel;
-        setSize(clockDefaultSize);
-        panelType = PANEL_STOPWATCH;
+        setCurrentPanel(stopwatchPanel);
         stopwatchPanel.setupSettingsMenu();
+        setSize(clockDefaultSize);
+        setPanelType(PANEL_STOPWATCH);
     }
 
     /**
@@ -355,77 +356,28 @@ public class ClockFrame extends JFrame
         }
     }
 
-    public clock.entity.Panel getPanelType() {
-        return panelType;
-    }
+    /** Getters */
+    public clock.entity.Panel getPanelType() { return panelType; }
+    public ClockPanel getCurrentPanel() { return currentPanel; }
+    public DigitalClockPanel getDigitalClockPanel() { return digitalClockPanel; }
+    public AnalogueClockPanel getAnalogueClockPanel() { return analogueClockPanel; }
+    public AlarmPanel getAlarmPanel() { return alarmPanel; }
+    public ClockMenuBar getClockMenuBar() { return menuBar; }
+    public TimerPanel getTimerPanel() { return timerPanel; }
+    public StopwatchPanel getStopwatchPanel() { return stopwatchPanel; }
+    public Clock getClock() { return clock; }
+    public ScheduledExecutorService getScheduler() { return scheduler; }
 
-    public void setPanelType(Panel panelType) {
-        this.panelType = panelType;
-    }
-
-    public ClockPanel getCurrentPanel() {
-        return currentPanel;
-    }
-
-    public void setCurrentPanel(ClockPanel currentPanel) {
-        this.currentPanel = currentPanel;
-    }
-
-    public DigitalClockPanel getDigitalClockPanel() {
-        return digitalClockPanel;
-    }
-
-    public void setDigitalClockPanel(DigitalClockPanel digitalClockPanel) {
-        this.digitalClockPanel = digitalClockPanel;
-    }
-
-    public AnalogueClockPanel getAnalogueClockPanel() {
-        return analogueClockPanel;
-    }
-
-    public void setAnalogueClockPanel(AnalogueClockPanel analogueClockPanel) {
-        this.analogueClockPanel = analogueClockPanel;
-    }
-
-    public AlarmPanel getAlarmPanel() {
-        return alarmPanel;
-    }
-
-    public void setAlarmPanel(AlarmPanel alarmPanel) {
-        this.alarmPanel = alarmPanel;
-    }
-
-    public ClockMenuBar getClockMenuBar() {
-        return menuBar;
-    }
-
-    public TimerPanel getTimerPanel() {
-        return timerPanel;
-    }
-
-    public void setTimerPanel(TimerPanel timerPanel) {
-        this.timerPanel = timerPanel;
-    }
-
-    public StopwatchPanel getStopwatchPanel() {
-        return stopwatchPanel;
-    }
-
-    public void setStopwatchPanel(StopwatchPanel stopwatchPanel) {
-        this.stopwatchPanel = stopwatchPanel;
-    }
-
-    public Clock getClock() {
-        return clock;
-    }
-
-    public ScheduledExecutorService getScheduler() {
-        return scheduler;
-    }
-
-    public void setScheduler(ScheduledExecutorService scheduler) {
-        this.scheduler = scheduler;
-    }
+    /** Setters */
+    public void setPanelType(Panel panelType) { this.panelType = panelType; logger.debug("set panel type to {}", panelType); }
+    public void setCurrentPanel(ClockPanel currentPanel) { this.currentPanel = currentPanel; logger.debug("currentPanel set"); }
+    public void setDigitalClockPanel(DigitalClockPanel digitalClockPanel) { this.digitalClockPanel = digitalClockPanel; logger.debug("digitalClockPanel set"); }
+    public void setAnalogueClockPanel(AnalogueClockPanel analogueClockPanel) { this.analogueClockPanel = analogueClockPanel; logger.debug("analogueClockPanel set"); }
+    public void setAlarmPanel(AlarmPanel alarmPanel) { this.alarmPanel = alarmPanel; logger.debug("alarmPanel set"); }
+    public void setTimerPanel(TimerPanel timerPanel) { this.timerPanel = timerPanel; logger.debug("timerPanel set"); }
+    public void setStopwatchPanel(StopwatchPanel stopwatchPanel) { this.stopwatchPanel = stopwatchPanel; logger.debug("stopwatchPanel set"); }
+    public void setClock(Clock clock) { this.clock = clock; logger.debug("clock set"); }
+    public void setScheduler(ScheduledExecutorService scheduler) { this.scheduler = scheduler; logger.debug("scheduler set"); }
 }
 
 
