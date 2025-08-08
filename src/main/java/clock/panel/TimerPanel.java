@@ -73,7 +73,6 @@ public class TimerPanel extends ClockPanel implements Runnable
         setBackground(Color.BLACK);
         setForeground(Color.BLACK);
         setupTimerPanel();
-        setupSettingsMenu();
         addComponentsToPanel();
         SwingUtilities.updateComponentTreeUI(this);
         logger.info("Finished creating Timer Panel");
@@ -233,7 +232,7 @@ public class TimerPanel extends ClockPanel implements Runnable
         resetButton.addActionListener(this::resetTimerPanel);
         resetButton.setEnabled(false);
         setupTimersTableDefaults(true);
-        start();
+        setupDefaultValues();
     }
 
     /**
@@ -244,6 +243,12 @@ public class TimerPanel extends ClockPanel implements Runnable
     {
         clockFrame.clearSettingsMenu();
         clockFrame.getClockMenuBar().getSettingsMenu().add(clockFrame.getClockMenuBar().getPauseResumeAllTimersSetting());
+    }
+
+    public void setupDefaultValues()
+    {
+        setupSettingsMenu();
+        start();
     }
 
     /**

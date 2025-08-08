@@ -84,7 +84,6 @@ public class AlarmPanel extends ClockPanel implements Runnable
         setBackground(Color.BLACK);
         setForeground(Color.BLACK);
         setupAlarmPanel();
-        setupSettingsMenu();
         addComponentsToPanel();
         SwingUtilities.updateComponentTreeUI(this);
         logger.info("Finished creating Alarm Panel");

@@ -249,7 +249,6 @@ public class ClockFrame extends JFrame
         alarmPanel.setupDefaultValues();
         setSize(clockDefaultSize);
         panelType = PANEL_ALARM;
-        alarmPanel.start();
     }
 
     /**
@@ -260,10 +259,9 @@ public class ClockFrame extends JFrame
         logger.info("change to timer panel");
         add(timerPanel);
         currentPanel = timerPanel;
+        timerPanel.setupDefaultValues();
         setSize(clockDefaultSize);
         panelType = PANEL_TIMER;
-        timerPanel.setupSettingsMenu();
-        timerPanel.start();
     }
 
     /**
