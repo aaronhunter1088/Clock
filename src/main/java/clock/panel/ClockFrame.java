@@ -21,8 +21,9 @@ import static clock.entity.Panel.*;
 import static clock.util.Constants.*;
 
 /**
- * The ClockFrame is the main panel to display
- * the clock and its various components.
+ * ClockFrame
+ * <p>
+ * The main panel used to display the clock application.
  *
  * @author michael ball
  * @version 2.9

@@ -13,12 +13,9 @@ import static clock.util.Constants.*;
 import static java.lang.Thread.sleep;
 
 /**
- * The DigitalClockPanel is the main panel and is
- * visible first to the user. Here you can
- * see the time and date.
- * Clicking on the menu options under
- * Settings can change how the time and date
- * look.
+ * Digital Clock Panel
+ * <p>
+ * Used to view the date and time.
  *
  * @author michael ball
  * @version 1.0

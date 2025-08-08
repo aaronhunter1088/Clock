@@ -43,7 +43,7 @@ class AlarmPanelTest
     }
 
     @BeforeEach
-    void beforeEach() throws InvalidInputException
+    void beforeEach()
     {
         clock = new Clock();
         //alarm = new Alarm(clock, true);

@@ -12,10 +12,12 @@ import static java.lang.Thread.sleep;
 import static clock.entity.Panel.PANEL_ANALOGUE_CLOCK;
 
 /**
- * The AnalogueClockPanel is used to view the time
- * in analogue mode. The time will still show up
- * below the center in digital format. If you wish
- * to hide this, the settings allows for that.
+ * Analogue Clock Panel
+ * <p>
+ * Used to view the time in analogue mode.
+ * The time will still show up below the center in
+ * its digital format. If you wish to hide this,
+ * there is a setting to change that.
  *
  * @author michael ball
  * @version 2.6

@@ -50,14 +50,14 @@ class TimerTest
 
     @Test
     @DisplayName("Create a Timer")
-    void testCreatingATimer() throws InvalidInputException
+    void testCreatingATimer()
     {
         assertEquals("00:00:00", new clock.entity.Timer().toString());
     }
 
     @Test
     @DisplayName("Create a 1 hour Timer")
-    void testCreateA1HourTimer() throws InvalidInputException
+    void testCreateA1HourTimer()
     {
         timer1 = new clock.entity.Timer(1, 0, 0);
 
@@ -71,7 +71,7 @@ class TimerTest
 
     @Test
     @DisplayName("Create a 5 min Timer")
-    void testCreatingA5MinuteTimer() throws InvalidInputException
+    void testCreatingA5MinuteTimer()
     {
         timer1 = new clock.entity.Timer(0, 5, 0, clock);
         timer2 = new clock.entity.Timer(0, 5, 0, "Two", clock);
@@ -93,7 +93,7 @@ class TimerTest
 
     @Test
     @DisplayName("Create 2 Timers, Pause Both, Resume 1")
-    void testCreateTwoTimers() throws InvalidInputException, InterruptedException
+    void testCreateTwoTimers()
     {
         timer1 = new Timer(0, 4, 0, clock);
         timer2 = new Timer(0, 5, 0, clock);
@@ -226,7 +226,7 @@ class TimerTest
     // TODO: Move to TimerPanelTest
 //    @Test
 //    @DisplayName("Create 2 Timers Using GUI")
-//    void testCreateTwoTimersUsingGUI() throws InvalidInputException, InterruptedException, InvocationTargetException
+//    void testCreateTwoTimersUsingGUI() throws InterruptedException, InvocationTargetException
 //    {
 //        AtomicReference<clock.entity.Timer> timer1 = new AtomicReference<>(new clock.entity.Timer(0, 4, 0, clock));
 //        AtomicReference<clock.entity.Timer> timer2 = new AtomicReference<>(new clock.entity.Timer(0, 5, 0, clock));

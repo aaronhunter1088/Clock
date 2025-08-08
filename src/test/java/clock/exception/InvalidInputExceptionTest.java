@@ -54,9 +54,8 @@ class InvalidInputExceptionTest
                 case OCTOBER -> 10;
                 case NOVEMBER -> 11;
                 case DECEMBER -> 12;
-                default -> throw new InvalidInputException("Unknown month");
             };
-        } catch (InvalidInputException iie) {
+        } catch (IllegalArgumentException iae) {
             fail("No exception should have been thrown");
         }
         assertEquals(8, month);

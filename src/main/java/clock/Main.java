@@ -13,13 +13,16 @@ import java.time.DayOfWeek;
 import java.time.Month;
 import java.util.List;
 
+import static clock.util.Constants.COMMA;
+
 /**
- * Main application to start Clock
+ * Main class to start the application.
  *
  * @author Michael Ball
  * @version 1.0
  */
-public class Main {
+public class Main
+{
     private final static Logger logger = LogManager.getLogger(Main.class);
 
     /**
@@ -45,7 +48,7 @@ public class Main {
     {
         int startValue = 0;
         try {
-            int starting = Integer.parseInt(List.of(args[0].split(",")).getFirst());
+            int starting = Integer.parseInt(List.of(args[0].split(COMMA)).getFirst());
             startValue = Math.max(0, starting);
         } catch (ArrayIndexOutOfBoundsException e) {
             logger.info("No arguments provided, starting default clock.");
@@ -58,7 +61,7 @@ public class Main {
         else if (startValue == 1) {
             try {
                 specificPanelStart(args);
-            } catch (IllegalArgumentException e) {
+            } catch (InvalidInputException | IllegalArgumentException e) {
                 defaultStart();
             }
 
@@ -66,7 +69,7 @@ public class Main {
         else if (startValue == 2) {
             try {
                 specificClockStart(args);
-            } catch (InvalidInputException e) {
+            } catch (InvalidInputException | IllegalArgumentException e) {
                 defaultStart();
             }
         }
@@ -86,7 +89,7 @@ public class Main {
      */
     public static void specificPanelStart(String[] args)
     {
-        Panel type = Panel.valueOf(List.of(args[0].split(",")).get(1).toUpperCase());
+        Panel type = Panel.valueOf(List.of(args[0].split(COMMA)).get(1).toUpperCase());
         SwingUtilities.invokeLater(() -> ClockFrame.createAndShowGUI(type));
     }
 
@@ -105,9 +108,9 @@ public class Main {
      * "PM" is the AM/PM designation.
      * @param args list of strings containing the clock settings
      */
-    public static void specificClockStart(String[] args) throws InvalidInputException
+    public static void specificClockStart(String[] args)
     {
-        List<String> values = List.of(args[0].split(","));
+        List<String> values = List.of(args[0].split(COMMA));
         int hours = Integer.parseInt(values.get(1)); // hours more than 12 will enforce showMilitaryTime
         int minutes = Integer.parseInt(values.get(2));
         int seconds = Integer.parseInt(values.get(3));

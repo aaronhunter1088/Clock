@@ -8,11 +8,13 @@ import javax.swing.*;
 import java.awt.*;
 
 /**
- * This is the Stopwatch panel.
- * The stopwatch panel is used to set a countdown timer.
- * Given some Hours, some Minutes, some Seconds, it will
- * begin counting down. When the timer reaches '00:00:00',
- * it will make a short alarm sound, then turn off.
+ * Stopwatch Panel: TODO: Implement
+ * <p>
+ * The stopwatch panel is used to set a timer that counts up.
+ * Given some Hours, some Minutes, some Seconds, it will begin
+ * counting up. This will continue until the user stops it
+ * (although it will be stopped automatically if the stopwatch
+ * were to reach 24 hours).
  *
  * @author michael ball
  * @version 2.9

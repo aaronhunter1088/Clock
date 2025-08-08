@@ -16,8 +16,11 @@ import static clock.util.Constants.*;
 import static java.lang.Thread.sleep;
 
 /**
- * A Timer object that can be set to go off
- * after a specific amount of time
+ * Timer
+ * <p>
+ * A Timer is basically a countdown LocalTime object.
+ * Given a name, hours, minutes and seconds, it will
+ * create the countdown and start counting down.
  *
  * @author michael ball
  * @version 2.0
@@ -41,7 +44,7 @@ public class Timer implements Serializable, Comparable<Timer>, Runnable
     /**
      * Creates a new Timer object with default values
      */
-    public Timer() throws IllegalArgumentException
+    public Timer()
     {
         this(0, 0, 0, null, false, false, false, null);
     }
@@ -51,9 +54,8 @@ public class Timer implements Serializable, Comparable<Timer>, Runnable
      * @param hours the hours for the timer
      * @param minutes the minutes for the timer
      * @param seconds the seconds for the timer
-     * @throws InvalidInputException if the input values are invalid
      */
-    public Timer(int hours, int minutes, int seconds) throws IllegalArgumentException
+    public Timer(int hours, int minutes, int seconds)
     {
         this(hours, minutes, seconds, null, false, false, false, null);
     }
@@ -64,9 +66,8 @@ public class Timer implements Serializable, Comparable<Timer>, Runnable
      * @param minutes the minutes for the timer
      * @param seconds the seconds for the timer
      * @param clock the clock object associated with this timer
-     * @throws InvalidInputException if the input values are invalid
      */
-    public Timer(int hours, int minutes, int seconds, Clock clock) throws IllegalArgumentException
+    public Timer(int hours, int minutes, int seconds, Clock clock)
     {
         this(hours, minutes, seconds, null, false, false, false, clock);
     }
@@ -78,9 +79,8 @@ public class Timer implements Serializable, Comparable<Timer>, Runnable
      * @param seconds the seconds for the timer
      * @param name the name of the timer
      * @param clock the clock object associated with this timer
-     * @throws InvalidInputException if the input values are invalid
      */
-    public Timer(int hours, int minutes, int seconds, String name, Clock clock) throws IllegalArgumentException
+    public Timer(int hours, int minutes, int seconds, String name, Clock clock)
     {
         this(hours, minutes, seconds, name, false, false, false, clock);
     }
@@ -98,11 +98,11 @@ public class Timer implements Serializable, Comparable<Timer>, Runnable
      * @throws IllegalArgumentException if the input values are invalid
      */
     public Timer(int hours, int minutes, int seconds, String name,
-                 boolean timerGoingOff, boolean paused, boolean hasBeenStarted, Clock clock) throws IllegalArgumentException
+                 boolean timerGoingOff, boolean paused, boolean hasBeenStarted, Clock clock)
     {
-        if (hours < 0 || hours > 12) throw new IllegalArgumentException("Hours must be between 0 and 12");
-        if (minutes < 0 || minutes > 59) throw new IllegalArgumentException("Minutes must be between 0 and 59");
-        if (seconds < 0 || seconds > 59) throw new IllegalArgumentException("Seconds must be between 0 and 59");
+        if (hours < 0 || hours > 12) throw new InvalidInputException("Hours must be between 0 and 12");
+        if (minutes < 0 || minutes > 59) throw new InvalidInputException("Minutes must be between 0 and 59");
+        if (seconds < 0 || seconds > 59) throw new InvalidInputException("Seconds must be between 0 and 59");
         setHours(hours);
         setMinutes(minutes);
         setSeconds(seconds);
@@ -188,10 +188,9 @@ public class Timer implements Serializable, Comparable<Timer>, Runnable
 
     /**
      * This method starts the timer
-     * @throws InvalidInputException if the input values are invalid
      */
     @Override
-    public void run() throws InvalidInputException
+    public void run()
     {
         while (selfThread != null)
         {

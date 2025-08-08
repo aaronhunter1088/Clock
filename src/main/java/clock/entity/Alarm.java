@@ -22,8 +22,13 @@ import static java.time.DayOfWeek.*;
 import static clock.util.Constants.*;
 
 /**
- * An Alarm object that can be set to go off
- * at a specific time, on specific days.
+ * Alarm
+ * <p>
+ * An Alarm is an object that represents a specific
+ * time and day of the week. When the clock's time
+ * matches the alarm's time and day, the alarm will
+ * make a sound. The alarm can be set to snooze,
+ * reset, stopped, or removed.
  *
  * @author michael ball
 *  @version 2.0
@@ -50,9 +55,8 @@ public class Alarm implements Serializable, Comparable<Alarm>, Runnable
      * MockitoException: Cannot instantiate @InjectMocks
      * named 'some alarm' Cause: the type 'Alarm' has
      * not default constructor.
-     * @throws InvalidInputException thrown when invalid input is given
      */
-    public Alarm() throws InvalidInputException
+    public Alarm()
     {
         this("Alarm"+(Alarm.alarmsCounter+1), 0, 0, AM, new ArrayList<>(), false, null);
         logger.debug("Default alarm created");
@@ -66,8 +70,6 @@ public class Alarm implements Serializable, Comparable<Alarm>, Runnable
      * @param updatingAlarm updating an alarm
      * @param days          the days to trigger alarm
      * @param clock         reference to the clock that created this alarm
-     * @throws InvalidInputException thrown when invalid input is given
-     * @see InvalidInputException
      */
     public Alarm(String name, int hours, int minutes, String ampm, List<DayOfWeek> days,
                  boolean updatingAlarm, Clock clock)
@@ -202,7 +204,6 @@ public class Alarm implements Serializable, Comparable<Alarm>, Runnable
     public void snooze()
     {
         logger.warn("IMPLEMENT");
-
     }
 
     /**

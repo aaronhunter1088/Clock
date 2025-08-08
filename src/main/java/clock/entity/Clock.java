@@ -87,11 +87,9 @@ public class Clock implements Serializable, Comparable<Clock>, Runnable
      * @param dayOfMonth the date of the month to set
      * @param year       the year to set
      * @param ampm       the AM or PM to set
-     * @throws InvalidInputException when an InvalidInput has been given
-     * @see InvalidInputException
      */
     public Clock(int hours, int minutes, int seconds, Month month, DayOfWeek dayOfWeek,
-                 int dayOfMonth, int year, String ampm) throws InvalidInputException
+                 int dayOfMonth, int year, String ampm)
     {
         logger.info("Initializing Specific Test Clock");
         setTestingClock(true);

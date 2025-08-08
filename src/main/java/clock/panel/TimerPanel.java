@@ -30,7 +30,10 @@ import static clock.util.Constants.*;
  * below the timer creation fields. Each timer
  * will have a name, hours, minutes, and seconds.
  * Once it reaches zero, it will sound an alarm
- * until the user turns it off.
+ * until the user turns it off. You can pause,
+ * resume, restart, or remove the timer. There is
+ * a settings that allows you to pause or resume
+ * all existing timers at once.
  *
  * @author Michael Ball
  * @version since 2.9

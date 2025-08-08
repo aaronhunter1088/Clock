@@ -1,7 +1,8 @@
 package clock.util;
 
 /**
- * Constants for Clock application
+ * Constants
+ * <p>
  * Alphabetized for easy reference in each section.
  * @author Michael Ball
  * @version 2.0

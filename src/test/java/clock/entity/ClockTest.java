@@ -324,7 +324,7 @@ class ClockTest
     }
 
     @Test
-    void testWhenClockInMilitaryTimeAlarmStillTriggers() throws InvalidInputException
+    void testWhenClockInMilitaryTimeAlarmStillTriggers()
     {
         clock.setShowMilitaryTime(true);
         clock.setHours(13);
@@ -401,7 +401,7 @@ class ClockTest
 //    }
 
 //    @Test
-//    void testUpdateClockTimeSyncsClockTime() throws InvalidInputException
+//    void testUpdateClockTimeSyncsClockTime()
 //    {
 //        clock.setHours(7);
 //        clock.setMinutes(0);
@@ -417,7 +417,7 @@ class ClockTest
 //    }
 
 //    @Test
-//    void testUpdateClockTimeDoesNotSyncClockTime() throws InvalidInputException
+//    void testUpdateClockTimeDoesNotSyncClockTime()
 //    {
 //        clock.setHours(7);
 //        clock.setMinutes(0);
@@ -453,7 +453,7 @@ class ClockTest
     }
 
     @Test
-    void testTickClockFaster() throws InvalidInputException, InterruptedException
+    void testTickClockFaster() throws InterruptedException
     {
         clock.setHours(7);
         clock.setMinutes(59);

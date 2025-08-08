@@ -65,7 +65,6 @@ public class AlarmPanel extends ClockPanel implements Runnable
     private JButton setAlarmButton; // set-alarm button
     private ClockFrame clockFrame; // the clockFrame
     private Clock clock;
-    private Alarm alarm;
 
     /**
      * Main constructor for creating the AlarmPanel
@@ -541,9 +540,8 @@ public class AlarmPanel extends ClockPanel implements Runnable
      * Validates the hours text field is a valid hour
      * Allows military time format if the clock is set to show military time
      * @return boolean true if the first text field is valid
-     * @throws InvalidInputException if the first text field is invalid
      */
-    boolean validateHoursTextField() throws InvalidInputException
+    boolean validateHoursTextField()
     {
         logger.info("validateFirstTextField");
         if (hoursTextField.getText().isEmpty() && nameTextField.getText().isEmpty()) {
@@ -571,9 +569,8 @@ public class AlarmPanel extends ClockPanel implements Runnable
     /**
      * Validates the minutes text field
      * @return boolean true if the second text field is valid
-     * @throws InvalidInputException if the second text field is invalid
      */
-    boolean validateMinutesTextField() throws InvalidInputException
+    boolean validateMinutesTextField()
     {
         logger.info("validate second text field");
         if (minutesTextField.getText().isEmpty() && nameTextField.getText().isEmpty())
@@ -602,9 +599,8 @@ public class AlarmPanel extends ClockPanel implements Runnable
     /**
      * Validates that at least one checkbox is selected
      * @return boolean true if at least one checkbox is selected
-     * @throws InvalidInputException if no checkboxes are selected
      */
-    boolean validateTheCheckBoxes(List<DayOfWeek> days) throws InvalidInputException
+    boolean validateTheCheckBoxes(List<DayOfWeek> days)
     {
         logger.info("validate checkboxes");
         if (days.isEmpty()) { throw new InvalidInputException("Days cannot be empty"); }

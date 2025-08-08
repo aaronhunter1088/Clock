@@ -4,23 +4,15 @@ import java.io.Serial;
 import java.io.Serializable;
 
 /**
+ * InvalidInputException
+ * <p>
  * This class is used to determine that an error
- * has occurred while initializing Clock. It is
- * a checked exception, meaning the clock will always
- * break, and this exception must be dealt with.
- * "extends Exception says that this exception is a
- * Checked Exception: the compiler forces you to
- * handle these exceptions explicitly. Methods that
- * generate this exception must declare that this
- * exception is thrown.
- * It forces the programmer to deal with the exception."
- * Example: Supplying a negative minutes value or a value
- * greater than 59 will throw this exception. The rule of
- * thumb being that a proper minute value is between 0 and 59,
- * and once it becomes 60, it rolls back to 0, and increases
- * the hour by 1. During initialization, none of the logic
- * which determines whether or not to increase any hour
- * value (in this example) executes.
+ * has occurred while initializing a Clock, Alarm or
+ * a Timer. It is an unchecked exception.
+ * It is thrown when the user enters invalid input
+ * while creating a Clock, Alarm or Timer.
+ * The application will account for this and will
+ * report the error to the user as necessary.
  *
  * @author michael ball
  * @version 2.0
