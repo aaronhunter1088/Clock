@@ -228,36 +228,34 @@ public class Alarm implements Serializable, Comparable<Alarm>, Runnable
     {
         logger.info("getDaysShortened");
         List<String> shortenedDays = new ArrayList<>();
-        shortenedDays.add("Days: ");
         if (days.contains(MONDAY) && days.contains(TUESDAY) &&
             days.contains(WEDNESDAY) && days.contains(THURSDAY) && days.contains(FRIDAY)
             && !days.contains(SATURDAY) && !days.contains(SUNDAY))
-        { shortenedDays.add("Weekdays "); }
+        { shortenedDays.add(WEEKDAYS); }
         else if (!days.contains(MONDAY) && !days.contains(TUESDAY) &&
                 !days.contains(WEDNESDAY) && !days.contains(THURSDAY) && !days.contains(FRIDAY)
                 && days.contains(SATURDAY) && days.contains(SUNDAY))
-        { shortenedDays.add("Weekends "); }
+        { shortenedDays.add(WEEKENDS); }
         else if (days.contains(MONDAY) && days.contains(TUESDAY) &&
                 days.contains(WEDNESDAY) && days.contains(THURSDAY) && days.contains(FRIDAY)
                 && days.contains(SATURDAY) && days.contains(SUNDAY))
-        { shortenedDays.add("Every day "); }
+        { shortenedDays.add(EVERY_DAY); }
         else
         {
             for(DayOfWeek day : days)
             {
                 switch (day)
                 {
-                    case MONDAY -> shortenedDays.add("M ");
-                    case TUESDAY -> shortenedDays.add("T ");
-                    case WEDNESDAY -> shortenedDays.add("W ");
-                    case THURSDAY -> shortenedDays.add("Th ");
-                    case FRIDAY -> shortenedDays.add("F ");
-                    case SATURDAY -> shortenedDays.add("S ");
-                    case SUNDAY -> shortenedDays.add("Su ");
+                    case MONDAY -> shortenedDays.add(M);
+                    case TUESDAY -> shortenedDays.add(T);
+                    case WEDNESDAY -> shortenedDays.add(W);
+                    case THURSDAY -> shortenedDays.add(TH);
+                    case FRIDAY -> shortenedDays.add(F);
+                    case SATURDAY -> shortenedDays.add(S);
+                    case SUNDAY -> shortenedDays.add(SU);
                 }
             }
         }
-        shortenedDays.add("\n------");
         return shortenedDays;
     }
 

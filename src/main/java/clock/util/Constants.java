@@ -2,7 +2,7 @@ package clock.util;
 
 /**
  * Constants for Clock application
- *
+ * Alphabetized for easy reference in each section.
  * @author Michael Ball
  * @version 2.0
  */
@@ -105,10 +105,20 @@ public class Constants {
     public static final String ALARM = "Alarm";
     public static final String AMPM = "AM/PM";
     public static final String CURRENT_ALARMS = "Current Alarms";
+    public static final String EVERY_DAY = "Every Day";
+    public static final String F = "F";
+    public static final String M = "M";
+    public static final String T = "T";
+    public static final String TH = "Th";
+    public static final String SU = "Su";
     public static final String SET_ALARMS = "Set Alarms";
     public static final String VIEW_ALARMS = "View Alarms";
+    public static final String W = "W";
     public static final String WEEK = "WK";
+    public static final String WEEK_FULL = "Week";
+    public static final String WEEKDAYS = "Weekdays";
     public static final String WEEKEND = "WKD";
+    public static final String WEEKENDS = "Weekends";
     public static final String VIEW_DIGITAL_CLOCK = "View Digital Clock";
     public static final String VIEW_ANALOGUE_CLOCK = "View Analogue Clock";
 }

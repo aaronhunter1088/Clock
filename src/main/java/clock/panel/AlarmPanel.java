@@ -457,7 +457,7 @@ public class AlarmPanel extends ClockPanel implements Runnable
                 .map(alarm -> new Object[] {
                         alarm.getName() != null ? alarm.getName() : alarm.toString(),
                         alarm.getAlarmAsString(),
-                        alarm.getDaysShortened(),
+                        String.join(COMMA+SPACE, alarm.getDaysShortened()),
                         "Snooze",
                         "Remove"
                 })
@@ -743,17 +743,6 @@ public class AlarmPanel extends ClockPanel implements Runnable
         if (fridayCheckBox.isSelected()) { daysSelected.add(FRIDAY); }
         if (saturdayCheckBox.isSelected()) { daysSelected.add(SATURDAY); }
         if (sundayCheckBox.isSelected()) { daysSelected.add(SUNDAY); }
-        if (weekCheckBox.isSelected()) {
-            if (!daysSelected.contains(MONDAY)) daysSelected.add(MONDAY);
-            if (!daysSelected.contains(TUESDAY)) daysSelected.add(TUESDAY);
-            if (!daysSelected.contains(WEDNESDAY)) daysSelected.add(WEDNESDAY);
-            if (!daysSelected.contains(THURSDAY)) daysSelected.add(THURSDAY);
-            if (!daysSelected.contains(FRIDAY)) daysSelected.add(FRIDAY);
-        } // add Monday - Friday
-        if (weekendCheckBox.isSelected()) {
-            if (!daysSelected.contains(SATURDAY)) daysSelected.add(SATURDAY);
-            if (!daysSelected.contains(SUNDAY)) daysSelected.add(SUNDAY);
-        } // add Saturday and Sunday
         return daysSelected;
     }
 
