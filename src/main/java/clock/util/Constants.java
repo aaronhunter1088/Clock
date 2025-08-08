@@ -13,6 +13,7 @@ public class Constants {
     // General
     public static final String AM = "AM";
     public static final String are = "are";
+    public static final String CHANGE = "Change";
     public static final String COLON = ":";
     public static final String COMMA = ",";
     public static final String CLOCK = "Clock";
