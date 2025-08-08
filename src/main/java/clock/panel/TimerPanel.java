@@ -24,7 +24,7 @@ import static clock.util.Constants.*;
 
 /**
  * Timer Panel
- *
+ * <p>
  * This panel will allow you to create multiple
  * timers, and see them displayed in a table
  * below the timer creation fields. Each timer
@@ -38,20 +38,19 @@ import static clock.util.Constants.*;
 public class TimerPanel extends ClockPanel implements Runnable
 {
     private static final Logger logger = LogManager.getLogger(TimerPanel.class);
-    private Thread thread = null;
+    private Thread thread;
     private GridBagLayout layout;
     private GridBagConstraints constraints;
     private JLabel nameLabel,
-            hoursLabel,
-            minutesLabel,
-            secondsLabel;
+                   hoursLabel,
+                   minutesLabel,
+                   secondsLabel;
     private JTextField nameField,
-            hourField,
-            minuteField,
-            secondField;
-    private JButton setTimerButton;
-    private JButton resetButton;
-
+                       hourField,
+                       minuteField,
+                       secondField;
+    private JButton setTimerButton,
+                    resetButton;
     private JTable timersTable;
     private JScrollPane scrollTable;
     private ClockFrame clockFrame;
@@ -64,10 +63,10 @@ public class TimerPanel extends ClockPanel implements Runnable
     public TimerPanel(ClockFrame clockFrame)
     {
         super();
-        logger.info("Creating TimerPanel");
+        logger.debug("Creating TimerPanel");
         setClockFrame(clockFrame);
         setClock(clockFrame.getClock());
-        setSize(ClockFrame.panelSize);
+        setMaximumSize(ClockFrame.alarmSize);
         setGridBagLayout(new GridBagLayout());
         setLayout(layout);
         setGridBagConstraints(new GridBagConstraints());
@@ -77,7 +76,7 @@ public class TimerPanel extends ClockPanel implements Runnable
         setupSettingsMenu();
         addComponentsToPanel();
         SwingUtilities.updateComponentTreeUI(this);
-        logger.info("Finished creating TimerPanel Panel");
+        logger.info("Finished creating Timer Panel");
     }
 
     /**
@@ -247,6 +246,13 @@ public class TimerPanel extends ClockPanel implements Runnable
         clockFrame.getClockMenuBar().getSettingsMenu().add(clockFrame.getClockMenuBar().getPauseResumeAllTimersSetting());
     }
 
+    /**
+     * This method creates the button action for the
+     * buttons in the timers table.
+     *
+     * @param columnIndex
+     * @return
+     */
     public Action buttonAction(int columnIndex)
     {
         return new AbstractAction()
@@ -291,6 +297,11 @@ public class TimerPanel extends ClockPanel implements Runnable
         };
     }
 
+    /**
+     * Resets the timer and updates the button text
+     * @param columnIndex the index of the column
+     * @return the action to reset the timer
+     */
     public Action resetAction(int columnIndex)
     {
         return new AbstractAction()
@@ -334,6 +345,7 @@ public class TimerPanel extends ClockPanel implements Runnable
 
     /**
      * Sets the default values for the timers table
+     * @param setup true if we are setting up for the first time.
      */
     public void setupTimersTableDefaults(boolean setup)
     {
@@ -377,19 +389,6 @@ public class TimerPanel extends ClockPanel implements Runnable
                 });
             }
         }
-
-    }
-
-    /**
-     * This method updates the timers and then
-     * updates the timers table to reflect the
-     * changes.
-     */
-    public void updateTimersTable()
-    {
-        logger.info("update timers table");
-        clock.getListOfTimers().forEach(Timer::startTimer);
-        setupTimersTableDefaults(false);
     }
 
     /**
@@ -398,16 +397,16 @@ public class TimerPanel extends ClockPanel implements Runnable
     public void addComponentsToPanel()
     {
         logger.info("addComponentsToPanel");
-        addComponent(nameLabel,0,0,1,1,0,0, 1, 0, GridBagConstraints.NONE, new Insets(0,0,0,0)); // H
-        addComponent(nameField,0,1,1,1,0,0, 3, 0, GridBagConstraints.BOTH, new Insets(0,0,0,0)); // All Timers
-        addComponent(hoursLabel,0,3,1,1, 0,0, 1, 0, GridBagConstraints.NONE, new Insets(0,0,0,0)); // M
-        addComponent(hourField,0,4,1,1, 0,0, 1, 0, GridBagConstraints.BOTH, new Insets(0,0,0,0)); // textField
-        addComponent(minutesLabel,0,5,1,1, 0,0, 1, 0, GridBagConstraints.NONE, new Insets(0,0,0,0)); // M
-        addComponent(minuteField,0,6,1,1, 0,0, 1, 0, GridBagConstraints.BOTH, new Insets(0,0,0,0)); // textField
-        addComponent(secondsLabel,0,7,1,1, 0,0, 1, 0, GridBagConstraints.NONE, new Insets(0,0,0,0)); // M
-        addComponent(secondField,0,8,1,1, 0,0, 1, 0, GridBagConstraints.BOTH, new Insets(0,0,0,0)); // textField
+        addComponent(nameLabel,0,0,1,1,0,0, 1, 0, GridBagConstraints.NONE, new Insets(0,0,0,0));
+        addComponent(nameField,0,1,1,1,0,0, 3, 0, GridBagConstraints.BOTH, new Insets(0,0,0,0));
+        addComponent(hoursLabel,0,3,1,1, 0,0, 1, 0, GridBagConstraints.NONE, new Insets(0,0,0,0));
+        addComponent(hourField,0,4,1,1, 0,0, 1, 0, GridBagConstraints.BOTH, new Insets(0,0,0,0));
+        addComponent(minutesLabel,0,5,1,1, 0,0, 1, 0, GridBagConstraints.NONE, new Insets(0,0,0,0));
+        addComponent(minuteField,0,6,1,1, 0,0, 1, 0, GridBagConstraints.BOTH, new Insets(0,0,0,0));
+        addComponent(secondsLabel,0,7,1,1, 0,0, 1, 0, GridBagConstraints.NONE, new Insets(0,0,0,0));
+        addComponent(secondField,0,8,1,1, 0,0, 1, 0, GridBagConstraints.BOTH, new Insets(0,0,0,0));
         addComponent(resetButton,0,9,1,1, 0,0, 1, 0, GridBagConstraints.NONE, new Insets(0,0,0,0));
-        addComponent(setTimerButton,0,10,1,1, 0,0, 1, 0, GridBagConstraints.NONE, new Insets(0,0,0,0)); // Set Timer
+        addComponent(setTimerButton,0,10,1,1, 0,0, 1, 0, GridBagConstraints.NONE, new Insets(0,0,0,0));
 
         // leaving row 1 blank for spacing
 

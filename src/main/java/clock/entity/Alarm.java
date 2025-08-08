@@ -197,6 +197,14 @@ public class Alarm implements Serializable, Comparable<Alarm>, Runnable
     }
 
     /**
+     * Snoozing.... TODO: Implement this method
+     */
+    public void snooze()
+    {
+        logger.warn("IMPLEMENT");
+    }
+
+    /**
      * This method prints the stack trace of an exception
      * that may occur when the digital panel is in use.
      * @param e the exception

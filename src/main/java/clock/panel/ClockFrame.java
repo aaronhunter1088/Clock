@@ -183,6 +183,8 @@ public class ClockFrame extends JFrame
             acp.stop();
         if (currentPanel instanceof TimerPanel tp)
             tp.stop();
+        if (currentPanel instanceof AlarmPanel ap)
+            ap.stop();
         showPanel(clockPanel, resetValues);
         repaint();
         setVisible(true);
@@ -248,14 +250,13 @@ public class ClockFrame extends JFrame
         {
             alarmPanel.getJTextField1().setText(EMPTY);
             alarmPanel.getJTextField2().setText(EMPTY);
-            alarmPanel.getJTextField3().setText(EMPTY);
             alarmPanel.resetJCheckBoxes();
-            alarmPanel.resetJTextArea(); // so error alarms don't show up after navigating out and back in
-            alarmPanel.getJAlarmLbl4().setText("Current Alarms");
+            //alarmPanel.resetJTextArea(); // so error alarms don't show up after navigating out and back in
         }
         setSize(clockDefaultSize);
         panelType = PANEL_ALARM;
         alarmPanel.setupSettingsMenu();
+        alarmPanel.start();
     }
 
     /**
