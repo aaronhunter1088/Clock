@@ -7,7 +7,7 @@ import java.awt.*;
 
 /**
  * Abstract class for clock panels, implementing the IClockPanel interface.
- *
+ * <p>
  * @author Michael Ball
  * @version since 2.9
  */

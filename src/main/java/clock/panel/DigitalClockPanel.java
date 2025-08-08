@@ -229,7 +229,6 @@ public class DigitalClockPanel extends ClockPanel implements Runnable
     /**
      * This method adds the components to the digital clock panel
      */
-    @Override
     public void addComponentsToPanel()
     { /* no operation */ }
 

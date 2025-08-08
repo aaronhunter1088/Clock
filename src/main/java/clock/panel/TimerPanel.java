@@ -248,6 +248,7 @@ public class TimerPanel extends ClockPanel implements Runnable
         clockFrame.getClockMenuBar().getSettingsMenu().add(clockFrame.getClockMenuBar().getPauseResumeAllTimersSetting());
     }
 
+    /** Sets up the default values for the timer panel. */
     public void setupDefaultValues()
     {
         setupSettingsMenu();
@@ -258,9 +259,8 @@ public class TimerPanel extends ClockPanel implements Runnable
     /**
      * This method creates the button action for the
      * buttons in the timers table.
-     *
-     * @param columnIndex
-     * @return
+     * @param columnIndex the index of the column where the button is located
+     * @return the action to be performed when the button is clicked
      */
     public Action buttonAction(int columnIndex)
     {
@@ -620,6 +620,10 @@ public class TimerPanel extends ClockPanel implements Runnable
         return someNotBlank;
     }
 
+    /**
+     * Validates all text fields
+     * @return true if all text fields are valid
+     */
     public boolean validTextFields()
     {
         return validateFirstTextField() && validateSecondTextField() && validateThirdTextField()

@@ -405,8 +405,6 @@ public class AlarmPanel extends ClockPanel implements Runnable
         add(cpt);
     }
 
-
-
     /**
      * Creates the action for the buttons in the alarms table
      * @param columnIndex the index of the column where the button is located

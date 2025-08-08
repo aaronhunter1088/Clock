@@ -48,7 +48,6 @@ public class StopwatchPanel extends ClockPanel implements Runnable
         logger.info("Finished creating StopwatchPanel");
     }
 
-    @Override
     public void addComponentsToPanel() {
 
     }

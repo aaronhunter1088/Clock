@@ -60,12 +60,14 @@ public class ClockFrame extends JFrame
      * Default constructor for ClockFrame
      * Initializes the clock with default settings
      */
-    public ClockFrame() {
+    public ClockFrame()
+    {
         super(CLOCK);
         initialize(null);
     }
 
-    public ClockFrame(clock.entity.Panel panelType) {
+    public ClockFrame(clock.entity.Panel panelType)
+    {
         super(CLOCK);
         this.panelType = panelType;
         initialize(null);
@@ -75,12 +77,17 @@ public class ClockFrame extends JFrame
      * Constructor for ClockFrame with a clock
      * @param clock the clock to use
      */
-    public ClockFrame(Clock clock) {
+    public ClockFrame(Clock clock)
+    {
         super("Test" + SPACE + CLOCK);
         logger.info("Creating ClockFrame with test clock");
         initialize(clock);
     }
 
+    /**
+     * Initializes the ClockFrame with the given clock.
+     * @param clock the clock to use for initialization
+     */
     private void initialize(Clock clock)
     {
         logger.info("Initializing ClockFrame");
@@ -388,17 +395,9 @@ public class ClockFrame extends JFrame
         this.alarmPanel = alarmPanel;
     }
 
-//    public TimerPanel getTimerPanel() {
-//        return timerPanel;
-//    }
-
     public ClockMenuBar getClockMenuBar() {
         return menuBar;
     }
-
-//    public void setTimerPanel(TimerPanel timerPanel) {
-//        this.timerPanel = timerPanel;
-//    }
 
     public TimerPanel getTimerPanel() {
         return timerPanel;
