@@ -6,6 +6,7 @@ import clock.entity.Clock;
 import clock.exception.InvalidInputException;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.codehaus.plexus.util.StringUtils;
 
 import javax.swing.*;
 import javax.swing.border.LineBorder;
@@ -98,23 +99,23 @@ public class AlarmPanel extends ClockPanel implements Runnable
     {
         logger.info("setup AlarmPanel");
         nameLabel = new JLabel(NAME, SwingConstants.CENTER);
-        nameLabel.setFont(ClockFrame.font20);
-        nameLabel.setForeground(Color.WHITE);
+        nameLabel.setName(NAME+LABEL);
         nameTextField = new JTextField(EMPTY, 10);
-        nameTextField.setName(NAME+TEXT_FIELD);
+        nameTextField.setName(NAME + TEXT_FIELD);
 
         hoursLabel = new JLabel(Hours, SwingConstants.CENTER);
-        hoursLabel.setFont(ClockFrame.font20);
-        hoursLabel.setForeground(Color.WHITE);
+        hoursLabel.setName(Hours+LABEL);
         hoursTextField = new JTextField(EMPTY, 4);
-        hoursTextField.setName(HOUR+TEXT_FIELD);
-        hoursTextField.requestFocusInWindow();
+        hoursTextField.setName(HOUR + TEXT_FIELD);
 
         minutesLabel = new JLabel(Minutes, SwingConstants.CENTER);
-        minutesLabel.setFont(ClockFrame.font20);
-        minutesLabel.setForeground(Color.WHITE);
+        minutesLabel.setName(Minutes+LABEL);
         minutesTextField = new JTextField(EMPTY, 4);
-        minutesTextField.setName(MIN+TEXT_FIELD);
+        minutesTextField.setName(MIN + TEXT_FIELD);
+
+        ampmLabel = new JLabel(AMPM, SwingConstants.CENTER);
+        ampmLabel.setName(AMPM + LABEL);
+        setupOptionsSelection();
 
         List.of(nameTextField, hoursTextField, minutesTextField).forEach(textField -> {
             textField.setFont(ClockFrame.font20);
@@ -172,11 +173,11 @@ public class AlarmPanel extends ClockPanel implements Runnable
                 }
             });
         });
+        List.of(nameLabel, hoursLabel, minutesLabel, ampmLabel).forEach(label -> {
+            label.setFont(ClockFrame.font20);
+            label.setForeground(Color.WHITE);
+        });
 
-        ampmLabel = new JLabel(AMPM, SwingConstants.CENTER);
-        ampmLabel.setFont(ClockFrame.font20);
-        ampmLabel.setForeground(Color.WHITE);
-        setupOptionsSelection();
         // setup Set button
         setAlarmButton = new JButton(SET);
         setAlarmButton.setFont(ClockFrame.font20);
@@ -188,32 +189,6 @@ public class AlarmPanel extends ClockPanel implements Runnable
         setupCheckBoxes();
         setupAlarmsTableDefaults(true);
         setupDefaultValues();
-    }
-
-    /**
-     * Sets default values for the alarm panel
-     */
-    public void setupDefaultValues()
-    {
-        setBackground(Color.BLACK);
-        setForeground(Color.BLACK);
-        nameTextField.setText(EMPTY);
-        hoursTextField.setText(EMPTY);
-        minutesTextField.setText(EMPTY);
-        resetAlarmPanel();
-        setupSettingsMenu();
-        clockFrame.setTitle("Alarm Panel");
-        start();
-    }
-
-    /**
-     * This method sets up the settings menu for the
-     * alarm panel.
-     */
-    public void setupSettingsMenu()
-    {
-        clockFrame.clearSettingsMenu();
-        logger.info("No settings defined up for Alarm Panel");
     }
 
     /**
@@ -319,30 +294,77 @@ public class AlarmPanel extends ClockPanel implements Runnable
     }
 
     /**
+     * Sets default values for the alarm panel
+     */
+    public void setupDefaultValues()
+    {
+        nameTextField.requestFocusInWindow();
+        setBackground(Color.BLACK);
+        setForeground(Color.BLACK);
+        nameTextField.setText(EMPTY);
+        hoursTextField.setText(EMPTY);
+        minutesTextField.setText(EMPTY);
+        resetAlarmPanel();
+        setupSettingsMenu();
+        clockFrame.setTitle("Alarm Panel");
+        start();
+    }
+
+    /**
+     * Rests all the checkboxes to false
+     */
+    public void resetAlarmPanel()
+    {
+        logger.info("reset alarm panel");
+        hoursTextField.setText(EMPTY);
+        minutesTextField.setText(EMPTY);
+        nameTextField.setText(EMPTY);
+        sundayCheckBox.setSelected(false);
+        mondayCheckBox.setSelected(false);
+        tuesdayCheckBox.setSelected(false);
+        wednesdayCheckBox.setSelected(false);
+        thursdayCheckBox.setSelected(false);
+        fridayCheckBox.setSelected(false);
+        saturdayCheckBox.setSelected(false);
+        weekCheckBox.setSelected(false);
+        weekendCheckBox.setSelected(false);
+    }
+
+    /**
+     * This method sets up the settings menu for the
+     * alarm panel.
+     */
+    public void setupSettingsMenu()
+    {
+        clockFrame.clearSettingsMenu();
+        logger.info("No settings defined up for Alarm Panel");
+    }
+
+    /**
      * This method adds the components to the alarm panel
      */
     public void addComponentsToPanel()
     {
         logger.info("addComponentsToPanel");
-        addComponent(nameLabel,0,0,1,1,0,0, 1, 0, GridBagConstraints.NONE, new Insets(0,0,0,0)); // H
-        addComponent(nameTextField,0,1,1,1, 0,0, 3, 0, GridBagConstraints.BOTH, new Insets(0,0,0,0)); // textField
-        addComponent(hoursLabel,0,2,1,1,0,0, 1, 0, GridBagConstraints.NONE, new Insets(0,0,0,0)); // H
-        addComponent(hoursTextField,0,3,1,1, 0,0, 1, 0, GridBagConstraints.BOTH, new Insets(0,0,0,0)); // textField
-        addComponent(minutesLabel,0,4,1,1, 0,0, 1, 0, GridBagConstraints.NONE, new Insets(0,0,0,0)); // M
-        addComponent(minutesTextField,0,5,1,1, 0,0, 1, 0, GridBagConstraints.BOTH, new Insets(0,0,0,0)); // textField
-        addComponent(ampmLabel,0,6,1,1, 0,0, 1, 0, GridBagConstraints.NONE, new Insets(0,0,0,0)); // Time (AM/PM)
-        addComponent(ampmDropDown,0,7,1,1, 0,0, 1, 0, GridBagConstraints.BOTH, new Insets(0,0,0,0)); // textField
-        addComponent(setAlarmButton, 0, 8, 2, 1, 1, 1, 1, 0, GridBagConstraints.CENTER, new Insets(0,0,0,0)); // Set button
+        addComponent(nameLabel,0,0,1,1,0,0, 1, 0, GridBagConstraints.NONE, new Insets(0,0,0,0));
+        addComponent(nameTextField,0,1,1,1, 0,0, 3, 0, GridBagConstraints.BOTH, new Insets(0,0,0,0));
+        addComponent(hoursLabel,0,2,1,1,0,0, 1, 0, GridBagConstraints.NONE, new Insets(0,0,0,0));
+        addComponent(hoursTextField,0,3,1,1, 0,0, 1, 0, GridBagConstraints.BOTH, new Insets(0,0,0,0));
+        addComponent(minutesLabel,0,4,1,1, 0,0, 1, 0, GridBagConstraints.NONE, new Insets(0,0,0,0));
+        addComponent(minutesTextField,0,5,1,1, 0,0, 1, 0, GridBagConstraints.BOTH, new Insets(0,0,0,0));
+        addComponent(ampmLabel,0,6,1,1, 0,0, 1, 0, GridBagConstraints.NONE, new Insets(0,0,0,0));
+        addComponent(ampmDropDown,0,7,1,1, 0,0, 1, 0, GridBagConstraints.BOTH, new Insets(0,0,0,0));
+        addComponent(setAlarmButton, 0, 8, 2, 1, 1, 1, 1, 0, GridBagConstraints.CENTER, new Insets(0,0,0,0));
         // new row
-        addComponent(mondayCheckBox, 1,0,1,1, 0,0, 1, 0, GridBagConstraints.NONE, new Insets(0,0,0,0)); // Sqr Monday
-        addComponent(tuesdayCheckBox, 1, 1, 1, 1, 0, 0, 1, 0, GridBagConstraints.NONE, new Insets(0,0,0,0)); // Sqr Thursday
-        addComponent(wednesdayCheckBox, 1, 2, 1, 1, 1, 0, 1, 0, GridBagConstraints.NONE, new Insets(0,0,0,0)); // Sqr Sunday
-        addComponent(thursdayCheckBox, 1, 3, 1, 1, 0, 0, 1, 0, GridBagConstraints.NONE, new Insets(0,0,0,0)); // Sqr Sunday
-        addComponent(fridayCheckBox, 1, 4, 1, 1, 0, 0, 1, 0, GridBagConstraints.NONE, new Insets(0,0,0,0)); // Sqr Weekend
-        addComponent(saturdayCheckBox, 1, 5, 1, 1, 0, 0, 1, 0, GridBagConstraints.NONE, new Insets(0,0,0,0)); // Sqr Tuesday
-        addComponent(sundayCheckBox, 1, 6, 1, 1, 0, 0, 1, 0, GridBagConstraints.NONE, new Insets(0,0,0,0)); // Sqr Friday
-        addComponent(weekCheckBox, 1, 7, 1, 1, 1, 0, 1, 0, GridBagConstraints.NONE, new Insets(0,0,0,0)); // Sqr Weekend
-        addComponent(weekendCheckBox, 1, 8, 1, 1, 1, 0, 1, 0, GridBagConstraints.NONE, new Insets(0,0,0,0)); // Sqr Weekend
+        addComponent(mondayCheckBox, 1,0,1,1, 0,0, 1, 0, GridBagConstraints.NONE, new Insets(0,0,0,0));
+        addComponent(tuesdayCheckBox, 1, 1, 1, 1, 0, 0, 1, 0, GridBagConstraints.NONE, new Insets(0,0,0,0));
+        addComponent(wednesdayCheckBox, 1, 2, 1, 1, 1, 0, 1, 0, GridBagConstraints.NONE, new Insets(0,0,0,0));
+        addComponent(thursdayCheckBox, 1, 3, 1, 1, 0, 0, 1, 0, GridBagConstraints.NONE, new Insets(0,0,0,0));
+        addComponent(fridayCheckBox, 1, 4, 1, 1, 0, 0, 1, 0, GridBagConstraints.NONE, new Insets(0,0,0,0));
+        addComponent(saturdayCheckBox, 1, 5, 1, 1, 0, 0, 1, 0, GridBagConstraints.NONE, new Insets(0,0,0,0));
+        addComponent(sundayCheckBox, 1, 6, 1, 1, 0, 0, 1, 0, GridBagConstraints.NONE, new Insets(0,0,0,0));
+        addComponent(weekCheckBox, 1, 7, 1, 1, 1, 0, 1, 0, GridBagConstraints.NONE, new Insets(0,0,0,0));
+        addComponent(weekendCheckBox, 1, 8, 1, 1, 1, 0, 1, 0, GridBagConstraints.NONE, new Insets(0,0,0,0));
         // new row
         addComponent(scrollTable, 2, 0, 9, 1, 0, 0, 1, 2, GridBagConstraints.BOTH, new Insets(0,0,0,0));
 
@@ -392,7 +414,7 @@ public class AlarmPanel extends ClockPanel implements Runnable
         {
             public void actionPerformed(ActionEvent e)
             {
-                int modelRow = Integer.valueOf( e.getActionCommand() );
+                int modelRow = Integer.parseInt( e.getActionCommand() );
                 String buttonAction = (String) alarmsTable.getModel().getValueAt(modelRow, columnIndex);
                 // find the correct alarm
                 Alarm alarm = clock.getListOfAlarms().get(modelRow);
@@ -508,7 +530,7 @@ public class AlarmPanel extends ClockPanel implements Runnable
      */
     boolean validateHoursTextField()
     {
-        logger.debug("validate hours text field");
+        boolean result = false;
         if (hoursTextField.getText().isEmpty() && nameTextField.getText().isEmpty()
              && !minutesTextField.getText().isEmpty())
         {
@@ -519,7 +541,11 @@ public class AlarmPanel extends ClockPanel implements Runnable
         {
             throw new InvalidInputException("Hour cannot be blank");
         }
-        else if (!hoursTextField.getText().isEmpty() && !nameTextField.getText().isEmpty())
+        else if (areAllBlank())
+        {
+            return true;
+        }
+        else if (!hoursTextField.getText().isEmpty() || !nameTextField.getText().isEmpty())
         {
             try
             {
@@ -528,14 +554,15 @@ public class AlarmPanel extends ClockPanel implements Runnable
                 {
                     throw new InvalidInputException("Hours must be between 0 and " + upperLimit);
                 }
-                return true;
+                result = true;
             }
             catch (NumberFormatException nfe)
             {
                 throw new InvalidInputException("Hours must be a number");
             }
         }
-        return true;
+        logger.debug("validate hours text field: {}", result);
+        return result;
     }
 
     /**
@@ -544,7 +571,7 @@ public class AlarmPanel extends ClockPanel implements Runnable
      */
     boolean validateMinutesTextField()
     {
-        logger.debug("validate minutes text field");
+        boolean result = false;
         if (minutesTextField.getText().isEmpty() && nameTextField.getText().isEmpty()
              && !hoursTextField.getText().isEmpty())
         {
@@ -555,20 +582,28 @@ public class AlarmPanel extends ClockPanel implements Runnable
         {
             throw new InvalidInputException("Minutes cannot be blank");
         }
-        else if (!nameTextField.getText().isEmpty() && !hoursTextField.getText().isEmpty() &&
-                !minutesTextField.getText().isEmpty())
+        else if (areAllBlank())
         {
-            try {
+            return true;
+        }
+        else if (!minutesTextField.getText().isEmpty() || !nameTextField.getText().isEmpty())
+        {
+            try
+            {
                 if (Integer.parseInt(minutesTextField.getText()) < 0 ||
                         Integer.parseInt(minutesTextField.getText()) > 59 )
                 {
                     throw new InvalidInputException("Minutes must be between 0 and 59");
                 }
-            } catch (NumberFormatException nfe) {
+                result = true;
+            }
+            catch (NumberFormatException nfe)
+            {
                 throw new InvalidInputException("Minutes must be a number");
             }
         }
-        return true;
+        logger.debug("validate minutes text field: {}", result);
+        return result;
     }
 
     /**
@@ -577,9 +612,35 @@ public class AlarmPanel extends ClockPanel implements Runnable
      */
     boolean validateTheCheckBoxes(List<DayOfWeek> days)
     {
-        logger.debug("validate checkboxes");
         if (days.isEmpty()) { throw new InvalidInputException("Days cannot be empty"); }
+        logger.debug("checkboxes are valid");
         return true;
+    }
+
+    /**
+     * Checks if all text fields are not zeroes or empty
+     * @return true if all text fields are not zeroes or empty
+     */
+    public boolean areAllNotZeroes()
+    {
+        boolean hoursIsZero = ZERO.equals(hoursTextField.getText());
+        boolean minutesIsZero = ZERO.equals(minutesTextField.getText());
+        boolean allNotZero = !(hoursIsZero && minutesIsZero);
+        logger.debug("are all not zeroes: {}", allNotZero);
+        return allNotZero;
+    }
+
+    /**
+     * Checks if all text fields are blank or empty
+     * @return true if all text fields are blank or empty
+     */
+    public boolean areAllBlank()
+    {
+        boolean hoursIsBlank = StringUtils.isBlank(hoursTextField.getText());
+        boolean minutesIsBlank = StringUtils.isBlank(minutesTextField.getText());
+        boolean allBlank = hoursIsBlank && minutesIsBlank;
+        logger.debug("are all blank: {}", allBlank);
+        return allBlank;
     }
 
     /**
@@ -587,8 +648,18 @@ public class AlarmPanel extends ClockPanel implements Runnable
      */
     public boolean validateTextFields()
     {
-        return validateHoursTextField() && validateMinutesTextField()
-                && validateTheCheckBoxes(getDaysChecked());
+        boolean validTextFields;
+        boolean validHours = validateHoursTextField();
+        boolean validMinutes = validateMinutesTextField();
+        if (areAllBlank())
+        {
+            throw new InvalidInputException("Hours cannot be blank");
+        }
+        boolean validCheckboxes = validateTheCheckBoxes(getDaysChecked());
+        validTextFields = validHours && validMinutes && validCheckboxes
+                && areAllNotZeroes() && !areAllBlank();
+        logger.debug("validTextFields: {}", validTextFields);
+        return validTextFields;
     }
 
     /**
@@ -631,6 +702,14 @@ public class AlarmPanel extends ClockPanel implements Runnable
         Alarm alarm = null;
         if (validateTextFields())
         {
+            if (EMPTY.equals(hoursTextField.getText())) hoursTextField.setText(ZERO);
+            if (EMPTY.equals(minutesTextField.getText())) minutesTextField.setText(ZERO);
+            if (!areAllNotZeroes())
+            {
+                hoursTextField.setText(EMPTY);
+                minutesTextField.setText(EMPTY);
+                throw new InvalidInputException("One of the text fields is not valid");
+            }
             int hour = Integer.parseInt(hoursTextField.getText());
             int minutes = Integer.parseInt(minutesTextField.getText());
             String ampm = Objects.requireNonNull(ampmDropDown.getSelectedItem()).toString();
@@ -671,26 +750,6 @@ public class AlarmPanel extends ClockPanel implements Runnable
         if (saturdayCheckBox.isSelected()) { daysSelected.add(SATURDAY); }
         if (sundayCheckBox.isSelected()) { daysSelected.add(SUNDAY); }
         return daysSelected;
-    }
-
-    /**
-     * Rests all the checkboxes to false
-     */
-    public void resetAlarmPanel()
-    {
-        logger.info("reset alarm panel");
-        hoursTextField.setText(EMPTY);
-        minutesTextField.setText(EMPTY);
-        nameTextField.setText(EMPTY);
-        sundayCheckBox.setSelected(false);
-        mondayCheckBox.setSelected(false);
-        tuesdayCheckBox.setSelected(false);
-        wednesdayCheckBox.setSelected(false);
-        thursdayCheckBox.setSelected(false);
-        fridayCheckBox.setSelected(false);
-        saturdayCheckBox.setSelected(false);
-        weekCheckBox.setSelected(false);
-        weekendCheckBox.setSelected(false);
     }
 
     /**

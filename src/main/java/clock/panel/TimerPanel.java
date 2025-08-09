@@ -52,8 +52,7 @@ public class TimerPanel extends ClockPanel implements Runnable
                        hoursTextField,
                        minutesTextField,
                        secondsTextField;
-    private JButton setTimerButton,
-                    resetButton;
+    private JButton setTimerButton;
     private JTable timersTable;
     private JScrollPane scrollTable;
     private ClockFrame clockFrame;
@@ -88,20 +87,23 @@ public class TimerPanel extends ClockPanel implements Runnable
         nameLabel = new JLabel(NAME, SwingConstants.CENTER);
         nameLabel.setName(NAME+LABEL);
         nameTextField = new JTextField(EMPTY, 10);
-        nameTextField.setName(NAME+ TEXT_FIELD);
-        nameTextField.requestFocusInWindow();
+        nameTextField.setName(NAME + TEXT_FIELD);
+
         hoursLabel = new JLabel(Hours, SwingConstants.CENTER);
         hoursLabel.setName(Hours+LABEL);
         hoursTextField = new JTextField(EMPTY, 4);
-        hoursTextField.setName(HOUR+ TEXT_FIELD);
+        hoursTextField.setName(HOUR + TEXT_FIELD);
+
         minutesLabel = new JLabel(Minutes, SwingConstants.CENTER);
         minutesLabel.setName(Minutes+LABEL);
         minutesTextField = new JTextField(EMPTY, 4);
-        minutesTextField.setName(MIN+ TEXT_FIELD);
+        minutesTextField.setName(MIN + TEXT_FIELD);
+
         secondsLabel = new JLabel(Seconds, SwingConstants.CENTER);
         secondsLabel.setName(Seconds+LABEL);
         secondsTextField = new JTextField(EMPTY, 4);
-        secondsTextField.setName(SEC+ TEXT_FIELD);
+        secondsTextField.setName(SEC + TEXT_FIELD);
+
         List.of(nameTextField, hoursTextField, minutesTextField, secondsTextField).forEach(textField -> {
             textField.setFont(ClockFrame.font20);
             textField.setForeground(Color.BLACK);
@@ -179,14 +181,12 @@ public class TimerPanel extends ClockPanel implements Runnable
             label.setFont(ClockFrame.font20);
             label.setForeground(Color.WHITE);
         });
+        // setup Set button
         setTimerButton = new JButton(SET);
-        resetButton = new JButton(RESET);
-        List.of(setTimerButton, resetButton).forEach(button -> {
-            button.setFont(ClockFrame.font20);
-            button.setOpaque(true);
-            button.setBackground(Color.BLACK);
-            button.setForeground(Color.BLACK);
-        });
+        setTimerButton.setFont(ClockFrame.font20);
+        setTimerButton.setOpaque(true);
+        setTimerButton.setBackground(Color.BLACK);
+        setTimerButton.setForeground(Color.BLACK);
         setTimerButton.addActionListener(this::setTimer);
         setupTimersTableDefaults(true);
         setupDefaultValues();
@@ -206,9 +206,11 @@ public class TimerPanel extends ClockPanel implements Runnable
     /** Sets up the default values for the timer panel. */
     public void setupDefaultValues()
     {
+        nameTextField.requestFocusInWindow();
         setBackground(Color.BLACK);
         setForeground(Color.BLACK);
         setupSettingsMenu();
+        clearTextFields();
         clockFrame.setTitle("Timer Panel");
         start();
     }
@@ -225,7 +227,7 @@ public class TimerPanel extends ClockPanel implements Runnable
         {
             public void actionPerformed(ActionEvent e)
             {
-                int modelRow = Integer.valueOf( e.getActionCommand() );
+                int modelRow = Integer.parseInt( e.getActionCommand() );
                 String buttonAction = (String) timersTable.getModel().getValueAt(modelRow, columnIndex);
                 // find the correct timer
                 Timer timer = clock.getListOfTimers().get(modelRow);
@@ -488,8 +490,6 @@ public class TimerPanel extends ClockPanel implements Runnable
         hoursTextField.setText(EMPTY);
         minutesTextField.setText(EMPTY);
         secondsTextField.setText(EMPTY);
-        logger.debug("timer button set to {}", SET);
-        setTimerButton.setText(SET);
     }
 
     /**
@@ -630,7 +630,7 @@ public class TimerPanel extends ClockPanel implements Runnable
     public boolean areAllBlank()
     {
         boolean hoursIsBlank = StringUtils.isBlank(hoursTextField.getText());
-        boolean minutesIsBlank = StringUtils.isBlank(minutesTextField.getText()) ;
+        boolean minutesIsBlank = StringUtils.isBlank(minutesTextField.getText());
         boolean secondsIsBlank = StringUtils.isBlank(secondsTextField.getText());
         boolean allBlank = hoursIsBlank && minutesIsBlank && secondsIsBlank;
         logger.debug("are all blank: {}", allBlank);
@@ -643,8 +643,11 @@ public class TimerPanel extends ClockPanel implements Runnable
      */
     public boolean validTextFields()
     {
-        boolean validFields = validateHoursTextField() && validateMinutesTextField() && validateSecondsTextField()
-                && areAllNotZeroes() && !areAllBlank();
+        boolean validHours = validateHoursTextField();
+        boolean validMinutes = validateMinutesTextField();
+        boolean validSeconds = validateSecondsTextField();
+        boolean areAllNotZeroes = areAllNotZeroes();
+        boolean validFields = validHours && validMinutes && validSeconds && areAllNotZeroes;
         logger.info("valid text fields: {}", validFields);
         return validFields;
     }
@@ -706,7 +709,6 @@ public class TimerPanel extends ClockPanel implements Runnable
     public JTextField getHoursTextField() { return hoursTextField; }
     public JTextField getMinutesTextField() { return minutesTextField; }
     public JTextField getSecondsTextField() { return secondsTextField; }
-    public JButton getResetButton() { return resetButton; }
     public JButton getSetTimerButton() { return setTimerButton; }
 
     /* Setters */
@@ -718,5 +720,4 @@ public class TimerPanel extends ClockPanel implements Runnable
     public void setMinutesTextField(JTextField minutesTextField) { this.minutesTextField = minutesTextField; }
     public void setSecondsTextField(JTextField secondsTextField) { this.secondsTextField = secondsTextField; }
     public void setSetTimerButton(JButton setTimerButton) { this.setTimerButton = setTimerButton; }
-    public void setResetButton(JButton resetButton) { this.resetButton = resetButton; }
 }
