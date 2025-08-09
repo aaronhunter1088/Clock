@@ -508,6 +508,10 @@ public class TimerPanel extends ClockPanel implements Runnable
         {
             result = true;
         }
+        else if (areAllBlank())
+        {
+            return true;
+        }
         else if (!hoursTextField.getText().isEmpty() || !nameTextField.getText().isEmpty())
         {
             try
@@ -544,6 +548,10 @@ public class TimerPanel extends ClockPanel implements Runnable
         {
             result = true;
         }
+        else if (areAllBlank())
+        {
+            return true;
+        }
         else if (!minutesTextField.getText().isEmpty() || !nameTextField.getText().isEmpty())
         {
             try {
@@ -576,6 +584,10 @@ public class TimerPanel extends ClockPanel implements Runnable
                 || !minutesTextField.getText().isEmpty()))
         {
             result = true;
+        }
+        else if (areAllBlank())
+        {
+            return true;
         }
         else if (!secondsTextField.getText().isEmpty() || !nameTextField.getText().isEmpty())
         {
