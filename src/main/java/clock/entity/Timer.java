@@ -278,7 +278,6 @@ public class Timer implements Serializable, Comparable<Timer>, Runnable
         hasBeenStarted = false;
         hasBeenTriggered = false;
         stopTimer = true;
-        clock.getListOfTimers().remove(this);
         logger.info("{} timer stopped", this);
     }
 

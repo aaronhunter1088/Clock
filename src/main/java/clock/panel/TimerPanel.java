@@ -131,8 +131,8 @@ public class TimerPanel extends ClockPanel implements Runnable
                     switch (e.getSource() instanceof JTextField textField ? textField.getName() : null)
                     {
                         case NAME+TEXT_FIELD -> {
-                            if (nameTextField.getText().isBlank() || nameTextField.getText().isEmpty())
-                            { nameTextField.setText(TIMER+(Timer.timersCounter+1)); }
+                            if (nameTextField.getText().isBlank())
+                            { setupNameTextField(); }
                             else if (nameTextField.getText().length() > 10)
                             { nameTextField.setText(nameTextField.getText().substring(0, 10)); }
                         }
@@ -409,10 +409,7 @@ public class TimerPanel extends ClockPanel implements Runnable
         logger.debug("set timer");
         clock.entity.Timer timer = null;
         try {
-            if (nameTextField.getText().isEmpty()) {
-                nameTextField.setText(TIMER + (Timer.timersCounter + 1));
-                logger.debug("name text field was empty, set to default: {}", nameTextField.getText());
-            }
+            setupNameTextField();
             timer = createTimer();
             logger.debug("timer created: {}", timer);
             clock.getListOfTimers().add(timer);
@@ -454,6 +451,17 @@ public class TimerPanel extends ClockPanel implements Runnable
     }
 
     /**
+     * Sets the name text field to the default value
+     */
+    public void setupNameTextField()
+    {
+        if (nameTextField.getText().isEmpty()) {
+            nameTextField.setText(TIMER + (Timer.timersCounter + 1));
+            logger.debug("name text field was empty, set to default: {}", nameTextField.getText());
+        }
+    }
+
+    /**
      * Resets the timer panel
      */
     public void resetTimerPanel()
@@ -461,6 +469,11 @@ public class TimerPanel extends ClockPanel implements Runnable
         logger.info("reset timer fields");
         clearTextFields();
         timersTable.setModel(new javax.swing.table.DefaultTableModel());
+        clock.getListOfTimers().forEach(timer -> {
+            timer.stopTimer();
+            timer.setPaused(false);
+            timer.setTimerGoingOff(false);
+        });
         clock.getListOfTimers().clear();
         logger.info("all timers cleared");
     }
