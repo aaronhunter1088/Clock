@@ -64,8 +64,8 @@ public class AlarmPanel extends ClockPanel implements Runnable
     private JCheckBox mondayCheckBox,tuesdayCheckBox,
                       wednesdayCheckBox,thursdayCheckBox,
                       fridayCheckBox,saturdayCheckBox,
-                      sundayCheckBox,weekCheckBox,
-                      weekendCheckBox;
+                      sundayCheckBox, weekdaysCheckBox,
+                      weekendsCheckBox;
     private JButton setAlarmButton;
     private JTable alarmsTable;
     private JScrollPane scrollTable;
@@ -95,26 +95,26 @@ public class AlarmPanel extends ClockPanel implements Runnable
     /**
      * Adds all the components to the AlarmPanel
      */
-    void setupAlarmPanel()
+    private void setupAlarmPanel()
     {
         logger.info("setup AlarmPanel");
-        nameLabel = new JLabel(NAME, SwingConstants.CENTER);
-        nameLabel.setName(NAME+LABEL);
-        nameTextField = new JTextField(EMPTY, 10);
-        nameTextField.setName(NAME + TEXT_FIELD);
+        setNameLabel(new JLabel(NAME, SwingConstants.CENTER));
+        getNameLabel().setName(NAME+LABEL);
+        setNameTextField(new JTextField(EMPTY, 10));
+        getNameTextField().setName(NAME + TEXT_FIELD);
 
-        hoursLabel = new JLabel(Hours, SwingConstants.CENTER);
-        hoursLabel.setName(Hours+LABEL);
-        hoursTextField = new JTextField(EMPTY, 4);
-        hoursTextField.setName(HOUR + TEXT_FIELD);
+        setHoursLabel(new JLabel(Hours, SwingConstants.CENTER));
+        getHoursLabel().setName(Hours+LABEL);
+        setHoursTextField(new JTextField(EMPTY, 4));
+        getHoursTextField().setName(HOUR + TEXT_FIELD);
 
-        minutesLabel = new JLabel(Minutes, SwingConstants.CENTER);
-        minutesLabel.setName(Minutes+LABEL);
-        minutesTextField = new JTextField(EMPTY, 4);
-        minutesTextField.setName(MIN + TEXT_FIELD);
+        setMinutesLabel(new JLabel(Minutes, SwingConstants.CENTER));
+        getMinutesLabel().setName(Minutes+LABEL);
+        setMinutesTextField(new JTextField(EMPTY, 4));
+        getMinutesTextField().setName(MIN + TEXT_FIELD);
 
-        ampmLabel = new JLabel(AMPM, SwingConstants.CENTER);
-        ampmLabel.setName(AMPM + LABEL);
+        setAmpmLabel(new JLabel(AMPM, SwingConstants.CENTER));
+        getAmpmLabel().setName(AMPM+LABEL);
         setupOptionsSelection();
 
         List.of(nameTextField, hoursTextField, minutesTextField).forEach(textField -> {
@@ -149,15 +149,14 @@ public class AlarmPanel extends ClockPanel implements Runnable
                         }
                         case HOUR+TEXT_FIELD -> {
                             int upperLimit = clockFrame.getClock().isShowMilitaryTime() ? 23 : 12;
-                            try {
-                                validateHoursTextField();
+                            boolean validHours = validateHoursTextField();
+                            if (validHours) {
                                 hoursTextField.setBorder(new LineBorder(Color.ORANGE));
                             }
-                            catch (InvalidInputException iie) {
                                 displayPopupMessage(ALARM_ERROR, "Hours must be between 0 and "+upperLimit, 0);
                                 hoursTextField.setBorder(new LineBorder(Color.RED));
                                 hoursTextField.requestFocusInWindow();
-                            }
+
                         }
                         case MIN+TEXT_FIELD -> {
                             try {
@@ -179,12 +178,12 @@ public class AlarmPanel extends ClockPanel implements Runnable
         });
 
         // setup Set button
-        setAlarmButton = new JButton(SET);
-        setAlarmButton.setFont(ClockFrame.font20);
-        setAlarmButton.setOpaque(true);
-        setAlarmButton.setBackground(Color.BLACK);
-        setAlarmButton.setForeground(Color.BLACK);
-        setAlarmButton.addActionListener(this::setAlarm);
+        setSetAlarmButton(new JButton(SET));
+        getSetAlarmButton().setFont(ClockFrame.font20);
+        getSetAlarmButton().setOpaque(true);
+        getSetAlarmButton().setBackground(Color.BLACK);
+        getSetAlarmButton().setForeground(Color.BLACK);
+        getSetAlarmButton().addActionListener(this::setAlarm);
         // setup checkboxes
         setupCheckBoxes();
         setupAlarmsTableDefaults(true);
@@ -198,7 +197,7 @@ public class AlarmPanel extends ClockPanel implements Runnable
      */
     private void setupOptionsSelection()
     {
-        setDateOperationsDropdown(new JComboBox<>(new String[]{AM, PM}));
+        setAmpmDropDown(new JComboBox<>(new String[]{AM, PM}));
         ampmDropDown.setSelectedItem(clockFrame.getClock().getAMPM().equals(AM)?AM:PM);
         ampmDropDown.setComponentOrientation(ComponentOrientation.LEFT_TO_RIGHT);
     }
@@ -206,25 +205,24 @@ public class AlarmPanel extends ClockPanel implements Runnable
     /**
      * Sets up the checkboxes for the Alarm Panel
      */
-    public void setupCheckBoxes()
+    private void setupCheckBoxes()
     {
         logger.info("setup checkboxes");
-        sundayCheckBox = new JCheckBox(SUNDAY.toString().substring(0,2), false);
-        mondayCheckBox = new JCheckBox(MONDAY.toString().substring(0,1), false);
-        tuesdayCheckBox = new JCheckBox(TUESDAY.toString().substring(0,1), false);
-        wednesdayCheckBox = new JCheckBox(WEDNESDAY.toString().substring(0,1), false);
-        thursdayCheckBox = new JCheckBox(THURSDAY.toString().substring(0,2), false);
-        fridayCheckBox = new JCheckBox(FRIDAY.toString().substring(0,1), false);
-        saturdayCheckBox = new JCheckBox(SATURDAY.toString().substring(0,1), false);
-        weekCheckBox = new JCheckBox(WEEK, false);
-        weekendCheckBox = new JCheckBox(WEEKEND, false);
-        List.of(sundayCheckBox, mondayCheckBox, tuesdayCheckBox, wednesdayCheckBox, thursdayCheckBox, fridayCheckBox, saturdayCheckBox, weekCheckBox, weekendCheckBox)
-                .forEach(checkBox -> {
-                            checkBox.setFont(ClockFrame.font20);
-                            checkBox.setBackground(Color.BLACK);
-                            checkBox.setForeground(Color.WHITE);
-                        }
-                );
+        setSundayCheckBox(new JCheckBox(SU.toUpperCase(), false));
+        setMondayCheckBox(new JCheckBox(M, false));
+        setTuesdayCheckBox(new JCheckBox(T, false));
+        setWednesdayCheckBox(new JCheckBox(W, false));
+        setThursdayCheckBox(new JCheckBox(TH.toUpperCase(), false));
+        setFridayCheckBox(new JCheckBox(F, false));
+        setSaturdayCheckBox(new JCheckBox(S, false));
+        setWeekdaysCheckBox(new JCheckBox(WEEK, false));
+        setWeekendsCheckBox(new JCheckBox(WEEKEND, false));
+        List.of(sundayCheckBox, mondayCheckBox, tuesdayCheckBox, wednesdayCheckBox, thursdayCheckBox,
+                fridayCheckBox, saturdayCheckBox, weekdaysCheckBox, weekendsCheckBox).forEach(checkBox -> {
+                    checkBox.setFont(ClockFrame.font20);
+                    checkBox.setBackground(Color.BLACK);
+                    checkBox.setForeground(Color.WHITE);
+        });
         sundayCheckBox.addActionListener(action -> {
             sundayCheckBox.setSelected(sundayCheckBox.isSelected());
             logger.info("sundayCheckBox: {}", sundayCheckBox.isSelected());
@@ -253,11 +251,11 @@ public class AlarmPanel extends ClockPanel implements Runnable
             saturdayCheckBox.setSelected(saturdayCheckBox.isSelected());
             logger.info("saturdayCheckBox: {}", saturdayCheckBox.isSelected());
         });
-        weekCheckBox.addActionListener(action -> {
-            if (!weekCheckBox.isSelected())
+        weekdaysCheckBox.addActionListener(action -> {
+            if (!weekdaysCheckBox.isSelected())
             {
                 logger.info("Week checkbox not selected!");
-                weekCheckBox.setSelected(false);
+                weekdaysCheckBox.setSelected(false);
                 mondayCheckBox.setSelected(false);
                 tuesdayCheckBox.setSelected(false);
                 wednesdayCheckBox.setSelected(false);
@@ -267,7 +265,7 @@ public class AlarmPanel extends ClockPanel implements Runnable
             else
             {
                 logger.info("Week checkbox selected!");
-                weekCheckBox.setSelected(true);
+                weekdaysCheckBox.setSelected(true);
                 mondayCheckBox.setSelected(true);
                 tuesdayCheckBox.setSelected(true);
                 wednesdayCheckBox.setSelected(true);
@@ -275,18 +273,18 @@ public class AlarmPanel extends ClockPanel implements Runnable
                 fridayCheckBox.setSelected(true);
             }
         });
-        weekendCheckBox.addActionListener(action -> {
-            if (!weekendCheckBox.isSelected())
+        weekendsCheckBox.addActionListener(action -> {
+            if (!weekendsCheckBox.isSelected())
             {
                 logger.info("Weekend checkbox not selected!");
-                weekendCheckBox.setSelected(false);
+                weekendsCheckBox.setSelected(false);
                 saturdayCheckBox.setSelected(false);
                 sundayCheckBox.setSelected(false);
             }
             else
             {
                 logger.info("Weekend checkbox selected!");
-                weekendCheckBox.setSelected(true);
+                weekendsCheckBox.setSelected(true);
                 saturdayCheckBox.setSelected(true);
                 sundayCheckBox.setSelected(true);
             }
@@ -326,8 +324,8 @@ public class AlarmPanel extends ClockPanel implements Runnable
         thursdayCheckBox.setSelected(false);
         fridayCheckBox.setSelected(false);
         saturdayCheckBox.setSelected(false);
-        weekCheckBox.setSelected(false);
-        weekendCheckBox.setSelected(false);
+        weekdaysCheckBox.setSelected(false);
+        weekendsCheckBox.setSelected(false);
     }
 
     /**
@@ -363,8 +361,8 @@ public class AlarmPanel extends ClockPanel implements Runnable
         addComponent(fridayCheckBox, 1, 4, 1, 1, 0, 0, 1, 0, GridBagConstraints.NONE, new Insets(0,0,0,0));
         addComponent(saturdayCheckBox, 1, 5, 1, 1, 0, 0, 1, 0, GridBagConstraints.NONE, new Insets(0,0,0,0));
         addComponent(sundayCheckBox, 1, 6, 1, 1, 0, 0, 1, 0, GridBagConstraints.NONE, new Insets(0,0,0,0));
-        addComponent(weekCheckBox, 1, 7, 1, 1, 1, 0, 1, 0, GridBagConstraints.NONE, new Insets(0,0,0,0));
-        addComponent(weekendCheckBox, 1, 8, 1, 1, 1, 0, 1, 0, GridBagConstraints.NONE, new Insets(0,0,0,0));
+        addComponent(weekdaysCheckBox, 1, 7, 1, 1, 1, 0, 1, 0, GridBagConstraints.NONE, new Insets(0,0,0,0));
+        addComponent(weekendsCheckBox, 1, 8, 1, 1, 1, 0, 1, 0, GridBagConstraints.NONE, new Insets(0,0,0,0));
         // new row
         addComponent(scrollTable, 2, 0, 9, 1, 0, 0, 1, 2, GridBagConstraints.BOTH, new Insets(0,0,0,0));
 
@@ -483,21 +481,27 @@ public class AlarmPanel extends ClockPanel implements Runnable
     {
         Object[][] data = getAlarmsTableData();
         String[] columnNames = getAlarmsTableColumnNames();
-        if (setup) {
+        if (setup)
+        {
             alarmsTable = new JTable(new DefaultTableModel(data, columnNames));
-            alarmsTable.setPreferredScrollableViewportSize(alarmsTable.getPreferredSize());//thanks mKorbel +1 http://stackoverflow.com/questions/10551995/how-to-set-jscrollpane-layout-to-be-the-same-as-jtable
+            alarmsTable.setPreferredScrollableViewportSize(alarmsTable.getPreferredSize());
             alarmsTable.setFont(ClockFrame.font10);
             alarmsTable.setBackground(Color.BLACK);
             alarmsTable.setForeground(Color.WHITE);
             alarmsTable.setFillsViewportHeight(true);
             scrollTable = new JScrollPane(alarmsTable);
-        } else {
+        }
+        else
+        {
             // only update if the timers count changes
-            if(alarmsTable.getModel().getRowCount() != data.length) {
+            if(alarmsTable.getModel().getRowCount() != data.length)
+            {
                 alarmsTable.setModel(new javax.swing.table.DefaultTableModel(data, columnNames));
                 new ButtonColumn(alarmsTable, buttonAction(3), 3);
                 new ButtonColumn(alarmsTable, buttonAction(4), 4);
-            } else {
+            }
+            else
+            {
                 AtomicInteger rowIndex = new AtomicInteger();
                 clock.getListOfAlarms().forEach(alarm -> {
                     String currentAlarm = alarmsTable.getValueAt(rowIndex.get(), 0).toString();
@@ -531,37 +535,27 @@ public class AlarmPanel extends ClockPanel implements Runnable
     boolean validateHoursTextField()
     {
         boolean result = false;
-        if (hoursTextField.getText().isEmpty() && nameTextField.getText().isEmpty()
-             && !minutesTextField.getText().isEmpty())
-        {
-            throw new InvalidInputException("Hour cannot be blank");
-        }
-        else if (hoursTextField.getText().isEmpty() && !minutesTextField.getText().isEmpty()
-                  && !nameTextField.getText().isEmpty())
-        {
-            throw new InvalidInputException("Hour cannot be blank");
-        }
-        else if (areAllBlank())
+        if (areAllBlank())
         {
             return true;
         }
-        else if (!hoursTextField.getText().isEmpty() || !nameTextField.getText().isEmpty())
+        else if (!hoursTextField.getText().isEmpty())
         {
+            int upperLimit = clockFrame.getClock().isShowMilitaryTime() ? 23 : 12;
             try
             {
-                int upperLimit = clockFrame.getClock().isShowMilitaryTime() ? 23 : 12;
-                if (Integer.parseInt(hoursTextField.getText()) < 0 || Integer.parseInt(hoursTextField.getText()) > upperLimit)
+                if (Integer.parseInt(hoursTextField.getText()) >= 0
+                        && Integer.parseInt(hoursTextField.getText()) <= upperLimit)
                 {
-                    throw new InvalidInputException("Hours must be between 0 and " + upperLimit);
+                    result = true;
                 }
-                result = true;
             }
             catch (NumberFormatException nfe)
             {
-                throw new InvalidInputException("Hours must be a number");
+                logger.debug("Invalid input in hours text field: {}", nfe.getMessage());
             }
         }
-        logger.debug("validate hours text field: {}", result);
+        logger.debug("validate hours {} text field: {}", hoursTextField.getText(), result);
         return result;
     }
 
@@ -572,34 +566,23 @@ public class AlarmPanel extends ClockPanel implements Runnable
     boolean validateMinutesTextField()
     {
         boolean result = false;
-        if (minutesTextField.getText().isEmpty() && nameTextField.getText().isEmpty()
-             && !hoursTextField.getText().isEmpty())
-        {
-            throw new InvalidInputException("Minutes cannot be blank");
-        }
-        else if (minutesTextField.getText().isEmpty() && !hoursTextField.getText().isEmpty()
-                && !nameTextField.getText().isEmpty())
-        {
-            throw new InvalidInputException("Minutes cannot be blank");
-        }
-        else if (areAllBlank())
+        if (areAllBlank())
         {
             return true;
         }
-        else if (!minutesTextField.getText().isEmpty() || !nameTextField.getText().isEmpty())
+        else if (!minutesTextField.getText().isEmpty())
         {
             try
             {
-                if (Integer.parseInt(minutesTextField.getText()) < 0 ||
-                        Integer.parseInt(minutesTextField.getText()) > 59 )
+                if (Integer.parseInt(minutesTextField.getText()) >= 0 &&
+                        Integer.parseInt(minutesTextField.getText()) <= 59)
                 {
-                    throw new InvalidInputException("Minutes must be between 0 and 59");
+                    result = true;
                 }
-                result = true;
             }
             catch (NumberFormatException nfe)
             {
-                throw new InvalidInputException("Minutes must be a number");
+                logger.debug("Invalid input in minutes text field: {}", nfe.getMessage());
             }
         }
         logger.debug("validate minutes text field: {}", result);
@@ -612,9 +595,9 @@ public class AlarmPanel extends ClockPanel implements Runnable
      */
     boolean validateTheCheckBoxes(List<DayOfWeek> days)
     {
-        if (days.isEmpty()) { throw new InvalidInputException("Days cannot be empty"); }
-        logger.debug("checkboxes are valid");
-        return true;
+        boolean result = !days.isEmpty();
+        logger.debug("checkboxes are {}", result);
+        return result;
     }
 
     /**
@@ -643,17 +626,15 @@ public class AlarmPanel extends ClockPanel implements Runnable
         return allBlank;
     }
 
-    /**
-     * Validates all the text fields
-     */
-    public boolean validateTextFields()
+    /** Validates all the inputs used to create an alarm */
+    public boolean validateAllInputs()
     {
         boolean validTextFields;
         boolean validHours = validateHoursTextField();
         boolean validMinutes = validateMinutesTextField();
-        if (areAllBlank())
+        if (areAllBlank() && !nameTextField.getText().isEmpty())
         {
-            throw new InvalidInputException("Hours cannot be blank");
+            return false;
         }
         boolean validCheckboxes = validateTheCheckBoxes(getDaysChecked());
         validTextFields = validHours && validMinutes && validCheckboxes
@@ -668,25 +649,23 @@ public class AlarmPanel extends ClockPanel implements Runnable
     public void setAlarm(ActionEvent action)
     {
         logger.info("set alarm");
-        Alarm alarm;
         try {
-            alarm = createAlarm();
+            Alarm alarm = createAlarm();
             // checks equality
-            if (alarm != null && !clock.getListOfAlarms().contains(alarm)) {
+            if (!clock.getListOfAlarms().contains(alarm))
+            {
                 clock.getListOfAlarms().add(alarm);
                 resetAlarmPanel();
             }
-            else if (alarm == null) {
-                logger.warn("alarm is null");
-            }
-            else {
+            else
+            {
                 logger.warn("alarm already exists");
                 displayPopupMessage(ALARM_ERROR, "Alarm already exists!", JOptionPane.ERROR_MESSAGE);
             }
         }
         catch (InvalidInputException iie)
         {
-            logger.warn("Invalid input: {}", iie.getMessage());
+            logger.error("Invalid input: {}", iie.getMessage());
             displayPopupMessage(ALARM_ERROR, iie.getMessage(), JOptionPane.ERROR_MESSAGE);
         }
     }
@@ -696,11 +675,11 @@ public class AlarmPanel extends ClockPanel implements Runnable
      * defined in setAlarm
      * @return Alarm
      */
-    public Alarm createAlarm()
+    private Alarm createAlarm()
     {
         logger.info("creating alarm");
-        Alarm alarm = null;
-        if (validateTextFields())
+        Alarm alarm;
+        if (validateAllInputs())
         {
             if (EMPTY.equals(hoursTextField.getText())) hoursTextField.setText(ZERO);
             if (EMPTY.equals(minutesTextField.getText())) minutesTextField.setText(ZERO);
@@ -717,19 +696,11 @@ public class AlarmPanel extends ClockPanel implements Runnable
             String alarmName = nameTextField.getText();
             List<DayOfWeek> days = getDaysChecked();
             alarm = new Alarm(alarmName, hour, minutes, ampm, days, false, getClock());
-            StringBuilder daysStr = new StringBuilder();
-            daysStr.append("days: ");
-            for(DayOfWeek day: days)
-            {
-                daysStr.append(day);
-                daysStr.append("\t");
-            }
-            logger.info("days: {}", daysStr);
             logger.info("Created an alarm: {}", alarm);
         }
         else {
             logger.error("One of the text fields is not valid");
-            throw new InvalidInputException("Invalid text field value, null alarm");
+            throw new InvalidInputException("Invalid text field value, no alarm");
         }
         return alarm;
     }
@@ -777,13 +748,13 @@ public class AlarmPanel extends ClockPanel implements Runnable
             wednesdayCheckBox.setSelected(true);
             thursdayCheckBox.setSelected(true);
             fridayCheckBox.setSelected(true);
-            weekCheckBox.setSelected(true);
+            weekdaysCheckBox.setSelected(true);
         }
         if (alarmToUpdate.getDays().contains(SATURDAY) &&
                 alarmToUpdate.getDays().contains(SUNDAY)) {
             saturdayCheckBox.setSelected(true);
             sundayCheckBox.setSelected(true);
-            weekendCheckBox.setSelected(true);
+            weekendsCheckBox.setSelected(true);
         }
     }
 
@@ -841,11 +812,14 @@ public class AlarmPanel extends ClockPanel implements Runnable
     public GridBagLayout getGridBagLayout() { return this.layout; }
     public GridBagConstraints getGridBagConstraints() { return this.constraints; }
     public Clock getClock() { return this.clockFrame.getClock(); }
+    public JLabel getNameLabel() { return this.nameLabel; }
     public JLabel getHoursLabel() { return this.hoursLabel; }
     public JLabel getMinutesLabel() { return this.minutesLabel; }
-    public JLabel getAMPMLabel() { return this.ampmLabel; }
+    public JLabel getAmpmLabel() { return this.ampmLabel; }
+    public JTextField getNameTextField() { return this.nameTextField; }
     public JTextField getHoursTextField() { return this.hoursTextField; }
     public JTextField getMinutesTextField() { return this.minutesTextField; }
+    public JComboBox<String> getAmpmDropDown() { return this.ampmDropDown; }
     public JButton getSetAlarmButton() { return this.setAlarmButton; }
     public JCheckBox getMondayCheckBox() { return mondayCheckBox; }
     public JCheckBox getTuesdayCheckBox() { return tuesdayCheckBox; }
@@ -854,30 +828,30 @@ public class AlarmPanel extends ClockPanel implements Runnable
     public JCheckBox getFridayCheckBox() { return fridayCheckBox; }
     public JCheckBox getSaturdayCheckBox() { return saturdayCheckBox; }
     public JCheckBox getSundayCheckBox() { return sundayCheckBox; }
-    public JCheckBox getWeekCheckBox() { return weekCheckBox; }
-    public JCheckBox getWeekendCheckBox() { return weekendCheckBox; }
-    public JComboBox<String> getJComboBox() { return this.ampmDropDown; }
+    public JCheckBox getWeekdaysCheckBox() { return weekdaysCheckBox; }
+    public JCheckBox getWeekendsCheckBox() { return weekendsCheckBox; }
 
     /* Setters */
-    private void setClockFrame(ClockFrame clockFrame) { this.clockFrame = clockFrame; logger.debug("clockFrame set"); }
-    protected void setGridBagLayout(GridBagLayout layout) { this.layout = layout; }
-    protected void setGridBagConstraints(GridBagConstraints constraints) { this.constraints = constraints; }
-    protected void setJAlarmLbl1(JLabel alarmLabel1) { this.hoursLabel = alarmLabel1; }
-    protected void setJAlarmLbl2(JLabel alarmLabel2) { this.minutesLabel = alarmLabel2; }
-    protected void setJAlarmLbl3(JLabel alarmLabel3) { this.ampmLabel = alarmLabel3; }
-    protected void setJTextField1(JTextField textField1) { this.hoursTextField = textField1; }
-    protected void setJTextField2(JTextField textField2) { this.minutesTextField = textField2; }
-    protected void setSetAlarmButton(JButton setAlarmButton) { this.setAlarmButton = setAlarmButton; }
-    protected void setMondayCheckBox(JCheckBox mondayCheckBox) { this.mondayCheckBox = mondayCheckBox; }
-    protected void setTuesdayCheckBox(JCheckBox tuesdayCheckBox) { this.tuesdayCheckBox = tuesdayCheckBox; }
-    protected void setWednesdayCheckBox(JCheckBox wednesdayCheckBox) { this.wednesdayCheckBox = wednesdayCheckBox; }
-    protected void setThursdayCheckBox(JCheckBox thursdayCheckBox) { this.thursdayCheckBox = thursdayCheckBox; }
-    protected void setFridayCheckBox(JCheckBox fridayCheckBox) { this.fridayCheckBox = fridayCheckBox; }
-    protected void setSaturdayCheckBox(JCheckBox saturdayCheckBox) { this.saturdayCheckBox = saturdayCheckBox; }
-    protected void setSundayCheckBox(JCheckBox sundayCheckBox) { this.sundayCheckBox = sundayCheckBox; }
-    protected void setWeekCheckBox(JCheckBox weekCheckBox) { this.weekCheckBox = weekCheckBox; }
-    protected void setWeekendCheckBox(JCheckBox weekendCheckBox) { this.weekendCheckBox = weekendCheckBox; }
-    public void setClock(Clock clock) { this.clock = clock; logger.info("Clock set in AlarmPanel"); }
-    private void setDateOperationsDropdown(JComboBox<String> ampmDropDown) { this.ampmDropDown = ampmDropDown; }
-
+    public void setClock(Clock clock) { this.clock = clock; logger.info("clock set"); }
+    protected void setClockFrame(ClockFrame clockFrame) { this.clockFrame = clockFrame; logger.debug("clockFrame set"); }
+    protected void setGridBagLayout(GridBagLayout layout) { this.layout = layout; logger.debug("layout set"); }
+    protected void setGridBagConstraints(GridBagConstraints constraints) { this.constraints = constraints; logger.debug("constraints set"); }
+    protected void setNameLabel(JLabel nameLabel) { this.nameLabel = nameLabel; logger.debug("nameLabel set"); }
+    protected void setHoursLabel(JLabel alarmLabel1) { this.hoursLabel = alarmLabel1; logger.debug("hoursLabel set"); }
+    protected void setMinutesLabel(JLabel alarmLabel2) { this.minutesLabel = alarmLabel2; logger.debug("minutesLabel set"); }
+    protected void setAmpmLabel(JLabel alarmLabel3) { this.ampmLabel = alarmLabel3; logger.debug("ampmLabel set"); }
+    protected void setAmpmDropDown(JComboBox<String> ampmDropDown) { this.ampmDropDown = ampmDropDown; logger.debug("ampmDropDown set"); }
+    protected void setNameTextField(JTextField nameTextField) { this.nameTextField = nameTextField; logger.debug("nameTextField set"); }
+    protected void setHoursTextField(JTextField textField1) { this.hoursTextField = textField1; logger.debug("hoursTextField set"); }
+    protected void setMinutesTextField(JTextField textField2) { this.minutesTextField = textField2; logger.debug("minutesTextField set"); }
+    protected void setSetAlarmButton(JButton setAlarmButton) { this.setAlarmButton = setAlarmButton; logger.debug("setAlarmButton set"); }
+    protected void setMondayCheckBox(JCheckBox mondayCheckBox) { this.mondayCheckBox = mondayCheckBox; logger.debug("mondayCheckBox set"); }
+    protected void setTuesdayCheckBox(JCheckBox tuesdayCheckBox) { this.tuesdayCheckBox = tuesdayCheckBox; logger.debug("tuesdayCheckBox set"); }
+    protected void setWednesdayCheckBox(JCheckBox wednesdayCheckBox) { this.wednesdayCheckBox = wednesdayCheckBox; logger.debug("wednesdayCheckBox set"); }
+    protected void setThursdayCheckBox(JCheckBox thursdayCheckBox) { this.thursdayCheckBox = thursdayCheckBox; logger.debug("thursdayCheckBox set"); }
+    protected void setFridayCheckBox(JCheckBox fridayCheckBox) { this.fridayCheckBox = fridayCheckBox; logger.debug("fridayCheckBox set"); }
+    protected void setSaturdayCheckBox(JCheckBox saturdayCheckBox) { this.saturdayCheckBox = saturdayCheckBox; logger.debug("saturdayCheckBox set"); }
+    protected void setSundayCheckBox(JCheckBox sundayCheckBox) { this.sundayCheckBox = sundayCheckBox; logger.debug("sundayCheckBox set"); }
+    protected void setWeekdaysCheckBox(JCheckBox weekdaysCheckBox) { this.weekdaysCheckBox = weekdaysCheckBox; logger.debug("weekCheckBox set"); }
+    protected void setWeekendsCheckBox(JCheckBox weekendsCheckBox) { this.weekendsCheckBox = weekendsCheckBox; logger.debug("weekendCheckBox set"); }
 }

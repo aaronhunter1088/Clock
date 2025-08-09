@@ -33,8 +33,6 @@ class TimerPanelTest
     Clock clock;
 
     TimerPanel timerPanel;
-    @Mock
-    ActionEvent action;
 
     @BeforeAll
     static void beforeClass()
