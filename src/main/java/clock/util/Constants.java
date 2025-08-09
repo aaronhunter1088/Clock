@@ -57,6 +57,7 @@ public class Constants {
     public static final String STAR = "*";
     public static final String SLASH = "/";
     public static final String TEN = "10";
+    public static final String TEST = "Test";
     public static final String THREE = "3";
     public static final String Turn = "Turn";
     public static final String TWELVE = "12";
@@ -98,6 +99,7 @@ public class Constants {
     public static final String TIMER_HOUR_ERROR_24 = "0 <= "+HOUR+" > 24";
     public static final String TIMER_MIN_ERROR = "0 <= "+MIN+" > 60";
     public static final String TIMER_SEC_ERROR = "0 <= "+SEC+" > 60";
+    public static final String TIMER_ERROR = "Timer Error";
     public static final String VIEW_TIMERS = "View Timers";
     public static final String VIEW_STOPWATCH = "View Stopwatch";
     public static final String ZERO = "0";

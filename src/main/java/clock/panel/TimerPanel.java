@@ -49,9 +49,9 @@ public class TimerPanel extends ClockPanel implements Runnable
                    minutesLabel,
                    secondsLabel;
     private JTextField nameTextField,
-                       hourTextField,
-                       minuteTextField,
-                       secondTextField;
+                       hoursTextField,
+                       minutesTextField,
+                       secondsTextField;
     private JButton setTimerButton,
                     resetButton;
     private JTable timersTable;
@@ -73,8 +73,6 @@ public class TimerPanel extends ClockPanel implements Runnable
         setGridBagLayout(new GridBagLayout());
         setLayout(layout);
         setGridBagConstraints(new GridBagConstraints());
-        setBackground(Color.BLACK);
-        setForeground(Color.BLACK);
         setupTimerPanel();
         addComponentsToPanel();
         SwingUtilities.updateComponentTreeUI(this);
@@ -94,17 +92,17 @@ public class TimerPanel extends ClockPanel implements Runnable
         nameTextField.requestFocusInWindow();
         hoursLabel = new JLabel(Hours, SwingConstants.CENTER);
         hoursLabel.setName(Hours+LABEL);
-        hourTextField = new JTextField(EMPTY, 4);
-        hourTextField.setName(HOUR+ TEXT_FIELD);
+        hoursTextField = new JTextField(EMPTY, 4);
+        hoursTextField.setName(HOUR+ TEXT_FIELD);
         minutesLabel = new JLabel(Minutes, SwingConstants.CENTER);
         minutesLabel.setName(Minutes+LABEL);
-        minuteTextField = new JTextField(EMPTY, 4);
-        minuteTextField.setName(MIN+ TEXT_FIELD);
+        minutesTextField = new JTextField(EMPTY, 4);
+        minutesTextField.setName(MIN+ TEXT_FIELD);
         secondsLabel = new JLabel(Seconds, SwingConstants.CENTER);
         secondsLabel.setName(Seconds+LABEL);
-        secondTextField = new JTextField(EMPTY, 4);
-        secondTextField.setName(SEC+ TEXT_FIELD);
-        List.of(nameTextField, hourTextField, minuteTextField, secondTextField).forEach(textField -> {
+        secondsTextField = new JTextField(EMPTY, 4);
+        secondsTextField.setName(SEC+ TEXT_FIELD);
+        List.of(nameTextField, hoursTextField, minutesTextField, secondsTextField).forEach(textField -> {
             textField.setFont(ClockFrame.font20);
             textField.setForeground(Color.BLACK);
             //textField.setPreferredSize(new Dimension(50, 50));
@@ -124,7 +122,6 @@ public class TimerPanel extends ClockPanel implements Runnable
                         case HOUR+TEXT_FIELD -> { logger.debug("Focus gained on hour field"); }
                         case MIN+TEXT_FIELD -> { logger.debug("Focus gained on minute field"); }
                         case SEC+TEXT_FIELD -> { logger.debug("Focus gained on second field"); }
-                        case null -> logger.warn("Lost focus on a text field with no name");
                         default -> throw new InvalidInputException("Lost focus on an unknown text field: " + e.getSource());
                     }
                 }
@@ -140,80 +137,80 @@ public class TimerPanel extends ClockPanel implements Runnable
                         }
                         case HOUR+TEXT_FIELD -> {
                             try {
-                                if (StringUtils.isNotBlank(hourTextField.getText()) && Integer.parseInt(hourTextField.getText()) >= 0)
+                                if (StringUtils.isNotBlank(hoursTextField.getText()) && Integer.parseInt(hoursTextField.getText()) >= 0)
                                 {
-                                    int hour = Integer.parseInt(hourTextField.getText());
+                                    int hour = Integer.parseInt(hoursTextField.getText());
                                     if (hour < 24 && hour >= 0)
                                     {
                                         setTimerButton.setText(SET);
-                                        hourTextField.setBorder(new LineBorder(Color.ORANGE));
+                                        hoursTextField.setBorder(new LineBorder(Color.ORANGE));
                                     }
                                     else
                                     {
                                         setTimerButton.setText(TIMER_HOUR_ERROR_24);
-                                        hourTextField.setBorder(new LineBorder(Color.RED));
-                                        hourTextField.requestFocusInWindow();
+                                        hoursTextField.setBorder(new LineBorder(Color.RED));
+                                        hoursTextField.requestFocusInWindow();
                                     }
                                 }
                             }
                             catch (NumberFormatException ignored) {
-                                logger.warn("Hour field is not a number: {}", hourTextField.getText());
-                                hourTextField.setBorder(new LineBorder(Color.RED));
-                                hourTextField.requestFocusInWindow();
+                                logger.warn("Hour field is not a number: {}", hoursTextField.getText());
+                                hoursTextField.setBorder(new LineBorder(Color.RED));
+                                hoursTextField.requestFocusInWindow();
                             }
                         }
                         case MIN+TEXT_FIELD -> {
                             try {
-                                if (StringUtils.isNotBlank(minuteTextField.getText()) && Integer.parseInt(minuteTextField.getText()) >= 0)
+                                if (StringUtils.isNotBlank(minutesTextField.getText()) && Integer.parseInt(minutesTextField.getText()) >= 0)
                                 {
-                                    int minute = Integer.parseInt(minuteTextField.getText());
+                                    int minute = Integer.parseInt(minutesTextField.getText());
                                     if (minute < 60 && minute >= 0)
                                     {
                                         setTimerButton.setText(SET);
-                                        minuteTextField.setBorder(new LineBorder(Color.ORANGE));
+                                        minutesTextField.setBorder(new LineBorder(Color.ORANGE));
                                     }
                                     else
                                     {
                                         setTimerButton.setText(TIMER_MIN_ERROR);
-                                        minuteTextField.setBorder(new LineBorder(Color.RED));
-                                        minuteTextField.requestFocusInWindow();
+                                        minutesTextField.setBorder(new LineBorder(Color.RED));
+                                        minutesTextField.requestFocusInWindow();
                                     }
                                 }
                             }
                             catch (NumberFormatException ignored) {
-                                logger.warn("Minute field is not a number: {}", minuteTextField.getText());
-                                minuteTextField.setBorder(new LineBorder(Color.RED));
-                                minuteTextField.requestFocusInWindow();
+                                logger.warn("Minute field is not a number: {}", minutesTextField.getText());
+                                minutesTextField.setBorder(new LineBorder(Color.RED));
+                                minutesTextField.requestFocusInWindow();
                             }
                         }
                         case SEC+TEXT_FIELD -> {
                             try {
-                                if (StringUtils.isNotBlank(secondTextField.getText()) && Integer.parseInt(secondTextField.getText()) >= 0)
+                                if (StringUtils.isNotBlank(secondsTextField.getText()) && Integer.parseInt(secondsTextField.getText()) >= 0)
                                 {
-                                    int second = Integer.parseInt(secondTextField.getText());
+                                    int second = Integer.parseInt(secondsTextField.getText());
                                     if (second < 60 && second >= 0)
                                     {
                                         setTimerButton.setText(SET);
-                                        secondTextField.setBorder(new LineBorder(Color.ORANGE));
+                                        secondsTextField.setBorder(new LineBorder(Color.ORANGE));
                                     }
                                     else
                                     {
                                         setTimerButton.setText(TIMER_SEC_ERROR);
-                                        secondTextField.setBorder(new LineBorder(Color.RED));
-                                        secondTextField.requestFocusInWindow();
+                                        secondsTextField.setBorder(new LineBorder(Color.RED));
+                                        secondsTextField.requestFocusInWindow();
                                     }
                                 }
                             }
                             catch (NumberFormatException ignored) {
-                                logger.warn("Second field is not a number: {}", secondTextField.getText());
-                                secondTextField.setBorder(new LineBorder(Color.RED));
-                                secondTextField.requestFocusInWindow();
+                                logger.warn("Second field is not a number: {}", secondsTextField.getText());
+                                secondsTextField.setBorder(new LineBorder(Color.RED));
+                                secondsTextField.requestFocusInWindow();
                             }
                         }
                         case null -> logger.warn("Lost focus on a text field with no name");
                         default -> throw new InvalidInputException("Lost focus on an unknown text field: " + e.getSource());
                     }
-                    enableDisableTimerButton();
+                    //enableDisableTimerButton();
                 }
             });
         });
@@ -227,13 +224,10 @@ public class TimerPanel extends ClockPanel implements Runnable
             button.setFont(ClockFrame.font20);
             button.setOpaque(true);
             button.setBackground(Color.BLACK);
-            button.setForeground(Color.WHITE);
-            button.setBorder(new LineBorder(Color.WHITE));
+            button.setForeground(Color.BLACK);
+            //button.setBorder(new LineBorder(Color.WHITE));
         });
         setTimerButton.addActionListener(this::setTimer);
-        setTimerButton.setEnabled(false);
-        resetButton.addActionListener(this::resetTimerPanel);
-        resetButton.setEnabled(false);
         setupTimersTableDefaults(true);
         setupDefaultValues();
     }
@@ -251,6 +245,8 @@ public class TimerPanel extends ClockPanel implements Runnable
     /** Sets up the default values for the timer panel. */
     public void setupDefaultValues()
     {
+        setBackground(Color.BLACK);
+        setForeground(Color.BLACK);
         setupSettingsMenu();
         clockFrame.setTitle("Timer Panel");
         start();
@@ -407,17 +403,17 @@ public class TimerPanel extends ClockPanel implements Runnable
         addComponent(nameLabel,0,0,1,1,0,0, 1, 0, GridBagConstraints.NONE, new Insets(0,0,0,0));
         addComponent(nameTextField,0,1,1,1,0,0, 3, 0, GridBagConstraints.BOTH, new Insets(0,0,0,0));
         addComponent(hoursLabel,0,3,1,1, 0,0, 1, 0, GridBagConstraints.NONE, new Insets(0,0,0,0));
-        addComponent(hourTextField,0,4,1,1, 0,0, 1, 0, GridBagConstraints.BOTH, new Insets(0,0,0,0));
+        addComponent(hoursTextField,0,4,1,1, 0,0, 1, 0, GridBagConstraints.BOTH, new Insets(0,0,0,0));
         addComponent(minutesLabel,0,5,1,1, 0,0, 1, 0, GridBagConstraints.NONE, new Insets(0,0,0,0));
-        addComponent(minuteTextField,0,6,1,1, 0,0, 1, 0, GridBagConstraints.BOTH, new Insets(0,0,0,0));
+        addComponent(minutesTextField,0,6,1,1, 0,0, 1, 0, GridBagConstraints.BOTH, new Insets(0,0,0,0));
         addComponent(secondsLabel,0,7,1,1, 0,0, 1, 0, GridBagConstraints.NONE, new Insets(0,0,0,0));
-        addComponent(secondTextField,0,8,1,1, 0,0, 1, 0, GridBagConstraints.BOTH, new Insets(0,0,0,0));
-        addComponent(resetButton,0,9,1,1, 0,0, 1, 0, GridBagConstraints.NONE, new Insets(0,0,0,0));
-        addComponent(setTimerButton,0,10,1,1, 0,0, 1, 0, GridBagConstraints.NONE, new Insets(0,0,0,0));
+        addComponent(secondsTextField,0,8,1,1, 0,0, 1, 0, GridBagConstraints.BOTH, new Insets(0,0,0,0));
+        //addComponent(resetButton,0,9,1,1, 0,0, 1, 0, GridBagConstraints.NONE, new Insets(0,0,0,0));
+        addComponent(setTimerButton,0,9,1,1, 0,0, 1, 0, GridBagConstraints.NONE, new Insets(0,0,0,0));
 
         // leaving row 1 blank for spacing
 
-        addComponent(scrollTable, 2, 0, 11, 1, 0, 0, 1, 2, GridBagConstraints.BOTH, new Insets(0,0,0,0));
+        addComponent(scrollTable, 2, 0, 10, 1, 0, 0, 1, 2, GridBagConstraints.BOTH, new Insets(0,0,0,0));
 
         constraints.weighty = 4;
         constraints.weightx = 2;
@@ -462,11 +458,11 @@ public class TimerPanel extends ClockPanel implements Runnable
     public void enableDisableTimerButton()
     {
         logger.debug("enable timer button");
-        var allValid = validateFirstTextField() && validateSecondTextField() && validateThirdTextField();
-        var allAreNotZeroes = !(ZERO.equals(hourTextField.getText()) && ZERO.equals(minuteTextField.getText()) && ZERO.equals(secondTextField.getText()));
+        var allValid = validateHoursTextField() && validateMinutesTextField() && validateSecondsTextField();
+        var allAreNotZeroes = !(ZERO.equals(hoursTextField.getText()) && ZERO.equals(minutesTextField.getText()) && ZERO.equals(secondsTextField.getText()));
         var someNotBlank = areSomeNotBlank();
-        logger.debug("enabled?: {}", allValid && allAreNotZeroes);
-        setTimerButton.setEnabled(allValid && allAreNotZeroes && someNotBlank);
+        logger.debug("enabled?: {}", allValid && allAreNotZeroes && someNotBlank);
+        //setTimerButton.setEnabled(allValid && allAreNotZeroes && someNotBlank);
     }
 
     /**
@@ -476,12 +472,18 @@ public class TimerPanel extends ClockPanel implements Runnable
     public void setTimer(ActionEvent action)
     {
         logger.debug("set timer");
-        clock.entity.Timer timer = createTimer();
-        logger.debug("timer created: {}", timer);
-        clock.getListOfTimers().add(timer);
-        clearTextFields();
-        resetButton.setEnabled(true);
-        setTimerButton.setEnabled(false);
+        clock.entity.Timer timer = null;
+        try {
+            timer = createTimer();
+            logger.debug("timer created: {}", timer);
+            clock.getListOfTimers().add(timer);
+            clearTextFields();
+        }
+        catch (InvalidInputException iie)
+        {
+            logger.error("Invalid input exception: {}", iie.getMessage());
+            displayPopupMessage(TIMER_ERROR, "Hours, minutes, and/or seconds must be set", 0);
+        }
     }
 
     /**
@@ -491,24 +493,16 @@ public class TimerPanel extends ClockPanel implements Runnable
     {
         logger.debug("creating timer");
         clock.entity.Timer timer = null;
-        try
-        {
-            if (validTextFields()) {
-                if (EMPTY.equals(nameTextField.getText())) nameTextField.setText(TIMER+(Timer.timersCounter+1));
-                if (EMPTY.equals(hourTextField.getText())) hourTextField.setText(ZERO);
-                if (EMPTY.equals(minuteTextField.getText())) minuteTextField.setText(ZERO);
-                if (EMPTY.equals(secondTextField.getText())) secondTextField.setText(ZERO);
+        if (validTextFields()) {
+            if (EMPTY.equals(hoursTextField.getText())) hoursTextField.setText(ZERO);
+            if (EMPTY.equals(minutesTextField.getText())) minutesTextField.setText(ZERO);
+            if (EMPTY.equals(secondsTextField.getText())) secondsTextField.setText(ZERO);
 
-                timer = new clock.entity.Timer(Integer.parseInt(hourTextField.getText()), Integer.parseInt(minuteTextField.getText()),
-                        Integer.parseInt(secondTextField.getText()), nameTextField.getText(), clockFrame.getClock());
-            }
-            else {
-                logger.error("One of the text fields is not valid");
-            }
+            timer = new Timer(Integer.parseInt(hoursTextField.getText()), Integer.parseInt(minutesTextField.getText()),
+                    Integer.parseInt(secondsTextField.getText()), nameTextField.getText(), clockFrame.getClock());
         }
-        catch (InvalidInputException iie)
-        {
-            logger.error("Invalid input exception: {}", iie.getMessage());
+        else {
+            logger.error("One of the text fields is not valid");
         }
         return timer;
     }
@@ -524,8 +518,6 @@ public class TimerPanel extends ClockPanel implements Runnable
         timersTable.setModel(new javax.swing.table.DefaultTableModel());
         clock.getListOfTimers().clear();
         logger.info("all timers cleared");
-        resetButton.setEnabled(false);
-        setTimerButton.setEnabled(false);
     }
 
     /**
@@ -535,60 +527,75 @@ public class TimerPanel extends ClockPanel implements Runnable
     {
         logger.debug("clearing timer fields");
         nameTextField.setText(EMPTY);
-        hourTextField.setText(EMPTY);
-        minuteTextField.setText(EMPTY);
-        secondTextField.setText(EMPTY);
+        hoursTextField.setText(EMPTY);
+        minutesTextField.setText(EMPTY);
+        secondsTextField.setText(EMPTY);
         logger.debug("timer button set to {}", SET);
         setTimerButton.setText(SET);
     }
 
     /**
-     * Validates the first text field
+     * Validates the hours text field
      * @return true if the text field is valid
      */
-    public boolean validateFirstTextField()
+    public boolean validateHoursTextField()
     {
-        boolean result;
-        if (EMPTY.equals(hourTextField.getText())) { result = true; }
-        // by default, cannot be more than 23 hours or less than 0
-        else {
-            result = Integer.parseInt(hourTextField.getText()) < 24 &&
-                    Integer.parseInt(hourTextField.getText()) >= 0;
+        if (hoursTextField.getText().isEmpty() && nameTextField.getText().isEmpty()) {
+            throw new InvalidInputException("Hour cannot be blank");
         }
-        logger.info("validate first text field result: {}", result);
-        return result;
+        else if (!nameTextField.getText().isEmpty() && !hoursTextField.getText().isEmpty() &&
+                !minutesTextField.getText().isEmpty())
+        {
+            return true;
+        }
+        else
+        {
+            try
+            {
+                int upperLimit = clockFrame.getClock().isShowMilitaryTime() ? 23 : 12;
+                if (Integer.parseInt(hoursTextField.getText()) <= 0 || Integer.parseInt(hoursTextField.getText()) > upperLimit)
+                {
+                    throw new InvalidInputException("Hours must be between 0 and " + upperLimit);
+                }
+            }
+            catch (NumberFormatException nfe)
+            {
+                throw new InvalidInputException("Hours must be a number");
+            }
+        }
+        return true;
     }
 
     /**
-     * Validates the second text field
+     * Validates the minutes text field
      * @return true if the text field is valid
      */
-    public boolean validateSecondTextField()
+    public boolean validateMinutesTextField()
     {
         boolean result;
-        if (EMPTY.equals(minuteTextField.getText())) { result = true; }
-        else if (!NumberUtils.isNumber(minuteTextField.getText())) { result = false; }
+        if (EMPTY.equals(minutesTextField.getText())) { result = true; }
+        else if (!NumberUtils.isNumber(minutesTextField.getText())) { result = false; }
         else {
-            result = Integer.parseInt(minuteTextField.getText()) < 60 &&
-                    Integer.parseInt(minuteTextField.getText()) >= 0;
+            result = Integer.parseInt(minutesTextField.getText()) < 60 &&
+                    Integer.parseInt(minutesTextField.getText()) >= 0;
         }
         logger.info("validate second text field result: {}", result);
         return result;
     }
 
     /**
-     * Validates the third text field
+     * Validates the seconds text field
      * @return true if the text field is valid
      */
-    public boolean validateThirdTextField()
+    public boolean validateSecondsTextField()
     {
         boolean result;
-        if (EMPTY.equals(secondTextField.getText())) { result = true; }
-        else if (!NumberUtils.isNumber(secondTextField.getText())) { result = false; }
+        if (EMPTY.equals(secondsTextField.getText())) { result = true; }
+        else if (!NumberUtils.isNumber(secondsTextField.getText())) { result = false; }
         else
         {
-            result = Integer.parseInt(secondTextField.getText()) < 60 &&
-                    Integer.parseInt(secondTextField.getText()) >= 0;
+            result = Integer.parseInt(secondsTextField.getText()) < 60 &&
+                    Integer.parseInt(secondsTextField.getText()) >= 0;
         }
         logger.info("validate third text field result: {}", result);
         return result;
@@ -600,9 +607,9 @@ public class TimerPanel extends ClockPanel implements Runnable
      */
     public boolean areAllNotZeroes()
     {
-        boolean hoursIsZero = ZERO.equals(hourTextField.getText());
-        boolean minutesIsZero = ZERO.equals(minuteTextField.getText());
-        boolean secondsIsZero = ZERO.equals(secondTextField.getText());
+        boolean hoursIsZero = ZERO.equals(hoursTextField.getText());
+        boolean minutesIsZero = ZERO.equals(minutesTextField.getText());
+        boolean secondsIsZero = ZERO.equals(secondsTextField.getText());
         boolean allNotZero = !(hoursIsZero && minutesIsZero && secondsIsZero);
         logger.info("are all not zeroes: {}", allNotZero);
         return allNotZero;
@@ -614,8 +621,8 @@ public class TimerPanel extends ClockPanel implements Runnable
      */
     public boolean areSomeNotBlank()
     {
-        boolean someNotBlank = !StringUtils.isBlank(hourTextField.getText()) || !StringUtils.isBlank(minuteTextField.getText()) ||
-                !StringUtils.isBlank(secondTextField.getText());
+        boolean someNotBlank = !StringUtils.isBlank(hoursTextField.getText()) || !StringUtils.isBlank(minutesTextField.getText()) ||
+                !StringUtils.isBlank(secondsTextField.getText());
         logger.info("are some not blank: {}", someNotBlank);
         return someNotBlank;
     }
@@ -626,7 +633,7 @@ public class TimerPanel extends ClockPanel implements Runnable
      */
     public boolean validTextFields()
     {
-        return validateFirstTextField() && validateSecondTextField() && validateThirdTextField()
+        return validateHoursTextField() && validateMinutesTextField() && validateSecondsTextField()
                 && areAllNotZeroes() && areSomeNotBlank();
     }
 
@@ -684,9 +691,9 @@ public class TimerPanel extends ClockPanel implements Runnable
     public GridBagLayout getGridBagLayout() { return this.layout; }
     public GridBagConstraints getGridBagConstraints() { return this.constraints; }
     public Clock getClock() { return clockFrame.getClock(); }
-    public JTextField getHourTextField() { return hourTextField; }
-    public JTextField getMinuteTextField() { return minuteTextField; }
-    public JTextField getSecondTextField() { return secondTextField; }
+    public JTextField getHoursTextField() { return hoursTextField; }
+    public JTextField getMinutesTextField() { return minutesTextField; }
+    public JTextField getSecondsTextField() { return secondsTextField; }
     public JButton getResetButton() { return resetButton; }
     public JButton getSetTimerButton() { return setTimerButton; }
 
@@ -695,9 +702,9 @@ public class TimerPanel extends ClockPanel implements Runnable
     protected void setGridBagLayout(GridBagLayout layout) { this.layout = layout; logger.debug("layout set"); }
     protected void setGridBagConstraints(GridBagConstraints constraints) { this.constraints = constraints; logger.debug("constraints set"); }
     public void setClock(Clock clock) { this.clock = clock; logger.debug("Clock set in TimerPanel"); }
-    public void setHourTextField(JTextField hourTextField) { this.hourTextField = hourTextField; }
-    public void setMinuteTextField(JTextField minuteTextField) { this.minuteTextField = minuteTextField; }
-    public void setSecondTextField(JTextField secondTextField) { this.secondTextField = secondTextField; }
+    public void setHoursTextField(JTextField hoursTextField) { this.hoursTextField = hoursTextField; }
+    public void setMinutesTextField(JTextField minutesTextField) { this.minutesTextField = minutesTextField; }
+    public void setSecondsTextField(JTextField secondsTextField) { this.secondsTextField = secondsTextField; }
     public void setSetTimerButton(JButton setTimerButton) { this.setTimerButton = setTimerButton; }
     public void setResetButton(JButton resetButton) { this.resetButton = resetButton; }
 }

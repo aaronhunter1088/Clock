@@ -69,7 +69,7 @@ public class ClockFrame extends JFrame
     public ClockFrame(clock.entity.Panel panelType)
     {
         super(CLOCK);
-        this.panelType = panelType;
+        setPanelType(panelType);
         initialize(null);
     }
 
@@ -79,7 +79,7 @@ public class ClockFrame extends JFrame
      */
     public ClockFrame(Clock clock)
     {
-        super("Test" + SPACE + CLOCK);
+        super(TEST + SPACE + CLOCK);
         logger.info("Creating ClockFrame with test clock");
         initialize(clock);
     }
@@ -100,9 +100,7 @@ public class ClockFrame extends JFrame
         taskbar.setIconImage(icon.getImage());
         setIconImage(icon.getImage());
         setLocationRelativeTo(null); // loads the GUI in the center of the screen
-        setVisible(true);
         setResizable(false);
-        logger.info("Creating {} Clock", clock != null ? "Test" : "Regular");
         setClock(clock != null ? clock : new Clock());
         setScheduler(Executors.newScheduledThreadPool(25));
         setupMenuBar(); // daylightSavingsTimeEnabled directly influences menu bar setup
@@ -110,7 +108,8 @@ public class ClockFrame extends JFrame
         setAnalogueClockPanel(new AnalogueClockPanel(this));
         setAlarmPanel(new AlarmPanel(this));
         setTimerPanel(new TimerPanel(this));
-        changePanels(PANEL_DIGITAL_CLOCK);
+        changePanels(panelType != null ? panelType : PANEL_DIGITAL_CLOCK);
+        setVisible(true);
     }
 
     /**
@@ -185,7 +184,7 @@ public class ClockFrame extends JFrame
      */
     public void changePanels(clock.entity.Panel changePanelType)
     {
-        if (changePanelType != panelType)
+        if (changePanelType != panelType || !isVisible())
         {
             logger.info("change panels");
             if (currentPanel != null) remove(currentPanel);
