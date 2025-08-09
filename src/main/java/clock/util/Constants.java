@@ -88,9 +88,11 @@ public class Constants {
     public static final String CURRENT_TIMERS = "Current Timers";
     public static final String HOUR = "Hour";
     public static final String MIN = "Min";
+    public static final String PAUSE = "Pause";
     public static final String PAUSE_TIMER = "Pause Timer";
     public static final String REMOVE = "Remove";
     public static final String RESET = "Reset";
+    public static final String RESUME = "Resume";
     public static final String RESUME_TIMER = "Resume Timer";
     public static final String SEC = "Sec";
     public static final String SET = "Set";

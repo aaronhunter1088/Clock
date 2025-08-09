@@ -27,23 +27,25 @@ public class ClockMenuBar extends JMenuBar
     private final ClockFrame clockFrame;
     private final Clock clock;
     // Two main menu options
-    private JMenu settingsMenu;
-    private JMenu featuresMenu;
+    private JMenu settingsMenu,
+                  featuresMenu;
     // Options for Settings
-    private JMenuItem militaryTimeSetting;
-    private JMenuItem fullTimeSetting;
-    private JMenuItem partialTimeSetting;
-    private JMenuItem toggleDSTSetting;
-    private JMenuItem showDigitalTimeSettingOnAnalogueClockSetting;
-    private JMenuItem pauseResumeAllTimersSetting;
+    private JMenuItem militaryTimeSetting,
+                      fullTimeSetting,
+                      partialTimeSetting,
+                      toggleDSTSetting,
+                      showDigitalTimeSettingOnAnalogueClockSetting,
+                      pauseResumeAllTimersSetting,
+                      resetPanelSetting,
+    // Options for Features
+                      digitalClockFeature,
+                      analogueClockFeature,
+                      alarmsFeature,
+                      timerFeature,
+                      stopwatchFeature;
     private JMenu changeTimeZone;
     private List<JMenuItem> timezones;
-    // Options for Features
-    private JMenuItem digitalClockFeature;
-    private JMenuItem analogueClockFeature;
-    private JMenuItem alarmsFeature;
-    private JMenuItem timerFeature;
-    private JMenuItem stopwatchFeature;
+
 
     /**
      * The main constructor for the clock menu bar.
@@ -159,6 +161,14 @@ public class ClockMenuBar extends JMenuBar
                 getPauseResumeAllTimersSetting().setText("Pause All Timers");
                 getPauseResumeAllTimersSetting().setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_P, InputEvent.CTRL_DOWN_MASK));
             }
+        });
+
+        setResetPanelSetting(new JMenuItem("Reset Panel"));
+        getResetPanelSetting().setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_R, InputEvent.CTRL_DOWN_MASK));
+        getResetPanelSetting().setForeground(Color.WHITE);
+        getResetPanelSetting().addActionListener(action -> {
+            logger.info("clicked reset panel setting");
+            clockFrame.getTimerPanel().resetTimerPanel();
         });
 
         // Features menu choices
@@ -287,6 +297,7 @@ public class ClockMenuBar extends JMenuBar
     public JMenuItem getPartialTimeSetting() { return this.partialTimeSetting; }
     public JMenuItem getToggleDSTSetting() { return toggleDSTSetting; }
     public JMenuItem getPauseResumeAllTimersSetting() { return pauseResumeAllTimersSetting; }
+    public JMenuItem getResetPanelSetting() { return resetPanelSetting; }
     public JMenuItem getShowDigitalTimeOnAnalogueClockSetting() { return this.showDigitalTimeSettingOnAnalogueClockSetting; }
     public JMenu getChangeTimeZoneMenu() { return this.changeTimeZone; }
     public java.util.List<JMenuItem> getTimezones() { return this.timezones; }
@@ -304,6 +315,7 @@ public class ClockMenuBar extends JMenuBar
     protected void setPartialTimeSetting(JMenuItem partialTimeSetting) { this.partialTimeSetting = partialTimeSetting; }
     protected void setToggleDSTSetting(JMenuItem toggleDSTSetting) { this.toggleDSTSetting = toggleDSTSetting; }
     protected void setPauseResumeAllTimersSetting(JMenuItem pauseResumeAllTimersSetting) { this.pauseResumeAllTimersSetting = pauseResumeAllTimersSetting; }
+    protected void setResetPanelSetting(JMenuItem resetPanelSetting) { this.resetPanelSetting = resetPanelSetting; }
     protected void setShowDigitalTimeOnAnalogueClockSetting(JMenuItem showDigitalTimeSettingOnAnalogueClockSetting) { this.showDigitalTimeSettingOnAnalogueClockSetting = showDigitalTimeSettingOnAnalogueClockSetting; }
     protected void setChangeTimeZoneMenu(JMenu changeTimeZone) { this.changeTimeZone = changeTimeZone; }
     protected void setDigitalClockFeature(JMenuItem digitalClockFeature) { this.digitalClockFeature = digitalClockFeature; }

@@ -118,8 +118,6 @@ public class AlarmPanel extends ClockPanel implements Runnable
 
         List.of(nameTextField, hoursTextField, minutesTextField).forEach(textField -> {
             textField.setFont(ClockFrame.font20);
-            //textField.setSize(new Dimension(50,50));
-            //textField.setMaximumSize(textField.getSize());
             textField.setForeground(Color.BLACK);
             textField.setBorder(new LineBorder(Color.ORANGE));
             textField.setHorizontalAlignment(JTextField.CENTER);
@@ -149,11 +147,13 @@ public class AlarmPanel extends ClockPanel implements Runnable
                             { nameTextField.setText(nameTextField.getText().substring(0, 10)); }
                         }
                         case HOUR+TEXT_FIELD -> {
+                            int upperLimit = clockFrame.getClock().isShowMilitaryTime() ? 23 : 12;
                             try {
                                 validateHoursTextField();
                                 hoursTextField.setBorder(new LineBorder(Color.ORANGE));
-                            } catch (InvalidInputException ex) {
-                                logger.warn("Hour field invalid: {}", hoursTextField.getText());
+                            }
+                            catch (InvalidInputException iie) {
+                                displayPopupMessage(ALARM_ERROR, "Hours must be between 0 and "+upperLimit, 0);
                                 hoursTextField.setBorder(new LineBorder(Color.RED));
                                 hoursTextField.requestFocusInWindow();
                             }
@@ -163,7 +163,7 @@ public class AlarmPanel extends ClockPanel implements Runnable
                                 validateMinutesTextField();
                                 minutesTextField.setBorder(new LineBorder(Color.ORANGE));
                             } catch (InvalidInputException ex) {
-                                logger.warn("Minute field is invalid: {}", minutesTextField.getText());
+                                displayPopupMessage(ALARM_ERROR, "Minutes must be between 0 and 59", 0);
                                 minutesTextField.setBorder(new LineBorder(Color.RED));
                                 minutesTextField.requestFocusInWindow();
                             }
@@ -339,7 +339,8 @@ public class AlarmPanel extends ClockPanel implements Runnable
                 logger.warn("alarm already exists");
                 displayPopupMessage(ALARM_ERROR, "Alarm already exists!", JOptionPane.ERROR_MESSAGE);
             }
-        } catch (InvalidInputException iie)
+        }
+        catch (InvalidInputException iie)
         {
             logger.warn("Invalid input: {}", iie.getMessage());
             displayPopupMessage(ALARM_ERROR, iie.getMessage(), JOptionPane.ERROR_MESSAGE);
@@ -426,6 +427,11 @@ public class AlarmPanel extends ClockPanel implements Runnable
                 // find the correct alarm
                 Alarm alarm = clock.getListOfAlarms().get(modelRow);
                 switch (buttonAction) {
+                    case SNOOZE -> {
+                        alarmsTable.getModel().setValueAt(SLEEPING, modelRow, 3);
+                        alarm.snooze();
+                        clock.getListOfAlarms().set(modelRow, alarm);
+                    }
                     case SLEEPING -> {
                         logger.info("Edit alarm");
                         alarm.stopAlarm();
@@ -439,35 +445,14 @@ public class AlarmPanel extends ClockPanel implements Runnable
                     case STOP -> {
                         logger.info("Stopping alarm");
                         alarm.stopAlarm();
+                        clock.getListOfAlarms().set(modelRow, alarm);
                     }
                     case REMOVE -> {
                         logger.info("Removing {} at row: {}", alarm, modelRow);
                         alarm.stopAlarm();
                         clock.getListOfAlarms().remove(alarm);
-                        //((DefaultTableModel)alarmsTable.getModel()).removeRow(modelRow);
                     }
                 }
-            }
-        };
-    }
-
-    /**
-     * Creates the snooze action for the snooze button
-     * @param columnIndex the index of the column where the snooze button is located
-     * @return the Action for the snooze button
-     */
-    public Action snoozeAction(int columnIndex)
-    {
-        return new AbstractAction()
-        {
-            public void actionPerformed(ActionEvent e)
-            {
-                int modelRow = Integer.valueOf( e.getActionCommand() );
-                String buttonAction = (String) alarmsTable.getModel().getValueAt(modelRow, columnIndex);
-                alarmsTable.getModel().setValueAt(SLEEPING, modelRow, 3);
-                Alarm alarm = clock.getListOfAlarms().get(modelRow);
-                alarm.snooze();
-                clock.getListOfAlarms().set(modelRow, alarm);
             }
         };
     }
@@ -518,7 +503,7 @@ public class AlarmPanel extends ClockPanel implements Runnable
             // only update if the timers count changes
             if(alarmsTable.getModel().getRowCount() != data.length) {
                 alarmsTable.setModel(new javax.swing.table.DefaultTableModel(data, columnNames));
-                new ButtonColumn(alarmsTable, snoozeAction(3), 3);
+                new ButtonColumn(alarmsTable, buttonAction(3), 3);
                 new ButtonColumn(alarmsTable, buttonAction(4), 4);
             } else {
                 AtomicInteger rowIndex = new AtomicInteger();
@@ -531,7 +516,7 @@ public class AlarmPanel extends ClockPanel implements Runnable
                     if (alarm.isAlarmGoingOff() && !alarm.isSnoozing()) {
                         alarmsTable.getModel().setValueAt(SNOOZE, rowIndex.get(), 3);
                         alarmsTable.getModel().setValueAt(STOP, rowIndex.get(), 4);
-                        new ButtonColumn(alarmsTable, snoozeAction(3), 3);
+                        new ButtonColumn(alarmsTable, buttonAction(3), 3);
                         new ButtonColumn(alarmsTable, buttonAction(4), 4);
                     }
                     else {
@@ -553,24 +538,21 @@ public class AlarmPanel extends ClockPanel implements Runnable
      */
     boolean validateHoursTextField()
     {
-        logger.info("validateFirstTextField");
-        if (hoursTextField.getText().isEmpty() && nameTextField.getText().isEmpty()) {
+        logger.debug("validate hours text field");
+        if (hoursTextField.getText().isEmpty() && nameTextField.getText().isEmpty())
+        {
             throw new InvalidInputException("Hour cannot be blank");
         }
-        else if (!nameTextField.getText().isEmpty() && !hoursTextField.getText().isEmpty() &&
-                !minutesTextField.getText().isEmpty())
-        {
-            return true;
-        }
-        else
+        else if (!nameTextField.getText().isEmpty() && !hoursTextField.getText().isEmpty())
         {
             try
             {
                 int upperLimit = clockFrame.getClock().isShowMilitaryTime() ? 23 : 12;
-                if (Integer.parseInt(hoursTextField.getText()) <= 0 || Integer.parseInt(hoursTextField.getText()) > upperLimit)
+                if (Integer.parseInt(hoursTextField.getText()) < 0 || Integer.parseInt(hoursTextField.getText()) > upperLimit)
                 {
                     throw new InvalidInputException("Hours must be between 0 and " + upperLimit);
                 }
+                return true;
             }
             catch (NumberFormatException nfe)
             {
@@ -586,7 +568,7 @@ public class AlarmPanel extends ClockPanel implements Runnable
      */
     boolean validateMinutesTextField()
     {
-        logger.info("validate second text field");
+        logger.debug("validate minutes text field");
         if (minutesTextField.getText().isEmpty() && nameTextField.getText().isEmpty())
         {
             throw new InvalidInputException("Minutes cannot be blank");
@@ -594,9 +576,6 @@ public class AlarmPanel extends ClockPanel implements Runnable
         else if (!nameTextField.getText().isEmpty() && !hoursTextField.getText().isEmpty() &&
                 !minutesTextField.getText().isEmpty())
         {
-            return true;
-        }
-        else {
             try {
                 if (Integer.parseInt(minutesTextField.getText()) < 0 ||
                         Integer.parseInt(minutesTextField.getText()) > 59 )
@@ -616,7 +595,7 @@ public class AlarmPanel extends ClockPanel implements Runnable
      */
     boolean validateTheCheckBoxes(List<DayOfWeek> days)
     {
-        logger.info("validate checkboxes");
+        logger.debug("validate checkboxes");
         if (days.isEmpty()) { throw new InvalidInputException("Days cannot be empty"); }
         return true;
     }
@@ -644,6 +623,7 @@ public class AlarmPanel extends ClockPanel implements Runnable
             int hour = Integer.parseInt(hoursTextField.getText());
             int minutes = Integer.parseInt(minutesTextField.getText());
             String ampm = Objects.requireNonNull(ampmDropDown.getSelectedItem()).toString();
+            if (hour == 0 && ampm.equals(AM)) hour = 12; // convert 0 AM to 12 AM
             String alarmName = nameTextField.getText();
             List<DayOfWeek> days = getDaysChecked();
             alarm = new Alarm(alarmName, hour, minutes, ampm, days, false, getClock());

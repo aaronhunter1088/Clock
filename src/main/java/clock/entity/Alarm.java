@@ -41,7 +41,10 @@ public class Alarm implements Serializable, Comparable<Alarm>, Runnable
     public static long alarmsCounter = 0L;
     public static final long SNOOZE_TIME = 7 * 60 * 1000; // 7 minutes in milliseconds
     private int hours, minutes;
-    private String minutesAsStr,hoursAsStr,ampm, name;
+    private String minutesAsStr,
+                   hoursAsStr,
+                   ampm,
+                   name; // limited to 10 characters
     private List<DayOfWeek> days;
     private boolean alarmGoingOff, updatingAlarm, triggeredToday, isSnoozing;
     private Clock clock;
