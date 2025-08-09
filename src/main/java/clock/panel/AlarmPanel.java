@@ -319,35 +319,6 @@ public class AlarmPanel extends ClockPanel implements Runnable
     }
 
     /**
-     * Sets the action for the set alarm button
-     */
-    public void setAlarm(ActionEvent action)
-    {
-        logger.info("set alarm");
-        Alarm alarm;
-        try {
-            alarm = createAlarm();
-            // checks equality
-            if (alarm != null && !clock.getListOfAlarms().contains(alarm)) {
-                clock.getListOfAlarms().add(alarm);
-                resetAlarmPanel();
-            }
-            else if (alarm == null) {
-                logger.warn("alarm is null");
-            }
-            else {
-                logger.warn("alarm already exists");
-                displayPopupMessage(ALARM_ERROR, "Alarm already exists!", JOptionPane.ERROR_MESSAGE);
-            }
-        }
-        catch (InvalidInputException iie)
-        {
-            logger.warn("Invalid input: {}", iie.getMessage());
-            displayPopupMessage(ALARM_ERROR, iie.getMessage(), JOptionPane.ERROR_MESSAGE);
-        }
-    }
-
-    /**
      * This method adds the components to the alarm panel
      */
     public void addComponentsToPanel()
@@ -423,7 +394,6 @@ public class AlarmPanel extends ClockPanel implements Runnable
             {
                 int modelRow = Integer.valueOf( e.getActionCommand() );
                 String buttonAction = (String) alarmsTable.getModel().getValueAt(modelRow, columnIndex);
-
                 // find the correct alarm
                 Alarm alarm = clock.getListOfAlarms().get(modelRow);
                 switch (buttonAction) {
@@ -539,11 +509,17 @@ public class AlarmPanel extends ClockPanel implements Runnable
     boolean validateHoursTextField()
     {
         logger.debug("validate hours text field");
-        if (hoursTextField.getText().isEmpty() && nameTextField.getText().isEmpty())
+        if (hoursTextField.getText().isEmpty() && nameTextField.getText().isEmpty()
+             && !minutesTextField.getText().isEmpty())
         {
             throw new InvalidInputException("Hour cannot be blank");
         }
-        else if (!nameTextField.getText().isEmpty() && !hoursTextField.getText().isEmpty())
+        else if (hoursTextField.getText().isEmpty() && !minutesTextField.getText().isEmpty()
+                  && !nameTextField.getText().isEmpty())
+        {
+            throw new InvalidInputException("Hour cannot be blank");
+        }
+        else if (!hoursTextField.getText().isEmpty() && !nameTextField.getText().isEmpty())
         {
             try
             {
@@ -569,7 +545,13 @@ public class AlarmPanel extends ClockPanel implements Runnable
     boolean validateMinutesTextField()
     {
         logger.debug("validate minutes text field");
-        if (minutesTextField.getText().isEmpty() && nameTextField.getText().isEmpty())
+        if (minutesTextField.getText().isEmpty() && nameTextField.getText().isEmpty()
+             && !hoursTextField.getText().isEmpty())
+        {
+            throw new InvalidInputException("Minutes cannot be blank");
+        }
+        else if (minutesTextField.getText().isEmpty() && !hoursTextField.getText().isEmpty()
+                && !nameTextField.getText().isEmpty())
         {
             throw new InvalidInputException("Minutes cannot be blank");
         }
@@ -605,8 +587,37 @@ public class AlarmPanel extends ClockPanel implements Runnable
      */
     public boolean validateTextFields()
     {
-        return validateHoursTextField() && validateMinutesTextField() &&
-                validateTheCheckBoxes(getDaysChecked());
+        return validateHoursTextField() && validateMinutesTextField()
+                && validateTheCheckBoxes(getDaysChecked());
+    }
+
+    /**
+     * Sets the action for the set alarm button
+     */
+    public void setAlarm(ActionEvent action)
+    {
+        logger.info("set alarm");
+        Alarm alarm;
+        try {
+            alarm = createAlarm();
+            // checks equality
+            if (alarm != null && !clock.getListOfAlarms().contains(alarm)) {
+                clock.getListOfAlarms().add(alarm);
+                resetAlarmPanel();
+            }
+            else if (alarm == null) {
+                logger.warn("alarm is null");
+            }
+            else {
+                logger.warn("alarm already exists");
+                displayPopupMessage(ALARM_ERROR, "Alarm already exists!", JOptionPane.ERROR_MESSAGE);
+            }
+        }
+        catch (InvalidInputException iie)
+        {
+            logger.warn("Invalid input: {}", iie.getMessage());
+            displayPopupMessage(ALARM_ERROR, iie.getMessage(), JOptionPane.ERROR_MESSAGE);
+        }
     }
 
     /**
@@ -634,12 +645,12 @@ public class AlarmPanel extends ClockPanel implements Runnable
                 daysStr.append(day);
                 daysStr.append("\t");
             }
-            logger.info("Created an alarm: {}", alarm);
             logger.info("days: {}", daysStr);
-            logger.info("Alarm created");
+            logger.info("Created an alarm: {}", alarm);
         }
         else {
             logger.error("One of the text fields is not valid");
+            throw new InvalidInputException("Invalid text field value, null alarm");
         }
         return alarm;
     }
