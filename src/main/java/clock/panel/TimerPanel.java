@@ -706,6 +706,7 @@ public class TimerPanel extends ClockPanel implements Runnable
     public GridBagLayout getGridBagLayout() { return this.layout; }
     public GridBagConstraints getGridBagConstraints() { return this.constraints; }
     public Clock getClock() { return clockFrame.getClock(); }
+    public JTextField getNameTextField() { return this.nameTextField; }
     public JTextField getHoursTextField() { return hoursTextField; }
     public JTextField getMinutesTextField() { return minutesTextField; }
     public JTextField getSecondsTextField() { return secondsTextField; }
@@ -716,8 +717,9 @@ public class TimerPanel extends ClockPanel implements Runnable
     protected void setGridBagLayout(GridBagLayout layout) { this.layout = layout; logger.debug("layout set"); }
     protected void setGridBagConstraints(GridBagConstraints constraints) { this.constraints = constraints; logger.debug("constraints set"); }
     public void setClock(Clock clock) { this.clock = clock; logger.debug("Clock set in TimerPanel"); }
-    public void setHoursTextField(JTextField hoursTextField) { this.hoursTextField = hoursTextField; }
-    public void setMinutesTextField(JTextField minutesTextField) { this.minutesTextField = minutesTextField; }
-    public void setSecondsTextField(JTextField secondsTextField) { this.secondsTextField = secondsTextField; }
-    public void setSetTimerButton(JButton setTimerButton) { this.setTimerButton = setTimerButton; }
+    public void setNameTextField(JTextField nameTextField) { this.nameTextField = nameTextField; logger.debug("nameTextField set in TimerPanel"); }
+    public void setHoursTextField(JTextField hoursTextField) { this.hoursTextField = hoursTextField; logger.debug("hoursTextField set in TimerPanel"); }
+    public void setMinutesTextField(JTextField minutesTextField) { this.minutesTextField = minutesTextField; logger.debug("minutesTextField set in TimerPanel"); }
+    public void setSecondsTextField(JTextField secondsTextField) { this.secondsTextField = secondsTextField; logger.debug("secondsTextField set in TimerPanel"); }
+    public void setSetTimerButton(JButton setTimerButton) { this.setTimerButton = setTimerButton; logger.debug("setTimerButton set in TimerPanel");}
 }

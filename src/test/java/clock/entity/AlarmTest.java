@@ -237,7 +237,7 @@ class AlarmTest {
     {
         alarm1 = weekDays730AmAlarm;
         List<String> expectedShortenedDays = new ArrayList<>() {{
-            add("Days: "); add("Weekdays "); add("\n------");
+            add(WEEKDAYS);
         }};
         List<String> actualShortenedDays = alarm1.getDaysShortened();
 
@@ -250,7 +250,7 @@ class AlarmTest {
     {
         alarm1 = weekend10AmAlarm;
         List<String> expectedShortenedDays = new ArrayList<>() {{
-            add("Days: "); add("Weekends "); add("\n------");
+            add(WEEKENDS);
         }};
         List<String> actualShortenedDays = alarm1.getDaysShortened();
 
@@ -268,8 +268,8 @@ class AlarmTest {
                         DayOfWeek.SUNDAY
                 ), false, clock);
         List<String> expectedShortenedDays = new ArrayList<>() {{
-            add("Days: "); add("M "); add("W ");
-            add("F "); add("Su "); add("\n------");
+            add(M); add(W);
+            add(F); add(SU);
         }};
         List<String> actualShortenedDays = alarm1.getDaysShortened();
 
@@ -290,7 +290,7 @@ class AlarmTest {
                         DayOfWeek.SUNDAY
                 ), false, clock);
         List<String> expectedShortenedDays = new ArrayList<>() {{
-            add("Days: "); add("Every day "); add("\n------");
+            add(EVERY_DAY);
         }};
         List<String> actualShortenedDays = alarm1.getDaysShortened();
 

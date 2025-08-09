@@ -125,7 +125,7 @@ class TimerTest
     @DisplayName("Create Invalid Timer by Hour")
     void testCreateInvalidTimerByHour(int hours)
     {
-        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () -> new Timer(hours, 0, 0, clock));
+        InvalidInputException exception = assertThrows(InvalidInputException.class, () -> new Timer(hours, 0, 0, clock));
         assertEquals("Hours must be between 0 and 12", exception.getMessage());
     }
 
@@ -134,7 +134,7 @@ class TimerTest
     @DisplayName("Create Invalid Timer by Minute")
     void testCreateInvalidTimerByMinute(int minutes)
     {
-        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () -> new Timer(1, minutes, 0, clock));
+        InvalidInputException exception = assertThrows(InvalidInputException.class, () -> new Timer(1, minutes, 0, clock));
         assertEquals("Minutes must be between 0 and 59", exception.getMessage());
     }
 
@@ -143,7 +143,7 @@ class TimerTest
     @DisplayName("Create Invalid Timer by Second")
     void testCreateInvalidTimerBySecond(int seconds)
     {
-        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () -> new Timer(1, 1, seconds, clock));
+        InvalidInputException exception = assertThrows(InvalidInputException.class, () -> new Timer(1, 1, seconds, clock));
         assertEquals("Seconds must be between 0 and 59", exception.getMessage());
     }
 
