@@ -115,7 +115,7 @@ public class AlarmPanel extends ClockPanel implements Runnable
 
         setAmpmLabel(new JLabel(AMPM, SwingConstants.CENTER));
         getAmpmLabel().setName(AMPM+LABEL);
-        setupOptionsSelection();
+        setupAmpmDropDownSelection();
 
         List.of(nameTextField, hoursTextField, minutesTextField).forEach(textField -> {
             textField.setFont(ClockFrame.font20);
@@ -150,19 +150,25 @@ public class AlarmPanel extends ClockPanel implements Runnable
                         case HOUR+TEXT_FIELD -> {
                             int upperLimit = clockFrame.getClock().isShowMilitaryTime() ? 23 : 12;
                             boolean validHours = validateHoursTextField();
-                            if (validHours) {
+                            if (validHours)
+                            {
                                 hoursTextField.setBorder(new LineBorder(Color.ORANGE));
                             }
+                            else
+                            {
                                 displayPopupMessage(ALARM_ERROR, "Hours must be between 0 and "+upperLimit, 0);
                                 hoursTextField.setBorder(new LineBorder(Color.RED));
                                 hoursTextField.requestFocusInWindow();
-
+                            }
                         }
                         case MIN+TEXT_FIELD -> {
-                            try {
-                                validateMinutesTextField();
+                            boolean validMinutes = validateMinutesTextField();
+                            if (validMinutes)
+                            {
                                 minutesTextField.setBorder(new LineBorder(Color.ORANGE));
-                            } catch (InvalidInputException ex) {
+                            }
+                            else
+                            {
                                 displayPopupMessage(ALARM_ERROR, "Minutes must be between 0 and 59", 0);
                                 minutesTextField.setBorder(new LineBorder(Color.RED));
                                 minutesTextField.requestFocusInWindow();
@@ -195,7 +201,7 @@ public class AlarmPanel extends ClockPanel implements Runnable
      * the selection dropdown box and adds
      * its functionality
      */
-    private void setupOptionsSelection()
+    private void setupAmpmDropDownSelection()
     {
         setAmpmDropDown(new JComboBox<>(new String[]{AM, PM}));
         ampmDropDown.setSelectedItem(clockFrame.getClock().getAMPM().equals(AM)?AM:PM);
@@ -585,7 +591,7 @@ public class AlarmPanel extends ClockPanel implements Runnable
                 logger.debug("Invalid input in minutes text field: {}", nfe.getMessage());
             }
         }
-        logger.debug("validate minutes text field: {}", result);
+        logger.debug("validate minutes {} text field: {}", minutesTextField.getText(), result);
         return result;
     }
 
@@ -629,7 +635,7 @@ public class AlarmPanel extends ClockPanel implements Runnable
     /** Validates all the inputs used to create an alarm */
     public boolean validateAllInputs()
     {
-        boolean validTextFields;
+        boolean allInputsAreValid;
         boolean validHours = validateHoursTextField();
         boolean validMinutes = validateMinutesTextField();
         if (areAllBlank() && !nameTextField.getText().isEmpty())
@@ -637,10 +643,10 @@ public class AlarmPanel extends ClockPanel implements Runnable
             return false;
         }
         boolean validCheckboxes = validateTheCheckBoxes(getDaysChecked());
-        validTextFields = validHours && validMinutes && validCheckboxes
+        allInputsAreValid = validHours && validMinutes && validCheckboxes
                 && areAllNotZeroes() && !areAllBlank();
-        logger.debug("validTextFields: {}", validTextFields);
-        return validTextFields;
+        logger.debug("all inputs are valid: {}", allInputsAreValid);
+        return allInputsAreValid;
     }
 
     /**
@@ -678,17 +684,9 @@ public class AlarmPanel extends ClockPanel implements Runnable
     private Alarm createAlarm()
     {
         logger.info("creating alarm");
-        Alarm alarm;
+        Alarm alarm = null;
         if (validateAllInputs())
         {
-            if (EMPTY.equals(hoursTextField.getText())) hoursTextField.setText(ZERO);
-            if (EMPTY.equals(minutesTextField.getText())) minutesTextField.setText(ZERO);
-            if (!areAllNotZeroes())
-            {
-                hoursTextField.setText(EMPTY);
-                minutesTextField.setText(EMPTY);
-                throw new InvalidInputException("One of the text fields is not valid");
-            }
             int hour = Integer.parseInt(hoursTextField.getText());
             int minutes = Integer.parseInt(minutesTextField.getText());
             String ampm = Objects.requireNonNull(ampmDropDown.getSelectedItem()).toString();
@@ -699,8 +697,13 @@ public class AlarmPanel extends ClockPanel implements Runnable
             logger.info("Created an alarm: {}", alarm);
         }
         else {
-            logger.error("One of the text fields is not valid");
-            throw new InvalidInputException("Invalid text field value, no alarm");
+            boolean validHours = validateHoursTextField();
+            boolean validMinutes = validateMinutesTextField();
+            boolean validCheckboxes = validateTheCheckBoxes(getDaysChecked());
+            if (!validHours) throw new InvalidInputException("Invalid hours input");
+            if (!validMinutes) throw new InvalidInputException("Invalid minutes input");
+            if (!validCheckboxes) throw new InvalidInputException("At least one checkbox must be selected");
+            if (EMPTY.equals(hoursTextField.getText()) && EMPTY.equals(hoursTextField.getText())) throw new InvalidInputException("Hours and minutes must not be blank");
         }
         return alarm;
     }
