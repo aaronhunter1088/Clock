@@ -3,7 +3,7 @@ package clock.contract;
 import clock.entity.Clock;
 
 /**
- * An contract for the clock's panels.
+ * A contract for the clock's panels.
  * <p>
  * @author Michael Ball
 *  @version 2.8

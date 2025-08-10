@@ -45,13 +45,13 @@ public class ClockFrame extends JFrame
     public final static Font font20 = new Font("Courier New", Font.BOLD, 20);
     public final static Font font10 = new Font("Courier New", Font.BOLD, 10);
     public final static Font analogueFont = new Font("TimesRoman", Font.BOLD, 20);
-    private clock.entity.Panel panelType;
-    private ClockPanel currentPanel;
+    private Panel panelType;
     private ClockMenuBar menuBar;
-    private DigitalClockPanel digitalClockPanel;
-    private AnalogueClockPanel analogueClockPanel;
-    private AlarmPanel alarmPanel;
-    private TimerPanel timerPanel;
+    private ClockPanel currentPanel,
+                       digitalClockPanel,
+                       analogueClockPanel,
+                       alarmPanel,
+                       timerPanel;
     private StopwatchPanel stopwatchPanel;
     private Clock clock;
     private ScheduledExecutorService scheduler;
@@ -228,7 +228,7 @@ public class ClockFrame extends JFrame
         logger.info("change to digital clock");
         add(digitalClockPanel);
         setCurrentPanel(digitalClockPanel);
-        digitalClockPanel.setupDefaultValues();
+        getDigitalClockPanel().setupDefaultValues();
         setSize(clockDefaultSize);
         setBackground(Color.BLACK);
         setPanelType(PANEL_DIGITAL_CLOCK);
@@ -242,7 +242,7 @@ public class ClockFrame extends JFrame
         logger.info("change to analogue clock");
         add(analogueClockPanel);
         setCurrentPanel(analogueClockPanel);
-        analogueClockPanel.setupDefaultValues();
+        getAnalogueClockPanel().setupDefaultValues();
         setSize(analogueClockPanel.getMaximumSize());
         setBackground(Color.BLACK);
         setPanelType(PANEL_ANALOGUE_CLOCK);
@@ -256,7 +256,7 @@ public class ClockFrame extends JFrame
         logger.info("change to alarm panel.");
         add(alarmPanel);
         setCurrentPanel(alarmPanel);
-        alarmPanel.setupDefaultValues();
+        getAlarmPanel().setupDefaultValues();
         setSize(clockDefaultSize);
         setPanelType(PANEL_ALARM);
     }
@@ -269,7 +269,7 @@ public class ClockFrame extends JFrame
         logger.info("change to timer panel");
         add(timerPanel);
         setCurrentPanel(timerPanel);
-        timerPanel.setupDefaultValues();
+        getTimerPanel().setupDefaultValues();
         setSize(clockDefaultSize);
         setPanelType(PANEL_TIMER);
     }
@@ -282,7 +282,7 @@ public class ClockFrame extends JFrame
         logger.debug("change to stopwatch panel");
         add(stopwatchPanel);
         setCurrentPanel(stopwatchPanel);
-        stopwatchPanel.setupSettingsMenu();
+        getStopwatchPanel().setupSettingsMenu();
         setSize(clockDefaultSize);
         setPanelType(PANEL_STOPWATCH);
     }
@@ -360,12 +360,12 @@ public class ClockFrame extends JFrame
     /** Getters */
     public clock.entity.Panel getPanelType() { return panelType; }
     public ClockPanel getCurrentPanel() { return currentPanel; }
-    public DigitalClockPanel getDigitalClockPanel() { return digitalClockPanel; }
-    public AnalogueClockPanel getAnalogueClockPanel() { return analogueClockPanel; }
-    public AlarmPanel getAlarmPanel() { return alarmPanel; }
+    public DigitalClockPanel getDigitalClockPanel() { return (DigitalClockPanel) digitalClockPanel; }
+    public AnalogueClockPanel getAnalogueClockPanel() { return (AnalogueClockPanel) analogueClockPanel; }
+    public AlarmPanel getAlarmPanel() { return (AlarmPanel) alarmPanel; }
     public ClockMenuBar getClockMenuBar() { return menuBar; }
-    public TimerPanel getTimerPanel() { return timerPanel; }
-    public StopwatchPanel getStopwatchPanel() { return stopwatchPanel; }
+    public TimerPanel getTimerPanel() { return (TimerPanel) timerPanel; }
+    public StopwatchPanel getStopwatchPanel() { return (StopwatchPanel) stopwatchPanel; }
     public Clock getClock() { return clock; }
     public ScheduledExecutorService getScheduler() { return scheduler; }
 

@@ -25,7 +25,6 @@ import static clock.entity.Panel.PANEL_ANALOGUE_CLOCK;
 public class AnalogueClockPanel extends ClockPanel implements Runnable
 {
     private static final Logger logger = LogManager.getLogger(AnalogueClockPanel.class);
-    public static final Panel PANEL = PANEL_ANALOGUE_CLOCK;
     private GridBagLayout layout;
     private GridBagConstraints constraints;
     private Thread thread = null;
@@ -97,7 +96,7 @@ public class AnalogueClockPanel extends ClockPanel implements Runnable
         logger.debug("starting analogue clock panel");
         if (thread == null)
         {
-            thread = new Thread(this);
+            setThread(new Thread(this));
             thread.start();
         }
     }
@@ -106,7 +105,7 @@ public class AnalogueClockPanel extends ClockPanel implements Runnable
     public void stop()
     {
         logger.debug("stopping analogue clock panel");
-        thread = null;
+        setThread(null);
     }
 
     /**
@@ -182,17 +181,6 @@ public class AnalogueClockPanel extends ClockPanel implements Runnable
     }
 
     /**
-     * Updates the analogue clock
-     * @param g the graphics object
-     */
-    @Override
-    public void update(Graphics g)
-    {
-        logger.info("updating graphics");
-        paint(g);
-    }
-
-    /**
      * Draws the analogue clock
      * @param g the graphics object
      */
@@ -226,13 +214,6 @@ public class AnalogueClockPanel extends ClockPanel implements Runnable
     }
 
     /**
-     * This method adds the components to the analogue clock panel
-     * Currently no-operation set.
-     */
-    public void addComponentsToPanel()
-    { /* no operation */ }
-
-    /**
      * This method prints the stack trace of an exception
      * that may occur when the digital panel is in use.
      * @param e the exception
@@ -256,12 +237,15 @@ public class AnalogueClockPanel extends ClockPanel implements Runnable
     public GridBagConstraints getGridBagConstraints() { return this.constraints; }
     public String getClockText() { return this.clockText; }
     public boolean isShowDigitalTimeOnAnalogueClock() { return showDigitalTimeOnAnalogueClock; }
+    public Thread getThread() { return this.thread; }
 
     /* Setters */
     private void setClockFrame(ClockFrame clockFrame) { this.clockFrame = clockFrame; logger.debug("clockFrame set"); }
-    private void setGridBagLayout(GridBagLayout layout) { this.layout = layout; }
-    private void setGridBagConstraints(GridBagConstraints constraints) { this.constraints = constraints; }
-    private void setClockText(String clockText) { this.clockText = clockText; }
-    public void setClock(Clock clock) { this.clock = clock; logger.debug("Clock set in AnalogueClockPanel"); }
-    public void setShowDigitalTimeOnAnalogueClock(boolean showDigitalTimeOnAnalogueClock)  { this.showDigitalTimeOnAnalogueClock = showDigitalTimeOnAnalogueClock; }
+    private void setGridBagLayout(GridBagLayout layout) { this.layout = layout; logger.debug("GridBagLayout set"); }
+    private void setGridBagConstraints(GridBagConstraints constraints) { this.constraints = constraints; logger.debug("GridBagConstraints set"); }
+    private void setClockText(String clockText) { this.clockText = clockText; logger.debug("clockText set"); }
+    @Override
+    public void setClock(Clock clock) { this.clock = clock; logger.debug("clock set"); }
+    public void setShowDigitalTimeOnAnalogueClock(boolean showDigitalTimeOnAnalogueClock)  { this.showDigitalTimeOnAnalogueClock = showDigitalTimeOnAnalogueClock; logger.debug("showDigitalTimeOnAnalogueClock set to " + showDigitalTimeOnAnalogueClock); }
+    private void setThread(Thread thread) { this.thread = thread; logger.debug("thread set");  }
 }
