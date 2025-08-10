@@ -44,8 +44,6 @@ class AlarmTest {
     @Mock
     private AdvancedPlayer musicPlayerMock;
 
-    private List<Alarm> alarms = new ArrayList<>();
-
     @BeforeAll
     static void beforeClass()
     { logger.info("Starting {}...", AlarmTest.class.getSimpleName()); }
@@ -307,6 +305,21 @@ class AlarmTest {
         assertEquals("Alarm3", alarm1.getName(), "Alarm1 name should match");
         assertEquals("Alarm"+currentAlarmsCounter, alarm2.getName(), "Alarm2 name should match");
     }
+
+    @Test
+    @DisplayName("Test Alarm Equals Method")
+    void testAlarmEqualsMethod()
+    {
+        alarm1 = new Alarm("Weekday Alarm", 7, 30, AM, weekDays, false, clock);
+        alarm2 = new Alarm("Alarm2", 7, 0, AM, weekDays, false, clock);
+
+        assertNotEquals(alarm1, alarm2, "Alarms should not be equal");
+
+        assertEquals(alarm1, weekDays730AmAlarm, "Alarms should be equal");
+
+        assertNotEquals(alarm1, weekend10AmAlarm, "Alarms should not be equal again");
+    }
+
     // Helper methods
     private void sleep(int time)
     {

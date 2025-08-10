@@ -11,6 +11,7 @@ import java.util.Objects;
 import clock.exception.InvalidInputException;
 import javazoom.jl.decoder.JavaLayerException;
 import javazoom.jl.player.advanced.AdvancedPlayer;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -348,25 +349,31 @@ public class Alarm implements Serializable, Comparable<Alarm>, Runnable
     public void setActivatedToday(boolean activatedToday) { this.activatedToday = activatedToday; logger.debug("triggeredToday: {}", activatedToday); }
     public void setSelfThread(Thread selfThread) { this.selfThread = selfThread; logger.debug("selfThread set"); }
 
+    /**
+     * Compares this alarm to another alarm based
+     * on the string representation of the alarm.
+     * Used for sorting alarms.
+     * @return a negative integer, zero, or a positive integer
+     */
     @Override
-    public int compareTo(Alarm o) {
+    public int compareTo(Alarm o)
+    {
         return this.getAlarmAsString().compareTo(o.getAlarmAsString());
     }
 
     /**
-     * Checks if two alarms are equals
-     * If they have a name, it will check
-     * against the lowercase version of the name.
+     * Checks if two alarms are equals.
      * @param o the object to compare with
      * @return true if the objects are equal, false otherwise
      */
     @Override
-    public boolean equals(Object o) {
+    public boolean equals(Object o)
+    {
         if (!(o instanceof Alarm alarm)) return false;
-        if (getName() != null) {
+        if (!StringUtils.isEmpty(getName())) {
             return getHours() == alarm.getHours() &&
                    getMinutes() == alarm.getMinutes() &&
-                   Objects.equals(getName().toLowerCase(), alarm.getName().toLowerCase()) &&
+                   Objects.equals(getName(), alarm.getName()) &&
                    Objects.equals(ampm, alarm.ampm) &&
                    Objects.equals(getDays(), alarm.getDays());
         } else {

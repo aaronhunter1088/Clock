@@ -8,6 +8,7 @@ import java.time.format.TextStyle;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
+import java.util.Objects;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -889,8 +890,50 @@ public class Clock implements Serializable, Comparable<Clock>, Runnable
     protected void setListOfAlarms(List<Alarm> listOfAlarms) { this.listOfAlarms = listOfAlarms; logger.debug("listOfAlarms: {}", listOfAlarms); }
     protected void setListOfTimers(List<Timer> listOfTimers) { this.listOfTimers = listOfTimers; logger.debug("listOfTimers: {}", listOfTimers); }
 
+    /**
+     * Compares this clock to another clock based
+     * on the current date and time. Comparison is
+     * performed in the following order: Year, Month
+     * Day, Hour, Minute, Second, Nanosecond. Returns
+     * a negative integer if this clocks datetime is
+     * before the other's, zero if they are equal, or
+     * a positive integer if this clock's datetime is
+     * after the others. Used for sorting.
+     * @param o the object to be compared.
+     * @return a negative integer, zero, or a positive integer
+     */
     @Override
     public int compareTo(Clock o) {
         return this.getCurrentDateTime().compareTo(o.getCurrentDateTime());
+    }
+
+    /**
+     * Compares this clock to another object for equality.
+     * @param o the object to be compared.
+     * @return true if the clocks are equal, false otherwise.
+     */
+    @Override
+    public boolean equals(Object o) {
+        if (!(o instanceof Clock clock)) return false;
+        return getSeconds() == clock.getSeconds() && getMinutes() == clock.getMinutes() &&
+                getHours() == clock.getHours() && getDayOfMonth() == clock.getDayOfMonth() &&
+                getYear() == clock.getYear();
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(getDate(), getDayOfWeek(), getMonth(), getTime(), getSeconds(), getMinutes(), getHours(), getDayOfMonth(), getYear(), ampm, getTimezone(), getHoursAsStr(), getMinutesAsStr(), getSecondsAsStr(), getBeginDaylightSavingsTimeDate(), getEndDaylightSavingsTimeDate(), getCurrentDateTime(), getListOfAlarms(), getListOfTimers(), isLeapYear(), isTodayMatchesDSTDate(), isDateChanged(), isNewYear(), isTestingClock(), isShowFullDate(), isShowPartialDate(), isShowMilitaryTime(), isDaylightSavingsTimeEnabled());
+    }
+
+    /**
+     * Returns a String representation of the clock
+     * Example: "Fri May 5, 2000 05:15:25 AM"
+     * @return a clock string
+     */
+    @Override
+    public String toString() {
+        String shortenedDayOfWeek = dayOfWeek.toString().charAt(0)+dayOfWeek.toString().substring(1,3).toLowerCase();
+        return shortenedDayOfWeek + SPACE +
+                DateTimeFormatter.ofPattern("MMM d, yyyy hh:mm:ss a").format(getCurrentDateTime());
     }
 }

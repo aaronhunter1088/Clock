@@ -11,10 +11,12 @@ import org.codehaus.plexus.util.StringUtils;
 import javax.swing.*;
 import javax.swing.border.LineBorder;
 import javax.swing.table.DefaultTableModel;
+import javax.swing.text.NumberFormatter;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.FocusEvent;
 import java.awt.event.FocusListener;
+import java.text.NumberFormat;
 import java.time.DayOfWeek;
 import java.util.ArrayList;
 import java.util.List;
@@ -106,6 +108,15 @@ public class AlarmPanel extends ClockPanel implements Runnable
         setHoursLabel(new JLabel(Hours, SwingConstants.CENTER));
         getHoursLabel().setName(Hours+LABEL);
         setHoursTextField(new JTextField(EMPTY, 4));
+        getHoursTextField().setName(HOUR + TEXT_FIELD);
+
+        NumberFormatter intFormatter = new NumberFormatter(NumberFormat.getIntegerInstance());
+        intFormatter.setValueClass(Integer.class);
+        intFormatter.setMinimum(0);
+        intFormatter.setMaximum(clockFrame.getClock().isShowMilitaryTime() ? 23 : 12);
+        intFormatter.setAllowsInvalid(false);
+        setHoursTextField(new JFormattedTextField(intFormatter));
+        getHoursTextField().setColumns(4);
         getHoursTextField().setName(HOUR + TEXT_FIELD);
 
         setMinutesLabel(new JLabel(Minutes, SwingConstants.CENTER));

@@ -4,12 +4,15 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.CsvSource;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.junit.jupiter.params.provider.ValueSource;
 
 import java.time.*;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.stream.Stream;
 
 import static clock.util.Constants.*;
 import static java.lang.Thread.sleep;
@@ -30,12 +33,15 @@ class ClockTest
     private static final LocalDate DATE_NOW = LocalDate.now();
     private static final LocalTime AM_TIME = LocalTime.of(10, 30, 45); // 10:30:45 AM
     private static final LocalTime PM_TIME = LocalTime.of(15, 30, 45); // 3:30:45 PM
+    private static Clock clockWEDJAN12025_103000AM, clockWEDJAN12025_103000PM;
     private Clock clock;
 
     @BeforeAll
     static void beforeClass()
     {
         logger.info("Starting {}...", ClockTest.class.getSimpleName());
+        clockWEDJAN12025_103000AM = new Clock(10, 30, 0, JANUARY, WEDNESDAY, 1, 2025, AM);
+        clockWEDJAN12025_103000PM = new Clock(10, 30, 0, JANUARY, WEDNESDAY, 1, 2025, PM);
     }
 
     @BeforeEach
@@ -599,6 +605,35 @@ class ClockTest
         assertEquals(currentYear+1, clock.getYear(), "Expected year to be 2023 after New Year");
     }
 
+    @ParameterizedTest
+    @DisplayName("Compare default clock with provided clocks")
+    @MethodSource("provideClocksForComparison")
+    void testCompareDefaultClock(Clock input, int expected)
+    {
+        assertSame(expected, clock.compareTo(input), "Expected default clock");
+    }
+    public static Stream<Arguments> provideClocksForComparison() {
+        return Stream.of(
+            Arguments.of(new Clock(), 0),
+            Arguments.of(clockWEDJAN12025_103000AM, 7),
+            Arguments.of(clockWEDJAN12025_103000PM, 7)
+        );
+    }
+
+    @ParameterizedTest
+    @MethodSource("provideClocksForEquality")
+    @DisplayName("Test compareTo between two clocks with similar time")
+    void testCompareToSimilarClocks(Clock input, boolean expected)
+    {
+        assertEquals(expected, clock.equals(input), "Clocks should not be equal");
+    }
+    public static Stream<Arguments> provideClocksForEquality() {
+        return Stream.of(
+                Arguments.of(new Clock(), true),
+                Arguments.of(clockWEDJAN12025_103000AM, false),
+                Arguments.of(clockWEDJAN12025_103000PM, false)
+        );
+    }
 
     // Helper methods
     private void tick(int times) {
