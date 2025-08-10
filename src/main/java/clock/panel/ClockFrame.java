@@ -108,6 +108,7 @@ public class ClockFrame extends JFrame
         setAnalogueClockPanel(new AnalogueClockPanel(this));
         setAlarmPanel(new AlarmPanel(this));
         setTimerPanel(new TimerPanel(this));
+        setStopwatchPanel(new StopwatchPanel(this));
         changePanels(panelType != null ? panelType : PANEL_DIGITAL_CLOCK);
         setVisible(true);
     }
@@ -351,8 +352,10 @@ public class ClockFrame extends JFrame
     /**
      * Stops the clock and all scheduled tasks.
      */
-    public void stop() {
-        if (scheduler != null && !scheduler.isShutdown()) {
+    public void stop()
+    {
+        if (scheduler != null && !scheduler.isShutdown())
+        {
             scheduler.shutdownNow();
         }
     }

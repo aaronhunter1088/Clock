@@ -22,22 +22,21 @@ import java.awt.*;
 public class StopwatchPanel extends ClockPanel implements Runnable
 {
     private static final Logger logger = LogManager.getLogger(StopwatchPanel.class);
-    private final GridBagLayout layout;
-    private final GridBagConstraints constraints;
-    private JTextArea textArea;
+    private GridBagLayout layout;
+    private GridBagConstraints constraints;
+    private ClockFrame clockFrame;
     private Clock clock;
     private JPanel setupStopwatchPanel;
 
     /**
      * Main constructor for creating the StopwatchPanel
-     * @param clock the clock object reference
+     * @param clockFrame the clockFrame object reference
      */
-    public StopwatchPanel(Clock clock)
+    public StopwatchPanel(ClockFrame clockFrame)
     {
         super();
-        setClock(clock);
-        //this.clock.setClockPanel(PANEL_STOPWATCH);
-        //setSize(Clock.panelSize);
+        setClockFrame(clockFrame);
+        setClock(clockFrame.getClock());
         this.layout = new GridBagLayout();
         setLayout(layout);
         this.constraints = new GridBagConstraints();
@@ -49,17 +48,12 @@ public class StopwatchPanel extends ClockPanel implements Runnable
     }
 
     public void addComponentsToPanel() {
-
-    }
-
-    @Override
-    public void setClock(Clock clock) {
-        this.clock = clock;
+        // Implement
     }
 
     @Override
     public void setupSettingsMenu() {
-
+        // Implement
     }
 
     @Override
@@ -71,4 +65,16 @@ public class StopwatchPanel extends ClockPanel implements Runnable
     public void run() {
 
     }
+
+    @Override
+    public void setClock(Clock clock) { this.clock = clock; logger.debug("clock set"); }
+    public void setClockFrame(ClockFrame clockFrame) { this.clockFrame = clockFrame; logger.debug("clockFrame set"); }
+    public void setStopwatchLayout(GridBagLayout gridBagLayout) { this.layout = gridBagLayout; logger.debug("constraints set"); }
+    public void setGridBagConstraints(GridBagConstraints constraints) { this.constraints = constraints; logger.debug("constraints set"); }
+
+    public Clock getClock() { return clock; }
+    public ClockFrame getClockFrame() { return clockFrame; }
+    public GridBagLayout getStopwatchLayout() { return layout; }
+    public GridBagConstraints getGridBagConstraints() { return constraints; }
+
 }
