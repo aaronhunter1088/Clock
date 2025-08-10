@@ -9,7 +9,6 @@ import org.mockito.MockitoAnnotations;
 
 import java.awt.*;
 
-import static clock.entity.Panel.PANEL_ALARM;
 import static clock.entity.Panel.PANEL_ANALOGUE_CLOCK;
 import static clock.util.Constants.AM;
 import static java.time.DayOfWeek.WEDNESDAY;
@@ -19,7 +18,6 @@ import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.Mockito.doNothing;
-import static org.mockito.Mockito.when;
 
 /**
  * Tests for the {@link AnalogueClockPanel} class
