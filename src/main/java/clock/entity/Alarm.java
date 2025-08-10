@@ -7,13 +7,10 @@ import java.time.DayOfWeek;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.TimeUnit;
 
 import clock.exception.InvalidInputException;
 import javazoom.jl.decoder.JavaLayerException;
 import javazoom.jl.player.advanced.AdvancedPlayer;
-import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -46,7 +43,7 @@ public class Alarm implements Serializable, Comparable<Alarm>, Runnable
                    ampm,
                    name; // limited to 10 characters
     private List<DayOfWeek> days;
-    private boolean alarmGoingOff, updatingAlarm, triggeredToday, isSnoozing;
+    private boolean alarmGoingOff, updatingAlarm, activatedToday, isSnoozing, isPaused;
     private Clock clock;
     private Thread selfThread;
     private AdvancedPlayer musicPlayer;
@@ -130,6 +127,26 @@ public class Alarm implements Serializable, Comparable<Alarm>, Runnable
         logger.info("{} alarm turned off", this);
     }
 
+    /** Pauses the alarm */
+    public void pauseAlarm()
+    {
+        logger.debug("pause alarm");
+        setIsPaused(true);
+    }
+
+    /**
+     * Resumes the alarm after it has been paused.
+     * This will reset the alarm to not going off,
+     * and not triggered today. This is to ensure
+     * that if you resume all timers, or that one,
+     * and it is still time to trigger the alarm,
+     */
+    public void resumeAlarm()
+    {
+        logger.debug("resume alarm");
+        setIsPaused(false);
+    }
+
     /**
      * Sets an alarm to go off
      */
@@ -170,14 +187,14 @@ public class Alarm implements Serializable, Comparable<Alarm>, Runnable
         while (selfThread != null)
         {
             try {
-                if (!alarmGoingOff && !triggeredToday) {
+                if (!alarmGoingOff && !activatedToday && !isPaused && !isSnoozing) {
                     activateAlarm();
                     sleep(1000);
                 }
                 else if (isSnoozing) {
                     sleep(SNOOZE_TIME);
                 }
-                else if (alarmGoingOff) {
+                else if (alarmGoingOff && !isPaused) {
                     triggerAlarm();
                     sleep(1000);
                 }
@@ -203,7 +220,7 @@ public class Alarm implements Serializable, Comparable<Alarm>, Runnable
                 && this.getDays().contains(clock.getDayOfWeek()))
         {
             setIsAlarmGoingOff(true);
-            setTriggeredToday(true);
+            setActivatedToday(true);
             logger.info("Alarm {} matches clock's time. Activating alarm", this);
         }
     }
@@ -288,6 +305,7 @@ public class Alarm implements Serializable, Comparable<Alarm>, Runnable
     public boolean isAlarmGoingOff() { return alarmGoingOff; }
     public boolean isUpdatingAlarm() { return updatingAlarm; }
     public boolean isSnoozing() { return isSnoozing; }
+    public boolean isPaused() { return isPaused; }
     public List<DayOfWeek> getDays() { return this.days; }
     public int getHours() { return this.hours; }
     public String getHoursAsStr() { return this.hoursAsStr; }
@@ -297,7 +315,7 @@ public class Alarm implements Serializable, Comparable<Alarm>, Runnable
     public String getName() { return this.name; }
     public AdvancedPlayer getMusicPlayer() { return this.musicPlayer; }
     public String getAlarmAsString() { return hoursAsStr+COLON+minutesAsStr+SPACE+ampm; }
-    public boolean isTriggeredToday() { return triggeredToday; }
+    public boolean isActivatedToday() { return activatedToday; }
     public Thread getSelfThread() { return selfThread; }
 
     /* Setters */
@@ -305,6 +323,7 @@ public class Alarm implements Serializable, Comparable<Alarm>, Runnable
     public void setIsAlarmGoingOff(boolean alarmGoingOff) { this.alarmGoingOff = alarmGoingOff; logger.debug("alarmGoingOff: {}", alarmGoingOff); }
     public void setUpdatingAlarm(boolean updatingAlarm) { this.updatingAlarm = updatingAlarm; logger.debug("updatingAlarm: {}", updatingAlarm); }
     public void setIsSnoozing(boolean isSnoozing) { this.isSnoozing = isSnoozing; logger.debug("isSnoozing: {}", isSnoozing); }
+    public void setIsPaused(boolean isPaused) { this.isPaused = isPaused; logger.debug("isPaused: {}", isPaused); }
     public void setDays(List<DayOfWeek> days) { this.days = days; logger.debug("days: {}", days); }
     public void setHours(int hours) {
         this.hours = hours;
@@ -326,7 +345,7 @@ public class Alarm implements Serializable, Comparable<Alarm>, Runnable
         logger.debug("name: {}", this.name);
     }
     public void setMusicPlayer(AdvancedPlayer musicPlayer) { this.musicPlayer = musicPlayer; logger.debug("musicPlayer set"); }
-    public void setTriggeredToday(boolean triggeredToday) { this.triggeredToday = triggeredToday; logger.debug("triggeredToday: {}", triggeredToday); }
+    public void setActivatedToday(boolean activatedToday) { this.activatedToday = activatedToday; logger.debug("triggeredToday: {}", activatedToday); }
     public void setSelfThread(Thread selfThread) { this.selfThread = selfThread; logger.debug("selfThread set"); }
 
     @Override

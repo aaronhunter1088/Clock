@@ -415,7 +415,7 @@ public class Clock implements Serializable, Comparable<Clock>, Runnable
     {
         if (dateChanged && !getListOfAlarms().isEmpty()) {
             getListOfAlarms().forEach(alarm -> {
-                alarm.setTriggeredToday(false);
+                alarm.setActivatedToday(false);
             });
             logger.info("Setting {} alarms to not triggered today", Alarm.alarmsCounter);
         }

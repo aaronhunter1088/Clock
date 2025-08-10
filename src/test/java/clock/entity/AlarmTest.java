@@ -18,7 +18,6 @@ import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.temporal.ChronoField;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 import static clock.util.Constants.*;
@@ -91,7 +90,7 @@ class AlarmTest {
         assertSame(weekDays, alarm1.getDays(), "Alarm days should be the same");
         assertFalse(alarm1.isUpdatingAlarm(), "Alarm should not be updating");
         assertFalse(alarm1.isAlarmGoingOff(), "Alarm should not be going off");
-        assertFalse(alarm1.isTriggeredToday(), "Alarm should not yet be triggered today");
+        assertFalse(alarm1.isActivatedToday(), "Alarm should not yet be triggered today");
     }
 
     @ParameterizedTest
@@ -186,7 +185,7 @@ class AlarmTest {
 
         javax.swing.SwingUtilities.invokeLater(() -> {
             assertTrue(alarm1.isAlarmGoingOff(), "Alarm should be going off");
-            assertTrue(alarm1.isTriggeredToday(), "Alarm should be triggered today");
+            assertTrue(alarm1.isActivatedToday(), "Alarm should be triggered today");
             assertNotNull(alarm1.getMusicPlayer(), "Music player should be set");
         });
     }

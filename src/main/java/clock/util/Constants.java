@@ -12,6 +12,7 @@ public class Constants {
     private Constants() {}
 
     // General
+    public static final String ALL = "All";
     public static final String AM = "AM";
     public static final String are = "are";
     public static final String CHANGE = "Change";

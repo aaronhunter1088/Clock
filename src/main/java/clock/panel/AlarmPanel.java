@@ -341,7 +341,8 @@ public class AlarmPanel extends ClockPanel implements Runnable
     public void setupSettingsMenu()
     {
         clockFrame.clearSettingsMenu();
-        logger.info("No settings defined up for Alarm Panel");
+        clockFrame.getClockMenuBar().getSettingsMenu().add(clockFrame.getClockMenuBar().getPauseResumeAllAlarmsSetting());
+        clockFrame.getClockMenuBar().getSettingsMenu().add(clockFrame.getClockMenuBar().getResetAlarmsPanelSetting());
     }
 
     /**
@@ -833,6 +834,7 @@ public class AlarmPanel extends ClockPanel implements Runnable
     public JCheckBox getSundayCheckBox() { return sundayCheckBox; }
     public JCheckBox getWeekdaysCheckBox() { return weekdaysCheckBox; }
     public JCheckBox getWeekendsCheckBox() { return weekendsCheckBox; }
+    public JTable getAlarmsTable() { return this.alarmsTable; }
 
     /* Setters */
     public void setClock(Clock clock) { this.clock = clock; logger.info("clock set"); }

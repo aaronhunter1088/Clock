@@ -36,7 +36,9 @@ public class ClockMenuBar extends JMenuBar
                       toggleDSTSetting,
                       showDigitalTimeSettingOnAnalogueClockSetting,
                       pauseResumeAllTimersSetting,
-                      resetPanelSetting,
+                      resetTimersPanelSetting,
+                      pauseResumeAllAlarmsSetting,
+                      resetAlarmsPanelSetting,
     // Options for Features
                       digitalClockFeature,
                       analogueClockFeature,
@@ -67,7 +69,7 @@ public class ClockMenuBar extends JMenuBar
         getMilitaryTimeSetting().setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_M, InputEvent.CTRL_DOWN_MASK));
         getMilitaryTimeSetting().setForeground(Color.WHITE);
         getMilitaryTimeSetting().addActionListener(action -> {
-            logger.info("clicked show military time setting");
+            logger.debug("clicked show military time setting");
             if (clock.isShowMilitaryTime()) {
                 clock.setShowMilitaryTime(false);
                 getMilitaryTimeSetting().setText(SHOW+SPACE+MILITARY_TIME_SETTING);
@@ -82,7 +84,7 @@ public class ClockMenuBar extends JMenuBar
         getFullTimeSetting().setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_F, InputEvent.CTRL_DOWN_MASK));
         getFullTimeSetting().setForeground(Color.WHITE);
         getFullTimeSetting().addActionListener(action -> {
-            logger.info("clicked show full time setting");
+            logger.debug("clicked show full time setting");
             if (clock.isShowFullDate()) {
                 clock.setShowFullDate(false);
                 clock.setShowPartialDate(false);
@@ -100,7 +102,7 @@ public class ClockMenuBar extends JMenuBar
         getPartialTimeSetting().setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_P, InputEvent.CTRL_DOWN_MASK));
         getPartialTimeSetting().setForeground(Color.WHITE);
         getPartialTimeSetting().addActionListener(action -> {
-            logger.info("clicked show partial time setting");
+            logger.debug("clicked show partial time setting");
             if (clock.isShowPartialDate()) {
                 clock.setShowPartialDate(false);
                 clock.setShowFullDate(false);
@@ -130,8 +132,7 @@ public class ClockMenuBar extends JMenuBar
         getShowDigitalTimeOnAnalogueClockSetting().setForeground(Color.WHITE);
         getShowDigitalTimeOnAnalogueClockSetting().addActionListener(action -> {
             boolean showingDigitalTime = clockFrame.getAnalogueClockPanel().isShowDigitalTimeOnAnalogueClock();
-            logger.info("clicked show digital time or hide on analogue clock");
-            logger.info("show digital time: {}", showingDigitalTime);
+            logger.debug("show digital time: {}", showingDigitalTime);
             if (showingDigitalTime)
             { getShowDigitalTimeOnAnalogueClockSetting().setText(SHOW+SPACE+DIGITAL_TIME); }
             else
@@ -142,33 +143,78 @@ public class ClockMenuBar extends JMenuBar
 
         setChangeTimeZoneMenu(new JMenu(CHANGE+SPACE+TIME_ZONES));
         setTimeZones(Arrays.asList(new JMenuItem(HAWAII), new JMenuItem(ALASKA),
-                new JMenuItem(PACIFIC), new JMenuItem(CENTRAL), new JMenuItem(EASTERN) ));
+                                   new JMenuItem(PACIFIC), new JMenuItem(CENTRAL),
+                                   new JMenuItem(EASTERN) ));
         getTimezones().forEach(this::setupTimezone);
         refreshTimezones();
         setCurrentTimeZone();
 
-        setPauseResumeAllTimersSetting(new JMenuItem("Pause All Timers"));
+        setPauseResumeAllTimersSetting(new JMenuItem(PAUSE+SPACE+ALL+SPACE+TIMER+S.toLowerCase()));
         getPauseResumeAllTimersSetting().setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_P, InputEvent.CTRL_DOWN_MASK));
         getPauseResumeAllTimersSetting().setForeground(Color.WHITE);
         getPauseResumeAllTimersSetting().addActionListener(action -> {
-            logger.info("clicked pause/resume all timers setting");
-            if (getPauseResumeAllTimersSetting().getText().equals("Pause All Timers")) {
-                clock.getListOfTimers().forEach(Timer::pauseTimer);
-                getPauseResumeAllTimersSetting().setText("Resume All Timers");
-                getPauseResumeAllTimersSetting().setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_R, InputEvent.CTRL_DOWN_MASK));
-            } else {
-                clock.getListOfTimers().forEach(Timer::resumeTimer);
-                getPauseResumeAllTimersSetting().setText("Pause All Timers");
-                getPauseResumeAllTimersSetting().setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_P, InputEvent.CTRL_DOWN_MASK));
+            if (clock.getListOfTimers().isEmpty())
+            {
+                logger.debug("no timers to pause/resume");
+            }
+            else
+            {
+                logger.debug("clicked pause/resume all timers setting");
+                if (getPauseResumeAllTimersSetting().getText().equals(PAUSE+SPACE+ALL+SPACE+TIMER+S.toLowerCase())) {
+                    clock.getListOfTimers().forEach(Timer::pauseTimer);
+                    getPauseResumeAllTimersSetting().setText(RESUME+SPACE+ALL+SPACE+TIMER+S.toLowerCase());
+                    getPauseResumeAllTimersSetting().setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_R, InputEvent.CTRL_DOWN_MASK));
+                } else {
+                    clock.getListOfTimers().forEach(Timer::resumeTimer);
+                    getPauseResumeAllTimersSetting().setText(PAUSE+SPACE+ALL+SPACE+TIMER+S.toLowerCase());
+                    getPauseResumeAllTimersSetting().setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_P, InputEvent.CTRL_DOWN_MASK));
+                }
             }
         });
 
-        setResetPanelSetting(new JMenuItem("Reset Panel"));
-        getResetPanelSetting().setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_R, InputEvent.CTRL_DOWN_MASK));
-        getResetPanelSetting().setForeground(Color.WHITE);
-        getResetPanelSetting().addActionListener(action -> {
-            logger.info("clicked reset panel setting");
+        setResetTimersPanelSetting(new JMenuItem(RESET+SPACE+TIMER+S.toLowerCase()));
+        getResetTimersPanelSetting().setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_R, InputEvent.CTRL_DOWN_MASK));
+        getResetTimersPanelSetting().setForeground(Color.WHITE);
+        getResetTimersPanelSetting().addActionListener(action -> {
+            logger.debug("clicked reset timers panel setting");
             clockFrame.getTimerPanel().resetTimerPanel();
+        });
+
+        setPauseResumeAllAlarmsSetting(new JMenuItem(PAUSE+SPACE+ALL+SPACE+ALARM+S.toLowerCase()));
+        getPauseResumeAllAlarmsSetting().setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_P, InputEvent.CTRL_DOWN_MASK));
+        getPauseResumeAllAlarmsSetting().setForeground(Color.WHITE);
+        getPauseResumeAllAlarmsSetting().addActionListener(action -> {
+            if (clock.getListOfAlarms().isEmpty())
+            {
+                logger.debug("no alarms to pause/resume");
+            }
+            else
+            {
+                logger.debug("clicked pause/resume all alarms setting");
+                if (getPauseResumeAllAlarmsSetting().getText().equals(PAUSE+SPACE+ALL+SPACE+ALARM+S.toLowerCase())) {
+                    clock.getListOfAlarms().forEach(Alarm::pauseAlarm);
+                    getPauseResumeAllAlarmsSetting().setText(RESUME+SPACE+ALL+SPACE+ALARM+S.toLowerCase());
+                    getPauseResumeAllAlarmsSetting().setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_R, InputEvent.CTRL_DOWN_MASK));
+                } else {
+                    clock.getListOfAlarms().forEach(Alarm::resumeAlarm);
+                    getPauseResumeAllAlarmsSetting().setText(PAUSE+SPACE+ALL+SPACE+ALARM+S.toLowerCase());
+                    getPauseResumeAllAlarmsSetting().setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_P, InputEvent.CTRL_DOWN_MASK));
+                }
+            }
+        });
+
+        setResetAlarmsPanelSetting(new JMenuItem(RESET+SPACE+ALARM+S.toLowerCase()));
+        getResetAlarmsPanelSetting().setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_R, InputEvent.CTRL_DOWN_MASK));
+        getResetAlarmsPanelSetting().setForeground(Color.WHITE);
+        getResetAlarmsPanelSetting().addActionListener(action -> {
+            logger.debug("clicked reset alarms panel setting");
+            clockFrame.getAlarmPanel().resetAlarmPanel();
+            clockFrame.getAlarmPanel().getAlarmsTable().setModel(new javax.swing.table.DefaultTableModel());
+            clock.getListOfAlarms().forEach(alarm -> {
+                alarm.stopAlarm();
+            });
+            clock.getListOfAlarms().clear();
+            logger.info("all alarms cleared");
         });
 
         // Features menu choices
@@ -297,7 +343,9 @@ public class ClockMenuBar extends JMenuBar
     public JMenuItem getPartialTimeSetting() { return this.partialTimeSetting; }
     public JMenuItem getToggleDSTSetting() { return toggleDSTSetting; }
     public JMenuItem getPauseResumeAllTimersSetting() { return pauseResumeAllTimersSetting; }
-    public JMenuItem getResetPanelSetting() { return resetPanelSetting; }
+    public JMenuItem getResetTimersPanelSetting() { return resetTimersPanelSetting; }
+    public JMenuItem getPauseResumeAllAlarmsSetting() { return pauseResumeAllAlarmsSetting; }
+    public JMenuItem getResetAlarmsPanelSetting() { return resetAlarmsPanelSetting; }
     public JMenuItem getShowDigitalTimeOnAnalogueClockSetting() { return this.showDigitalTimeSettingOnAnalogueClockSetting; }
     public JMenu getChangeTimeZoneMenu() { return this.changeTimeZone; }
     public java.util.List<JMenuItem> getTimezones() { return this.timezones; }
@@ -307,20 +355,22 @@ public class ClockMenuBar extends JMenuBar
     public JMenuItem getStopwatchFeature() { return this.stopwatchFeature; }
 
     /* Setters */
-    protected void setSettingsMenu(JMenu settingsMenu) { this.settingsMenu = settingsMenu; }
-    protected void setFeaturesMenu(JMenu featuresMenu) { this.featuresMenu = featuresMenu; }
-    protected void setAlarmsFeature(JMenuItem alarmsFeature) { this.alarmsFeature = alarmsFeature; }
-    protected void setMilitaryTimeSetting(JMenuItem militaryTimeSetting) { this.militaryTimeSetting = militaryTimeSetting; }
-    protected void setFullTimeSetting(JMenuItem fullTimeSetting) { this.fullTimeSetting = fullTimeSetting; }
-    protected void setPartialTimeSetting(JMenuItem partialTimeSetting) { this.partialTimeSetting = partialTimeSetting; }
-    protected void setToggleDSTSetting(JMenuItem toggleDSTSetting) { this.toggleDSTSetting = toggleDSTSetting; }
-    protected void setPauseResumeAllTimersSetting(JMenuItem pauseResumeAllTimersSetting) { this.pauseResumeAllTimersSetting = pauseResumeAllTimersSetting; }
-    protected void setResetPanelSetting(JMenuItem resetPanelSetting) { this.resetPanelSetting = resetPanelSetting; }
-    protected void setShowDigitalTimeOnAnalogueClockSetting(JMenuItem showDigitalTimeSettingOnAnalogueClockSetting) { this.showDigitalTimeSettingOnAnalogueClockSetting = showDigitalTimeSettingOnAnalogueClockSetting; }
-    protected void setChangeTimeZoneMenu(JMenu changeTimeZone) { this.changeTimeZone = changeTimeZone; }
-    protected void setDigitalClockFeature(JMenuItem digitalClockFeature) { this.digitalClockFeature = digitalClockFeature; }
-    protected void setAnalogueClockFeature(JMenuItem analogueClockFeature) { this.analogueClockFeature = analogueClockFeature; }
-    protected void setTimeZones(java.util.List<JMenuItem> timezones) { this.timezones = timezones;}
-    protected void setTimerFeature(JMenuItem timerFeature) { this.timerFeature = timerFeature; }
-    protected void setStopwatchFeature(JMenuItem stopwatchFeature) { this.stopwatchFeature = stopwatchFeature; }
+    protected void setSettingsMenu(JMenu settingsMenu) { this.settingsMenu = settingsMenu; logger.debug("settings menu"); }
+    protected void setFeaturesMenu(JMenu featuresMenu) { this.featuresMenu = featuresMenu; logger.debug("features menu"); }
+    protected void setAlarmsFeature(JMenuItem alarmsFeature) { this.alarmsFeature = alarmsFeature; logger.debug("alarms feature"); }
+    protected void setMilitaryTimeSetting(JMenuItem militaryTimeSetting) { this.militaryTimeSetting = militaryTimeSetting; logger.debug("military time setting"); }
+    protected void setFullTimeSetting(JMenuItem fullTimeSetting) { this.fullTimeSetting = fullTimeSetting; logger.debug("full time setting"); }
+    protected void setPartialTimeSetting(JMenuItem partialTimeSetting) { this.partialTimeSetting = partialTimeSetting; logger.debug("partial time setting"); }
+    protected void setToggleDSTSetting(JMenuItem toggleDSTSetting) { this.toggleDSTSetting = toggleDSTSetting; logger.debug("toggle dst setting"); }
+    protected void setPauseResumeAllTimersSetting(JMenuItem pauseResumeAllTimersSetting) { this.pauseResumeAllTimersSetting = pauseResumeAllTimersSetting; logger.debug("pause/resume all timers setting"); }
+    protected void setResetTimersPanelSetting(JMenuItem resetTimersPanelSetting) { this.resetTimersPanelSetting = resetTimersPanelSetting; logger.debug("reset timers panel setting"); }
+    protected void setPauseResumeAllAlarmsSetting(JMenuItem pauseResumeAllAlarmsSetting) { this.pauseResumeAllAlarmsSetting = pauseResumeAllAlarmsSetting; logger.debug("pause/resume all alarms setting"); }
+    protected void setResetAlarmsPanelSetting(JMenuItem resetAlarmsPanelSetting) { this.resetAlarmsPanelSetting = resetAlarmsPanelSetting; logger.debug("reset alarms panel setting"); }
+    protected void setShowDigitalTimeOnAnalogueClockSetting(JMenuItem showDigitalTimeSettingOnAnalogueClockSetting) { this.showDigitalTimeSettingOnAnalogueClockSetting = showDigitalTimeSettingOnAnalogueClockSetting; logger.debug("show digital time on analogue clock setting"); }
+    protected void setChangeTimeZoneMenu(JMenu changeTimeZone) { this.changeTimeZone = changeTimeZone; logger.debug("change time zone menu"); }
+    protected void setDigitalClockFeature(JMenuItem digitalClockFeature) { this.digitalClockFeature = digitalClockFeature; logger.debug("digital clock feature"); }
+    protected void setAnalogueClockFeature(JMenuItem analogueClockFeature) { this.analogueClockFeature = analogueClockFeature; logger.debug("analogue clock feature"); }
+    protected void setTimeZones(java.util.List<JMenuItem> timezones) { this.timezones = timezones; logger.debug("timezones list"); }
+    protected void setTimerFeature(JMenuItem timerFeature) { this.timerFeature = timerFeature; logger.debug("timer feature"); }
+    protected void setStopwatchFeature(JMenuItem stopwatchFeature) { this.stopwatchFeature = stopwatchFeature; logger.debug("stopwatch feature");}
 }

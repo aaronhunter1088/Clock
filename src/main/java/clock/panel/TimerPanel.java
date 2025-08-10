@@ -4,7 +4,6 @@ import clock.entity.ButtonColumn;
 import clock.entity.Clock;
 import clock.entity.Timer;
 import clock.exception.InvalidInputException;
-import org.apache.commons.lang3.math.NumberUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.codehaus.plexus.util.StringUtils;
@@ -203,7 +202,7 @@ public class TimerPanel extends ClockPanel implements Runnable
     {
         clockFrame.clearSettingsMenu();
         clockFrame.getClockMenuBar().getSettingsMenu().add(clockFrame.getClockMenuBar().getPauseResumeAllTimersSetting());
-        clockFrame.getClockMenuBar().getSettingsMenu().add(clockFrame.getClockMenuBar().getResetPanelSetting());
+        clockFrame.getClockMenuBar().getSettingsMenu().add(clockFrame.getClockMenuBar().getResetTimersPanelSetting());
     }
 
     /** Sets up the default values for the timer panel. */
