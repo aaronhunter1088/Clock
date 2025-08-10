@@ -7,6 +7,8 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
@@ -18,10 +20,12 @@ import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.temporal.ChronoField;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
+import java.util.stream.Stream;
 
 import static clock.util.Constants.*;
-import static java.lang.Thread.sleep;
+import static java.time.DayOfWeek.*;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
@@ -36,7 +40,7 @@ class AlarmTest {
     private static final Logger logger = LogManager.getLogger(AlarmTest.class);
 
     private Clock clock;
-    private final List<DayOfWeek> weekDays = List.of(DayOfWeek.MONDAY, DayOfWeek.TUESDAY, DayOfWeek.WEDNESDAY, DayOfWeek.THURSDAY, DayOfWeek.FRIDAY),
+    private final List<DayOfWeek> weekDays = List.of(DayOfWeek.MONDAY, TUESDAY, WEDNESDAY, THURSDAY, DayOfWeek.FRIDAY),
             weekendDays = List.of(DayOfWeek.SATURDAY, DayOfWeek.SUNDAY);
     @InjectMocks
     private Alarm alarm1, alarm2, weekDays730AmAlarm, weekend10AmAlarm;
@@ -53,8 +57,8 @@ class AlarmTest {
     {
         MockitoAnnotations.initMocks(this);
         clock = new Clock();
-        weekDays730AmAlarm = new Alarm("Weekday Alarm", 7, 30, AM, weekDays, false, clock);
-        weekend10AmAlarm = new Alarm("Weekend Alarm", 10, 0, AM, weekendDays, false, clock);
+        weekDays730AmAlarm = new Alarm("Weekdays Alarm", 7, 30, AM, weekDays, false, clock);
+        weekend10AmAlarm = new Alarm("Weekends Alarm", 10, 0, AM, weekendDays, false, clock);
     }
 
     @AfterEach
@@ -189,6 +193,55 @@ class AlarmTest {
     }
 
     @Test
+    @DisplayName("Test Pausing An Alarm")
+    void testPausingAnAlarm()
+    {
+        alarm1 = weekDays730AmAlarm;
+
+        // Simulate the clock reaching the alarm time
+        LocalDate date = LocalDateTime.now().toLocalDate().with(ChronoField.DAY_OF_WEEK, DayOfWeek.MONDAY.getValue());
+        LocalTime time = LocalDateTime.now().toLocalTime().withHour(7).withMinute(30);
+        LocalDateTime dateTime = LocalDateTime.of(date, time);
+        clock.setTheTime(dateTime);
+
+        alarm1.startAlarm();
+        sleep(1000); // Allow time for the alarm to trigger
+
+        javax.swing.SwingUtilities.invokeLater(() -> {
+            assertTrue(alarm1.isAlarmGoingOff(), "Alarm should be going off");
+            assertTrue(alarm1.isActivatedToday(), "Alarm should be triggered today");
+            alarm1.pauseAlarm();
+            assertTrue(alarm1.isPaused(), "Alarm should be paused");
+        });
+    }
+
+    @Test
+    @DisplayName("Test Resuming A Paused Alarm")
+    void testResumingAPausedAlarm()
+    {
+        alarm1 = weekDays730AmAlarm;
+
+        // Simulate the clock reaching the alarm time
+        LocalDate date = LocalDateTime.now().toLocalDate().with(ChronoField.DAY_OF_WEEK, DayOfWeek.MONDAY.getValue());
+        LocalTime time = LocalDateTime.now().toLocalTime().withHour(7).withMinute(30);
+        LocalDateTime dateTime = LocalDateTime.of(date, time);
+        clock.setTheTime(dateTime);
+
+        alarm1.startAlarm();
+        sleep(1000); // Allow time for the alarm to trigger
+
+        javax.swing.SwingUtilities.invokeLater(() -> {
+            assertTrue(alarm1.isAlarmGoingOff(), "Alarm should be going off");
+            assertTrue(alarm1.isActivatedToday(), "Alarm should be triggered today");
+            alarm1.pauseAlarm();
+            assertTrue(alarm1.isPaused(), "Alarm should be paused");
+            sleep(2000); // Simulate some time passing while paused
+            alarm1.resumeAlarm();
+            assertFalse(alarm1.isPaused(), "Alarm should not be paused anymore");
+        });
+    }
+
+    @Test
     @DisplayName("Checking An Alarm when not equal to current time does nothing")
     void testCheckingAnAlarmWhenNotEqualToCurrentTimeDoesNothing()
     {
@@ -203,9 +256,7 @@ class AlarmTest {
         alarm1.startAlarm();
         sleep(1000);
 
-        javax.swing.SwingUtilities.invokeLater(() -> {
-            assertNull(alarm1.getMusicPlayer(), "Music player should not be set yet");
-        });
+        javax.swing.SwingUtilities.invokeLater(() -> assertNull(alarm1.getMusicPlayer(), "Music player should not be set yet"));
     }
 
     @Test
@@ -260,7 +311,7 @@ class AlarmTest {
     {
         alarm1 = new Alarm("Random Days Alarm", 8, 0, AM,
                 List.of(DayOfWeek.MONDAY,
-                        DayOfWeek.WEDNESDAY,
+                        WEDNESDAY,
                         DayOfWeek.FRIDAY,
                         DayOfWeek.SUNDAY
                 ), false, clock);
@@ -279,9 +330,9 @@ class AlarmTest {
     {
         alarm1 = new Alarm("All Days Alarm", 8, 0, AM,
                 List.of(DayOfWeek.MONDAY,
-                        DayOfWeek.TUESDAY,
-                        DayOfWeek.WEDNESDAY,
-                        DayOfWeek.THURSDAY,
+                        TUESDAY,
+                        WEDNESDAY,
+                        THURSDAY,
                         DayOfWeek.FRIDAY,
                         DayOfWeek.SATURDAY,
                         DayOfWeek.SUNDAY
@@ -306,21 +357,59 @@ class AlarmTest {
         assertEquals("Alarm"+currentAlarmsCounter, alarm2.getName(), "Alarm2 name should match");
     }
 
-    @Test
+    @ParameterizedTest
     @DisplayName("Test Alarm Equals Method")
-    void testAlarmEqualsMethod()
+    @MethodSource("checkForEquality")
+    void testAlarmEqualsMethod(Object testAlarm, boolean expected)
     {
-        alarm1 = new Alarm("Weekday Alarm", 7, 30, AM, weekDays, false, clock);
-        alarm2 = new Alarm("Alarm2", 7, 0, AM, weekDays, false, clock);
+        alarm1 = new Alarm("Weekdays Alarm", 7, 30, AM, weekDays, false, clock);
 
-        assertNotEquals(alarm1, alarm2, "Alarms should not be equal");
+        assertEquals(expected, alarm1.equals(testAlarm), "Expected " + expected + " but got " + testAlarm.equals(alarm1));
+    }
+    private static Stream<Arguments> checkForEquality()
+    {
+        // Return a stream of arguments, one being an object to compare against the alarm, and the expected result of the comparison
+        // Updating an alarm and the clock is not compared against the alarm
+        return Stream.of(
+                /* Different name, days */ Arguments.of(new Alarm("Monday Alarm", 7, 30, AM, List.of(MONDAY), false, new Clock()), false),
+                Arguments.of(new Alarm("Saturday Alarm", 10, 0, AM, List.of(SATURDAY), false, new Clock()), false),
+                Arguments.of(new Clock(), false),
+                // Compare each option
+                /* Name different */ Arguments.of(new Alarm("Different Alarm", 7, 30, AM, List.of(MONDAY), false, new Clock()), false),
+                /* Name same */ Arguments.of(new Alarm("Weekdays Alarm", 7, 30, AM, List.of(MONDAY), false, new Clock()), false),
+                /* Name same, different hour */ Arguments.of(new Alarm("Weekdays Alarm", 6, 30, AM, List.of(MONDAY), false, new Clock()), false),
+                /* Name same, same hour */ Arguments.of(new Alarm("Weekdays Alarm", 7, 30, AM, List.of(MONDAY), false, new Clock()), false),
+                /* Name same, same hour, different minute */ Arguments.of(new Alarm("Weekdays Alarm", 7, 0, AM, List.of(MONDAY), false, new Clock()), false),
+                /* Name same, same hour, same minute */ Arguments.of(new Alarm("Weekdays Alarm", 7, 30, AM, List.of(MONDAY), false, new Clock()), false),
+                /* Name same, same hour, same minute, different AMPM */ Arguments.of(new Alarm("Weekdays Alarm", 7, 30, PM, List.of(MONDAY), false, new Clock()), false),
+                /* Name same, same hour, same minute, same AMPM */ Arguments.of(new Alarm("Weekdays Alarm", 7, 30, AM, List.of(MONDAY), false, new Clock()), false),
+                /* Name same, same hour, same minute, same AMPM, different days */ Arguments.of(new Alarm("Weekdays Alarm", 7, 30, AM, List.of(MONDAY, TUESDAY), false, new Clock()), false),
+                /* Same everything */ Arguments.of(new Alarm("Weekdays Alarm", 7, 30, AM, List.of(MONDAY, TUESDAY, WEDNESDAY, THURSDAY, FRIDAY), false, new Clock()), true)
+        );
+    }
 
-        assertEquals(alarm1, weekDays730AmAlarm, "Alarms should be equal");
+    @Test
+    @DisplayName("Test Alarms compared against another")
+    void testAlarmsComparedAgainstAnother()
+    {
+        alarm1 = new Alarm("Alarm1", 7, 30, AM, weekDays, false, clock);
+        alarm2 = new Alarm("Work", 5, 0, AM, weekDays, false, clock);
 
-        assertNotEquals(alarm1, weekend10AmAlarm, "Alarms should not be equal again");
+        List<Alarm> expectedAlarms = List.of(alarm2, alarm1, weekDays730AmAlarm, weekend10AmAlarm);
+
+        // test that the alarms are sorted by time
+        List<Alarm> alarms = new ArrayList<>(4);
+        alarms.add(alarm1);
+        alarms.add(alarm2);
+        alarms.add(weekDays730AmAlarm);
+        alarms.add(weekend10AmAlarm);
+        Collections.sort(alarms);
+
+        assertIterableEquals(expectedAlarms, alarms, "Alarms should match");
     }
 
     // Helper methods
+    @SuppressWarnings("SameParameterValue")
     private void sleep(int time)
     {
         try {

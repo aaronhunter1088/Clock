@@ -85,7 +85,6 @@ public class Alarm implements Serializable, Comparable<Alarm>, Runnable
         setDays(days);
         setUpdatingAlarm(updatingAlarm);
         setName(name);
-        //setupMusicPlayer();
         alarmsCounter++;
         logger.debug("Total alarms created: {}", alarmsCounter);
         if (alarmsCounter == 100L) {
@@ -174,7 +173,7 @@ public class Alarm implements Serializable, Comparable<Alarm>, Runnable
     {
         if (selfThread == null)
         {
-            selfThread = new Thread(this);
+            setSelfThread(selfThread = new Thread(this));
             selfThread.start();
         }
     }
@@ -370,22 +369,18 @@ public class Alarm implements Serializable, Comparable<Alarm>, Runnable
     public boolean equals(Object o)
     {
         if (!(o instanceof Alarm alarm)) return false;
-        if (!StringUtils.isEmpty(getName())) {
-            return getHours() == alarm.getHours() &&
-                   getMinutes() == alarm.getMinutes() &&
-                   Objects.equals(getName(), alarm.getName()) &&
-                   Objects.equals(ampm, alarm.ampm) &&
-                   Objects.equals(getDays(), alarm.getDays());
-        } else {
-            return getHours() == alarm.getHours() &&
-                   getMinutes() == alarm.getMinutes() &&
-                   Objects.equals(ampm, alarm.ampm) &&
-                   Objects.equals(getDays(), alarm.getDays());
-        }
+        return Objects.equals(getName(), alarm.getName()) &&
+                getHours() == alarm.getHours() &&
+                getMinutes() == alarm.getMinutes() &&
+                Objects.equals(getAMPM(), alarm.getAMPM()) &&
+                Objects.equals(getDays(), alarm.getDays());
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(getHours(), getMinutes(), getName(), getMinutesAsStr(), getHoursAsStr(), ampm, getDays(), isAlarmGoingOff(), isUpdatingAlarm(), getClock(), getMusicPlayer());
+        return Objects.hash(getHours(), getMinutes(),
+                getName(), getMinutesAsStr(),
+                getHoursAsStr(), getAMPM(),
+                getDays());
     }
 }
