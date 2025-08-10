@@ -605,11 +605,12 @@ public class TimerPanel extends ClockPanel implements Runnable
         boolean validHours = validateHoursTextField();
         boolean validMinutes = validateMinutesTextField();
         boolean validSeconds = validateSecondsTextField();
-        if (EMPTY.equals(hoursTextField.getText())) {
+        if (EMPTY.equals(hoursTextField.getText()) || ZERO.equals(hoursTextField.getText())) {
             hoursTextField.setText(ZERO);
-            if (EMPTY.equals(minutesTextField.getText())) {
+            if (EMPTY.equals(minutesTextField.getText()) || ZERO.equals(minutesTextField.getText())) {
                 minutesTextField.setText(ZERO);
-                if (EMPTY.equals(secondsTextField.getText())) secondsTextField.setText(ZERO);
+                if (EMPTY.equals(secondsTextField.getText()) || ZERO.equals(secondsTextField.getText()))
+                    secondsTextField.setText(ZERO);
             }
         }
         if (!areAllNotZeroes())

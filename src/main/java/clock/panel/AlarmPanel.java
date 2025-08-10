@@ -110,15 +110,6 @@ public class AlarmPanel extends ClockPanel implements Runnable
         setHoursTextField(new JTextField(EMPTY, 4));
         getHoursTextField().setName(HOUR + TEXT_FIELD);
 
-        NumberFormatter intFormatter = new NumberFormatter(NumberFormat.getIntegerInstance());
-        intFormatter.setValueClass(Integer.class);
-        intFormatter.setMinimum(0);
-        intFormatter.setMaximum(clockFrame.getClock().isShowMilitaryTime() ? 23 : 12);
-        intFormatter.setAllowsInvalid(false);
-        setHoursTextField(new JFormattedTextField(intFormatter));
-        getHoursTextField().setColumns(4);
-        getHoursTextField().setName(HOUR + TEXT_FIELD);
-
         setMinutesLabel(new JLabel(Minutes, SwingConstants.CENTER));
         getMinutesLabel().setName(Minutes+LABEL);
         setMinutesTextField(new JTextField(EMPTY, 4));
@@ -316,9 +307,6 @@ public class AlarmPanel extends ClockPanel implements Runnable
         nameTextField.requestFocusInWindow();
         setBackground(Color.BLACK);
         setForeground(Color.BLACK);
-        nameTextField.setText(EMPTY);
-        hoursTextField.setText(EMPTY);
-        minutesTextField.setText(EMPTY);
         resetAlarmPanel();
         setupSettingsMenu();
         clockFrame.setTitle("Alarm Panel");
@@ -712,10 +700,10 @@ public class AlarmPanel extends ClockPanel implements Runnable
             boolean validHours = validateHoursTextField();
             boolean validMinutes = validateMinutesTextField();
             boolean validCheckboxes = validateTheCheckBoxes(getDaysChecked());
+            if (areAllBlank()) throw new InvalidInputException("Hours and minutes must not be blank");
             if (!validHours) throw new InvalidInputException("Invalid hours input");
             if (!validMinutes) throw new InvalidInputException("Invalid minutes input");
             if (!validCheckboxes) throw new InvalidInputException("At least one checkbox must be selected");
-            if (EMPTY.equals(hoursTextField.getText()) && EMPTY.equals(hoursTextField.getText())) throw new InvalidInputException("Hours and minutes must not be blank");
         }
         return alarm;
     }
