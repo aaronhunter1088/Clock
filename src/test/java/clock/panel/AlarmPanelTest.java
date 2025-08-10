@@ -2,6 +2,7 @@ package clock.panel;
 
 import clock.entity.Alarm;
 import clock.entity.Clock;
+import clock.entity.Panel;
 import clock.exception.InvalidInputException;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -20,6 +21,7 @@ import java.time.DayOfWeek;
 import java.util.List;
 import java.util.stream.Stream;
 
+import static clock.entity.Panel.PANEL_ALARM;
 import static clock.util.Constants.*;
 import static clock.util.Constants.TIMER_HOUR_ERROR_12;
 import static java.time.DayOfWeek.MONDAY;
@@ -52,6 +54,7 @@ class AlarmPanelTest
     {
         clock = new Clock(11, 30, 0, JANUARY, WEDNESDAY, 1, 2025, AM); // 11:30 AM
         alarmPanel = new AlarmPanel(new ClockFrame(clock));
+        alarmPanel.getClockFrame().changePanels(PANEL_ALARM);
     }
 
     @AfterEach

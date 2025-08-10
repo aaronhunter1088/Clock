@@ -1,21 +1,23 @@
 package clock.panel;
 
 import clock.entity.Clock;
+import clock.entity.Panel;
 import clock.exception.InvalidInputException;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.*;
 import org.mockito.Mock;
 
+import javax.swing.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.FocusEvent;
 import java.awt.event.MouseEvent;
+import java.lang.reflect.InvocationTargetException;
 import java.util.Arrays;
+import java.util.concurrent.atomic.AtomicReference;
 
 import static clock.util.Constants.*;
+import static java.lang.Thread.sleep;
 import static java.time.DayOfWeek.WEDNESDAY;
 import static java.time.Month.JANUARY;
 import static org.junit.jupiter.api.Assertions.*;
@@ -43,6 +45,7 @@ class TimerPanelTest
     {
         clock = new Clock();
         timerPanel = new TimerPanel(new ClockFrame(clock));
+        timerPanel.getClockFrame().changePanels(Panel.PANEL_TIMER);
     }
 
     @AfterEach
@@ -344,4 +347,55 @@ class TimerPanelTest
         });
     }
 
+    @Test
+    @DisplayName("Create 2 Timers Using GUI")
+    void testCreateTwoTimersUsingGUI() throws InterruptedException, InvocationTargetException
+    {
+        AtomicReference<clock.entity.Timer> timer1 = new AtomicReference<>(new clock.entity.Timer(0, 4, 0, clock));
+        AtomicReference<clock.entity.Timer> timer2 = new AtomicReference<>(new clock.entity.Timer(0, 5, 0, clock));
+
+        SwingUtilities.invokeLater(() -> {
+            try {
+                timerPanel.getHoursTextField().grabFocus();
+                timerPanel.getHoursTextField().setText(Integer.toString(timer1.get().getHours()));
+                //sleep(2000);
+                timerPanel.getMinutesTextField().grabFocus();
+                timerPanel.getMinutesTextField().setText(Integer.toString(timer1.get().getMinutes()));
+                //sleep(2000);
+                timerPanel.getSecondsTextField().grabFocus();
+                timerPanel.getSetTimerButton().setEnabled(timerPanel.validTextFields());
+                //sleep(2000);
+                timerPanel.getSetTimerButton().doClick();
+
+                timerPanel.getHoursTextField().grabFocus();
+                timerPanel.getHoursTextField().setText(Integer.toString(timer2.get().getHours()));
+                //sleep(2000);
+                timerPanel.getMinutesTextField().grabFocus();
+                timerPanel.getMinutesTextField().setText(Integer.toString(timer2.get().getMinutes()));
+                //sleep(2000);
+                timerPanel.getSecondsTextField().grabFocus();
+                timerPanel.getSetTimerButton().setEnabled(timerPanel.validTextFields());
+                //sleep(2000);
+                timerPanel.getSetTimerButton().doClick();
+
+                sleep(1000); // timer1 now at 3:58, timer2 at 4:59
+                timerPanel.getClock().getListOfTimers().getFirst().pauseTimer(); // timer1 paused, timer2 at 4:58
+                sleep(3000);
+
+                timer1.set(timerPanel.getClock().getListOfTimers().get(0));
+                timer2.set(timerPanel.getClock().getListOfTimers().get(1));
+
+                assertSame(0, timer1.get().getHours());
+                assertSame(3, timer1.get().getMinutes());
+                assertSame(58, timer1.get().getSeconds());
+
+                assertSame(0, timer2.get().getHours());
+                assertSame(4, timer2.get().getMinutes());
+                assertSame(55, timer2.get().getSeconds());
+            }
+            catch (InterruptedException e) {
+                throw new RuntimeException(e);
+            }
+        });
+    }
 }

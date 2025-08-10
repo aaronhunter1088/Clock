@@ -1,5 +1,6 @@
 package clock.panel;
 
+import clock.entity.Alarm;
 import clock.entity.ButtonColumn;
 import clock.entity.Clock;
 import clock.entity.Timer;
@@ -133,7 +134,7 @@ public class TimerPanel extends ClockPanel implements Runnable
                     {
                         case NAME+TEXT_FIELD -> {
                             if (nameTextField.getText().isBlank())
-                            { setupNameTextField(); }
+                            { nameTextField.setText(TIMER+(Timer.timersCounter+1)); }
                             else if (nameTextField.getText().length() > 10)
                             { nameTextField.setText(nameTextField.getText().substring(0, 10)); }
                         }
@@ -276,8 +277,8 @@ public class TimerPanel extends ClockPanel implements Runnable
                 .map(timer -> new Object[] {
                         timer.getName() != null ? timer.getName() : timer.toString(),
                         timer.getCountdownString(),
-                        "Pause",
-                        "Remove"
+                        PAUSE,
+                        REMOVE
                 })
                 .toArray(Object[][]::new);
     }
@@ -287,9 +288,7 @@ public class TimerPanel extends ClockPanel implements Runnable
      * @return the column names for the timers table
      */
     public String[] getTimersTableColumnNames()
-    {
-        return new String[]{"Name", "Countdown", "Resume/Pause/Reset", "Remove"};
-    }
+    { return new String[]{NAME, COUNTDOWN, RESUME+SLASH+PAUSE+SLASH+RESET, REMOVE}; }
 
     /**
      * Sets the default values for the timers table
@@ -392,29 +391,14 @@ public class TimerPanel extends ClockPanel implements Runnable
     }
 
     /**
-     * Enables the timer button if the text fields are valid
-     */
-    public void enableDisableTimerButton()
-    {
-        logger.debug("enable timer button");
-        var allValid = validateHoursTextField() && validateMinutesTextField() && validateSecondsTextField();
-        var allAreNotZeroes = !(ZERO.equals(hoursTextField.getText()) && ZERO.equals(minutesTextField.getText()) && ZERO.equals(secondsTextField.getText()));
-        var someNotBlank = areAllBlank();
-        logger.debug("enabled?: {}", allValid && allAreNotZeroes && someNotBlank);
-        //setTimerButton.setEnabled(allValid && allAreNotZeroes && someNotBlank);
-    }
-
-    /**
      * Executes when we hit the timer button
      * @param action the action event
      */
     public void setTimer(ActionEvent action)
     {
         logger.debug("set timer");
-        clock.entity.Timer timer = null;
         try {
-            setupNameTextField();
-            timer = createTimer();
+            Timer timer = createTimer();
             logger.debug("timer created: {}", timer);
             clock.getListOfTimers().add(timer);
             clearTextFields();
@@ -429,10 +413,10 @@ public class TimerPanel extends ClockPanel implements Runnable
     /**
      * Creates a new Timer
      */
-    public clock.entity.Timer createTimer()
+    public Timer createTimer()
     {
         logger.debug("creating timer");
-        clock.entity.Timer timer = null;
+        Timer timer = null;
         if (validTextFields())
         {
             timer = new Timer(Integer.parseInt(hoursTextField.getText()), Integer.parseInt(minutesTextField.getText()),
@@ -448,17 +432,6 @@ public class TimerPanel extends ClockPanel implements Runnable
             if (!validSeconds) throw new InvalidInputException("Invalid seconds");
         }
         return timer;
-    }
-
-    /**
-     * Sets the name text field to the default value
-     */
-    public void setupNameTextField()
-    {
-        if (nameTextField.getText().isEmpty()) {
-            nameTextField.setText(TIMER + (Timer.timersCounter + 1));
-            logger.debug("name text field was empty, set to default: {}", nameTextField.getText());
-        }
     }
 
     /**
@@ -483,7 +456,7 @@ public class TimerPanel extends ClockPanel implements Runnable
      */
     public void clearTextFields()
     {
-        logger.debug("clearing timer fields");
+        logger.debug("clearing timer text fields");
         nameTextField.setText(EMPTY);
         hoursTextField.setText(EMPTY);
         minutesTextField.setText(EMPTY);

@@ -268,61 +268,6 @@ class TimerTest
         assertIterableEquals(expectedTimers, timers, "Timers should match");
     }
 
-    // TODO: Move to TimerPanelTest
-//    @Test
-//    @DisplayName("Create 2 Timers Using GUI")
-//    void testCreateTwoTimersUsingGUI() throws InterruptedException, InvocationTargetException
-//    {
-//        AtomicReference<clock.entity.Timer> timer1 = new AtomicReference<>(new clock.entity.Timer(0, 4, 0, clock));
-//        AtomicReference<clock.entity.Timer> timer2 = new AtomicReference<>(new clock.entity.Timer(0, 5, 0, clock));
-//
-//        openTimerPanel();
-//
-//        SwingUtilities.invokeLater(() -> {
-//            clock.getTimerPanel().getHourField().grabFocus();
-//            clock.getTimerPanel().getHourField().setText(Integer.toString(timer1.get().getHours()));
-//            //sleep(2000);
-//            clock.getTimerPanel().getMinuteField().grabFocus();
-//            clock.getTimerPanel().getMinuteField().setText(Integer.toString(timer1.get().getMinutes()));
-//            //sleep(2000);
-//            clock.getTimerPanel().getSecondField().grabFocus();
-//            clock.getTimerPanel().getTimerButton().setEnabled(clock.getTimerPanel().validTextFields());
-//            //sleep(2000);
-//            clock.getTimerPanel().getTimerButton().doClick();
-//
-//            clock.getTimerPanel().getHourField().grabFocus();
-//            clock.getTimerPanel().getHourField().setText(Integer.toString(timer2.get().getHours()));
-//            //sleep(2000);
-//            clock.getTimerPanel2().getMinuteField().grabFocus();
-//            clock.getTimerPanel2().getMinuteField().setText(Integer.toString(timer2.get().getMinutes()));
-//            //sleep(2000);
-//            clock.getTimerPanel2().getSecondField().grabFocus();
-//            clock.getTimerPanel2().getTimerButton().setEnabled(clock.getTimerPanel2().validTextFields());
-//            //sleep(2000);
-//            clock.getTimerPanel2().getTimerButton().doClick();
-//
-//            try {
-//                new Thread().sleep(1000); // timer1 now at 3:58, timer2 at 4:59
-//                clock.getTimerPanel2().getActiveTimers().get(0).pauseTimer(); // timer1 paused, timer2 at 4:58
-//                new Thread().sleep(3000);
-//
-//                timer1.set(clock.getTimerPanel2().getActiveTimers().get(0));
-//                timer2.set(clock.getTimerPanel2().getActiveTimers().get(1));
-//
-//                assertSame(0, timer1.get().getHours());
-//                assertSame(3, timer1.get().getMinutes());
-//                assertSame(58, timer1.get().getSeconds());
-//
-//                assertSame(0, timer2.get().getHours());
-//                assertSame(4, timer2.get().getMinutes());
-//                assertSame(55, timer2.get().getSeconds());
-//            }
-//            catch (InterruptedException e) {
-//                throw new RuntimeException(e);
-//            }
-//        });
-//    }
-
     // Helper methods
     private void sleep(int time)
     {

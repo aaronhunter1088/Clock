@@ -3,12 +3,10 @@ package clock.panel;
 import clock.entity.Panel;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.*;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import static clock.entity.Panel.*;
@@ -37,28 +35,24 @@ class PanelTypeTest
     void afterEach() {}
 
     @Test
+    @DisplayName("Panel Types are Different")
     void testClockFacesAreDifferent()
     {
-        Panel c1 = PANEL_DIGITAL_CLOCK;
-        Panel c2 = PANEL_ALARM;
-        assertNotSame(c1, c2);
+        assertNotSame(PANEL_DIGITAL_CLOCK, PANEL_ALARM);
     }
 
     @Test
+    @DisplayName("Panel in List are All There")
     void testThatWeGetAllValues()
     {
-        List<Panel> clockPanels = new ArrayList<>();
-        for (Panel cf : Panel.values()) {
-            clockPanels.add(cf);
-        }
-        // x should be hard coded for future tests
-        assertTrue(Panel.values().length == clockPanels.size());
+        List<Panel> clockPanels = new ArrayList<>(Arrays.asList(values()));
+        assertEquals(values().length, clockPanels.size());
     }
 
     @Test
+    @DisplayName("Panel name and toString are the same")
     void testToStringPrintsFaceName()
     {
-        Panel cf = PANEL_DIGITAL_CLOCK;
-        assertEquals("PANEL_DIGITAL_CLOCK", cf.toString(), "Printed the Name");
+        assertEquals(PANEL_DIGITAL_CLOCK.name(), PANEL_DIGITAL_CLOCK.toString(), "Expected the name to be the same");
     }
 }
