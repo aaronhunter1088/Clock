@@ -5,12 +5,14 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.junit.jupiter.params.provider.ValueSource;
-import org.mockito.Mock;
 
-import java.awt.event.ActionEvent;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
+import java.util.stream.Stream;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -26,10 +28,6 @@ class TimerTest
 
     private Clock clock;
     private Timer timer1, timer2;
-    private List<Timer> timers = new ArrayList<>();
-
-    @Mock
-    ActionEvent actionEvent;
 
     @BeforeAll
     static void beforeClass()
@@ -52,7 +50,8 @@ class TimerTest
     @DisplayName("Create a Timer")
     void testCreatingATimer()
     {
-        assertEquals("00:00:00", new clock.entity.Timer().toString());
+        String expectedName = "(Timer"+(Timer.timersCounter+1)+") 00:00:00";
+        assertEquals(expectedName, new clock.entity.Timer().toString());
     }
 
     @Test
@@ -61,7 +60,8 @@ class TimerTest
     {
         timer1 = new clock.entity.Timer(1, 0, 0);
 
-        assertEquals("01:00:00", timer1.toString(), "Strings don't match");
+        String expectedName = "(Timer"+Timer.timersCounter+") 01:00:00";
+        assertEquals(expectedName, timer1.toString(), "Strings don't match");
         assertSame(1, timer1.getHours());
         assertSame(0, timer1.getMinutes());
         assertSame(0, timer1.getSeconds());
@@ -76,7 +76,8 @@ class TimerTest
         timer1 = new clock.entity.Timer(0, 5, 0, clock);
         timer2 = new clock.entity.Timer(0, 5, 0, "Two", clock);
 
-        assertEquals("00:05:00", timer1.toString(), "Strings don't match");
+        String expectedName = "(Timer"+(Timer.timersCounter-1)+") 00:05:00";
+        assertEquals(expectedName, timer1.toString(), "Strings don't match");
         assertSame(0, timer1.getHours());
         assertSame(5, timer1.getMinutes());
         assertSame(0, timer1.getSeconds());
@@ -97,8 +98,6 @@ class TimerTest
     {
         timer1 = new Timer(0, 4, 0, clock);
         timer2 = new Timer(0, 5, 0, clock);
-        timers.add(timer1);
-        timers.add(timer2);
 
         timer1.startTimer();
         sleep(1000); // timer1 now at 3:59, timer2 "doesn't exist yet"
@@ -168,7 +167,8 @@ class TimerTest
         sleep(6000); // wait for the timer to reach zero
 
         assertTrue(timer1.isTimerGoingOff(), "Timer should be going off");
-        assertEquals("00:00:00", timer1.toString(), "Timer did not reach zero as expected");
+        String expectedName = "(Timer"+Timer.timersCounter+") 00:00:00";
+        assertEquals(expectedName, timer1.toString(), "Timer did not reach zero as expected");
     }
 
     @Test
@@ -221,6 +221,51 @@ class TimerTest
             assertFalse(timer1.isHasBeenTriggered(), "Timer should not have been triggered after stopping");
             assertEquals("(Test Timer) 00:00:07", timer1.toString(), "Timer did not stop at the expected time");
         });
+    }
+
+    @ParameterizedTest
+    @DisplayName("Test Timer Equals Method")
+    @MethodSource("checkForTimerEquality")
+    void testTimerEqualsMethod(Object testTimer, boolean expected)
+    {
+        timer1 = new Timer(1, 2, 3, "Test Timer", clock);
+
+        assertEquals(expected, timer1.equals(testTimer), "Expected " + expected + " but got " + timer1.equals(testTimer));
+    }
+    private static Stream<Arguments> checkForTimerEquality()
+    {
+        // Return a stream of arguments, one being an object to compare against the timer, and the expected result of the comparison
+        // The clock is not compared against the timer
+        return Stream.of(
+                /* Not a Timer */ Arguments.of(new Clock(), false),
+                // Compare each option
+                /* Hours different */ Arguments.of(new Timer(0, 2, 3, "Test Timer", new Clock()), false),
+                /* Hours same */ Arguments.of(new Timer(1, 0, 3, "Test Timer", new Clock()), false),
+                /* Hours same, different minutes */ Arguments.of(new Timer(1, 0, 3, "Test Timer", new Clock()), false),
+                /* Hours same, same minutes */ Arguments.of(new Timer(1, 2, 0, "Test Timer", new Clock()), false),
+                /* Hours same, same minutes, different seconds */ Arguments.of(new Timer(1, 2, 4, "Test Timer", new Clock()), false),
+                /* Hours same, same minutes, same seconds */ Arguments.of(new Timer(1, 2, 3, "Test1 Timer", new Clock()), false),
+                /* Hours same, same minutes, same seconds, different name */ Arguments.of(new Timer(1, 2, 3, "Test1 Timer", new Clock()), false),
+                /* Hours same, same minutes, same seconds, same name */ Arguments.of(new Timer(1, 2, 3, "Test Timer", new Clock()), true)
+        );
+    }
+
+    @Test
+    @DisplayName("Test Alarms compared against another")
+    void testAlarmsComparedAgainstAnother()
+    {
+        timer1 = new Timer(0, 0, 5, "Timer1", clock);
+        timer2 = new Timer(1, 2, 3, "Timer2", clock);
+
+        List<Timer> expectedTimers = List.of(timer1, timer2);
+
+        // test that the alarms are sorted by time
+        List<Timer> timers = new ArrayList<>(2);
+        timers.add(timer2);
+        timers.add(timer1);
+        Collections.sort(timers);
+
+        assertIterableEquals(expectedTimers, timers, "Timers should match");
     }
 
     // TODO: Move to TimerPanelTest

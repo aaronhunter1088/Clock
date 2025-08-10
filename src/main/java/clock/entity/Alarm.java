@@ -38,13 +38,18 @@ public class Alarm implements Serializable, Comparable<Alarm>, Runnable
     private static final Logger logger = LogManager.getLogger(Alarm.class);
     public static long alarmsCounter = 0L;
     public static final long SNOOZE_TIME = 7 * 60 * 1000; // 7 minutes in milliseconds
-    private int hours, minutes;
+    private int hours,
+                minutes;
     private String minutesAsStr,
                    hoursAsStr,
                    ampm,
                    name; // limited to 10 characters
     private List<DayOfWeek> days;
-    private boolean alarmGoingOff, updatingAlarm, activatedToday, isSnoozing, isPaused;
+    private boolean alarmGoingOff,
+                    updatingAlarm,
+                    activatedToday,
+                    isSnoozing,
+                    isPaused;
     private Clock clock;
     private Thread selfThread;
     private AdvancedPlayer musicPlayer;
@@ -84,7 +89,7 @@ public class Alarm implements Serializable, Comparable<Alarm>, Runnable
         setAMPM(ampm.toUpperCase());
         setDays(days);
         setUpdatingAlarm(updatingAlarm);
-        setName(name);
+        setName(StringUtils.isBlank(name) ? ALARM  + (alarmsCounter + 1) : name);
         alarmsCounter++;
         logger.debug("Total alarms created: {}", alarmsCounter);
         if (alarmsCounter == 100L) {
@@ -291,15 +296,6 @@ public class Alarm implements Serializable, Comparable<Alarm>, Runnable
         return shortenedDays;
     }
 
-    @Override
-    public String toString()
-    {
-        if (name == null || name.isBlank())
-        { return getAlarmAsString(); }
-        else
-        { return "(" + name + ")" + SPACE + getAlarmAsString(); }
-    }
-
     /* Getters */
     public Clock getClock() { return this.clock; }
     public boolean isAlarmGoingOff() { return alarmGoingOff; }
@@ -336,14 +332,7 @@ public class Alarm implements Serializable, Comparable<Alarm>, Runnable
         logger.debug("minutes: {}", minutes);
     }
     public void setAMPM(String ampm) { this.ampm = ampm; logger.debug("ampm: {}", ampm); }
-    public void setName(String name) {
-        if (name == null || name.isBlank()) {
-            this.name = "Alarm" + alarmsCounter;
-        } else {
-            this.name = name;
-        }
-        logger.debug("name: {}", this.name);
-    }
+    public void setName(String name) { this.name = name; logger.debug("name set to {}", name); }
     public void setMusicPlayer(AdvancedPlayer musicPlayer) { this.musicPlayer = musicPlayer; logger.debug("musicPlayer set"); }
     public void setActivatedToday(boolean activatedToday) { this.activatedToday = activatedToday; logger.debug("triggeredToday: {}", activatedToday); }
     public void setSelfThread(Thread selfThread) { this.selfThread = selfThread; logger.debug("selfThread set"); }
@@ -383,4 +372,13 @@ public class Alarm implements Serializable, Comparable<Alarm>, Runnable
                 getHoursAsStr(), getAMPM(),
                 getDays());
     }
+
+    /**
+     * Returns a string representation of the alarm.
+     * Example: "(Alarm1) 08:30 AM"
+     * @return a string representation of the alarm
+     */
+    @Override
+    public String toString()
+    { return "(" + name + ")" + SPACE + getAlarmAsString(); }
 }

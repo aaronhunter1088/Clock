@@ -57,13 +57,13 @@ class TimerPanelTest
         assertTrue(timerPanel.validateHoursTextField(), "Expected value to be Hour");
 
         timerPanel.getHoursTextField().setText("13");
-        assertThrows(InvalidInputException.class, () -> timerPanel.validateHoursTextField(), "Expected value to be invalid");
+        assertFalse(timerPanel.validateHoursTextField(), "Expected value to be invalid");
 
         timerPanel.getHoursTextField().setText("24");
-        assertThrows(InvalidInputException.class, () -> timerPanel.validateHoursTextField(), "Expected value to be invalid");
+        assertFalse(timerPanel.validateHoursTextField(), "Expected value to be invalid");
 
         timerPanel.getHoursTextField().setText("-1");
-        assertThrows(InvalidInputException.class, () -> timerPanel.validateHoursTextField(), "Expected value to be invalid");
+        assertFalse(timerPanel.validateHoursTextField(), "Expected value to be invalid");
 
         clock = new Clock(13, 30, 0, JANUARY, WEDNESDAY, 1, 2025, PM);
         timerPanel.getClockFrame().setClock(clock);
@@ -82,10 +82,10 @@ class TimerPanelTest
         assertTrue(timerPanel.validateMinutesTextField(), "Expected value to be 13");
 
         timerPanel.getMinutesTextField().setText("60");
-        assertThrows(InvalidInputException.class, () -> timerPanel.validateMinutesTextField(), "Expected value to be invalid");
+        assertFalse(timerPanel.validateMinutesTextField(), "Expected value to be invalid");
 
         timerPanel.getMinutesTextField().setText("-1");
-        assertThrows(InvalidInputException.class, () -> timerPanel.validateMinutesTextField(), "Expected value to be invalid");
+        assertFalse(timerPanel.validateMinutesTextField(), "Expected value to be invalid");
     }
 
     @Test
@@ -102,10 +102,10 @@ class TimerPanelTest
         assertTrue(timerPanel.validateSecondsTextField(), "Expected value to be 59");
 
         timerPanel.getSecondsTextField().setText("60");
-        assertThrows(InvalidInputException.class, () -> timerPanel.validateSecondsTextField(), "Expected value to be invalid");
+        assertFalse(timerPanel.validateSecondsTextField(), "Expected value to be invalid");
 
         timerPanel.getSecondsTextField().setText("-1");
-        assertThrows(InvalidInputException.class, () -> timerPanel.validateSecondsTextField(), "Expected value to be invalid");
+        assertFalse(timerPanel.validateSecondsTextField(), "Expected value to be invalid");
     }
 
     @Test

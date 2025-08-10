@@ -352,9 +352,8 @@ class AlarmTest {
         alarm1 = new Alarm("Alarm3", 7, 0, AM, weekDays, false, clock);
         alarm2 = new Alarm("", 6, 0, PM, weekendDays, false, clock);
 
-        long currentAlarmsCounter = Alarm.alarmsCounter-1; // Subtract 1
         assertEquals("Alarm3", alarm1.getName(), "Alarm1 name should match");
-        assertEquals("Alarm"+currentAlarmsCounter, alarm2.getName(), "Alarm2 name should match");
+        assertEquals("Alarm"+Alarm.alarmsCounter, alarm2.getName(), "Alarm2 name should match");
     }
 
     @ParameterizedTest
@@ -364,7 +363,7 @@ class AlarmTest {
     {
         alarm1 = new Alarm("Weekdays Alarm", 7, 30, AM, weekDays, false, clock);
 
-        assertEquals(expected, alarm1.equals(testAlarm), "Expected " + expected + " but got " + testAlarm.equals(alarm1));
+        assertEquals(expected, alarm1.equals(testAlarm), "Expected " + expected + " but got " + alarm1.equals(testAlarm));
     }
     private static Stream<Arguments> checkForEquality()
     {
