@@ -18,6 +18,7 @@ public abstract class ClockPanel extends JPanel implements IClockPanel
 {
     private static final Logger logger = LogManager.getLogger(ClockPanel.class);
 
+    // TODO: Move to new Utility class
     /**
      * Displays a popup message with the given title and message.
      * @param title the title of the popup message

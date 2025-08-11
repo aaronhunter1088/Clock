@@ -55,7 +55,8 @@ class ClockTest
     {}
 
     @AfterAll
-    static void afterAll() { logger.info("Concluding {}", ClockTest.class.getSimpleName()); }
+    static void afterAll()
+    { logger.info("Concluding {}", ClockTest.class.getSimpleName()); }
 
     @Test
     void testDefaultClock()

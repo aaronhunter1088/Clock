@@ -318,10 +318,10 @@ public class AlarmPanel extends ClockPanel implements Runnable
      */
     public void resetAlarmPanel()
     {
-        logger.info("reset alarm panel");
+        logger.debug("reset alarm panel");
+        nameTextField.setText(EMPTY);
         hoursTextField.setText(EMPTY);
         minutesTextField.setText(EMPTY);
-        nameTextField.setText(EMPTY);
         sundayCheckBox.setSelected(false);
         mondayCheckBox.setSelected(false);
         tuesdayCheckBox.setSelected(false);
@@ -331,6 +331,10 @@ public class AlarmPanel extends ClockPanel implements Runnable
         saturdayCheckBox.setSelected(false);
         weekdaysCheckBox.setSelected(false);
         weekendsCheckBox.setSelected(false);
+        alarmsTable.setModel(new javax.swing.table.DefaultTableModel());
+        clock.getListOfAlarms().forEach(Alarm::stopAlarm);
+        clock.getListOfAlarms().clear();
+        logger.debug("all alarms cleared");
     }
 
     /**

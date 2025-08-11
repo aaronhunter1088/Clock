@@ -440,7 +440,7 @@ public class TimerPanel extends ClockPanel implements Runnable
      */
     public void resetTimerPanel()
     {
-        logger.info("reset timer fields");
+        logger.debug("reset timer fields");
         clearTextFields();
         timersTable.setModel(new javax.swing.table.DefaultTableModel());
         clock.getListOfTimers().forEach(timer -> {
@@ -449,7 +449,7 @@ public class TimerPanel extends ClockPanel implements Runnable
             timer.setTimerGoingOff(false);
         });
         clock.getListOfTimers().clear();
-        logger.info("all timers cleared");
+        logger.debug("all timers cleared");
     }
 
     /**
