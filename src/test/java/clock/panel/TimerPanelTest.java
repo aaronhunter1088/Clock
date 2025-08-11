@@ -6,6 +6,9 @@ import clock.exception.InvalidInputException;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.junit.jupiter.api.*;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.Mock;
 
 import javax.swing.*;
@@ -52,63 +55,116 @@ class TimerPanelTest
     void afterEach()
     {}
 
-    @Test
-    void validateHoursTextField()
+    @ParameterizedTest
+    @DisplayName("Test Validate Hours Text Field")
+    @CsvSource({
+            "0, true",
+            "1, true",
+            "2, true",
+            "3, true",
+            "4, true",
+            "5, true",
+            "6, true",
+            "7, true",
+            "8, true",
+            "9, true",
+            "10, true",
+            "11, true",
+            "12, true",
+            "13, false",
+            "24, false",
+            "-1, false",
+            "g, false",
+    })
+    void validateHoursTextField(String hours, boolean expected)
     {
         timerPanel.getNameTextField().setText(NAME);
         timerPanel.getHoursTextField().setText(EMPTY);
-        assertTrue(timerPanel.validateHoursTextField(), "Expected value to be Hour");
-
-        timerPanel.getHoursTextField().setText("13");
-        assertFalse(timerPanel.validateHoursTextField(), "Expected value to be invalid");
-
-        timerPanel.getHoursTextField().setText("24");
-        assertFalse(timerPanel.validateHoursTextField(), "Expected value to be invalid");
-
-        timerPanel.getHoursTextField().setText("-1");
-        assertFalse(timerPanel.validateHoursTextField(), "Expected value to be invalid");
-
-        clock = new Clock(13, 30, 0, JANUARY, WEDNESDAY, 1, 2025, PM);
-        timerPanel.getClockFrame().setClock(clock);
-        timerPanel.getHoursTextField().setText("13");
-        assertTrue(timerPanel.validateHoursTextField(), "Expected value to be 13");
+        timerPanel.getHoursTextField().setText(hours);
+        assertEquals(expected, timerPanel.validateHoursTextField(), "Expected " + hours + " to be " + expected);
     }
 
-    @Test
-    void validateMinutesTextField()
+    @ParameterizedTest
+    @DisplayName("Test Validate Hours Text Field when isShowMilitaryTime is true")
+    @CsvSource({
+            "0, true", "1, true",
+            "2, true", "3, true",
+            "4, true", "5, true",
+            "6, true", "7, true",
+            "8, true", "9, true",
+            "10, true", "11, true",
+            "12, true", "13, true", // 1 PM
+            "14, true", /* 2 PM */ "15, true", // 3 PM
+            "16, true", /* 4 PM */ "17, true", // 5 PM
+            "18, true", /* 6 PM */ "19, true", // 7 PM
+            "20, true", /* 8 PM */ "21, true", // 9 PM
+            "22, true", /* 10 PM */ "23, true", // 11 PM
+            "24, false", /* Invalid hour */ "-1, false", // Invalid hour
+            "g, false" // Invalid input
+    })
+    void validateHoursTextFieldWithMilitaryTime(String hours, boolean expected)
+    {
+        timerPanel.getClock().setShowMilitaryTime(true);
+        timerPanel.getNameTextField().setText(NAME);
+        timerPanel.getHoursTextField().setText(EMPTY);
+        timerPanel.getHoursTextField().setText(hours);
+        assertEquals(expected, timerPanel.validateHoursTextField(), "Expected " + hours + " to be " + expected);
+    }
+
+    @ParameterizedTest
+    @DisplayName("Test Validate Minutes Text Field")
+    @CsvSource({
+            "0, true", "1, true", "2, true", "3, true",
+            "4, true", "5, true", "6, true", "7, true",
+            "8, true", "9, true", "10, true", "11, true",
+            "12, true", "13, true", "14, true", "15, true",
+            "16, true", "17, true", "18, true", "19, true",
+            "20, true", "21, true", "22, true", "23, true",
+            "24, true", "25, true", "26, true", "27, true",
+            "28, true", "29, true", "30, true", "31, true",
+            "32, true", "33, true", "34, true", "35, true",
+            "36, true", "37, true", "38, true", "39, true",
+            "40, true", "41, true", "42, true", "43, true",
+            "44, true", "45, true", "46, true", "47, true",
+            "48, true", "49, true", "50, true", "51, true",
+            "52, true", "53, true", "54, true", "55, true",
+            "56, true", "57, true", "58, true", "59, true",
+            "60, false", "-1, false", "g, false", "@, false"
+    })
+    void validateMinutesTextField(String minutes, boolean expected)
     {
         timerPanel.getNameTextField().setText(NAME);
         timerPanel.getMinutesTextField().setText(EMPTY);
-        assertTrue(timerPanel.validateMinutesTextField(), "Expected value to be Min");
-
-        timerPanel.getMinutesTextField().setText("13");
-        assertTrue(timerPanel.validateMinutesTextField(), "Expected value to be 13");
-
-        timerPanel.getMinutesTextField().setText("60");
-        assertFalse(timerPanel.validateMinutesTextField(), "Expected value to be invalid");
-
-        timerPanel.getMinutesTextField().setText("-1");
-        assertFalse(timerPanel.validateMinutesTextField(), "Expected value to be invalid");
+        timerPanel.getMinutesTextField().setText(minutes);
+        assertEquals(expected, timerPanel.validateMinutesTextField(), "Expected " + minutes + " to be " + expected);
     }
 
-    @Test
-    void validateSecondsTextField()
+    @ParameterizedTest
+    @DisplayName("Test Validate Seconds Text Field")
+    @CsvSource({
+            "0, true", "1, true", "2, true", "3, true",
+            "4, true", "5, true", "6, true", "7, true",
+            "8, true", "9, true", "10, true", "11, true",
+            "12, true", "13, true", "14, true", "15, true",
+            "16, true", "17, true", "18, true", "19, true",
+            "20, true", "21, true", "22, true", "23, true",
+            "24, true", "25, true", "26, true", "27, true",
+            "28, true", "29, true", "30, true", "31, true",
+            "32, true", "33, true", "34, true", "35, true",
+            "36, true", "37, true", "38, true", "39, true",
+            "40, true", "41, true", "42, true", "43, true",
+            "44, true", "45, true", "46, true", "47, true",
+            "48, true", "49, true", "50, true", "51, true",
+            "52, true", "53, true", "54, true", "55, true",
+            "56, true", "57, true", "58, true", "59, true",
+            "60, false", "-1, false", "g, false", "@, false"
+    })
+    void validateSecondsTextField(String seconds, boolean expected)
     {
         timerPanel.getNameTextField().setText(NAME);
         timerPanel.getSecondsTextField().setText(EMPTY);
-        assertTrue(timerPanel.validateSecondsTextField(), "Expected value to be SEC");
-
-        timerPanel.getSecondsTextField().setText("13");
-        assertTrue(timerPanel.validateSecondsTextField(), "Expected value to be 13");
-
-        timerPanel.getSecondsTextField().setText("59");
-        assertTrue(timerPanel.validateSecondsTextField(), "Expected value to be 59");
-
-        timerPanel.getSecondsTextField().setText("60");
-        assertFalse(timerPanel.validateSecondsTextField(), "Expected value to be invalid");
-
-        timerPanel.getSecondsTextField().setText("-1");
-        assertFalse(timerPanel.validateSecondsTextField(), "Expected value to be invalid");
+        timerPanel.getSecondsTextField().setText(seconds);
+        assertEquals(expected, timerPanel.validateSecondsTextField(), "Expected " + seconds + " to be " + expected);
     }
 
     @Test

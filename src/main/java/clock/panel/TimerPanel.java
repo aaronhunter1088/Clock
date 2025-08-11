@@ -519,7 +519,7 @@ public class TimerPanel extends ClockPanel implements Runnable
         {
             try {
                 if (Integer.parseInt(minutesTextField.getText()) >= 0 &&
-                        Integer.parseInt(minutesTextField.getText()) <= 59 )
+                        Integer.parseInt(minutesTextField.getText()) <= 59)
                 {
                     result = true;
                 }
@@ -554,7 +554,7 @@ public class TimerPanel extends ClockPanel implements Runnable
             try
             {
                 if (Integer.parseInt(secondsTextField.getText()) >= 0 &&
-                        Integer.parseInt(secondsTextField.getText()) <= 59 )
+                        Integer.parseInt(secondsTextField.getText()) <= 59)
                 {
                     result = true;
                 }

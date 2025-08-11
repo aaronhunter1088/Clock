@@ -886,7 +886,7 @@ public class Clock implements Serializable, Comparable<Clock>, Runnable
     protected void setIsNewYear(boolean isNewYear) { this.isNewYear = isNewYear; logger.debug("isNewYear: {}", isNewYear); }
     protected void setShowFullDate(boolean showFullDate) { this.showFullDate = showFullDate; logger.debug("showFullDate: {}", showFullDate); }
     protected void setShowPartialDate(boolean showPartialDate) { this.showPartialDate = showPartialDate; logger.debug("showPartialDate: {}", showPartialDate); }
-    protected void setShowMilitaryTime(boolean showMilitaryTime) { this.showMilitaryTime = showMilitaryTime; logger.debug("showMilitaryTime: {}", showMilitaryTime); }
+    public void setShowMilitaryTime(boolean showMilitaryTime) { this.showMilitaryTime = showMilitaryTime; logger.debug("showMilitaryTime: {}", showMilitaryTime); }
     private void setTestingClock(boolean testingClock) { this.testingClock = testingClock; logger.debug("testingClock: {}", testingClock); }
     protected void setDaylightSavingsTimeEnabled(boolean daylightSavingsTimeEnabled) { this.daylightSavingsTimeEnabled = daylightSavingsTimeEnabled; logger.debug("daylightSavingsTimeEnabled: {}", daylightSavingsTimeEnabled); }
     protected void setListOfAlarms(List<Alarm> listOfAlarms) { this.listOfAlarms = listOfAlarms; logger.debug("listOfAlarms: {}", listOfAlarms); }
