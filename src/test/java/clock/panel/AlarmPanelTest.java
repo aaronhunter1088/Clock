@@ -31,7 +31,9 @@ import static org.junit.jupiter.api.Assertions.*;
 
 /**
  * Tests for the {@link AlarmPanel} class
- *
+ * This class has interactions that require
+ * you to close windows in order for tests
+ * to proceed.
  * @author Michael Ball
  * @version 2.9
  */
