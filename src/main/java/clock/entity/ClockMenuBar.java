@@ -8,8 +8,6 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
-import java.time.ZoneId;
-import java.util.Arrays;
 import java.util.List;
 
 import static clock.util.Constants.*;
@@ -142,11 +140,10 @@ public class ClockMenuBar extends JMenuBar
         });
 
         setChangeTimeZoneMenu(new JMenu(CHANGE+SPACE+TIME_ZONES));
-        setTimeZones(Arrays.asList(new JMenuItem(HAWAII), new JMenuItem(ALASKA),
-                                   new JMenuItem(PACIFIC), new JMenuItem(CENTRAL),
-                                   new JMenuItem(EASTERN) ));
+        setTimeZones(List.of(new JMenuItem(HAWAII), new JMenuItem(ALASKA),
+                             new JMenuItem(PACIFIC), new JMenuItem(CENTRAL),
+                             new JMenuItem(EASTERN), new JMenuItem(MOUNTAIN) ));
         getTimezones().forEach(this::setupTimezone);
-        refreshTimezones();
         setCurrentTimeZone();
 
         setPauseResumeAllTimersSetting(new JMenuItem(PAUSE+SPACE+ALL+SPACE+TIMER+S.toLowerCase()));
@@ -282,7 +279,7 @@ public class ClockMenuBar extends JMenuBar
     public void setupTimezone(JMenuItem timezone)
     {
         logger.debug("setup timezone for {}", timezone.getText());
-        timezone.addActionListener(l -> clockFrame.updateTheTime(timezone));
+        timezone.addActionListener(l -> clockFrame.updateClockTimezone(timezone));
         timezone.setForeground(Color.WHITE);
         timezone.setBackground(Color.BLACK);
         getChangeTimeZoneMenu().add(timezone);
@@ -294,30 +291,19 @@ public class ClockMenuBar extends JMenuBar
      */
     public void setCurrentTimeZone()
     {
-        ZoneId currentTimezone = clock.getTimezone();
-        timezones.forEach(jMenuItemTimeZone -> {
-            if (jMenuItemTimeZone.getText().equals(clock.getPlainTimezoneFromZoneId(currentTimezone))) {
-                if (!jMenuItemTimeZone.getText().contains(STAR)) {
-                    jMenuItemTimeZone.setText(jMenuItemTimeZone.getText()+SPACE+STAR);
+        timezones.forEach(menuItem -> {
+            if (clock.getPlainTimezoneFromZoneId(clock.getTimezone()).equals(menuItem.getText().replace(STAR,EMPTY).trim())) {
+                if (!menuItem.getText().contains(STAR)) {
+                    menuItem.setText(menuItem.getText()+SPACE+STAR);
                 } else {
                     logger.info("selected timezone already has *");
-                    logger.info("no change to timezone: {}", clock.getPlainTimezoneFromZoneId(currentTimezone));
+                    logger.info("no change to timezone: {}", clock.getPlainTimezoneFromZoneId(clock.getTimezone()));
                 }
             } else {
-                var tzName = jMenuItemTimeZone.getText().replace(STAR,EMPTY).trim();
-                jMenuItemTimeZone.setText(tzName);
+                var tzName = menuItem.getText().replace(STAR,EMPTY).trim();
+                menuItem.setText(tzName);
             }
         });
-    }
-
-    /**
-     * Refreshes each timezone menu item by removing the star
-     */
-    public void refreshTimezones()
-    {
-        timezones.forEach(jMenuItemTimeZone ->
-            jMenuItemTimeZone.setText(jMenuItemTimeZone.getText().replace(STAR,EMPTY).trim())
-        );
     }
 
     /**

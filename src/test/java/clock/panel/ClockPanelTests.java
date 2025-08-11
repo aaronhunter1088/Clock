@@ -11,7 +11,6 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
 import org.mockito.MockitoAnnotations;
 
-import static clock.entity.Panel.PANEL_ANALOGUE_CLOCK;
 import static clock.util.Constants.AM;
 import static java.time.DayOfWeek.WEDNESDAY;
 import static java.time.Month.JANUARY;
@@ -34,7 +33,7 @@ public class ClockPanelTests
     @BeforeAll
     static void beforeClass()
     {
-        logger.info("Starting AnalogueClockPanelTest...");
+        logger.info("Starting ClockPanelTests...");
     }
 
     @BeforeEach

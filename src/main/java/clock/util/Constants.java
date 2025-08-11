@@ -73,6 +73,7 @@ public class Constants {
     public static final String CENTRAL = "Central";
     public static final String EASTERN = "Eastern";
     public static final String HAWAII = "Hawaii";
+    public static final String MOUNTAIN = "Mountain";
     public static final String PACIFIC = "Pacific";
 
     // ZoneIds
@@ -81,6 +82,7 @@ public class Constants {
     public static final String AMERICA_LOS_ANGELES = "America/Los_Angeles";
     public static final String AMERICA_NEW_YORK = "America/New_York";
     public static final String PACIFIC_HONOLULU = "Pacific/Honolulu";
+    public static final String AMERICA_DENVER = "America/Denver";
 
     //String
 

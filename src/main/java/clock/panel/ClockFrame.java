@@ -66,6 +66,10 @@ public class ClockFrame extends JFrame
         initialize(null);
     }
 
+    /**
+     * Constructor for ClockFrame with a specific panel type
+     * @param panelType the type of panel to display
+     */
     public ClockFrame(clock.entity.Panel panelType)
     {
         super(CLOCK);
@@ -110,7 +114,6 @@ public class ClockFrame extends JFrame
         setTimerPanel(new TimerPanel(this));
         setStopwatchPanel(new StopwatchPanel(this));
         changePanels(panelType != null ? panelType : PANEL_DIGITAL_CLOCK);
-        setVisible(true);
     }
 
     /**
@@ -134,6 +137,17 @@ public class ClockFrame extends JFrame
 
     /**
      * Creates and shows the GUI for the Clock application.
+     * This method is invoked in Main.
+     */
+    public static void createAndShowGUI()
+    {
+        logger.info("Starting Clock...");
+        ClockFrame clockFrame = new ClockFrame();
+        clockFrame.start();
+    }
+
+    /**
+     * Creates and shows the GUI for the Clock application.
      * This method is invoked in Main when testing the
      * application with a specific clock.
      * @param clock the clock to use for testing
@@ -146,22 +160,11 @@ public class ClockFrame extends JFrame
     }
 
     /**
-     * Creates and shows the GUI for the Clock application.
-     * This method is invoked in Main.
-     */
-    public static void createAndShowGUI()
-    {
-        logger.info("Starting Clock...");
-        ClockFrame clockFrame = new ClockFrame();
-        clockFrame.start();
-    }
-
-    /**
      * Creates and shows the GUI for the Clock application
      * with a specific panel type.
      * @param panelType the panel type to display
      */
-    public static void createAndShowGUI(clock.entity.Panel panelType)
+    public static void createAndShowGUI(Panel panelType)
     {
         logger.info("Starting Clock with panel type: {}", panelType);
         ClockFrame clockFrame = new ClockFrame(panelType);
@@ -171,7 +174,7 @@ public class ClockFrame extends JFrame
     /**
      * Sets up the menu bar
      */
-    public void setupMenuBar()
+    private void setupMenuBar()
     {
         logger.info("setup menubar");
         UIManager.put("MenuItem.background", Color.BLACK);
@@ -191,11 +194,11 @@ public class ClockFrame extends JFrame
             if (currentPanel != null) remove(currentPanel);
             if (currentPanel instanceof DigitalClockPanel dcp)
                 dcp.stop();
-            if (currentPanel instanceof AnalogueClockPanel acp)
+            else if (currentPanel instanceof AnalogueClockPanel acp)
                 acp.stop();
-            if (currentPanel instanceof TimerPanel tp)
+            else if (currentPanel instanceof TimerPanel tp)
                 tp.stop();
-            if (currentPanel instanceof AlarmPanel ap)
+            else if (currentPanel instanceof AlarmPanel ap)
                 ap.stop();
             showPanel(changePanelType);
             repaint();
@@ -208,7 +211,7 @@ public class ClockFrame extends JFrame
      * based on the provided clockPanel value.
      * @param clockPanel the panel to update to
      */
-    public void showPanel(clock.entity.Panel clockPanel)
+    private void showPanel(clock.entity.Panel clockPanel)
     {
         logger.debug("updating to {}", clockPanel);
         switch (clockPanel)
@@ -224,7 +227,7 @@ public class ClockFrame extends JFrame
     /**
      * Changes the panel to the digital clock panel
      */
-    public void changeToDigitalClockPanel()
+    private void changeToDigitalClockPanel()
     {
         logger.info("change to digital clock");
         add(digitalClockPanel);
@@ -238,7 +241,7 @@ public class ClockFrame extends JFrame
     /**
      * Changes the panel to the analogue clock panel
      */
-    public void changeToAnalogueClockPanel()
+    private void changeToAnalogueClockPanel()
     {
         logger.info("change to analogue clock");
         add(analogueClockPanel);
@@ -252,7 +255,7 @@ public class ClockFrame extends JFrame
     /**
      * Changes the panel to the alarm panel
      */
-    public void changeToAlarmPanel()
+    private void changeToAlarmPanel()
     {
         logger.info("change to alarm panel.");
         add(alarmPanel);
@@ -265,7 +268,7 @@ public class ClockFrame extends JFrame
     /**
      * Changes the panel to the timer panel
      */
-    public void changeToTimerPanel()
+    private void changeToTimerPanel()
     {
         logger.info("change to timer panel");
         add(timerPanel);
@@ -278,7 +281,7 @@ public class ClockFrame extends JFrame
     /**
      * Changes the panel to the stopwatch panel
      */
-    public void changeToStopwatchPanel()
+    private void changeToStopwatchPanel()
     {
         logger.debug("change to stopwatch panel");
         add(stopwatchPanel);
@@ -292,13 +295,12 @@ public class ClockFrame extends JFrame
      * Updates the current time based on the selected timezone
      * @param timezone the timezone to update the time to
      */
-    public void updateTheTime(JMenuItem timezone)
+    public void updateClockTimezone(JMenuItem timezone)
     {
         logger.info("clicked on {} timezone. updating the time", timezone.getText());
-        LocalDateTime ldt = determineNewTimeFromSelectedTimeZone(timezone.getText());
+        LocalDateTime ldt = determineNewTimeFromSelectedTimeZone(timezone.getText().replace(STAR,EMPTY).trim());
         clock.setTheTime(ldt);
-        clock.setTimeZone(clock.getZoneIdFromTimezoneButtonText(timezone.getText()));
-        menuBar.refreshTimezones();
+        clock.setTimeZone(clock.getZoneIdFromTimezoneButtonText(timezone.getText().replace(STAR,EMPTY).trim()));
         menuBar.setCurrentTimeZone();
     }
 
@@ -307,7 +309,7 @@ public class ClockFrame extends JFrame
      * @param timezone the timezone to determine the new time from
      * @return LocalDateTime the new currentTime in the selected timezone
      */
-    public LocalDateTime determineNewTimeFromSelectedTimeZone(String timezone)
+    private LocalDateTime determineNewTimeFromSelectedTimeZone(String timezone)
     {
         return switch (timezone) {
             case HAWAII -> LocalDateTime.now(ZoneId.of(PACIFIC_HONOLULU));
@@ -315,6 +317,7 @@ public class ClockFrame extends JFrame
             case PACIFIC -> LocalDateTime.now(ZoneId.of(AMERICA_LOS_ANGELES));
             case CENTRAL -> LocalDateTime.now(ZoneId.of(AMERICA_CHICAGO));
             case EASTERN -> LocalDateTime.now(ZoneId.of(AMERICA_NEW_YORK));
+            case MOUNTAIN -> LocalDateTime.now(ZoneId.of(AMERICA_DENVER));
             default -> LocalDateTime.now(ZoneId.systemDefault());
         };
     }

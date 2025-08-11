@@ -242,6 +242,7 @@ public class Clock implements Serializable, Comparable<Clock>, Runnable
             case AMERICA_LOS_ANGELES -> PACIFIC;
             case AMERICA_CHICAGO -> CENTRAL;
             case AMERICA_NEW_YORK -> EASTERN;
+            case AMERICA_DENVER -> MOUNTAIN;
             default -> ZoneId.systemDefault().getId();
         };
     }
@@ -769,6 +770,7 @@ public class Clock implements Serializable, Comparable<Clock>, Runnable
             case PACIFIC -> ZoneId.of(AMERICA_LOS_ANGELES);
             case CENTRAL -> ZoneId.of(AMERICA_CHICAGO);
             case EASTERN -> ZoneId.of(AMERICA_NEW_YORK);
+            case MOUNTAIN -> ZoneId.of(AMERICA_DENVER);
             default -> ZoneId.systemDefault();
         };
     }
