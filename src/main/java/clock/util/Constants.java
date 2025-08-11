@@ -14,11 +14,13 @@ public class Constants {
     // General
     public static final String ALL = "All";
     public static final String AM = "AM";
+    public static final String ANALOGUE = "Analogue";
     public static final String are = "are";
     public static final String CHANGE = "Change";
     public static final String COLON = ":";
     public static final String COMMA = ",";
     public static final String CLOCK = "Clock";
+    public static final String DIGITAL = "Digital";
     public static final String DIGITAL_TIME = "digital time";
     public static final String DST_SETTING = "daylight savings time";
     public static final String EIGHT = "8";
@@ -46,6 +48,7 @@ public class Constants {
     public static final String off = "off";
     public static final String on = "on";
     public static final String ONE = "1";
+    public static final String PANEL = "Panel";
     public static final String PARTIAL_TIME_SETTING = "partial date";
     public static final String PM = "PM";
     public static final String S = "S";
@@ -56,6 +59,7 @@ public class Constants {
     public static final String SPACE = " ";
     public static final String STANDARD_TIME_SETTING = "standard time";
     public static final String STAR = "*";
+    public static final String STOPWATCH = "Stopwatch";
     public static final String SLASH = "/";
     public static final String TEN = "10";
     public static final String TEST = "Test";

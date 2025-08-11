@@ -214,7 +214,7 @@ public class TimerPanel extends ClockPanel implements Runnable
         setForeground(Color.BLACK);
         setupSettingsMenu();
         clearTextFields();
-        clockFrame.setTitle("Timer Panel");
+        clockFrame.setTitle(TIMER+S.toLowerCase()+SPACE+PANEL);
         start();
     }
 

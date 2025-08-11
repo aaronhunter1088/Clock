@@ -309,7 +309,7 @@ public class AlarmPanel extends ClockPanel implements Runnable
         setForeground(Color.BLACK);
         resetAlarmPanel();
         setupSettingsMenu();
-        clockFrame.setTitle("Alarm Panel");
+        clockFrame.setTitle(ALARM+S.toLowerCase()+SPACE+PANEL);
         start();
     }
 

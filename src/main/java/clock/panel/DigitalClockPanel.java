@@ -62,7 +62,7 @@ public class DigitalClockPanel extends ClockPanel implements Runnable
         setBackground(Color.BLACK);
         setBorder(BorderFactory.createLineBorder(Color.BLACK));
         setForeground(Color.WHITE);
-        clockFrame.setTitle("Digital Clock");
+        clockFrame.setTitle(DIGITAL+SPACE+CLOCK);
         start();
     }
 

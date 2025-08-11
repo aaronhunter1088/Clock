@@ -7,6 +7,8 @@ import org.apache.logging.log4j.Logger;
 import javax.swing.*;
 import java.awt.*;
 
+import static clock.util.Constants.*;
+
 /**
  * Stopwatch Panel: TODO: Implement
  * <p>
@@ -42,6 +44,7 @@ public class StopwatchPanel extends ClockPanel implements Runnable
         this.constraints = new GridBagConstraints();
         setBackground(Color.BLACK);
         setForeground(Color.BLACK);
+        clockFrame.setTitle(STOPWATCH+SPACE+PANEL);
         addComponentsToPanel();
         SwingUtilities.updateComponentTreeUI(this);
         logger.info("Finished creating StopwatchPanel");
