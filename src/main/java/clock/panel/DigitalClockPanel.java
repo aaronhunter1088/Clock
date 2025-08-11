@@ -131,17 +131,6 @@ public class DigitalClockPanel extends ClockPanel implements Runnable
     }
 
     /**
-     * Updates the digital clock
-     * @param g the graphics object
-     */
-    @Override
-    public void update(Graphics g)
-    {
-        logger.info("updating graphics");
-        paint(g);
-    }
-
-    /**
      * Draws the digital clock
      * @param g the graphics object
      */
@@ -225,12 +214,6 @@ public class DigitalClockPanel extends ClockPanel implements Runnable
         g.drawString(timeStr, timeX, baseY + 30);
         g.setColor(Color.BLACK);
     }
-
-    /**
-     * This method adds the components to the digital clock panel
-     */
-    public void addComponentsToPanel()
-    { /* no operation */ }
 
     /**
      * This method prints the stack trace of an exception

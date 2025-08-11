@@ -2,21 +2,16 @@ package clock.panel;
 
 import clock.entity.Clock;
 import clock.entity.Panel;
-import clock.exception.InvalidInputException;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
-import org.junit.jupiter.params.provider.ValueSource;
-import org.mockito.Mock;
 
 import javax.swing.*;
-import java.awt.event.ActionEvent;
 import java.awt.event.FocusEvent;
 import java.awt.event.MouseEvent;
 import java.lang.reflect.InvocationTargetException;
-import java.util.Arrays;
 import java.util.concurrent.atomic.AtomicReference;
 
 import static clock.util.Constants.*;
@@ -31,9 +26,9 @@ import static org.junit.jupiter.api.Assertions.*;
  * @author Michael Ball
  * @version 2.9
  */
-class TimerPanelTest
+class TimerPanelTests
 {
-    private static final Logger logger = LogManager.getLogger(TimerPanelTest.class);
+    private static final Logger logger = LogManager.getLogger(TimerPanelTests.class);
 
     Clock clock;
 
@@ -41,7 +36,7 @@ class TimerPanelTest
 
     @BeforeAll
     static void beforeClass()
-    { logger.info("Starting TimerPanelTest..."); }
+    { logger.info("Starting TimerPanelTests..."); }
 
     @BeforeEach
     void beforeEach()

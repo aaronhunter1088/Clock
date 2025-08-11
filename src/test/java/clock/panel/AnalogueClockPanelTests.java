@@ -25,9 +25,9 @@ import static org.mockito.Mockito.doNothing;
  * @author Michael Ball
  * @version 2.9
  */
-public class AnalogueClockPanelTest
+public class AnalogueClockPanelTests
 {
-    private static final Logger logger = LogManager.getLogger(AnalogueClockPanelTest.class);
+    private static final Logger logger = LogManager.getLogger(AnalogueClockPanelTests.class);
 
     Clock clock;
 
@@ -39,7 +39,7 @@ public class AnalogueClockPanelTest
     @BeforeAll
     static void beforeClass()
     {
-        logger.info("Starting AnalogueClockPanelTest...");
+        logger.info("Starting AnalogueClockPanelTests...");
     }
 
     @BeforeEach

@@ -2,8 +2,6 @@ package clock.panel;
 
 import clock.entity.Alarm;
 import clock.entity.Clock;
-import clock.entity.Panel;
-import clock.exception.InvalidInputException;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.junit.jupiter.api.*;
@@ -11,19 +9,14 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.CsvSource;
 import org.junit.jupiter.params.provider.MethodSource;
-import org.junit.jupiter.params.provider.ValueSource;
 
-import javax.swing.*;
-import java.awt.*;
 import java.awt.event.ActionEvent;
-import java.awt.event.FocusEvent;
 import java.time.DayOfWeek;
 import java.util.List;
 import java.util.stream.Stream;
 
 import static clock.entity.Panel.PANEL_ALARM;
 import static clock.util.Constants.*;
-import static clock.util.Constants.TIMER_HOUR_ERROR_12;
 import static java.time.DayOfWeek.MONDAY;
 import static java.time.DayOfWeek.WEDNESDAY;
 import static java.time.Month.JANUARY;
@@ -37,9 +30,9 @@ import static org.junit.jupiter.api.Assertions.*;
  * @author Michael Ball
  * @version 2.9
  */
-class AlarmPanelTest
+class AlarmPanelTests
 {
-    private static final Logger logger = LogManager.getLogger(AlarmPanelTest.class);
+    private static final Logger logger = LogManager.getLogger(AlarmPanelTests.class);
 
     Clock clock;
 
@@ -48,7 +41,7 @@ class AlarmPanelTest
     @BeforeAll
     static void beforeClass()
     {
-        logger.info("Starting AlarmPanelTest...");
+        logger.info("Starting AlarmPanelTests...");
     }
 
     @BeforeEach
