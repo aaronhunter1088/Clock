@@ -6,19 +6,29 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.CsvSource;
+import org.junit.jupiter.params.provider.MethodSource;
 
 import javax.swing.*;
+import javax.swing.table.DefaultTableModel;
+import javax.swing.table.TableModel;
+import java.awt.event.ActionEvent;
 import java.awt.event.FocusEvent;
 import java.awt.event.MouseEvent;
 import java.lang.reflect.InvocationTargetException;
 import java.util.concurrent.atomic.AtomicReference;
+import java.util.stream.Stream;
 
+import static clock.entity.Panel.PANEL_TIMER;
 import static clock.util.Constants.*;
 import static java.lang.Thread.sleep;
 import static java.time.DayOfWeek.WEDNESDAY;
 import static java.time.Month.JANUARY;
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.anyInt;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 /**
  * Tests for the {@link TimerPanel} class
@@ -43,7 +53,7 @@ class TimerPanelTests
     {
         clock = new Clock();
         timerPanel = new TimerPanel(new ClockFrame(clock));
-        timerPanel.getClockFrame().changePanels(Panel.PANEL_TIMER);
+        timerPanel.getClockFrame().changePanels(PANEL_TIMER);
     }
 
     @AfterEach
@@ -165,6 +175,7 @@ class TimerPanelTests
     @Test
     void resetTimerFields()
     {
+        timerPanel.getClock().getListOfTimers().add(new clock.entity.Timer(0, 5, 0, clock));
         timerPanel.resetTimerPanel();
 
         assertTrue(timerPanel.getNameTextField().getText().isBlank(), "Expected name field to be blank");
@@ -180,6 +191,7 @@ class TimerPanelTests
 //
 //    }
 
+    // TODO: Update to parameterized test, create multiple timers
     @Test
     void testHittingSetButtonCreates5SecondTimer()
     {
@@ -448,5 +460,60 @@ class TimerPanelTests
                 throw new RuntimeException(e);
             }
         });
+    }
+
+    @Test
+    @DisplayName("Test TimerPanel Initialization")
+    void testTimerPanelInitialization()
+    {
+        assertEquals(PANEL_TIMER, timerPanel.getClockFrame().getPanelType(), "Current panel should be " + PANEL_TIMER);
+        assertNotNull(timerPanel, "TimerPanel should not be null");
+        assertNotNull(timerPanel.getClockFrame(), "ClockFrame should not be null");
+        assertNotNull(timerPanel.getGridBagConstraints(), "GridBagConstraints should not be null");
+        assertNotNull(timerPanel.getGridBagLayout(), "GridBagLayout should not be null");
+        assertNotNull(timerPanel.getNameTextField(), "Name TextField should not be null");
+        assertNotNull(timerPanel.getHoursTextField(), "Hours TextField should not be null");
+        assertNotNull(timerPanel.getMinutesTextField(), "Minutes TextField should not be null");
+        assertNotNull(timerPanel.getSecondsTextField(), "Seconds TextField should not be null");
+        assertNotNull(timerPanel.getSetTimerButton(), "Set Timer Button should not be null");
+    }
+
+    @ParameterizedTest
+    @DisplayName("Test TimerPanel Button Action")
+    @MethodSource("buttonActionProvider")
+    void testTimerPanelButtonAction(int column, String buttonText)
+    {
+        JTable timersTable = mock(JTable.class);
+        TableModel timersTableModel = mock(TableModel.class);
+        ActionEvent actionEvent = mock(ActionEvent.class);
+        Object[][] data = {
+                {TIMER+NAME, "00:05:00", "Pause", "Remove"},
+                {TIMER+NAME, "00:05:00", "Pause", "Remove"},
+        };
+        String[] columnNames = timerPanel.getTimersTableColumnNames();
+        //DefaultTableModel model = timersTableModel(data, columnNames);
+        when(timersTable.getModel()).thenReturn(timersTableModel);
+        when(timersTableModel.getValueAt(anyInt(), anyInt())).thenReturn(buttonText);
+        clock.getListOfTimers().add(new clock.entity.Timer(0, 4, 0, clock));
+
+        timersTable.setModel(timersTableModel);
+        timerPanel.setTimersTable(timersTable);
+        Action action = timerPanel.buttonAction(column);
+        assertNotNull(action);
+
+        when(actionEvent.getActionCommand()).thenReturn(Integer.toString(0));
+        action.actionPerformed(actionEvent);
+    }
+    private static Stream<Arguments> buttonActionProvider() {
+        return Stream.of(
+                Arguments.of(2, PAUSE),
+                Arguments.of(2, RESUME),
+                Arguments.of(2, RESET),
+                Arguments.of(3, REMOVE)
+        );
+    }
+    private DefaultTableModel timersTableModel(Object[][] data, String[] columnNames)
+    {
+        return new DefaultTableModel(data, columnNames);
     }
 }

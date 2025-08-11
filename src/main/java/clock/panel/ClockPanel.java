@@ -1,6 +1,9 @@
 package clock.panel;
 
 import clock.contract.IClockPanel;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.swing.*;
 import java.awt.*;
@@ -11,7 +14,9 @@ import java.awt.*;
  * @author Michael Ball
  * @version since 2.9
  */
-public abstract class ClockPanel extends JPanel implements IClockPanel {
+public abstract class ClockPanel extends JPanel implements IClockPanel
+{
+    private static final Logger logger = LogManager.getLogger(ClockPanel.class);
 
     /**
      * Displays a popup message with the given title and message.
@@ -34,5 +39,20 @@ public abstract class ClockPanel extends JPanel implements IClockPanel {
                 message,
                 title,
                 jOptionPane);
+    }
+
+    /**
+     * This method prints the stack trace of an exception
+     * that may occur when the digital panel is in use.
+     * @param e the exception
+     * @param message the message to print
+     */
+    @Override
+    public void printStackTrace(Exception e, String message)
+    {
+        if (null != message) logger.error(message);
+        else logger.error(e.getMessage());
+        for(StackTraceElement ste : e.getStackTrace())
+        { logger.error(ste.toString()); }
     }
 }

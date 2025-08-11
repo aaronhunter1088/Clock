@@ -268,14 +268,15 @@ public class TimerPanel extends ClockPanel implements Runnable
     }
 
     /**
-     * Gets the data for the timers table
+     * Gets the timer data for the timers table:
+     * timer.name, timer.countdown, 'Pause', 'Remove'
      * @return the data for the timers table
      */
     public Object[][] getTimersTableData()
     {
         return clock.getListOfTimers().stream()
                 .map(timer -> new Object[] {
-                        timer.getName() != null ? timer.getName() : timer.toString(),
+                        timer.getName(),
                         timer.getCountdownString(),
                         PAUSE,
                         REMOVE
@@ -624,22 +625,6 @@ public class TimerPanel extends ClockPanel implements Runnable
         return validInputs;
     }
 
-    /**
-     * This method prints the stack trace of an exception
-     * that may occur when the digital panel is in use.
-     * @param e the exception
-     * @param message the message to print
-     */
-    public void printStackTrace(Exception e, String message)
-    {
-        if (null != message)
-            logger.error(message);
-        else
-            logger.error(e.getMessage());
-        for(StackTraceElement ste : e.getStackTrace())
-        { logger.error(ste.toString()); }
-    }
-
     /** Starts the timer clock panel thread and internally calls the run method. */
     public void start()
     {
@@ -665,11 +650,13 @@ public class TimerPanel extends ClockPanel implements Runnable
         logger.debug("running timer panel");
         while (thread != null)
         {
-            try {
+            try
+            {
                 setupTimersTableDefaults(false);
                 sleep(1000);
             }
-            catch (InterruptedException e) { printStackTrace(e, e.getMessage());}
+            catch (InterruptedException e)
+            { printStackTrace(e, e.getMessage()); }
         }
     }
 
@@ -683,6 +670,7 @@ public class TimerPanel extends ClockPanel implements Runnable
     public JTextField getMinutesTextField() { return minutesTextField; }
     public JTextField getSecondsTextField() { return secondsTextField; }
     public JButton getSetTimerButton() { return setTimerButton; }
+    public JTable getTimersTable() { return timersTable; }
 
     /* Setters */
     private void setClockFrame(ClockFrame clockFrame) { this.clockFrame = clockFrame; logger.debug("clockFrame set"); }
@@ -694,4 +682,5 @@ public class TimerPanel extends ClockPanel implements Runnable
     public void setMinutesTextField(JTextField minutesTextField) { this.minutesTextField = minutesTextField; logger.debug("minutesTextField set in TimerPanel"); }
     public void setSecondsTextField(JTextField secondsTextField) { this.secondsTextField = secondsTextField; logger.debug("secondsTextField set in TimerPanel"); }
     public void setSetTimerButton(JButton setTimerButton) { this.setTimerButton = setTimerButton; logger.debug("setTimerButton set in TimerPanel");}
+    public void setTimersTable(JTable timersTable) { this.timersTable = timersTable; logger.debug("timersTable set in TimerPanel");  }
 }

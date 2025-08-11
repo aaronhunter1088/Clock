@@ -761,22 +761,6 @@ public class AlarmPanel extends ClockPanel implements Runnable
         }
     }
 
-    /**
-     * This method prints the stack trace of an exception
-     * that may occur when the digital panel is in use.
-     * @param e the exception
-     * @param message the message to print
-     */
-    public void printStackTrace(Exception e, String message)
-    {
-        if (null != message)
-            logger.error(message);
-        else
-            logger.error(e.getMessage());
-        for(StackTraceElement ste : e.getStackTrace())
-        { logger.error(ste.toString()); }
-    }
-
     /** Starts the alarm panel thread and internally calls the run method. */
     public void start()
     {
@@ -802,11 +786,13 @@ public class AlarmPanel extends ClockPanel implements Runnable
         logger.debug("running alarm panel");
         while (thread != null)
         {
-            try {
+            try
+            {
                 setupAlarmsTableDefaults(false);
                 sleep(1000);
             }
-            catch (InterruptedException e) { printStackTrace(e, e.getMessage());}
+            catch (InterruptedException e)
+            { printStackTrace(e, e.getMessage()); }
         }
     }
 

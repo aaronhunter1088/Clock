@@ -110,12 +110,13 @@ public class DigitalClockPanel extends ClockPanel implements Runnable
         logger.debug("starting digital clock");
         while (thread != null)
         {
-            try {
+            try
+            {
                 repaint(); // goes to paint
                 sleep(1000);
             }
-            catch (InterruptedException e) { printStackTrace(e, e.getMessage());}
-
+            catch (InterruptedException e)
+            { printStackTrace(e, e.getMessage()); }
         }
     }
 
@@ -213,20 +214,6 @@ public class DigitalClockPanel extends ClockPanel implements Runnable
         g.drawString(dateStr, dateX, baseY - 30);
         g.drawString(timeStr, timeX, baseY + 30);
         g.setColor(Color.BLACK);
-    }
-
-    /**
-     * This method prints the stack trace of an exception
-     * that may occur when the digital panel is in use.
-     * @param e the exception
-     * @param message the message to print
-     */
-    public void printStackTrace(Exception e, String message)
-    {
-        if (null != message) logger.error(message);
-        else logger.error(e.getMessage());
-        for(StackTraceElement ste : e.getStackTrace())
-        { logger.error(ste.toString()); }
     }
 
     /* Getters */
