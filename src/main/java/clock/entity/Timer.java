@@ -41,7 +41,7 @@ public class Timer implements Serializable, Comparable<Timer>, Runnable
                    secondsAsStr;
     private boolean timerGoingOff, paused,
                     hasBeenStarted, hasBeenTriggered,
-                    stopTimer;
+                    stopped;
     private Clock clock;
     private Thread selfThread;
     private LocalTime countDown;
@@ -187,10 +187,10 @@ public class Timer implements Serializable, Comparable<Timer>, Runnable
         while (selfThread != null)
         {
             try {
-                if (!timerGoingOff && !stopTimer) {
+                if (!timerGoingOff && !stopped) {
                     performCountdown();
                     sleep(1000);
-                } else if (timerGoingOff && !stopTimer) {
+                } else if (timerGoingOff && !stopped) {
                     triggerTimer();
                     sleep(1000);
                 } else { //if (stopTimer) {
@@ -272,7 +272,7 @@ public class Timer implements Serializable, Comparable<Timer>, Runnable
         setTimerGoingOff(false);
         setHasBeenStarted(false);
         setHasBeenTriggered(false);
-        setStopTimer(true);
+        setStopped(true);
         logger.info("{} timer stopped", this);
     }
 
@@ -317,7 +317,7 @@ public class Timer implements Serializable, Comparable<Timer>, Runnable
     public boolean isHasBeenStarted() { return hasBeenStarted; }
     public boolean isHasBeenTriggered() { return hasBeenTriggered; }
     public AdvancedPlayer getMusicPlayer() { return musicPlayer; }
-    public boolean isStopTimer() { return stopTimer; }
+    public boolean isStopped() { return stopped; }
     public Thread getSelfThread() { return selfThread; }
 
     /* Setters */
@@ -350,7 +350,7 @@ public class Timer implements Serializable, Comparable<Timer>, Runnable
     public void setHasBeenStarted(boolean hasBeenStarted) { this.hasBeenStarted = hasBeenStarted; logger.debug("hasBeenStarted set to {}", hasBeenStarted); }
     public void setHasBeenTriggered(boolean hasBeenTriggered) { this.hasBeenTriggered = hasBeenTriggered; logger.debug("hasBeenTriggered set to {}", hasBeenTriggered); }
     public void setMusicPlayer(AdvancedPlayer musicPlayer) { this.musicPlayer = musicPlayer; logger.debug("musicPlayer set"); }
-    public void setStopTimer(boolean stopTimer) { this.stopTimer = stopTimer; logger.debug("stopTimer set to {}", stopTimer); }
+    public void setStopped(boolean stopped) { this.stopped = stopped; logger.debug("stopTimer set to {}", stopped); }
     public void setSelfThread(Thread selfThread) { this.selfThread = selfThread; logger.debug("selfThread set to {}", selfThread); }
 
     /**

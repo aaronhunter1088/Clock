@@ -51,7 +51,7 @@ public class AnalogueClockPanel extends ClockPanel implements Runnable
      */
     public void initialize(ClockFrame clockFrame)
     {
-        logger.debug("setup default actions with clock");
+        logger.debug("initialize analogue clock panel");
         setClockFrame(clockFrame);
         setClock(clockFrame.getClock());
         setClockText(clock.getTimeAsStr());
@@ -79,6 +79,7 @@ public class AnalogueClockPanel extends ClockPanel implements Runnable
      */
     public void setupDefaultValues()
     {
+        logger.debug("set default values");
         setupSettingsMenu();
         setMaximumSize(ClockFrame.analogueSize);
         setBackground(Color.BLACK);

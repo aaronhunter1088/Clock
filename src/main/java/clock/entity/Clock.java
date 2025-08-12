@@ -19,12 +19,13 @@ import static java.time.DayOfWeek.*;
 import static clock.util.Constants.*;
 
 /**
- * The clock object is capable of showing the date and time.
- * The time can be viewed in standard form (HH:MM:SS AM/PM),
- * military time (HHMM hours SS), and analogue.
- * The date can be viewed in standard form (MONTH DATE, YEAR),
- * partial (DAY_OF_WEEK MONTH DATE, YEAR), and fully expressed
- * (DAY_OF_WEEK MONTH DATE, YEAR).
+ * Clock
+ * <p>
+ * The clock is used to display the current date and time.
+ * Starting with the current time, or a specific time, it
+ * will 'tick' every second. This will not only update the
+ * date and time but also perform the necessary functions
+ * to update alarms, timers, and itself if necessary.
  * 
  * @author Michael Ball 
  * @version since 1.0
@@ -49,6 +50,7 @@ public class Clock implements Serializable, Comparable<Clock>, Runnable
 
     private List<Alarm> listOfAlarms;
     private List<Timer> listOfTimers;
+    private List<Stopwatch> listOfStopwatches;
     private boolean isLeapYear, todayMatchesDSTDate,
             dateChanged, isNewYear, testingClock,
             showFullDate, showPartialDate, showMilitaryTime,

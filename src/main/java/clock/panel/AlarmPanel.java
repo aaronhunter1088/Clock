@@ -11,12 +11,10 @@ import org.codehaus.plexus.util.StringUtils;
 import javax.swing.*;
 import javax.swing.border.LineBorder;
 import javax.swing.table.DefaultTableModel;
-import javax.swing.text.NumberFormatter;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.FocusEvent;
 import java.awt.event.FocusListener;
-import java.text.NumberFormat;
 import java.time.DayOfWeek;
 import java.util.ArrayList;
 import java.util.List;
@@ -82,22 +80,28 @@ public class AlarmPanel extends ClockPanel implements Runnable
     {
         super();
         logger.debug("Creating AlarmPanel");
+        initialize();
+        SwingUtilities.updateComponentTreeUI(this);
+        logger.info("Finished creating Alarm Panel");
+    }
+
+    /** Initializes the AlarmPanel */
+    private void initialize()
+    {
         setClockFrame(clockFrame);
         setClock(clockFrame.getClock());
         setMaximumSize(ClockFrame.alarmSize);
         setGridBagLayout(new GridBagLayout());
         setLayout(layout);
         setGridBagConstraints(new GridBagConstraints());
-        setupAlarmPanel();
+        setupComponents();
         addComponentsToPanel();
-        SwingUtilities.updateComponentTreeUI(this);
-        logger.info("Finished creating Alarm Panel");
     }
 
     /**
      * Adds all the components to the AlarmPanel
      */
-    private void setupAlarmPanel()
+    private void setupComponents()
     {
         logger.info("setup AlarmPanel");
         setNameLabel(new JLabel(NAME, SwingConstants.CENTER));
