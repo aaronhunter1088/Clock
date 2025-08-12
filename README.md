@@ -1,9 +1,9 @@
 # Clock v2.9
 
-This is a Java Swing GUI project which displays the date and time to the user in both
-digital and analogue modes. It also has the ability to set multiple alarms and, with
-this release, multiple timers. You can also start the clock specifying a panel or a
-specific date and time. Following is the default command to run the clock:
+This is a Java Swing GUI application which displays the date and time to the user in
+both digital and analogue modes. It also has the capability to set multiple alarms and
+multiple timers. You can also start the clock specifying a panel or a specific date
+and time. The following is the default java command to run the clock:
 
 ```
 # Both commands achieve the same result:
@@ -18,45 +18,56 @@ java -jar Clock-2.9-jar-with-dependencies.jar 1,panel_alarm
 java -jar Clock-2.9-jar-with-dependencies.jar 2,10,30,0,august,wednesday,6,2025,pm
 ```
 
-The clock starts on the DigitalClock panel, displaying the current date like AUGUST 6, 2025
-and the current time below as 10:30:45 AM.
-By clicking on Features, you can change the mode of the clock. The modes are: 
-* View Digital Clock or Ctrl + D
-* View Analogue Clock or Ctrl + C
-* View Alarms or Ctrl + A
-* View Timers or Ctrl + T
+The clock defaults on the Digital Clock panel, displaying the current date like
+AUGUST 6, 2025 and the current time below the date as 10:30:45 AM.
+The clock has Settings and Features. Features will be consistent across all panels.
+By clicking on Features, you can change the panel. The panels are:
+* (Ctrl + D) View Digital Clock
+* (Ctrl + C) View Analogue Clock
+* (Ctrl + A) View Alarm
+* (Ctrl + T) View Timers
 
-On the DigitalClock panel, you can change the following settings:
-* (Ctrl + M) Show Time in Military Time: This will display the time in 24-hour like 1030 hours 45
-* (Ctrl + F) Expand Date: This will display the full date like FRIDAY AUGUST 6, 2025
-* (Ctrl + P) Show Partial Date: This will display a shorter version of the date like FRI AUG 6, 2025
-* (Shift + T) Turn On/Off Daylight Savings Time: This will turn on or off the daylight savings time
-* Change Timezone: This will change the timezone to any USA timezone like EST, CST, MST, PST, or AST.
+On the Digital Clock panel, you can change the following settings:
+* (Ctrl + M) Show Military/Standard Time: Toggles the time to show in military time (like 1030 hours 45)
+             or standard time (like 10:30:45 AM)
+* (Ctrl + F) Show/Hide Full Date: This will display the full date like FRIDAY AUGUST 6, 2025
+* (Ctrl + P) Show/Hide Partial Date: This will display a shorter version of the date like FRI AUG 6, 2025
+             Only one, Full or Partial date, can be displayed at a time
+* (Shift + T) Turn On/Off Daylight Savings Time: Toggles daylight savings time, default setting is on
+* Change Timezone: This will change the timezone to any US timezone. Default timezone is the user's timezone
 
-If you switch it to Analogue mode, the settings are slightly different. The digital time
-is displayed on the clock and if you don't want it, you can turn it off in the settings.
+On the Analogue Clock panel, the clock's time is displayed in analogue mode with the digital time
+displayed below the clock hands. The date is not displayed in this mode.
 
-On the AnalogueClock panel, you can change the following settings:
-* (Ctrl + E) Show/Hide Digital Time: This will display the digital time on the Analogue clock
-* (Shift + T) Turn On/Off Daylight Savings Time: This will turn on or off the daylight savings time
-* Change Timezone: This will change the timezone to any USA timezone like EST, CST, MST, PST, or AST.
+On the Analogue Clock panel, you can change the following settings:
+* (Ctrl + E) Show/Hide Digital Time: This will show/hide the digital time on the Analogue clock
+* (Shift + T) Turn On/Off Daylight Savings Time: Toggles daylight savings time; default setting is on.
+* Change Timezone: This will change the timezone to any US timezone. Default timezone is the user's timezone
 
-On the Alarms panel, you can set multiple alarms. Here you can enter the Name, Hour, Minutes, and Time 
+On the Alarms panel, you can set and manage alarms. Simply enter a Name, Hour, Minutes, and Time 
 (AM/PM) to set an alarm. You can choose a particular day or set of days, week days or weekends, 
-or all days of the week for this alarm to sound off. Once created, the alarm will be sleeping and you
-can either edit it or delete it. Once it is going off, it will sound off until you stop it. You can
-choose to stop the alarm, which will stop the sound and reset it for the next time it goes off, or you
-can snooze it, which will stop the sound temporarily for 8 minutes and then sound off again.
-The Alarms panel has no specific settings.
+or all days of the week for this alarm to sound off. If no name is provided, the alarm will default
+to "Alarm" + the current count of alarms, plus 1, e.g. "Alarm 1", "Alarm 2", etc.
+Once created, the alarm will be sleeping and you can either edit it or delete it. Once it is going off, 
+it will sound off until you stop it. You can choose to stop the alarm, which will stop the sound and 
+reset it for the next time it goes off, or you can snooze it, which will stop the sound temporarily for 
+7 minutes and then sound off again.
+
+The Alarms panel two settings:
+* (Ctrl + P) Pause/Resume All Alarms: This will pause or resume all alarms at once.
+* (Ctrl + R) Reset Panel: This will reset the alarms panel, removing all alarms and resetting the list.
 
 On the Timers panel, you can set multiple timers. Here you can enter the Name, Hours, Minutes, 
-and Seconds of a Timer. Once created, the timer will begin counting down from the set time. While
-it is counting down, you can pause it, resume it, or remove it. Once it is going off, it will play 
-a sound until you stop it. You can choose to reset the timer or stop the timer, which will also remove
+and Seconds of a Timer. If no name is provided, the name will default to "Timer" + the current count 
+of timers, plus 1, e.g. "Timer 1", "Timer 2", etc.
+Once created, the timer will begin counting down from the set time. While it is counting down, you can 
+pause it, resume it, or remove it. Once it is going off, it will play a sound until you stop it. You can 
+choose to reset the timer, which will restart the count down, or stop the timer, which will also remove 
 it from the list of timers.
 
 On the Timers panel, you can change the following settings:
-* Pause/Resume All Timers: This will pause or resume all timers at once.
+* (Ctrl + P) Pause/Resume All Timers: This will pause or resume all timers at once.
+* (Ctrl + R) Reset Panel: This will reset the timers panel, removing all timers and resetting the list.
 
 # History
 v2.9 Updated to use my parent pom. Multiple timers. Multiple ways to start the application.
