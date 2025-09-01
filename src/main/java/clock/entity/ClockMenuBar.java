@@ -134,7 +134,7 @@ public class ClockMenuBar extends JMenuBar
 
         setStopwatchFeature(new JMenuItem(VIEW_STOPWATCH));
         getStopwatchFeature().setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_S, InputEvent.CTRL_DOWN_MASK));
-        getStopwatchFeature().addActionListener(this::displayStopwatch);
+        getStopwatchFeature().addActionListener(action -> clockFrame.changePanels(PANEL_STOPWATCH));
 
         // Add options to Features Menu, consistent for each panel
         getFeaturesMenu().add(getDigitalClockFeature());

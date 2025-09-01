@@ -80,13 +80,13 @@ public class AlarmPanel extends ClockPanel implements Runnable
     {
         super();
         logger.debug("Creating AlarmPanel");
-        initialize();
+        initialize(clockFrame);
         SwingUtilities.updateComponentTreeUI(this);
         logger.info("Finished creating Alarm Panel");
     }
 
     /** Initializes the AlarmPanel */
-    private void initialize()
+    private void initialize(ClockFrame clockFrame)
     {
         setClockFrame(clockFrame);
         setClock(clockFrame.getClock());

@@ -1,6 +1,5 @@
 package clock.panel;
 
-import clock.entity.Alarm;
 import clock.entity.ButtonColumn;
 import clock.entity.Clock;
 import clock.entity.Timer;
@@ -277,7 +276,7 @@ public class TimerPanel extends ClockPanel implements Runnable
         return clock.getListOfTimers().stream()
                 .map(timer -> new Object[] {
                         timer.getName(),
-                        timer.getCountdownString(),
+                        timer.getCountDownString(),
                         PAUSE,
                         REMOVE
                 })
@@ -318,7 +317,7 @@ public class TimerPanel extends ClockPanel implements Runnable
                 clock.getListOfTimers().forEach(timer -> {
                     String currentTimer = timersTable.getValueAt(rowIndex.get(), 0).toString();
                     if (currentTimer.equals(timer.getName())) {
-                        timersTable.setValueAt(timer.getCountdownString(), rowIndex.get(), 1);
+                        timersTable.setValueAt(timer.getCountDownString(), rowIndex.get(), 1);
                     }
                     // update buttons to show restart or remove
                     if (timer.isTimerGoingOff()) {

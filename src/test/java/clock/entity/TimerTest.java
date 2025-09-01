@@ -197,8 +197,8 @@ class TimerTest
         timer1.resetTimer();
 
         assertFalse(timer1.isTimerGoingOff(), "Timer should not be going off after reset");
-        assertFalse(timer1.isHasBeenStarted(), "Timer should not have been started");
-        assertFalse(timer1.isHasBeenTriggered(), "Timer should not have been triggered");
+        assertFalse(timer1.isStarted(), "Timer should not have been started");
+        assertFalse(timer1.isTriggered(), "Timer should not have been triggered");
     }
 
     @Test
@@ -210,15 +210,15 @@ class TimerTest
         sleep(3000); // wait for 3 seconds
 
         javax.swing.SwingUtilities.invokeLater(() -> {
-            assertTrue(timer1.isHasBeenStarted(), "Timer should have been started");
-            assertFalse(timer1.isHasBeenTriggered(), "Timer should not have been triggered yet");
+            assertTrue(timer1.isStarted(), "Timer should have been started");
+            assertFalse(timer1.isTriggered(), "Timer should not have been triggered yet");
         });
 
         timer1.stopTimer();
 
         javax.swing.SwingUtilities.invokeLater(() -> {
-            assertFalse(timer1.isHasBeenStarted(), "Timer should not be started after stopping");
-            assertFalse(timer1.isHasBeenTriggered(), "Timer should not have been triggered after stopping");
+            assertFalse(timer1.isStarted(), "Timer should not be started after stopping");
+            assertFalse(timer1.isTriggered(), "Timer should not have been triggered after stopping");
             assertEquals("(Test Timer) 00:00:07", timer1.toString(), "Timer did not stop at the expected time");
         });
     }

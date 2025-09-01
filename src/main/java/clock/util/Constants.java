@@ -16,6 +16,7 @@ public class Constants {
     public static final String AM = "AM";
     public static final String ANALOGUE = "Analogue";
     public static final String are = "are";
+    public static final String BUTTON = "Button";
     public static final String CHANGE = "Change";
     public static final String COLON = ":";
     public static final String COMMA = ",";
@@ -140,4 +141,9 @@ public class Constants {
     public static final String WEEKENDS = "Weekends";
     public static final String VIEW_DIGITAL_CLOCK = "View Digital Clock";
     public static final String VIEW_ANALOGUE_CLOCK = "View Analogue Clock";
+
+    // Stopwatch
+    public static final String LAP = "Lap";
+    public static final String LAP_TIME = "Lap Time";
+    public static final String START = "Start";
 }

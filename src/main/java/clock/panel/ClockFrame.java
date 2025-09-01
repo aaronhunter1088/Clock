@@ -51,8 +51,8 @@ public class ClockFrame extends JFrame
                        digitalClockPanel,
                        analogueClockPanel,
                        alarmPanel,
-                       timerPanel;
-    private StopwatchPanel stopwatchPanel;
+                       timerPanel,
+                       stopwatchPanel;
     private Clock clock;
     private ScheduledExecutorService scheduler;
 
@@ -200,6 +200,8 @@ public class ClockFrame extends JFrame
                 tp.stop();
             else if (currentPanel instanceof AlarmPanel ap)
                 ap.stop();
+            else if (currentPanel instanceof StopwatchPanel sp)
+                sp.stop();
             showPanel(changePanelType);
             repaint();
             setVisible(true);
@@ -220,7 +222,7 @@ public class ClockFrame extends JFrame
             case PANEL_ANALOGUE_CLOCK -> changeToAnalogueClockPanel();
             case PANEL_ALARM -> changeToAlarmPanel();
             case PANEL_TIMER -> changeToTimerPanel();
-            //case PANEL_STOPWATCH -> changeToStopwatchPanel();
+            case PANEL_STOPWATCH -> changeToStopwatchPanel();
         }
     }
 
@@ -286,8 +288,8 @@ public class ClockFrame extends JFrame
         logger.debug("change to stopwatch panel");
         add(stopwatchPanel);
         setCurrentPanel(stopwatchPanel);
-        getStopwatchPanel().setupSettingsMenu();
-        setSize(clockDefaultSize);
+        getStopwatchPanel().setupDefaults();
+        setSize(stopwatchPanel.getMaximumSize());
         setPanelType(PANEL_STOPWATCH);
     }
 
