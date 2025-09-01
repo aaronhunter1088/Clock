@@ -28,7 +28,8 @@ public class DisplayTimePanel extends JPanel implements Runnable {
         setMaximumSize(ClockFrame.analogueSize);
         setBackground(Color.BLACK);
         setForeground(Color.BLACK);
-        start();
+        //start();
+        repaint();
     }
 
     /**
@@ -62,8 +63,9 @@ public class DisplayTimePanel extends JPanel implements Runnable {
         {
             try
             {
+                stopwatch.startStopwatch();
                 repaint(); // goes to paint
-                sleep(1000);
+                sleep(1);
             }
             catch (InterruptedException e)
             {}

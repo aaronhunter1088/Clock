@@ -87,7 +87,7 @@ public class Stopwatch implements Serializable, Comparable<Stopwatch>, Runnable
             try {
                 if (!paused && !stopped) {
                     performCountUp();
-                    sleep(10);
+                    sleep(1);
                 } else { //if (paused || stopped) {
                     sleep(1000);
                 }

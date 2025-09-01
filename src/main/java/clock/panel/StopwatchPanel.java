@@ -225,20 +225,6 @@ addComponent(stopwatchNameField, 1, 1, 1, 1, 0, 0, 1, 0, GridBagConstraints.HORI
         ((DisplayTimePanel)clockFrame.getStopwatchPanel().getDisplayTimePanel()).setShowAnaloguePanel(!current);
     }
 
-//    /**
-//     * Starts the stopwatch panel thread
-//     * and internally calls the run method.
-//     */
-//    public void start()
-//    {
-//        logger.debug("starting stopwatch panel");
-//        if (thread == null)
-//        {
-//            thread = new Thread(this);
-//            thread.start();
-//        }
-//    }
-//
     /** Stops the stopwatch panel thread. */
     public void stop()
     {
@@ -247,22 +233,6 @@ addComponent(stopwatchNameField, 1, 1, 1, 1, 0, 0, 1, 0, GridBagConstraints.HORI
         startButton.setText(RESUME);
         lapButton.setText(RESET);
     }
-//
-//    /** Repaints the stopwatch panel */
-//    @Override
-//    public void run()
-//    {
-//        while (thread != null)
-//        {
-//            try
-//            {
-//                if ( displayTimePanel.thread == null) displayTimePanel.start();
-//                sleep(1000);
-//            }
-//            catch (InterruptedException e)
-//            { printStackTrace(e, e.getMessage()); }
-//        }
-//    }
 
     private void executeStartResumeOrStop(ActionEvent e)
     {
@@ -290,7 +260,7 @@ addComponent(stopwatchNameField, 1, 1, 1, 1, 0, 0, 1, 0, GridBagConstraints.HORI
         String name = stopwatchNameField.getText();
         Stopwatch stopwatch = new Stopwatch(name, false, false, false, clock);
         displayTimePanel.setStopwatch(stopwatch);
-        stopwatch.startStopwatch();
+        displayTimePanel.start();
         if (displayTimePanel.isShowAnaloguePanel())
         {
             displayTimePanel.setClockText(stopwatch.getCountUpString());
