@@ -1,6 +1,7 @@
 package clock.entity;
 
 import clock.panel.ClockFrame;
+import clock.panel.DisplayTimePanel;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -117,7 +118,7 @@ public class ClockMenuBar extends JMenuBar
         getResetAlarmsPanelSetting().addActionListener(this::toggleResetAlarmsPanelSetting);
 
         setShowAnalogueTimePanel(new JMenuItem(SHOW+SPACE+ANALOGUE+SPACE+"Time"));
-        getShowAnalogueTimePanel().setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_R, InputEvent.CTRL_DOWN_MASK));
+        getShowAnalogueTimePanel().setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_T, InputEvent.CTRL_DOWN_MASK));
         getShowAnalogueTimePanel().setForeground(Color.WHITE);
         getShowAnalogueTimePanel().addActionListener(this::toggleTimePanels);
 
@@ -355,7 +356,7 @@ public class ClockMenuBar extends JMenuBar
     protected void toggleTimePanels(ActionEvent action)
     {
         clockFrame.getStopwatchPanel().switchPanels();
-        if (clockFrame.getStopwatchPanel().isShowAnaloguePanel())
+        if (!((DisplayTimePanel)clockFrame.getStopwatchPanel().getDisplayTimePanel()).isShowAnaloguePanel())
         {
             getShowAnalogueTimePanel().setText(SHOW+SPACE+ANALOGUE+SPACE+"Time");
         }
