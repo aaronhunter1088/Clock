@@ -1,5 +1,6 @@
 package clock.panel;
 
+import clock.entity.Stopwatch;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -13,11 +14,11 @@ import static java.lang.Thread.sleep;
 public class DisplayTimePanel extends JPanel implements Runnable {
 
     private static final Logger logger = LogManager.getLogger(DisplayTimePanel.class);
-    private GridBagLayout layout;
-    private GridBagConstraints constraints;
     // TODO: Make private, add get/set methods
     public Thread thread;
     private boolean showAnaloguePanel = false;
+    private String clockText = "Press Start"; // default text
+    private Stopwatch stopwatch;
 
     public DisplayTimePanel()
     {
@@ -49,6 +50,8 @@ public class DisplayTimePanel extends JPanel implements Runnable {
     {
         logger.debug("stopping digital clock panel");
         thread = null;
+        setClockText("Resume or reset");
+        getStopwatch().pauseStopwatch();
     }
 
     /** Repaints the stopwatch panel */
@@ -73,6 +76,7 @@ public class DisplayTimePanel extends JPanel implements Runnable {
         super.paint(g);
         if (showAnaloguePanel)
         {
+            setClockText(getStopwatch() == null ? clockText : getStopwatch().getCountUpString());
             drawAnalogueClock(g);
         }
         else
@@ -83,7 +87,7 @@ public class DisplayTimePanel extends JPanel implements Runnable {
 
     public void drawDigitalClock(Graphics g)
     {
-        logger.info("drawing time display panel");
+        logger.info("drawing display time panel");
         g.setFont(ClockFrame.font20);
         //if (clock.isShowFullDate()) g.setFont(ClockFrame.font40);
 
@@ -98,8 +102,8 @@ public class DisplayTimePanel extends JPanel implements Runnable {
         String timeStr;
 
         // TODO: Fix
-        dateStr = "00:00:00"; //clock.defaultText(1); // time
-        timeStr = "Press Start"; //clock.defaultText(2); // stopwatch status
+        dateStr = stopwatch == null ? "00:00:00" : stopwatch.getCountUpString(); //clock.defaultText(1); // time
+        timeStr = clockText; //clock.defaultText(2); // stopwatch status
         // Calculate centered x positions
         int dateWidth = fm.stringWidth(dateStr);
         int timeWidth = fm.stringWidth(timeStr);
@@ -148,7 +152,7 @@ public class DisplayTimePanel extends JPanel implements Runnable {
         g.fillOval(xcenter - radius, ycenter - radius, diameter, diameter);
 
         g.setColor(Color.WHITE);
-        g.drawString("Press Start", xcenter - 50, ycenter + (int)(radius * 0.45));  // adjust radius number as needed
+        g.drawString(clockText, xcenter - 50, ycenter + (int)(radius * 0.45));  // adjust radius number as needed
 
         // Draw numbers (adjust positions for new radius)
         g.drawString(ONE,    xcenter + (int)(radius * 0.4),  ycenter - (int)(radius * 0.75));
@@ -167,7 +171,9 @@ public class DisplayTimePanel extends JPanel implements Runnable {
         g.setColor(Color.BLACK);
 
         // Example hands (all zero for now)
-        int second = 0, minute = 0, hour = 0;
+        int second = stopwatch == null ? 0 : getStopwatch().getSeconds();
+        int minute = stopwatch == null ? 0 : getStopwatch().getMinutes();
+        int hour = stopwatch == null ? 0 : getStopwatch().getHours();
         int xsecond = (int)(Math.cos(second * Math.PI / 30 - Math.PI / 2) * (radius * 0.8) + xcenter);
         int ysecond = (int)(Math.sin(second * Math.PI / 30 - Math.PI / 2) * (radius * 0.8) + ycenter);
         int xminute = (int)(Math.cos(minute * Math.PI / 30 - Math.PI / 2) * (radius * 0.65) + xcenter);
@@ -183,10 +189,12 @@ public class DisplayTimePanel extends JPanel implements Runnable {
         g.drawLine(xcenter, ycenter, xhour, yhour);
     }
 
-    private void setGridBagLayout(GridBagLayout layout) { setLayout(layout); this.layout = layout; logger.debug("GridBagLayout set"); }
-    private void setGridBagConstraints(GridBagConstraints constraints) { this.constraints = constraints; logger.debug("constraints set"); }
     public void setShowAnaloguePanel(boolean showAnaloguePanel) { this.showAnaloguePanel = showAnaloguePanel; logger.debug("showAnaloguePanel set to {}", showAnaloguePanel); }
+    public void setClockText(String clockText) { this.clockText = clockText; logger.debug("clockText set to {}", clockText); }
+    public void setStopwatch(Stopwatch stopwatch) { this.stopwatch = stopwatch; logger.debug("stopwatch set to {}", stopwatch); }
 
     public boolean isShowAnaloguePanel() { return showAnaloguePanel; }
+    public String getClockText() { return clockText; }
+    public Stopwatch getStopwatch() { return stopwatch; }
 }
 

@@ -6,15 +6,11 @@ import org.apache.logging.log4j.Logger;
 import javax.swing.*;
 import java.awt.*;
 
-import static clock.util.Constants.*;
-import static clock.util.Constants.TWELVE;
 import static java.lang.Thread.sleep;
 
 class DisplayLapsPanel extends JPanel implements Runnable {
 
     private static final Logger logger = LogManager.getLogger(DisplayLapsPanel.class);
-    private GridBagLayout layout;
-    private GridBagConstraints constraints;
     public Thread thread;
     private int xcenter = 175, ycenter = 175, lastxs = 0, lastys = 0, lastxm = 0, lastym = 0, lastxh = 0, lastyh = 0;
 
@@ -70,7 +66,4 @@ class DisplayLapsPanel extends JPanel implements Runnable {
         super.paint(g);
     }
 
-    private void setGridBagLayout(GridBagLayout layout) { setLayout(layout); this.layout = layout; logger.debug("GridBagLayout set"); }
-    private void setGridBagConstraints(GridBagConstraints constraints) { this.constraints = constraints; logger.debug("constraints set"); }
 }
-

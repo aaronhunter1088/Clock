@@ -9,6 +9,7 @@ import org.codehaus.plexus.util.StringUtils;
 import javax.swing.*;
 import javax.swing.border.LineBorder;
 import java.awt.*;
+import java.awt.event.ActionEvent;
 import java.awt.event.FocusEvent;
 import java.awt.event.FocusListener;
 
@@ -35,25 +36,19 @@ import static java.lang.Thread.sleep;
  * @author michael ball
  * @version 2.9
  */
-public class StopwatchPanel extends ClockPanel implements Runnable
+public class StopwatchPanel extends ClockPanel
 {
     private static final Logger logger = LogManager.getLogger(StopwatchPanel.class);
     private GridBagLayout layout;
     private GridBagConstraints constraints;
-    private Thread thread;
-    private int xcenter = 175, ycenter = 175, lastxs = 0, lastys = 0, lastxm = 0, lastym = 0, lastxh = 0, lastyh = 0;
+//    private Thread thread;
     private ClockFrame clockFrame;
     private Clock clock;
-    private String clockText = EMPTY;
-    // Used to display the stopwatch time in two modes
-    private JPanel displayTimePanel,
-                   displayLapsPanel;
-                   //lapsPanel;
-                   //stopwatchesPanel;
-    private JButton lapButton, // toggles to reset when stopwatch is stopped
+    private DisplayTimePanel displayTimePanel; // Used to display the stopwatch time in two modes
+    private DisplayLapsPanel displayLapsPanel; // Used to display the laps recorded for all stopwatches
+    private JButton lapButton,   // toggles to reset when stopwatch is stopped
                     startButton; // toggles to stop when stopwatch is started
     private JTextField stopwatchNameField;
-    private boolean showAnaloguePanel;
 
     /**
      * Main constructor for creating the StopwatchPanel
@@ -97,6 +92,7 @@ public class StopwatchPanel extends ClockPanel implements Runnable
         lapButton.setName(LAP + BUTTON);
         lapButton.setBackground(Color.BLACK);
         lapButton.setForeground(Color.BLUE);
+        lapButton.addActionListener(this::executeLapOrReset);
 
         stopwatchNameField = new JTextField("Sw" + (Stopwatch.stopwatchCounter + 1), 4);
         stopwatchNameField.setFont(ClockFrame.font20);
@@ -130,10 +126,11 @@ public class StopwatchPanel extends ClockPanel implements Runnable
         startButton.setName(START + BUTTON);
         startButton.setBackground(Color.BLACK);
         startButton.setForeground(Color.BLUE);
+        startButton.addActionListener(this::executeStartResumeOrStop);
 
         createDisplayTimePanel();
         // Laps
-        createLapsPanel();
+        createDisplayLapsPanel();
     }
 
     /**
@@ -200,26 +197,27 @@ addComponent(stopwatchNameField, 1, 1, 1, 1, 0, 0, 1, 0, GridBagConstraints.HORI
         add(cpt);
     }
 
+    /** Sets up the settings menu for the stopwatch panel */
     @Override
     public void setupSettingsMenu()
     {
-        // Implement
         clockFrame.clearSettingsMenu();
         clockFrame.getClockMenuBar().getSettingsMenu().add(clockFrame.getClockMenuBar().getShowAnalogueTimePanel());
     }
 
+    /** Sets up the panel which displays the stopwatches' time */
     private void createDisplayTimePanel()
     {
         displayTimePanel = new DisplayTimePanel();
-        // Set layouts and properties for each panel
     }
 
-    private void createLapsPanel()
+    /** Sets up the panel which displays the laps */
+    private void createDisplayLapsPanel()
     {
         displayLapsPanel = new DisplayLapsPanel();
-        // Set layouts and properties for each panel
     }
 
+    /** Switches the display time panel between analogue and digital mode */
     public void switchPanels()
     {
         boolean current = ((DisplayTimePanel)clockFrame.getStopwatchPanel().getDisplayTimePanel()).isShowAnaloguePanel();
@@ -227,61 +225,142 @@ addComponent(stopwatchNameField, 1, 1, 1, 1, 0, 0, 1, 0, GridBagConstraints.HORI
         ((DisplayTimePanel)clockFrame.getStopwatchPanel().getDisplayTimePanel()).setShowAnaloguePanel(!current);
     }
 
-    /**
-     * Starts the analogue clock panel thread
-     * and internally calls the run method.
-     */
-    public void start()
-    {
-        logger.debug("starting stopwatch panel");
-        if (thread == null)
-        {
-            thread = new Thread(this);
-            thread.start();
-        }
-    }
-
-    /** Stops the timer panel thread. */
+//    /**
+//     * Starts the stopwatch panel thread
+//     * and internally calls the run method.
+//     */
+//    public void start()
+//    {
+//        logger.debug("starting stopwatch panel");
+//        if (thread == null)
+//        {
+//            thread = new Thread(this);
+//            thread.start();
+//        }
+//    }
+//
+    /** Stops the stopwatch panel thread. */
     public void stop()
     {
         logger.debug("stopping stopwatch panel");
-        thread = null;
-        ((DisplayTimePanel)displayTimePanel).stop();
-        ((DisplayLapsPanel)displayLapsPanel).stop();
+        displayTimePanel.stop();
+        startButton.setText(RESUME);
+        lapButton.setText(RESET);
+    }
+//
+//    /** Repaints the stopwatch panel */
+//    @Override
+//    public void run()
+//    {
+//        while (thread != null)
+//        {
+//            try
+//            {
+//                if ( displayTimePanel.thread == null) displayTimePanel.start();
+//                sleep(1000);
+//            }
+//            catch (InterruptedException e)
+//            { printStackTrace(e, e.getMessage()); }
+//        }
+//    }
+
+    private void executeStartResumeOrStop(ActionEvent e)
+    {
+        String buttonText = startButton.getText();
+        if (buttonText.equals(START))
+        {
+            startStopwatch();
+        }
+        else if (buttonText.equals(RESUME))
+        {
+            resumeStopwatch();
+        }
+        else
+        {
+            stopStopwatchPanel();
+        }
     }
 
-    /** Repaints the stopwatch panel */
-    @Override
-    public void run()
+    /**
+     * Starts a new stopwatch and changes
+     * the start button to a stop button
+     */
+    private void startStopwatch()
     {
-        while (thread != null)
+        String name = stopwatchNameField.getText();
+        Stopwatch stopwatch = new Stopwatch(name, false, false, false, clock);
+        displayTimePanel.setStopwatch(stopwatch);
+        stopwatch.startStopwatch();
+        if (displayTimePanel.isShowAnaloguePanel())
         {
-            try
-            {
-                if ( ((DisplayTimePanel)displayTimePanel).thread == null) ((DisplayTimePanel)displayTimePanel).start();
-                if ( ((DisplayLapsPanel)displayLapsPanel).thread == null) ((DisplayLapsPanel)displayLapsPanel).start();
-                sleep(1000);
-            }
-            catch (InterruptedException e)
-            { printStackTrace(e, e.getMessage()); }
+            displayTimePanel.setClockText(stopwatch.getCountUpString());
         }
+        if (!displayTimePanel.isShowAnaloguePanel())
+        {
+            displayTimePanel.setClockText(EMPTY);
+        }
+        startButton.setText(STOP);
+        lapButton.setText(LAP);
+    }
+
+    /** Resumes the current stopwatch */
+    private void resumeStopwatch()
+    {
+        displayTimePanel.getStopwatch().resumeStopwatch();
+        startButton.setText(STOP);
+        lapButton.setText(LAP);
+    }
+
+    /** Pauses the current stopwatch */
+    private void stopStopwatchPanel()
+    {
+        displayTimePanel.getStopwatch().pauseStopwatch();
+        startButton.setText(RESUME);
+        lapButton.setText(RESET);
+    }
+
+    /**
+     * Executes the appropriate action depending
+     * on the text of the button since this button
+     * toggles between lap and reset.
+     * @param e the action event
+     */
+    private void executeLapOrReset(ActionEvent e)
+    {
+        String buttonText = lapButton.getText();
+        if (buttonText.equals(LAP))
+        {
+            recordLap();
+        }
+        else
+        {
+            resetStopwatchPanel();
+        }
+    }
+
+    /** Records a lap for the current stopwatch */
+    private void recordLap()
+    {
+        logger.debug("recording lap");
+    }
+
+    /** Resets the stopwatch panel to its default state */
+    private void resetStopwatchPanel()
+    {
+        logger.debug("resetting stopwatch panel");
     }
 
     @Override
     public void setClock(Clock clock) { this.clock = clock; logger.debug("clock set"); }
     public void setClockFrame(ClockFrame clockFrame) { this.clockFrame = clockFrame; logger.debug("clockFrame set"); }
-    public void setStopwatchLayout(GridBagLayout gridBagLayout) { this.layout = gridBagLayout; logger.debug("constraints set"); }
     private void setGridBagLayout(GridBagLayout layout) { setLayout(layout); this.layout = layout; logger.debug("GridBagLayout set"); }
     public void setGridBagConstraints(GridBagConstraints constraints) { this.constraints = constraints; logger.debug("constraints set"); }
-    public void setShowAnaloguePanel(boolean showAnaloguePanel) { this.showAnaloguePanel = showAnaloguePanel; logger.debug("showAnaloguePanel set to {}", showAnaloguePanel); }
 
     public Clock getClock() { return clock; }
     public ClockFrame getClockFrame() { return clockFrame; }
-    public GridBagLayout getStopwatchLayout() { return layout; }
     public GridBagConstraints getGridBagConstraints() { return constraints; }
     public JPanel getDisplayTimePanel() { return displayTimePanel; }
     public JPanel getDisplayLapsPanel() { return displayLapsPanel; }
-    public boolean isShowAnaloguePanel() { return showAnaloguePanel;  }
 
 }
 

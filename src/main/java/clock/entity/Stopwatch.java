@@ -105,6 +105,7 @@ public class Stopwatch implements Serializable, Comparable<Stopwatch>, Runnable
         if (selfThread == null)
         {
             setSelfThread(new Thread(this));
+            countUp = LocalTime.of(hours, minutes, seconds);
             selfThread.start();
         }
     }
@@ -115,8 +116,8 @@ public class Stopwatch implements Serializable, Comparable<Stopwatch>, Runnable
     public void stopStopwatch()
     {
         logger.info("stopping {}", this);
-        setStarted(false);
         setStopped(true);
+        //setSelfThread(null); // TODO: Check if this is best way to stop thread
         logger.info("{} stopwatch stopped", this);
     }
 
@@ -159,7 +160,10 @@ public class Stopwatch implements Serializable, Comparable<Stopwatch>, Runnable
      */
     private void performCountUp()
     {
-        setStarted(true);
+        if (!started)
+        {
+            setStarted(true);
+        }
         logger.info("{} ticking up...", this);
         countUp = countUp.plusSeconds(1);
         logger.debug("CountUp: {}", getCountUpString());
@@ -167,6 +171,12 @@ public class Stopwatch implements Serializable, Comparable<Stopwatch>, Runnable
         {
             logger.info("{} has reached maximum", this);
             stopStopwatch();
+        }
+        else
+        {
+            setSeconds(countUp.getSecond());
+            setMinutes(countUp.getMinute());
+            setHours(countUp.getHour());
         }
     }
 
@@ -194,10 +204,10 @@ public class Stopwatch implements Serializable, Comparable<Stopwatch>, Runnable
     public String getMinutesAsStr() { return minutesAsStr; }
     public LocalTime getCountUp() { return countUp; }
     public String getCountUpString() {
-        String countdownHours = countUp.getHour() < 10 ? ZERO + countUp.getHour() : String.valueOf(countUp.getHour());
-        String countdownMinutes = countUp.getMinute() < 10 ? ZERO + countUp.getMinute() : String.valueOf(countUp.getMinute());
-        String countdownSeconds = countUp.getSecond() < 10 ? ZERO + countUp.getSecond() : String.valueOf(countUp.getSecond());
-        return String.format("%s:%s:%s", countdownHours, countdownMinutes, countdownSeconds);
+        String countupHours = countUp.getHour() < 10 ? ZERO + countUp.getHour() : String.valueOf(countUp.getHour());
+        String countupMinutes = countUp.getMinute() < 10 ? ZERO + countUp.getMinute() : String.valueOf(countUp.getMinute());
+        String countupSeconds = countUp.getSecond() < 10 ? ZERO + countUp.getSecond() : String.valueOf(countUp.getSecond());
+        return String.format("%s:%s:%s", countupHours, countupMinutes, countupSeconds);
     }
     public boolean isPaused() { return paused; }
     public int getSeconds() { return seconds; }
