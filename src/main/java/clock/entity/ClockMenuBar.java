@@ -356,7 +356,7 @@ public class ClockMenuBar extends JMenuBar
     protected void toggleTimePanels(ActionEvent action)
     {
         clockFrame.getStopwatchPanel().switchPanels();
-        if (!((DisplayTimePanel)clockFrame.getStopwatchPanel().getDisplayTimePanel()).isShowAnaloguePanel())
+        if (!clockFrame.getStopwatchPanel().getDisplayTimePanel().isShowAnaloguePanel())
         {
             getShowAnalogueTimePanel().setText(SHOW+SPACE+ANALOGUE+SPACE+"Time");
         }

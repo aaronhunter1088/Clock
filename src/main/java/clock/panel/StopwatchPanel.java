@@ -220,9 +220,10 @@ addComponent(stopwatchNameField, 1, 1, 1, 1, 0, 0, 1, 0, GridBagConstraints.HORI
     /** Switches the display time panel between analogue and digital mode */
     public void switchPanels()
     {
-        boolean current = ((DisplayTimePanel)clockFrame.getStopwatchPanel().getDisplayTimePanel()).isShowAnaloguePanel();
+        boolean current = clockFrame.getStopwatchPanel().getDisplayTimePanel().isShowAnaloguePanel();
         logger.debug("switching panels from {} to {}", current, !current);
-        ((DisplayTimePanel)clockFrame.getStopwatchPanel().getDisplayTimePanel()).setShowAnaloguePanel(!current);
+        clockFrame.getStopwatchPanel().getDisplayTimePanel().setShowAnaloguePanel(!current);
+        clockFrame.getStopwatchPanel().getDisplayTimePanel().repaint();
     }
 
     /** Stops the stopwatch panel thread. */
@@ -318,6 +319,7 @@ addComponent(stopwatchNameField, 1, 1, 1, 1, 0, 0, 1, 0, GridBagConstraints.HORI
     private void resetStopwatchPanel()
     {
         logger.debug("resetting stopwatch panel");
+        displayTimePanel.setStopwatch(null);
     }
 
     @Override
@@ -329,8 +331,8 @@ addComponent(stopwatchNameField, 1, 1, 1, 1, 0, 0, 1, 0, GridBagConstraints.HORI
     public Clock getClock() { return clock; }
     public ClockFrame getClockFrame() { return clockFrame; }
     public GridBagConstraints getGridBagConstraints() { return constraints; }
-    public JPanel getDisplayTimePanel() { return displayTimePanel; }
-    public JPanel getDisplayLapsPanel() { return displayLapsPanel; }
+    public DisplayTimePanel getDisplayTimePanel() { return displayTimePanel; }
+    public DisplayLapsPanel getDisplayLapsPanel() { return displayLapsPanel; }
 
 }
 
