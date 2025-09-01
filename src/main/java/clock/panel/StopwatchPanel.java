@@ -1,12 +1,16 @@
 package clock.panel;
 
 import clock.entity.Clock;
+import clock.entity.Stopwatch;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.codehaus.plexus.util.StringUtils;
 
 import javax.swing.*;
 import javax.swing.border.LineBorder;
 import java.awt.*;
+import java.awt.event.FocusEvent;
+import java.awt.event.FocusListener;
 
 import static clock.util.Constants.*;
 import static java.lang.Thread.sleep;
@@ -94,7 +98,7 @@ public class StopwatchPanel extends ClockPanel implements Runnable
         lapButton.setBackground(Color.BLACK);
         lapButton.setForeground(Color.BLUE);
 
-        stopwatchNameField = new JTextField("Name", 4);
+        stopwatchNameField = new JTextField("Sw" + (Stopwatch.stopwatchCounter + 1), 4);
         stopwatchNameField.setFont(ClockFrame.font20);
         stopwatchNameField.setOpaque(true);
         stopwatchNameField.setName(STOPWATCH + TEXT_FIELD);
@@ -102,6 +106,23 @@ public class StopwatchPanel extends ClockPanel implements Runnable
         stopwatchNameField.setForeground(Color.WHITE);
         stopwatchNameField.setBorder(new LineBorder(Color.ORANGE));
         stopwatchNameField.setToolTipText("Enter Stopwatch Name");
+        stopwatchNameField.addFocusListener(new FocusListener() {
+           @Override
+           public void focusGained(FocusEvent e) {
+               if (stopwatchNameField.getText().equals("Sw" + (Stopwatch.stopwatchCounter + 1))) {
+                   stopwatchNameField.setText(EMPTY);
+               }
+               logger.debug("Focus gained on name field");
+           }
+
+           @Override
+           public void focusLost(FocusEvent e) {
+               if (StringUtils.isBlank(stopwatchNameField.getText())) {
+                   stopwatchNameField.setText("Sw" + (Stopwatch.stopwatchCounter + 1));
+               }
+               logger.debug("Focus lost on name field");
+           }
+       });
 
         startButton = new JButton(START);
         startButton.setFont(ClockFrame.font20);
