@@ -49,7 +49,7 @@ public class StopwatchPanel extends ClockPanel implements Runnable
     private JButton lapButton, // toggles to reset when stopwatch is stopped
                     startButton; // toggles to stop when stopwatch is started
     private JTextField stopwatchNameField;
-    private boolean showDigitalPanel;
+    private boolean showAnaloguePanel;
 
     /**
      * Main constructor for creating the StopwatchPanel
@@ -125,11 +125,6 @@ public class StopwatchPanel extends ClockPanel implements Runnable
         setBackground(Color.BLACK);
         //setForeground(Color.WHITE);
         clockFrame.setTitle(STOPWATCH+SPACE+PANEL);
-        lapButton.setVisible(true);
-        startButton.setVisible(true);
-        stopwatchNameField.setVisible(true);
-        revalidate();
-        repaint();
         //setBorder(BorderFactory.createLineBorder(Color.BLACK));
     }
 
@@ -188,6 +183,8 @@ addComponent(stopwatchNameField, 1, 1, 1, 1, 0, 0, 1, 0, GridBagConstraints.HORI
     public void setupSettingsMenu()
     {
         // Implement
+        clockFrame.clearSettingsMenu();
+        clockFrame.getClockMenuBar().getSettingsMenu().add(clockFrame.getClockMenuBar().getShowAnalogueTimePanel());
     }
 
     private void createDisplayTimePanel()
@@ -202,10 +199,11 @@ addComponent(stopwatchNameField, 1, 1, 1, 1, 0, 0, 1, 0, GridBagConstraints.HORI
         // Set layouts and properties for each panel
     }
 
-    @Override
-    public void printStackTrace(Exception e, String message)
+    public void switchPanels()
     {
-
+        boolean current = ((TimeDisplayPanel)displayTimePanel).isShowAnaloguePanel();
+        logger.debug("switching panels from {} to {}", current, !current);
+        ((TimeDisplayPanel)displayTimePanel).setShowAnaloguePanel(!current);
     }
 
     /**
@@ -254,13 +252,13 @@ addComponent(stopwatchNameField, 1, 1, 1, 1, 0, 0, 1, 0, GridBagConstraints.HORI
     public void setStopwatchLayout(GridBagLayout gridBagLayout) { this.layout = gridBagLayout; logger.debug("constraints set"); }
     private void setGridBagLayout(GridBagLayout layout) { setLayout(layout); this.layout = layout; logger.debug("GridBagLayout set"); }
     public void setGridBagConstraints(GridBagConstraints constraints) { this.constraints = constraints; logger.debug("constraints set"); }
-    public void setShowDigitalPanel(boolean showDigitalPanel) { this.showDigitalPanel = showDigitalPanel; logger.debug("showDigitalPanel set to {}", showDigitalPanel); }
+    public void setShowAnaloguePanel(boolean showAnaloguePanel) { this.showAnaloguePanel = showAnaloguePanel; logger.debug("showAnaloguePanel set to {}", showAnaloguePanel); }
 
     public Clock getClock() { return clock; }
     public ClockFrame getClockFrame() { return clockFrame; }
     public GridBagLayout getStopwatchLayout() { return layout; }
     public GridBagConstraints getGridBagConstraints() { return constraints; }
-    public boolean isShowDigitalPanel() { return showDigitalPanel;  }
+    public boolean isShowAnaloguePanel() { return showAnaloguePanel;  }
 
 }
 
@@ -269,7 +267,9 @@ class TimeDisplayPanel extends JPanel implements Runnable {
     private static final Logger logger = LogManager.getLogger(TimeDisplayPanel.class);
     private GridBagLayout layout;
     private GridBagConstraints constraints;
+    // TODO: Make private, add get/set methods
     public Thread thread;
+    private boolean showAnaloguePanel = false;
 
     public TimeDisplayPanel()
     {
@@ -323,7 +323,14 @@ class TimeDisplayPanel extends JPanel implements Runnable {
     public void paint(Graphics g)
     {
         super.paint(g);
-        drawDigitalClock(g);
+        if (showAnaloguePanel)
+        {
+            drawAnalogueClock(g);
+        }
+        else
+        {
+            drawDigitalClock(g);
+        }
     }
 
     public void drawDigitalClock(Graphics g)
@@ -342,6 +349,7 @@ class TimeDisplayPanel extends JPanel implements Runnable {
         String dateStr;
         String timeStr;
 
+        // TODO: Fix
         dateStr = "00:00:00"; //clock.defaultText(1); // time
         timeStr = "Press Start"; //clock.defaultText(2); // stopwatch status
         // Calculate centered x positions
@@ -373,8 +381,65 @@ class TimeDisplayPanel extends JPanel implements Runnable {
         g.setColor(Color.BLACK);
     }
 
+    /**
+     * Draws the analogue clock
+     * @param g the graphics object
+     */
+    public void drawAnalogueClock(Graphics g)
+    {
+        logger.info("painting analogue clock panel");
+        int width = getWidth();
+        int height = getHeight();
+        int diameter = Math.min(width, height) - 20; // leave some margin
+        int radius = diameter / 2;
+        int xcenter = width / 2;
+        int ycenter = height / 2;
+
+        g.setFont(ClockFrame.analogueFont);
+        g.setColor(Color.BLACK);
+        g.fillOval(xcenter - radius, ycenter - radius, diameter, diameter);
+
+        g.setColor(Color.WHITE);
+        g.drawString("Press Start", xcenter - 50, ycenter + (int)(radius * 0.45));  // adjust radius number as needed
+
+        // Draw numbers (adjust positions for new radius)
+        g.drawString(ONE,    xcenter + (int)(radius * 0.4),  ycenter - (int)(radius * 0.75));
+        g.drawString(TWO,    xcenter + (int)(radius * 0.75), ycenter - (int)(radius * 0.4));
+        g.drawString(THREE,  xcenter + radius - 10,          ycenter);
+        g.drawString(FOUR,   xcenter + (int)(radius * 0.75), ycenter + (int)(radius * 0.4));
+        g.drawString(FIVE,   xcenter + (int)(radius * 0.4),  ycenter + (int)(radius * 0.75));
+        g.drawString(SIX,    xcenter - 10,                   ycenter + radius - 5);
+        g.drawString(SEVEN,  xcenter - (int)(radius * 0.5),  ycenter + (int)(radius * 0.7));
+        g.drawString(EIGHT,  xcenter - (int)(radius * 0.8),  ycenter + (int)(radius * 0.4));
+        g.drawString(NINE,   xcenter - radius + 5,           ycenter);
+        g.drawString(TEN,    xcenter - (int)(radius * 0.8),  ycenter - (int)(radius * 0.4));
+        g.drawString(ELEVEN, xcenter - (int)(radius * 0.5),  ycenter - (int)(radius * 0.7));
+        g.drawString(TWELVE, xcenter - 10,                   ycenter - radius + 20);
+
+        g.setColor(Color.BLACK);
+
+        // Example hands (all zero for now)
+        int second = 0, minute = 0, hour = 0;
+        int xsecond = (int)(Math.cos(second * Math.PI / 30 - Math.PI / 2) * (radius * 0.8) + xcenter);
+        int ysecond = (int)(Math.sin(second * Math.PI / 30 - Math.PI / 2) * (radius * 0.8) + ycenter);
+        int xminute = (int)(Math.cos(minute * Math.PI / 30 - Math.PI / 2) * (radius * 0.65) + xcenter);
+        int yminute = (int)(Math.sin(minute * Math.PI / 30 - Math.PI / 2) * (radius * 0.65) + ycenter);
+        int xhour = (int)(Math.cos((hour*30 + (double)minute/2) * Math.PI / 180 - Math.PI / 2) * (radius * 0.45) + xcenter);
+        int yhour = (int)(Math.sin((hour*30 + (double)minute/2) * Math.PI / 180 - Math.PI / 2) * (radius * 0.45) + ycenter);
+
+        // Draw hands
+        g.setColor(Color.RED);
+        g.drawLine(xcenter, ycenter, xsecond, ysecond);
+        g.setColor(Color.BLUE);
+        g.drawLine(xcenter, ycenter, xminute, yminute);
+        g.drawLine(xcenter, ycenter, xhour, yhour);
+    }
+
     private void setGridBagLayout(GridBagLayout layout) { setLayout(layout); this.layout = layout; logger.debug("GridBagLayout set"); }
     private void setGridBagConstraints(GridBagConstraints constraints) { this.constraints = constraints; logger.debug("constraints set"); }
+    public void setShowAnaloguePanel(boolean showAnaloguePanel) { this.showAnaloguePanel = showAnaloguePanel; logger.debug("showAnaloguePanel set to {}", showAnaloguePanel); }
+
+    public boolean isShowAnaloguePanel() { return showAnaloguePanel; }
 }
 
 class LapsDisplayPanel extends JPanel implements Runnable {

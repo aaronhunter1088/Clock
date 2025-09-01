@@ -39,6 +39,7 @@ public class ClockMenuBar extends JMenuBar
                       resetTimersPanelSetting,
                       pauseResumeAllAlarmsSetting,
                       resetAlarmsPanelSetting,
+                      showAnalogueTimePanel,
     // Options for Features
                       digitalClockFeature,
                       analogueClockFeature,
@@ -114,6 +115,11 @@ public class ClockMenuBar extends JMenuBar
         getResetAlarmsPanelSetting().setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_R, InputEvent.CTRL_DOWN_MASK));
         getResetAlarmsPanelSetting().setForeground(Color.WHITE);
         getResetAlarmsPanelSetting().addActionListener(this::toggleResetAlarmsPanelSetting);
+
+        setShowAnalogueTimePanel(new JMenuItem(SHOW+SPACE+ANALOGUE+SPACE+"Time"));
+        getShowAnalogueTimePanel().setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_R, InputEvent.CTRL_DOWN_MASK));
+        getShowAnalogueTimePanel().setForeground(Color.WHITE);
+        getShowAnalogueTimePanel().addActionListener(this::toggleTimePanels);
 
         // Features menu choices
         setDigitalClockFeature(new JMenuItem(VIEW_DIGITAL_CLOCK));
@@ -345,16 +351,18 @@ public class ClockMenuBar extends JMenuBar
         clockFrame.getAlarmPanel().resetAlarmPanel();
     }
 
-    /** Displays the stopwatch feature. */
-    protected void displayStopwatch(ActionEvent action)
+    /** Toggles between digital and analogue panels */
+    protected void toggleTimePanels(ActionEvent action)
     {
-        // TODO: Use new Utility method
-        Window window = SwingUtilities.getWindowAncestor(this);
-        JOptionPane.showMessageDialog(
-                window,
-                "No implementation yet for Stopwatch.\n",
-                "Stopwatch",
-                JOptionPane.INFORMATION_MESSAGE);
+        clockFrame.getStopwatchPanel().switchPanels();
+        if (clockFrame.getStopwatchPanel().isShowAnaloguePanel())
+        {
+            getShowAnalogueTimePanel().setText(SHOW+SPACE+ANALOGUE+SPACE+"Time");
+        }
+        else
+        {
+            getShowAnalogueTimePanel().setText(SHOW+SPACE+DIGITAL+SPACE+"Time");
+        }
     }
 
     /* Getters */
@@ -370,6 +378,7 @@ public class ClockMenuBar extends JMenuBar
     public JMenuItem getPauseResumeAllAlarmsSetting() { return pauseResumeAllAlarmsSetting; }
     public JMenuItem getResetAlarmsPanelSetting() { return resetAlarmsPanelSetting; }
     public JMenuItem getShowDigitalTimeOnAnalogueClockSetting() { return this.showDigitalTimeSettingOnAnalogueClockSetting; }
+    public JMenuItem getShowAnalogueTimePanel() { return this.showAnalogueTimePanel; }
     public JMenu getChangeTimeZoneMenu() { return this.changeTimeZoneMenuSetting; }
     public java.util.List<JMenuItem> getTimezones() { return this.timezones; }
     public JMenuItem getDigitalClockFeature() { return this.digitalClockFeature; }
@@ -392,6 +401,7 @@ public class ClockMenuBar extends JMenuBar
     protected void setPauseResumeAllAlarmsSetting(JMenuItem pauseResumeAllAlarmsSetting) { this.pauseResumeAllAlarmsSetting = pauseResumeAllAlarmsSetting; logger.debug("pause/resume all alarms setting"); }
     protected void setResetAlarmsPanelSetting(JMenuItem resetAlarmsPanelSetting) { this.resetAlarmsPanelSetting = resetAlarmsPanelSetting; logger.debug("reset alarms panel setting"); }
     protected void setShowDigitalTimeOnAnalogueClockSetting(JMenuItem showDigitalTimeSettingOnAnalogueClockSetting) { this.showDigitalTimeSettingOnAnalogueClockSetting = showDigitalTimeSettingOnAnalogueClockSetting; logger.debug("show digital time on analogue clock setting"); }
+    protected void setShowAnalogueTimePanel(JMenuItem showAnalogueTimePanel) { this.showAnalogueTimePanel = showAnalogueTimePanel; logger.debug("show analogue time panel"); }
     protected void setChangeTimeZoneMenu(JMenu changeTimeZone) { this.changeTimeZoneMenuSetting = changeTimeZone; logger.debug("change time zone menu"); }
     protected void setDigitalClockFeature(JMenuItem digitalClockFeature) { this.digitalClockFeature = digitalClockFeature; logger.debug("digital clock feature"); }
     protected void setAnalogueClockFeature(JMenuItem analogueClockFeature) { this.analogueClockFeature = analogueClockFeature; logger.debug("analogue clock feature"); }
