@@ -8,7 +8,6 @@ import javax.swing.*;
 import java.awt.*;
 
 import static clock.util.Constants.*;
-import static clock.util.Constants.TWELVE;
 import static java.lang.Thread.sleep;
 
 public class DisplayTimePanel extends JPanel implements Runnable {
@@ -86,6 +85,8 @@ public class DisplayTimePanel extends JPanel implements Runnable {
         }
         else
         {
+            if (getStopwatch() == null) setClockText(clockText);
+            else setClockText(EMPTY);
             drawDigitalClock(g);
         }
     }
@@ -107,7 +108,7 @@ public class DisplayTimePanel extends JPanel implements Runnable {
         String timeStr;
 
         // TODO: Fix
-        dateStr = stopwatch == null ? "00:00:00" : stopwatch.getCountUpString(); //clock.defaultText(1); // time
+        dateStr = stopwatch == null ? "00:00.00" : stopwatch.getCountUpString(); //clock.defaultText(1); // time
         timeStr = clockText; //clock.defaultText(2); // stopwatch status
         // Calculate centered x positions
         int dateWidth = fm.stringWidth(dateStr);
@@ -160,11 +161,11 @@ public class DisplayTimePanel extends JPanel implements Runnable {
         g.drawString(clockText, xcenter - 50, ycenter + (int)(radius * 0.45));  // adjust radius number as needed
 
         // Draw numbers (adjust positions for new radius)
-        g.drawString(FIVE,    xcenter + (int)(radius * 0.4),  ycenter - (int)(radius * 0.75));
-        g.drawString(TEN,    xcenter + (int)(radius * 0.75), ycenter - (int)(radius * 0.4));
-        g.drawString(ONE+FIVE,  xcenter + radius - 10,          ycenter);
-        g.drawString(TWO+ZERO,   xcenter + (int)(radius * 0.75), ycenter + (int)(radius * 0.4));
-        g.drawString(TWO+FIVE,   xcenter + (int)(radius * 0.4),  ycenter + (int)(radius * 0.75));
+        g.drawString(ZERO+FIVE,    xcenter + (int)(radius * 0.3),  ycenter - (int)(radius * 0.7));
+        g.drawString(TEN,    xcenter + (int)(radius * 0.6), ycenter - (int)(radius * 0.4));
+        g.drawString(ONE+FIVE,  xcenter + (int)(radius * 0.8),          ycenter);
+        g.drawString(TWO+ZERO,   xcenter + (int)(radius * 0.6), ycenter + (int)(radius * 0.4));
+        g.drawString(TWO+FIVE,   xcenter + (int)(radius * 0.3),  ycenter + (int)(radius * 0.7));
         g.drawString(THREE+ZERO,    xcenter - 10,                   ycenter + radius - 5);
         g.drawString(THREE+FIVE,  xcenter - (int)(radius * 0.5),  ycenter + (int)(radius * 0.7));
         g.drawString(FOUR+ZERO,  xcenter - (int)(radius * 0.8),  ycenter + (int)(radius * 0.4));
@@ -176,22 +177,35 @@ public class DisplayTimePanel extends JPanel implements Runnable {
         g.setColor(Color.BLACK);
 
         // Example hands (all zero for now)
-        int second = stopwatch == null ? 0 : getStopwatch().getSeconds();
-        int minute = stopwatch == null ? 0 : getStopwatch().getMinutes();
-        int hour = stopwatch == null ? 0 : getStopwatch().getHours();
-        int xsecond = (int)(Math.cos(second * Math.PI / 30 - Math.PI / 2) * (radius * 0.8) + xcenter);
-        int ysecond = (int)(Math.sin(second * Math.PI / 30 - Math.PI / 2) * (radius * 0.8) + ycenter);
-        int xminute = (int)(Math.cos(minute * Math.PI / 30 - Math.PI / 2) * (radius * 0.65) + xcenter);
-        int yminute = (int)(Math.sin(minute * Math.PI / 30 - Math.PI / 2) * (radius * 0.65) + ycenter);
-        int xhour = (int)(Math.cos((hour*30 + (double)minute/2) * Math.PI / 180 - Math.PI / 2) * (radius * 0.45) + xcenter);
-        int yhour = (int)(Math.sin((hour*30 + (double)minute/2) * Math.PI / 180 - Math.PI / 2) * (radius * 0.45) + ycenter);
+        //int millisecond = stopwatch == null ? 0 : getStopwatch().getSeconds();
+        // Derive milliseconds from seconds (assuming getStopwatch().getSeconds() returns total seconds with millisecond precision)
+        double totalSeconds = stopwatch == null ? 0 : getStopwatch().getSeconds();
+        double milliseconds = (totalSeconds - Math.floor(totalSeconds)) * 1000+14;
+        int minutes = stopwatch == null ? 0 : getStopwatch().getMinutes();
+        int seconds = (int) totalSeconds % 60;
 
-        // Draw hands
+// Millisecond hand (1 rotation = 1000 ms)
+        double millisecondAngle = (milliseconds) * 2 * Math.PI - Math.PI / 2;
+        int xmillisecond = (int) (Math.cos(millisecondAngle) * (radius * 0.8) + xcenter);
+        int ymillisecond = (int) (Math.sin(millisecondAngle) * (radius * 0.8) + ycenter);
+
+// Second hand (1 rotation = 60 s, includes ms for smoothness)
+        double secondAngle = ((seconds + milliseconds / 1000) / 60) * 2 * Math.PI - Math.PI / 2;
+        int xsecond = (int) (Math.cos(secondAngle) * (radius * 0.65) + xcenter);
+        int ysecond = (int) (Math.sin(secondAngle) * (radius * 0.65) + ycenter);
+
+// Minute hand (1 rotation = 60 min, includes seconds for smoothness)
+        double minuteAngle = ((minutes + (seconds + milliseconds / 1000) / 60) / 60) * 2 * Math.PI - Math.PI / 2;
+        int xminute = (int) (Math.cos(minuteAngle) * (radius * 0.45) + xcenter);
+        int yminute = (int) (Math.sin(minuteAngle) * (radius * 0.45) + ycenter);
+
+// Draw hands
         g.setColor(Color.RED);
-        g.drawLine(xcenter, ycenter, xsecond, ysecond);
+        g.drawLine(xcenter, ycenter, xmillisecond, ymillisecond);
         g.setColor(Color.BLUE);
+        g.drawLine(xcenter, ycenter, xsecond, ysecond);
+        g.setColor(Color.GREEN);
         g.drawLine(xcenter, ycenter, xminute, yminute);
-        g.drawLine(xcenter, ycenter, xhour, yhour);
     }
 
     public void setShowAnaloguePanel(boolean showAnaloguePanel) { this.showAnaloguePanel = showAnaloguePanel; logger.debug("showAnaloguePanel set to {}", showAnaloguePanel); }

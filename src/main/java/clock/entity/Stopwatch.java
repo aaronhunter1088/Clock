@@ -165,7 +165,8 @@ public class Stopwatch implements Serializable, Comparable<Stopwatch>, Runnable
             setStarted(true);
         }
         logger.info("{} ticking up...", this);
-        countUp = countUp.plusSeconds(1);
+        //countUp = countUp.plusSeconds(1);
+        countUp = countUp.plusNanos(15_000_000);
         logger.debug("CountUp: {}", getCountUpString());
         if (countUp.getHour() == 23 && countUp.getMinute() == 59 && countUp.getSecond() == 59)
         {
@@ -204,10 +205,9 @@ public class Stopwatch implements Serializable, Comparable<Stopwatch>, Runnable
     public String getMinutesAsStr() { return minutesAsStr; }
     public LocalTime getCountUp() { return countUp; }
     public String getCountUpString() {
-        String countupHours = countUp.getHour() < 10 ? ZERO + countUp.getHour() : String.valueOf(countUp.getHour());
         String countupMinutes = countUp.getMinute() < 10 ? ZERO + countUp.getMinute() : String.valueOf(countUp.getMinute());
         String countupSeconds = countUp.getSecond() < 10 ? ZERO + countUp.getSecond() : String.valueOf(countUp.getSecond());
-        return String.format("%s:%s:%s", countupHours, countupMinutes, countupSeconds);
+        return String.format("%s:%s.%s", countupMinutes, countupSeconds, Integer.parseInt(countupSeconds)/1000);
     }
     public boolean isPaused() { return paused; }
     public int getSeconds() { return seconds; }

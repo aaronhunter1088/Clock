@@ -272,6 +272,7 @@ addComponent(stopwatchNameField, 1, 1, 1, 1, 0, 0, 1, 0, GridBagConstraints.HORI
         }
         startButton.setText(STOP);
         lapButton.setText(LAP);
+        repaint();
     }
 
     /** Resumes the current stopwatch */
@@ -319,7 +320,12 @@ addComponent(stopwatchNameField, 1, 1, 1, 1, 0, 0, 1, 0, GridBagConstraints.HORI
     private void resetStopwatchPanel()
     {
         logger.debug("resetting stopwatch panel");
+        displayTimePanel.stop();
         displayTimePanel.setStopwatch(null);
+        displayTimePanel.setClockText("Press Start");
+        displayTimePanel.repaint();
+        startButton.setText(START);
+        lapButton.setText(LAP);
     }
 
     @Override
