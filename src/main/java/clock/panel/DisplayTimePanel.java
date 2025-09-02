@@ -16,7 +16,7 @@ public class DisplayTimePanel extends JPanel implements Runnable {
     // TODO: Make private, add get/set methods
     public Thread thread;
     private boolean showAnaloguePanel = false;
-    private String clockText = "Press Start"; // default text
+    private String clockText = "00:00.00"; // default text
     private Stopwatch stopwatch;
 
     public DisplayTimePanel()
@@ -109,7 +109,7 @@ public class DisplayTimePanel extends JPanel implements Runnable {
 
         // TODO: Fix
         dateStr = stopwatch == null ? "00:00.00" : stopwatch.getCountUpString(); //clock.defaultText(1); // time
-        timeStr = clockText; //clock.defaultText(2); // stopwatch status
+        timeStr = ""; //clock.defaultText(2); // stopwatch status
         // Calculate centered x positions
         int dateWidth = fm.stringWidth(dateStr);
         int timeWidth = fm.stringWidth(timeStr);
@@ -158,7 +158,7 @@ public class DisplayTimePanel extends JPanel implements Runnable {
         g.fillOval(xcenter - radius, ycenter - radius, diameter, diameter);
 
         g.setColor(Color.WHITE);
-        g.drawString(clockText, xcenter - 50, ycenter + (int)(radius * 0.45));  // adjust radius number as needed
+        g.drawString(clockText, xcenter - g.getFontMetrics().stringWidth(clockText) / 2, ycenter + (int)(radius * 0.5));  // adjust radius number as needed
 
         // Draw numbers (adjust positions for new radius)
         g.drawString(ZERO+FIVE,    xcenter + (int)(radius * 0.3),  ycenter - (int)(radius * 0.7));

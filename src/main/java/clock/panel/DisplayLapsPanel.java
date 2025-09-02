@@ -1,5 +1,6 @@
 package clock.panel;
 
+import clock.entity.Stopwatch;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -12,7 +13,7 @@ class DisplayLapsPanel extends JPanel implements Runnable {
 
     private static final Logger logger = LogManager.getLogger(DisplayLapsPanel.class);
     public Thread thread;
-    private int xcenter = 175, ycenter = 175, lastxs = 0, lastys = 0, lastxm = 0, lastym = 0, lastxh = 0, lastyh = 0;
+    private Stopwatch stopwatch;
 
     public DisplayLapsPanel()
     {
@@ -53,7 +54,9 @@ class DisplayLapsPanel extends JPanel implements Runnable {
         {
             try
             {
-                repaint(); // goes to paint
+                //repaint(); // goes to paint
+                // TODO: Add table of laps with stopwatch name
+                // Label should be clickable.
                 sleep(1000);
             }
             catch (InterruptedException e)
@@ -66,4 +69,7 @@ class DisplayLapsPanel extends JPanel implements Runnable {
         super.paint(g);
     }
 
+    public void setStopwatch(Stopwatch stopwatch) { this.stopwatch = stopwatch; logger.debug("stopwatch set to {}", stopwatch); }
+
+    public Stopwatch getStopwatch() { return stopwatch; }
 }

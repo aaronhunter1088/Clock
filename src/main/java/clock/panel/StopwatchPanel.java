@@ -262,6 +262,8 @@ addComponent(stopwatchNameField, 1, 1, 1, 1, 0, 0, 1, 0, GridBagConstraints.HORI
         Stopwatch stopwatch = new Stopwatch(name, false, false, false, clock);
         displayTimePanel.setStopwatch(stopwatch);
         displayTimePanel.start();
+        displayLapsPanel.setStopwatch(stopwatch);
+        displayLapsPanel.start();
         if (displayTimePanel.isShowAnaloguePanel())
         {
             displayTimePanel.setClockText(stopwatch.getCountUpString());
@@ -272,6 +274,7 @@ addComponent(stopwatchNameField, 1, 1, 1, 1, 0, 0, 1, 0, GridBagConstraints.HORI
         }
         startButton.setText(STOP);
         lapButton.setText(LAP);
+        revalidate();
         repaint();
     }
 
