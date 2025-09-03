@@ -5,7 +5,10 @@ import org.apache.logging.log4j.Logger;
 
 import java.io.Serial;
 import java.io.Serializable;
+import java.time.Duration;
 import java.time.LocalTime;
+import java.util.ArrayList;
+import java.util.List;
 
 import static clock.util.Constants.EMPTY;
 import static clock.util.Constants.ZERO;
@@ -47,6 +50,10 @@ public class Stopwatch implements Serializable, Comparable<Stopwatch>, Runnable
     private Clock clock;
     private Thread selfThread;
     private LocalTime countUp;
+    private long startNano = 0L;           // last start() nano timestamp
+    private long accumulatedNano = 0L;     // time accumulated across previous runs
+    private long lastLapMarkNano = 0L;     // elapsed ns at last lap
+    private List<Lap> laps;
 
     /**
      * The main constructor for creating a Stopwatch
@@ -67,6 +74,7 @@ public class Stopwatch implements Serializable, Comparable<Stopwatch>, Runnable
         setSeconds(0);
         setMinutes(0);
         setHours(0);
+        setLaps(new ArrayList<>());
     }
 
     /**
@@ -103,7 +111,7 @@ public class Stopwatch implements Serializable, Comparable<Stopwatch>, Runnable
      * This method begins the thread
      * that runs the stopwatch.
      */
-    public void startStopwatch()
+    public synchronized void startStopwatch()
     {
         if (selfThread == null)
         {
@@ -116,7 +124,7 @@ public class Stopwatch implements Serializable, Comparable<Stopwatch>, Runnable
     /**
      * Stop the stopwatch
      */
-    public void stopStopwatch()
+    public synchronized void stopStopwatch()
     {
         logger.info("stopping {}", this);
         setStopped(true);
@@ -127,7 +135,7 @@ public class Stopwatch implements Serializable, Comparable<Stopwatch>, Runnable
     /**
      * Pauses the stopwatch
      */
-    public void pauseStopwatch()
+    public synchronized void pauseStopwatch()
     {
         logger.info("pausing {}", this);
         setPaused(true);
@@ -136,7 +144,7 @@ public class Stopwatch implements Serializable, Comparable<Stopwatch>, Runnable
     /**
      * Resumes the stopwatch
      */
-    public void resumeStopwatch()
+    public synchronized void resumeStopwatch()
     {
         logger.info("resuming {}", this);
         setPaused(false);
@@ -145,7 +153,7 @@ public class Stopwatch implements Serializable, Comparable<Stopwatch>, Runnable
     /**
      * Resets the stopwatch to its initial state.
      */
-    public void resetStopwatch()
+    public synchronized void resetStopwatch()
     {
         logger.info("resetting {}", this);
         setStarted(false);
@@ -165,6 +173,7 @@ public class Stopwatch implements Serializable, Comparable<Stopwatch>, Runnable
     {
         if (!started)
         {
+            startNano = System.nanoTime();
             setStarted(true);
         }
         logger.info("{} ticking up...", this);
@@ -182,6 +191,22 @@ public class Stopwatch implements Serializable, Comparable<Stopwatch>, Runnable
             setMinutes(countUp.getMinute());
             setHours(countUp.getHour());
         }
+    }
+
+    public synchronized Duration elapsed() {
+        long nowAccum = accumulatedNano;
+        if (isStarted()) {
+            nowAccum += System.nanoTime() - startNano;
+        }
+        return Duration.ofNanos(nowAccum);
+    }
+
+    public void recordLap()
+    {
+        Duration elapsed = elapsed();
+        Lap lap = new Lap(laps.size() + 1, elapsed);
+        logger.info("Recording lap {}:{} for {}", lap.getLapNumber(), elapsed, this);
+        laps.add(lap);
     }
 
     /**
@@ -221,6 +246,7 @@ public class Stopwatch implements Serializable, Comparable<Stopwatch>, Runnable
     public boolean isStarted() { return started; }
     public boolean isStopped() { return stopped; }
     public Thread getSelfThread() { return selfThread; }
+    public List<Lap> getLaps() { return laps; }
 
     /* Setters */
     public void setClock(Clock clock) { this.clock = clock; logger.debug("clock set"); }
@@ -251,4 +277,6 @@ public class Stopwatch implements Serializable, Comparable<Stopwatch>, Runnable
     public void setStarted(boolean started) { this.started = started; logger.debug("started set to {}", started); }
     public void setStopped(boolean stopped) { this.stopped = stopped; logger.debug("stopped set to {}", stopped); }
     public void setSelfThread(Thread selfThread) { this.selfThread = selfThread; logger.debug("selfThread set to {}", selfThread); }
+    public void setLaps(List<Lap> laps) { this.laps = laps; logger.debug("laps set"); }
 }
+

@@ -220,10 +220,11 @@ addComponent(stopwatchNameField, 1, 1, 1, 1, 0, 0, 1, 0, GridBagConstraints.HORI
     /** Switches the display time panel between analogue and digital mode */
     public void switchPanels()
     {
-        boolean current = clockFrame.getStopwatchPanel().getDisplayTimePanel().isShowAnaloguePanel();
+        boolean current = getDisplayTimePanel().isShowAnaloguePanel();
         logger.debug("switching panels from {} to {}", current, !current);
-        clockFrame.getStopwatchPanel().getDisplayTimePanel().setShowAnaloguePanel(!current);
-        clockFrame.getStopwatchPanel().getDisplayTimePanel().repaint();
+        getDisplayTimePanel().setShowAnaloguePanel(!current);
+        getDisplayTimePanel().repaint();
+        getDisplayTimePanel().revalidate();
     }
 
     /** Stops the stopwatch panel thread. */
@@ -250,6 +251,8 @@ addComponent(stopwatchNameField, 1, 1, 1, 1, 0, 0, 1, 0, GridBagConstraints.HORI
         {
             stopStopwatchPanel();
         }
+        repaint();
+        revalidate();
     }
 
     /**
@@ -260,6 +263,7 @@ addComponent(stopwatchNameField, 1, 1, 1, 1, 0, 0, 1, 0, GridBagConstraints.HORI
     {
         String name = stopwatchNameField.getText();
         Stopwatch stopwatch = new Stopwatch(name, false, false, false, clock);
+        clock.getListOfStopwatches().add(stopwatch);
         displayTimePanel.setStopwatch(stopwatch);
         displayTimePanel.start();
         displayLapsPanel.setStopwatch(stopwatch);
@@ -274,14 +278,16 @@ addComponent(stopwatchNameField, 1, 1, 1, 1, 0, 0, 1, 0, GridBagConstraints.HORI
         }
         startButton.setText(STOP);
         lapButton.setText(LAP);
-        revalidate();
         repaint();
+        revalidate();
     }
 
     /** Resumes the current stopwatch */
     private void resumeStopwatch()
     {
         displayTimePanel.getStopwatch().resumeStopwatch();
+        displayTimePanel.start();
+        displayLapsPanel.start();
         startButton.setText(STOP);
         lapButton.setText(LAP);
     }
@@ -289,9 +295,12 @@ addComponent(stopwatchNameField, 1, 1, 1, 1, 0, 0, 1, 0, GridBagConstraints.HORI
     /** Pauses the current stopwatch */
     private void stopStopwatchPanel()
     {
-        displayTimePanel.getStopwatch().pauseStopwatch();
+        displayTimePanel.stop(); // also pauses the stopwatch
+        displayLapsPanel.stop();
         startButton.setText(RESUME);
         lapButton.setText(RESET);
+        repaint();
+        revalidate();
     }
 
     /**
@@ -317,15 +326,18 @@ addComponent(stopwatchNameField, 1, 1, 1, 1, 0, 0, 1, 0, GridBagConstraints.HORI
     private void recordLap()
     {
         logger.debug("recording lap");
+        displayTimePanel.getStopwatch().recordLap();
     }
 
     /** Resets the stopwatch panel to its default state */
     private void resetStopwatchPanel()
     {
         logger.debug("resetting stopwatch panel");
+        Stopwatch watchToStop = displayTimePanel.getStopwatch();
+        watchToStop.getClock().getListOfStopwatches().remove(watchToStop);
         displayTimePanel.stop();
         displayTimePanel.setStopwatch(null);
-        displayTimePanel.setClockText("Press Start");
+        displayTimePanel.setClockText("00:00.00");
         displayTimePanel.repaint();
         startButton.setText(START);
         lapButton.setText(LAP);

@@ -137,6 +137,7 @@ public class Clock implements Serializable, Comparable<Clock>, Runnable
         setLeapYear(date.isLeapYear());
         setListOfAlarms(new ArrayList<>());
         setListOfTimers(new ArrayList<>());
+        setListOfStopwatches(new ArrayList<>());
         setDaylightSavingsTimeEnabled(true);
     }
 
@@ -759,6 +760,7 @@ public class Clock implements Serializable, Comparable<Clock>, Runnable
     public boolean isDaylightSavingsTimeEnabled() { return daylightSavingsTimeEnabled; }
     public List<Alarm> getListOfAlarms() { return listOfAlarms; }
     public List<Timer> getListOfTimers() { return listOfTimers; }
+    public List<Stopwatch> getListOfStopwatches() { return listOfStopwatches; }
     /**
      * Returns the timezone from the selected timezone button text
      * @param btnText the text from the timezone button
@@ -893,6 +895,7 @@ public class Clock implements Serializable, Comparable<Clock>, Runnable
     protected void setDaylightSavingsTimeEnabled(boolean daylightSavingsTimeEnabled) { this.daylightSavingsTimeEnabled = daylightSavingsTimeEnabled; logger.debug("daylightSavingsTimeEnabled: {}", daylightSavingsTimeEnabled); }
     protected void setListOfAlarms(List<Alarm> listOfAlarms) { this.listOfAlarms = listOfAlarms; logger.debug("listOfAlarms: {}", listOfAlarms); }
     protected void setListOfTimers(List<Timer> listOfTimers) { this.listOfTimers = listOfTimers; logger.debug("listOfTimers: {}", listOfTimers); }
+    protected void setListOfStopwatches(List<Stopwatch> listOfStopwatches) { this.listOfStopwatches = listOfStopwatches; logger.debug("listOfStopwatches: {}", listOfStopwatches); }
 
     /**
      * Compares this clock to another clock based

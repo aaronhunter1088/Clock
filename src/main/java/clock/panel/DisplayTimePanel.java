@@ -67,6 +67,7 @@ public class DisplayTimePanel extends JPanel implements Runnable {
                     stopwatch.startStopwatch();
                 }
                 repaint(); // goes to paint
+                revalidate();
                 sleep(15);
             }
             catch (InterruptedException e)
