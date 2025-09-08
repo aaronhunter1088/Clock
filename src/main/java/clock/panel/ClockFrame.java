@@ -136,42 +136,6 @@ public class ClockFrame extends JFrame
     }
 
     /**
-     * Creates and shows the GUI for the Clock application.
-     * This method is invoked in Main.
-     */
-    public static void createAndShowGUI()
-    {
-        logger.info("Starting Clock...");
-        ClockFrame clockFrame = new ClockFrame();
-        clockFrame.start();
-    }
-
-    /**
-     * Creates and shows the GUI for the Clock application.
-     * This method is invoked in Main when testing the
-     * application with a specific clock.
-     * @param clock the clock to use for testing
-     */
-    public static void createAndShowGUI(Clock clock)
-    {
-        logger.info("Starting TestClock...");
-        ClockFrame clockFrame = new ClockFrame(clock);
-        clockFrame.start();
-    }
-
-    /**
-     * Creates and shows the GUI for the Clock application
-     * with a specific panel type.
-     * @param panelType the panel type to display
-     */
-    public static void createAndShowGUI(Panel panelType)
-    {
-        logger.info("Starting Clock with panel type: {}", panelType);
-        ClockFrame clockFrame = new ClockFrame(panelType);
-        clockFrame.start();
-    }
-
-    /**
      * Sets up the menu bar
      */
     private void setupMenuBar()
@@ -332,6 +296,42 @@ public class ClockFrame extends JFrame
     { getClockMenuBar().getSettingsMenu().removeAll(); }
 
     /**
+     * Creates and shows the GUI for the Clock application.
+     * This method is invoked in Main.
+     */
+    public static void createAndShowGUI()
+    {
+        logger.info("Starting Clock...");
+        ClockFrame clockFrame = new ClockFrame();
+        clockFrame.start();
+    }
+
+    /**
+     * Creates and shows the GUI for the Clock application.
+     * This method is invoked in Main when testing the
+     * application with a specific clock.
+     * @param clock the clock to use for testing
+     */
+    public static void createAndShowGUI(Clock clock)
+    {
+        logger.info("Starting TestClock...");
+        ClockFrame clockFrame = new ClockFrame(clock);
+        clockFrame.start();
+    }
+
+    /**
+     * Creates and shows the GUI for the Clock application
+     * with a specific panel type.
+     * @param panelType the panel type to display
+     */
+    public static void createAndShowGUI(Panel panelType)
+    {
+        logger.info("Starting Clock with panel type: {}", panelType);
+        ClockFrame clockFrame = new ClockFrame(panelType);
+        clockFrame.start();
+    }
+
+    /**
      * Starts the clock and schedules the
      * tasks to run at a fixed rate.
      */
@@ -343,7 +343,7 @@ public class ClockFrame extends JFrame
                 task.run();
             } catch (Exception e) {
                 logger.error("Scheduled task failed: {}", task, e);
-                logger.warn("""
+                logger.fatal("""
                         Because the schedule task failed, the application will now exit.
                         Please check the logs for more information.
                         """);

@@ -267,7 +267,8 @@ addComponent(stopwatchNameField, 1, 1, 1, 1, 0, 0, 1, 0, GridBagConstraints.HORI
         displayTimePanel.setStopwatch(stopwatch);
         displayTimePanel.start();
         displayLapsPanel.setStopwatch(stopwatch);
-        displayLapsPanel.start();
+        //displayLapsPanel.start();
+        displayLapsPanel.updateLabelsAndStopwatchTable();
         if (displayTimePanel.isShowAnaloguePanel())
         {
             displayTimePanel.setClockText(stopwatch.getCountUpString());
@@ -327,6 +328,9 @@ addComponent(stopwatchNameField, 1, 1, 1, 1, 0, 0, 1, 0, GridBagConstraints.HORI
     {
         logger.debug("recording lap");
         displayTimePanel.getStopwatch().recordLap();
+        displayLapsPanel.updateLabelsAndStopwatchTable();
+        revalidate();
+        repaint();
     }
 
     /** Resets the stopwatch panel to its default state */
@@ -339,8 +343,12 @@ addComponent(stopwatchNameField, 1, 1, 1, 1, 0, 0, 1, 0, GridBagConstraints.HORI
         displayTimePanel.setStopwatch(null);
         displayTimePanel.setClockText("00:00.00");
         displayTimePanel.repaint();
+        displayLapsPanel.resetPanel();
+        displayLapsPanel.setDefaultLayout();
         startButton.setText(START);
         lapButton.setText(LAP);
+        revalidate();
+        repaint();
     }
 
     @Override

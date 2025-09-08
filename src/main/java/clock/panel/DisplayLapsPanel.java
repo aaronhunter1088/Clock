@@ -29,6 +29,7 @@ class DisplayLapsPanel extends JPanel implements Runnable {
         setMaximumSize(ClockFrame.analogueSize);
         setBackground(Color.BLACK);
         setForeground(Color.BLACK);
+        setDefaultLayout();
     }
 
     /**
@@ -62,7 +63,7 @@ class DisplayLapsPanel extends JPanel implements Runnable {
             {
                 //repaint(); // goes to paint
                 // TODO: Add table of laps with stopwatch name
-                generateLabelsAndStopwatchTable();
+                updateLabelsAndStopwatchTable();
                 // Label should be clickable.
                 sleep(50);
             }
@@ -76,8 +77,10 @@ class DisplayLapsPanel extends JPanel implements Runnable {
         super.paint(g);
     }
 
-    private void generateLabelsAndStopwatchTable()
+    // TODO: We only create one table, but it's a table per stopwatch
+    public void updateLabelsAndStopwatchTable()
     {
+        resetPanel();
         List<Stopwatch> stopwatches = getStopwatch().getClock().getListOfStopwatches();
         stopwatches.forEach(stopwatch -> {
             // generate label or something clickable.
@@ -91,16 +94,32 @@ class DisplayLapsPanel extends JPanel implements Runnable {
                 data[i][0] = stopwatch.getLaps().get(i).getLapNumber();
                 data[i][1] = stopwatch.getLaps().get(i).getLapTime();
             }
-            // add a space or some gap, if needed
+            stopwatchTable = new JTable(data, columnNames);
+            //stopwatchTable.setModel(new javax.swing.table.DefaultTableModel(data, columnNames));
             constraints.anchor = GridBagConstraints.FIRST_LINE_START;
             addComponent(label, 0, 0, 1, 1, 5,5,1,1, GridBagConstraints.NONE, new Insets(5,5,5,5));
-            stopwatchTable = new JTable(data, columnNames);
             JScrollPane scrollPane = new JScrollPane(stopwatchTable);
             constraints = new GridBagConstraints();
             addComponent(scrollPane, 1, 0, 1, 1, 5,5,1,1, GridBagConstraints.BOTH, new Insets(5,5,5,5));
         });
         revalidate();
         repaint();
+    }
+
+    public void setDefaultLayout()
+    {
+        JLabel label = new JLabel("Sw1");
+        label.setForeground(Color.WHITE);
+        label.setFont(ClockFrame.font20);
+
+        String[] columnNames = {"Lap #", "Time"};
+        // add a space or some gap, if needed
+        constraints.anchor = GridBagConstraints.FIRST_LINE_START;
+        addComponent(label, 0, 0, 1, 1, 5,5,1,0, GridBagConstraints.NONE, new Insets(5,5,5,5));
+        stopwatchTable = new JTable(new Object[0][0], columnNames);
+        JScrollPane scrollPane = new JScrollPane(stopwatchTable);
+        //constraints = new GridBagConstraints();
+        addComponent(scrollPane, 1, 0, 1, 1, 5,5,1,1, GridBagConstraints.BOTH, new Insets(5,5,5,5));
     }
 
     /**
@@ -132,6 +151,13 @@ class DisplayLapsPanel extends JPanel implements Runnable {
         constraints.weighty = Math.max(weighty, 0);
         layout.setConstraints(cpt,constraints);
         add(cpt);
+    }
+
+    public void resetPanel()
+    {
+        removeAll();
+        revalidate();
+        repaint();
     }
 
     private void setGridBagLayout(GridBagLayout layout) { setLayout(layout); this.layout = layout; logger.debug("GridBagLayout set"); }
