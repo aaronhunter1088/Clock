@@ -49,6 +49,7 @@ public class StopwatchPanel extends ClockPanel
     private JButton lapButton,   // toggles to reset when stopwatch is stopped
                     startButton; // toggles to stop when stopwatch is started
     private JTextField stopwatchNameField;
+    private Stopwatch currentStopwatch;
 
     /**
      * Main constructor for creating the StopwatchPanel
@@ -101,7 +102,7 @@ public class StopwatchPanel extends ClockPanel
         stopwatchNameField.setBackground(Color.BLACK);
         stopwatchNameField.setForeground(Color.WHITE);
         stopwatchNameField.setBorder(new LineBorder(Color.ORANGE));
-        stopwatchNameField.setToolTipText("Enter Stopwatch Name");
+        stopwatchNameField.setToolTipText("Enter a Name");
         stopwatchNameField.addFocusListener(new FocusListener() {
            @Override
            public void focusGained(FocusEvent e) {
@@ -144,6 +145,14 @@ public class StopwatchPanel extends ClockPanel
         //setForeground(Color.WHITE);
         clockFrame.setTitle(STOPWATCH+SPACE+PANEL);
         //setBorder(BorderFactory.createLineBorder(Color.BLACK));
+        if (currentStopwatch != null) {
+            if (displayTimePanel.getStopwatch() != currentStopwatch) displayTimePanel.setStopwatch(currentStopwatch);
+            if (displayLapsPanel.getStopwatch() != currentStopwatch) displayLapsPanel.setStopwatch(currentStopwatch);
+        } else {
+            startButton.setText(START);
+            lapButton.setText(LAP);
+            displayTimePanel.setClockText(DisplayTimePanel.clockText);
+        }
     }
 
     /**
@@ -227,6 +236,10 @@ addComponent(stopwatchNameField, 1, 1, 1, 1, 0, 0, 1, 0, GridBagConstraints.HORI
         getDisplayTimePanel().revalidate();
     }
 
+    // TODO: At the moment, there is no action on this panel to stop
+    // The stopping actions will take place on the currentStopwatch
+    // or in the panels themselves, which should contain the same
+    // currentStopwatch reference
     /** Stops the stopwatch panel thread. */
     public void stop()
     {
@@ -241,15 +254,15 @@ addComponent(stopwatchNameField, 1, 1, 1, 1, 0, 0, 1, 0, GridBagConstraints.HORI
         String buttonText = startButton.getText();
         if (buttonText.equals(START))
         {
-            startStopwatch();
+            startStopwatch(); // sets startButton to STOP
         }
         else if (buttonText.equals(RESUME))
         {
-            resumeStopwatch();
+            resumeStopwatch(); // sets startButton to STOP
         }
         else
         {
-            stopStopwatchPanel();
+            stopStopwatchPanel(); // sets startButton to RESUME
         }
         repaint();
         revalidate();
@@ -267,20 +280,21 @@ addComponent(stopwatchNameField, 1, 1, 1, 1, 0, 0, 1, 0, GridBagConstraints.HORI
         displayTimePanel.setStopwatch(stopwatch);
         displayTimePanel.start();
         displayLapsPanel.setStopwatch(stopwatch);
+        currentStopwatch = stopwatch;
         //displayLapsPanel.start();
         displayLapsPanel.updateLabelsAndStopwatchTable();
         if (displayTimePanel.isShowAnaloguePanel())
         {
-            displayTimePanel.setClockText(stopwatch.getCountUpString());
+            displayTimePanel.setClockText(stopwatch.elapsedFormatted());
         }
-        if (!displayTimePanel.isShowAnaloguePanel())
+        else //if (!displayTimePanel.isShowAnaloguePanel())
         {
             displayTimePanel.setClockText(EMPTY);
         }
         startButton.setText(STOP);
         lapButton.setText(LAP);
-        repaint();
         revalidate();
+        repaint();
     }
 
     /** Resumes the current stopwatch */
@@ -327,6 +341,7 @@ addComponent(stopwatchNameField, 1, 1, 1, 1, 0, 0, 1, 0, GridBagConstraints.HORI
     private void recordLap()
     {
         logger.debug("recording lap");
+        //currentStopwatch;
         displayTimePanel.getStopwatch().recordLap();
         displayLapsPanel.updateLabelsAndStopwatchTable();
         revalidate();
@@ -341,7 +356,7 @@ addComponent(stopwatchNameField, 1, 1, 1, 1, 0, 0, 1, 0, GridBagConstraints.HORI
         watchToStop.getClock().getListOfStopwatches().remove(watchToStop);
         displayTimePanel.stop();
         displayTimePanel.setStopwatch(null);
-        displayTimePanel.setClockText("00:00.00");
+        displayTimePanel.setClockText(DisplayTimePanel.startText);
         displayTimePanel.repaint();
         displayLapsPanel.resetPanel();
         displayLapsPanel.setDefaultLayout();

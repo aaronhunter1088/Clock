@@ -6,6 +6,7 @@ import org.apache.logging.log4j.Logger;
 
 import javax.swing.*;
 import java.awt.*;
+import java.time.Duration;
 
 import static clock.util.Constants.*;
 import static java.lang.Thread.sleep;
@@ -16,7 +17,8 @@ public class DisplayTimePanel extends JPanel implements Runnable {
     // TODO: Make private, add get/set methods
     public Thread thread;
     private boolean showAnaloguePanel = false;
-    private String clockText = "00:00.00"; // default text
+    public static String clockText = "00:00.000";
+    public static String startText = "00:00.000"; // default text
     private Stopwatch stopwatch;
 
     public DisplayTimePanel()
@@ -31,12 +33,12 @@ public class DisplayTimePanel extends JPanel implements Runnable {
     }
 
     /**
-     * Starts the digital clock panel thread
+     * Starts the digital stopwatch panel thread
      * and internally calls the run method.
      */
     public void start()
     {
-        logger.debug("starting digital clock panel");
+        logger.debug("starting digital stopwatch panel");
         if (thread == null)
         {
             thread = new Thread(this);
@@ -44,13 +46,24 @@ public class DisplayTimePanel extends JPanel implements Runnable {
         }
     }
 
-    /** Stops the digital clock panel thread. */
+    /** Stops the digital stopwatch panel thread. */
     public void stop()
     {
-        logger.debug("stopping digital clock panel");
+        logger.debug("stopping digital stopwatch panel");
+        // TODO: Is this right? Is there a better way to do this?
         thread = null;
-        setClockText("Resume or reset");
-        getStopwatch().pauseStopwatch();
+        setClockText(DisplayTimePanel.clockText);
+        if (stopwatch != null)
+        {
+            stopwatch.pauseStopwatch();
+        }
+    }
+
+    /** Resumes the stopwatch panel thread */
+    public void resume()
+    {
+        logger.debug("resuming display stopwatch panel");
+        start();
     }
 
     /** Repaints the stopwatch panel */
@@ -65,9 +78,9 @@ public class DisplayTimePanel extends JPanel implements Runnable {
                 {
                     stopwatch.startStopwatch();
                 }
-                repaint(); // goes to paint
                 revalidate();
-                sleep(15);
+                repaint(); // goes to paint
+                sleep(1);
             }
             catch (InterruptedException e)
             {}
@@ -80,13 +93,19 @@ public class DisplayTimePanel extends JPanel implements Runnable {
         super.paint(g);
         if (showAnaloguePanel)
         {
-            setClockText(getStopwatch() == null ? clockText : getStopwatch().getCountUpString());
+            setClockText(getStopwatch() == null ? clockText : getStopwatch().elapsedFormatted());
             drawAnalogueClock(g);
         }
         else
         {
-            if (getStopwatch() == null) setClockText(clockText);
-            else setClockText(EMPTY);
+            if (stopwatch == null) {
+                logger.debug("stopwatch is null");
+                setClockText(clockText);
+            }
+            else {
+                logger.debug("emptying clock text");
+                setClockText(stopwatch.elapsedFormatted());
+            }
             drawDigitalClock(g);
         }
     }
@@ -108,7 +127,7 @@ public class DisplayTimePanel extends JPanel implements Runnable {
         String timeStr;
 
         // TODO: Fix
-        dateStr = stopwatch == null ? "00:00.00" : stopwatch.getCountUpString(); //clock.defaultText(1); // time
+        dateStr = stopwatch == null ? clockText : stopwatch.elapsedFormatted(); // stopwatch.elapsedTotalTimeString(); // stopwatch.getCountUpString(); //clock.defaultText(1); // time
         timeStr = ""; //clock.defaultText(2); // stopwatch status
         // Calculate centered x positions
         int dateWidth = fm.stringWidth(dateStr);
@@ -179,9 +198,10 @@ public class DisplayTimePanel extends JPanel implements Runnable {
         // Example hands (all zero for now)
         //int millisecond = stopwatch == null ? 0 : getStopwatch().getSeconds();
         // Derive milliseconds from seconds (assuming getStopwatch().getSeconds() returns total seconds with millisecond precision)
-        double totalSeconds = stopwatch == null ? 0 : getStopwatch().getSeconds();
+        Duration duration = stopwatch == null ? Duration.ZERO : Duration.ofSeconds(stopwatch.elapsed());
+        double totalSeconds = stopwatch == null ? 0 : duration.getSeconds();
         double milliseconds = (totalSeconds - Math.floor(totalSeconds)) * 1000+14;
-        int minutes = stopwatch == null ? 0 : getStopwatch().getMinutes();
+        long minutes = stopwatch == null ? 0L : duration.toMinutes();
         int seconds = (int) totalSeconds % 60;
 
 // Millisecond hand (1 rotation = 1000 ms)

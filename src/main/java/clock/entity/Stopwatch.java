@@ -7,6 +7,8 @@ import java.io.Serial;
 import java.io.Serializable;
 import java.time.Duration;
 import java.time.LocalTime;
+import java.time.temporal.ChronoUnit;
+import java.time.temporal.TemporalUnit;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -37,9 +39,6 @@ public class Stopwatch implements Serializable, Comparable<Stopwatch>, Runnable
     private static final long serialVersionUID = 1L;
     private static final Logger logger = LogManager.getLogger(Stopwatch.class);
     public static long stopwatchCounter = 0L;
-    private int hours,
-                minutes,
-                seconds;
     private String name,
                    hoursAsStr,
                    minutesAsStr,
@@ -49,11 +48,57 @@ public class Stopwatch implements Serializable, Comparable<Stopwatch>, Runnable
                     stopped;
     private Clock clock;
     private Thread selfThread;
-    private LocalTime countUp;
     private long startNano = 0L;           // last start() nano timestamp
     private long accumulatedNano = 0L;     // time accumulated across previous runs
     private long lastLapMarkNano = 0L;     // elapsed ns at last lap
+    private long pausedAccumNano;  // total paused duration accumulated
+    private long pauseStartNano;   // when Pause was pressed
     private List<Lap> laps;
+
+    // start here
+
+    // True elapsed, independent of refresh rate
+    public long elapsedNanos() {
+        if (startNano == 0L)
+        {
+            logger.debug("startNano is zero");
+            return 0L;
+        }
+        long now = System.nanoTime();
+        long paused = pausedAccumNano + (started ? 0L : (pauseStartNano == 0L ? 0L : (now - pauseStartNano)));
+        return now - startNano - paused;
+    }
+
+    // Convenience
+    public String elapsedFormatted() {
+        logger.debug("elapsedFormatted");
+        long ns = elapsedNanos();
+        long msTotal = ns / 1_000_000L;
+        long minutes = msTotal / 60_000;
+        long seconds = (msTotal % 60_000) / 1000;
+        long hundredths = msTotal % 1000; // 3 decimals: .000
+        return String.format("%02d:%02d.%03d", minutes, seconds, hundredths);
+
+//        String hhmmssms = String.format("%02d:%02d:%02d.%03d",
+//                ns.getLapTime() / 3600,
+//                (lap.getLapTime() % 3600) / 60,
+//                lap.getLapTime() % 60,
+//                (int)((lap.getLapTime() / 1_000_000) % 1000)); // Output: 00:01:15.123
+    }
+
+    /**
+     * Returns the total elapsed time as a string in HH:MM:SS format.
+     */
+    public String elapsedTotalTimeString() {
+        long ns = elapsedNanos();
+        long msTotal = ns / 1_000_000L;
+        long seconds = (msTotal / 1000) % 60;
+        long minutes = (msTotal / 60_000) % 60;
+        long hours = msTotal / 3_600_000;
+        return String.format("%02d:%02d.%02d", minutes, seconds, msTotal);
+    }
+
+    // end here
 
     /**
      * The main constructor for creating a Stopwatch
@@ -71,10 +116,13 @@ public class Stopwatch implements Serializable, Comparable<Stopwatch>, Runnable
         setStopped(stopped);
         setPaused(paused);
         setClock(clock);
-        setSeconds(0);
-        setMinutes(0);
-        setHours(0);
         setLaps(new ArrayList<>());
+        stopwatchCounter++;
+        logger.debug("Total stopwatches created: {}", stopwatchCounter);
+        if (stopwatchCounter == 100L) {
+            logger.info("Restarting counter for stopwatchCounter");
+            stopwatchCounter = 0L;
+        }
     }
 
     /**
@@ -90,21 +138,66 @@ public class Stopwatch implements Serializable, Comparable<Stopwatch>, Runnable
     /**
      * This method executes the logic for the stopwatch
      */
+//    @Override
+//    public void run()
+//    {
+//        while (selfThread != null)
+//        {
+//            try {
+//                if (!paused && !stopped) {
+//                    performCountUp();
+//                    sleep(1);
+//                } else { //if (paused || stopped) {
+//                    sleep(1000);
+//                }
+//            }
+//            catch (InterruptedException e) { printStackTrace(e, e.getMessage());}
+//        }
+//    }
+
     @Override
     public void run()
     {
+        long lastUpdate = 0L;
         while (selfThread != null)
         {
             try {
                 if (!paused && !stopped) {
-                    performCountUp();
-                    sleep(15);
-                } else { //if (paused || stopped) {
+                    long now = System.nanoTime();
+                    if (now - lastUpdate >= 1_000_000 || startNano == 0L) { // update every millisecond
+                        performCountUp();
+                        lastUpdate = now;
+                    }
+                    sleep(1);
+                } else {
+                    if (paused) {
+                        logger.debug("{} is paused", this.getName());
+                    } else { // if (stopped) {
+                        logger.debug("{} is stopped", this.getName());
+                    }
                     sleep(1000);
                 }
             }
-            catch (InterruptedException e) { printStackTrace(e, e.getMessage());}
+            catch (InterruptedException e) { printStackTrace(e, e.getMessage()); }
         }
+    }
+
+    @Override
+    public String toString()
+    {
+        final StringBuffer sb = new StringBuffer("Stopwatch {");
+        sb.append("name='").append(name).append('\'');
+        sb.append(", started=").append(started);
+        sb.append(", paused=").append(paused);
+        sb.append(", stopped=").append(stopped);
+        sb.append(", accumulatedNano=").append(accumulatedNano);
+        sb.append(", laps=").append(laps.size());
+//        sb.append("hours=").append(hours);
+//        sb.append(", minutes=").append(minutes);
+//        sb.append(", seconds=").append(seconds);
+//        sb.append(", name='").append(name).append('\'');
+        sb.append('}');
+        return sb.toString();
     }
 
     /**
@@ -116,7 +209,6 @@ public class Stopwatch implements Serializable, Comparable<Stopwatch>, Runnable
         if (selfThread == null)
         {
             setSelfThread(new Thread(this));
-            countUp = LocalTime.of(hours, minutes, seconds);
             selfThread.start();
         }
     }
@@ -138,6 +230,7 @@ public class Stopwatch implements Serializable, Comparable<Stopwatch>, Runnable
     public synchronized void pauseStopwatch()
     {
         logger.info("pausing {}", this);
+        pauseStartNano = System.nanoTime();
         setPaused(true);
     }
 
@@ -159,7 +252,9 @@ public class Stopwatch implements Serializable, Comparable<Stopwatch>, Runnable
         setStarted(false);
         setStopped(false);
         setPaused(false);
-        setCountUp(LocalTime.of(0, 0, 0));
+        startNano = 0L;
+        pausedAccumNano = 0L;
+        pauseStartNano = 0L;
         logger.info("{} stopwatch reset", this);
     }
 
@@ -171,42 +266,39 @@ public class Stopwatch implements Serializable, Comparable<Stopwatch>, Runnable
      */
     private void performCountUp()
     {
-        if (!started)
-        {
-            startNano = System.nanoTime();
-            setStarted(true);
+        logger.debug("{} ticking up...", this.getName());
+        long now = System.nanoTime();
+        if (pauseStartNano != 0L) {
+            // we were paused; add paused duration
+            pausedAccumNano += (now - pauseStartNano);
+            pauseStartNano = 0L;
+        } else if (startNano == 0L) {
+            // first ever start
+            logger.debug("startNano now set");
+            startNano = now;
         }
-        logger.info("{} ticking up...", this);
-        countUp = countUp.plusSeconds(1);
-        //countUp = countUp.plusNanos(15_000_000);
-        logger.debug("CountUp: {}", getCountUpString());
-        if (countUp.getHour() == 23 && countUp.getMinute() == 59 && countUp.getSecond() == 59)
-        {
-            logger.info("{} has reached maximum", this);
-            stopStopwatch();
-        }
-        else
-        {
-            setSeconds(countUp.getSecond());
-            setMinutes(countUp.getMinute());
-            setHours(countUp.getHour());
-        }
-    }
 
-    public synchronized Duration elapsed() {
-        long nowAccum = accumulatedNano;
-        if (isStarted()) {
-            nowAccum += System.nanoTime() - startNano;
-        }
-        return Duration.ofNanos(nowAccum);
     }
 
     public void recordLap()
     {
-        Duration elapsed = elapsed();
-        Lap lap = new Lap(laps.size() + 1, elapsed);
-        logger.info("Recording lap {}:{} for {}", lap.getLapNumber(), elapsed, this);
+        Duration elapsed = Duration.ofNanos(elapsed());
+        Lap lap = new Lap(laps.size() + 1, elapsed, this);
+        String hhmmssms = String.format("%02d:%02d:%02d.%03d",
+                lap.getLapTime() / 3600,
+                (lap.getLapTime() % 3600) / 60,
+                lap.getLapTime() % 60,
+                (int)((lap.getLapTime() / 1_000_000) % 1000)); // Output: 00:01:15.123
+        logger.info("Recording lap {}, time: {} for stopwatch:{}", lap.getLapNumber(), hhmmssms, this.getName());
         laps.add(lap);
+    }
+
+    public synchronized long elapsed() {
+        long now  = System.nanoTime();
+        long currentElapsed = now - startNano;
+        accumulatedNano += currentElapsed;
+        startNano = now;
+        return currentElapsed;
     }
 
     /**
@@ -227,20 +319,7 @@ public class Stopwatch implements Serializable, Comparable<Stopwatch>, Runnable
 
     /* Getters */
     public Clock getClock() { return clock; }
-    public int getHours() { return hours; }
-    public String getHoursAsStr() { return hoursAsStr; }
-    public int getMinutes() { return minutes; }
-    public String getMinutesAsStr() { return minutesAsStr; }
-    public LocalTime getCountUp() { return countUp; }
-    // TODO: Verify
-    public String getCountUpString() {
-        String countupSeconds = countUp.getSecond() < 10 ? ZERO + countUp.getSecond() : String.valueOf(countUp.getSecond());
-        String countupMinutes = countUp.getMinute() < 10 ? ZERO + countUp.getMinute() : String.valueOf(countUp.getMinute());
-        String countupHours = countUp.getHour() < 10 ? ZERO + countUp.getHour() : String.valueOf(countUp.getHour());
-        return String.format("%s:%s.%s", countupHours, countupMinutes, countupSeconds);
-    }
     public boolean isPaused() { return paused; }
-    public int getSeconds() { return seconds; }
     public String getSecondsAsStr() { return secondsAsStr; }
     public String getName() { return name; }
     public boolean isStarted() { return started; }
@@ -250,28 +329,7 @@ public class Stopwatch implements Serializable, Comparable<Stopwatch>, Runnable
 
     /* Setters */
     public void setClock(Clock clock) { this.clock = clock; logger.debug("clock set"); }
-    public void setHours(int hour) {
-        this.hours = hour;
-        if (hour < 10) setHoursAsStr(ZERO+hour);
-        else setHoursAsStr(EMPTY+hour);
-        logger.debug("hours set to {}", hour);
-    }
-    public void setHoursAsStr(String hoursAsStr) { this.hoursAsStr = hoursAsStr; logger.debug("hoursAsStr set to {}", hoursAsStr); }
-    public void setMinutes(int minutes) {
-        this.minutes = minutes;
-        if (minutes < 10) setMinutesAsStr(ZERO+ minutes);
-        else setMinutesAsStr(EMPTY+ minutes);
-        logger.debug("minutes set to {}", minutes);
-    }
-    public void setMinutesAsStr(String minutesAsStr) { this.minutesAsStr = minutesAsStr; logger.debug("minutesAsStr set to {}", minutesAsStr); }
-    public void setSeconds(int seconds) {
-        this.seconds = seconds;
-        if (seconds < 10) setSecondsAsStr(ZERO+ seconds);
-        else setSecondsAsStr(EMPTY+ seconds);
-        logger.debug("seconds set to {}", seconds);
-    }
     public void setSecondsAsStr(String secondsAsStr) { this.secondsAsStr = secondsAsStr; logger.debug("secondsAsStr set to {}", secondsAsStr); }
-    public void setCountUp(LocalTime countUp) { this.countUp = countUp; logger.debug("countUp set to {}", countUp); }
     public void setPaused(boolean paused) { this.paused = paused; logger.debug("paused set to {}", paused); }
     public void setName(String name) { this.name = name; logger.debug("name set to {}", name); }
     public void setStarted(boolean started) { this.started = started; logger.debug("started set to {}", started); }

@@ -53,6 +53,7 @@ class DisplayLapsPanel extends JPanel implements Runnable {
         thread = null;
     }
 
+    // TODO: Does this need to be 'running'?
     /** Repaints the display laps panel */
     @Override
     public void run()
@@ -97,13 +98,14 @@ class DisplayLapsPanel extends JPanel implements Runnable {
             stopwatchTable = new JTable(data, columnNames);
             //stopwatchTable.setModel(new javax.swing.table.DefaultTableModel(data, columnNames));
             constraints.anchor = GridBagConstraints.FIRST_LINE_START;
-            addComponent(label, 0, 0, 1, 1, 5,5,1,1, GridBagConstraints.NONE, new Insets(5,5,5,5));
+            addComponent(label, 0, 0, 1, 1, 5,5,1,0, GridBagConstraints.NONE, new Insets(5,5,5,5));
             JScrollPane scrollPane = new JScrollPane(stopwatchTable);
             constraints = new GridBagConstraints();
             addComponent(scrollPane, 1, 0, 1, 1, 5,5,1,1, GridBagConstraints.BOTH, new Insets(5,5,5,5));
         });
-        revalidate();
-        repaint();
+        // called immediately after returning
+        //revalidate();
+        //repaint();
     }
 
     public void setDefaultLayout()
