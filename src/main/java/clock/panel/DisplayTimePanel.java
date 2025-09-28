@@ -198,11 +198,13 @@ public class DisplayTimePanel extends JPanel implements Runnable {
         // Example hands (all zero for now)
         //int millisecond = stopwatch == null ? 0 : getStopwatch().getSeconds();
         // Derive milliseconds from seconds (assuming getStopwatch().getSeconds() returns total seconds with millisecond precision)
-        Duration duration = stopwatch == null ? Duration.ZERO : Duration.ofSeconds(stopwatch.elapsed());
-        double totalSeconds = stopwatch == null ? 0 : duration.getSeconds();
-        double milliseconds = (totalSeconds - Math.floor(totalSeconds)) * 1000+14;
-        long minutes = stopwatch == null ? 0L : duration.toMinutes();
-        int seconds = (int) totalSeconds % 60;
+        String time = stopwatch == null ? "00:00:000" : getStopwatch().elapsedAccumulated();
+        String[] parts = time.split(COLON);
+        //Duration duration = stopwatch == null ? Duration.ZERO : Duration.ofSeconds(stopwatch.elapsed());
+        //double totalSeconds = stopwatch == null ? 0 : duration.getSeconds();
+        double milliseconds = Double.parseDouble(parts[2]); //(totalSeconds - Math.floor(totalSeconds)) * 1000+14;
+        long minutes = Long.parseLong(parts[1]); // stopwatch == null ? 0L : duration.toMinutes();
+        int seconds = Integer.parseInt(parts[0]); // (int) totalSeconds % 60;
 
 // Millisecond hand (1 rotation = 1000 ms)
         double millisecondAngle = (milliseconds) * 2 * Math.PI - Math.PI / 2;

@@ -87,6 +87,20 @@ public class Stopwatch implements Serializable, Comparable<Stopwatch>, Runnable
     }
 
     /**
+     * Returns the accumulated elapsed time as a string in MM:SS:MS format
+     * for easy reading and parsing.
+     * @return the accumulated elapsed time as a string in MM:SS:MS format
+     */
+    public String elapsedAccumulated() {
+        logger.debug("elapsedAccumulated");
+        long msTotal = accumulatedNano / 1_000_000L;
+        long minutes = msTotal / 60_000;
+        long seconds = (msTotal % 60_000) / 1000;
+        long hundredths = msTotal % 1000; // 3 decimals: .000
+        return String.format("%02d:%02d:%03d", minutes, seconds, hundredths);
+    }
+
+    /**
      * Returns the total elapsed time as a string in HH:MM:SS format.
      */
     public String elapsedTotalTimeString() {
@@ -167,6 +181,7 @@ public class Stopwatch implements Serializable, Comparable<Stopwatch>, Runnable
                     if (now - lastUpdate >= 1_000_000 || startNano == 0L) { // update every millisecond
                         performCountUp();
                         lastUpdate = now;
+                        accumulatedNano += elapsedNanos();
                     }
                     sleep(1);
                 } else {
