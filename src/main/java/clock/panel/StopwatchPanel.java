@@ -285,14 +285,7 @@ addComponent(stopwatchNameField, 1, 1, 1, 1, 0, 0, 1, 0, GridBagConstraints.HORI
         currentStopwatch = stopwatch;
         //displayLapsPanel.start();
         displayLapsPanel.updateLabelsAndStopwatchTable();
-        if (displayTimePanel.isShowAnaloguePanel())
-        {
-            displayTimePanel.setClockText(stopwatch.elapsedFormatted());
-        }
-        else //if (!displayTimePanel.isShowAnaloguePanel())
-        {
-            displayTimePanel.setClockText(EMPTY);
-        }
+        displayTimePanel.setClockText(stopwatch.elapsedFormatted());
         startButton.setText(STOP);
         lapButton.setText(LAP);
     }
