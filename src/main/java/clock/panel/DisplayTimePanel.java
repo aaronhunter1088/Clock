@@ -127,7 +127,7 @@ public class DisplayTimePanel extends JPanel implements Runnable {
         String timeStr;
 
         // TODO: Fix
-        dateStr = stopwatch == null ? clockText : stopwatch.elapsedFormatted(); // stopwatch.elapsedTotalTimeString(); // stopwatch.getCountUpString(); //clock.defaultText(1); // time
+        dateStr = stopwatch == null ? startText : clockText; // stopwatch.elapsedTotalTimeString(); // stopwatch.getCountUpString(); //clock.defaultText(1); // time
         timeStr = ""; //clock.defaultText(2); // stopwatch status
         // Calculate centered x positions
         int dateWidth = fm.stringWidth(dateStr);
