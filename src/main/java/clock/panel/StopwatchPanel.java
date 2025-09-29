@@ -93,7 +93,7 @@ public class StopwatchPanel extends ClockPanel
         lapButton.setName(LAP + BUTTON);
         lapButton.setBackground(Color.BLACK);
         lapButton.setForeground(Color.BLUE);
-        lapButton.addActionListener(this::executeLapOrReset);
+        lapButton.addActionListener(this::executeButtonAction);
 
         stopwatchNameField = new JTextField("Sw" + (Stopwatch.stopwatchCounter + 1), 4);
         stopwatchNameField.setFont(ClockFrame.font20);
@@ -127,7 +127,7 @@ public class StopwatchPanel extends ClockPanel
         startButton.setName(START + BUTTON);
         startButton.setBackground(Color.BLACK);
         startButton.setForeground(Color.BLUE);
-        startButton.addActionListener(this::executeStartResumeOrStop);
+        startButton.addActionListener(this::executeButtonAction);
 
         createDisplayTimePanel();
         // Laps
@@ -249,20 +249,22 @@ addComponent(stopwatchNameField, 1, 1, 1, 1, 0, 0, 1, 0, GridBagConstraints.HORI
         lapButton.setText(RESET);
     }
 
-    private void executeStartResumeOrStop(ActionEvent e)
+    /**
+     * Executes the appropriate action depending
+     * on the text of the button since this button
+     * toggles between lap and reset.
+     * @param e the action event
+     */
+    private void executeButtonAction(ActionEvent e)
     {
-        String buttonText = startButton.getText();
-        if (buttonText.equals(START))
+        String buttonText = ((JButton)e.getSource()).getText();
+        switch (buttonText)
         {
-            startStopwatch(); // sets startButton to STOP
-        }
-        else if (buttonText.equals(RESUME))
-        {
-            resumeStopwatch(); // sets startButton to STOP
-        }
-        else
-        {
-            stopStopwatchPanel(); // sets startButton to RESUME
+            case START -> startStopwatch(); // sets startButton to STOP
+            case RESUME -> resumeStopwatch(); // sets startButton to STOP
+            case STOP -> stopStopwatchPanel(); // sets startButton to RESUME
+            case LAP -> recordLap();
+            case RESET -> resetStopwatchPanel();
         }
         repaint();
         revalidate();
@@ -293,8 +295,6 @@ addComponent(stopwatchNameField, 1, 1, 1, 1, 0, 0, 1, 0, GridBagConstraints.HORI
         }
         startButton.setText(STOP);
         lapButton.setText(LAP);
-        revalidate();
-        repaint();
     }
 
     /** Resumes the current stopwatch */
@@ -314,27 +314,6 @@ addComponent(stopwatchNameField, 1, 1, 1, 1, 0, 0, 1, 0, GridBagConstraints.HORI
         displayLapsPanel.stop();
         startButton.setText(RESUME);
         lapButton.setText(RESET);
-        repaint();
-        revalidate();
-    }
-
-    /**
-     * Executes the appropriate action depending
-     * on the text of the button since this button
-     * toggles between lap and reset.
-     * @param e the action event
-     */
-    private void executeLapOrReset(ActionEvent e)
-    {
-        String buttonText = lapButton.getText();
-        if (buttonText.equals(LAP))
-        {
-            recordLap();
-        }
-        else
-        {
-            resetStopwatchPanel();
-        }
     }
 
     /** Records a lap for the current stopwatch */
@@ -344,8 +323,6 @@ addComponent(stopwatchNameField, 1, 1, 1, 1, 0, 0, 1, 0, GridBagConstraints.HORI
         //currentStopwatch;
         displayTimePanel.getStopwatch().recordLap();
         displayLapsPanel.updateLabelsAndStopwatchTable();
-        revalidate();
-        repaint();
     }
 
     /** Resets the stopwatch panel to its default state */
@@ -362,8 +339,6 @@ addComponent(stopwatchNameField, 1, 1, 1, 1, 0, 0, 1, 0, GridBagConstraints.HORI
         displayLapsPanel.setDefaultLayout();
         startButton.setText(START);
         lapButton.setText(LAP);
-        revalidate();
-        repaint();
     }
 
     @Override
