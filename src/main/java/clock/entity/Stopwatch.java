@@ -11,6 +11,7 @@ import java.time.temporal.ChronoUnit;
 import java.time.temporal.TemporalUnit;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 import static clock.util.Constants.EMPTY;
 import static clock.util.Constants.ZERO;
@@ -58,13 +59,12 @@ public class Stopwatch implements Serializable, Comparable<Stopwatch>, Runnable
     // start here
 
     // True elapsed, independent of refresh rate
-    public long elapsedNanos() {
+    public long elapsedNanos(long now) {
         if (startNano == 0L)
         {
             logger.debug("startNano is zero");
             return 0L;
         }
-        long now = System.nanoTime();
         long paused = pausedAccumNano + (started ? 0L : (pauseStartNano == 0L ? 0L : (now - pauseStartNano)));
         return now - startNano - paused;
     }
@@ -72,7 +72,7 @@ public class Stopwatch implements Serializable, Comparable<Stopwatch>, Runnable
     // Convenience
     public String elapsedFormatted() {
         logger.debug("elapsedFormatted");
-        long ns = elapsedNanos();
+        long ns = accumulatedNano; //elapsedNanos();
         long msTotal = ns / 1_000_000L;
         long minutes = msTotal / 60_000;
         long seconds = (msTotal % 60_000) / 1000;
@@ -143,16 +143,16 @@ public class Stopwatch implements Serializable, Comparable<Stopwatch>, Runnable
     @Override
     public void run()
     {
-        long lastUpdate = 0L;
+        long lastUpdate = startNano;
         while (selfThread != null)
         {
             try {
                 if (!paused && !stopped) {
                     long now = System.nanoTime();
                     if (now - lastUpdate >= 1_000_000 || startNano == 0L) { // update every millisecond
-                        performCountUp();
+                        performCountUp(now);
                         lastUpdate = now;
-                        accumulatedNano = elapsedNanos();
+                        accumulatedNano = elapsedNanos(now);
                     }
                     sleep(1);
                 } else {
@@ -174,10 +174,9 @@ public class Stopwatch implements Serializable, Comparable<Stopwatch>, Runnable
      * accordingly. If the stopwatch reaches 24 hours,
      * it will be deleted.
      */
-    private void performCountUp()
+    private void performCountUp(long now)
     {
         logger.debug("{} ticking up...", this.getName());
-        long now = System.nanoTime();
         if (pauseStartNano != 0L) {
             // we were paused; add paused duration
             pausedAccumNano += (now - pauseStartNano);
@@ -268,7 +267,7 @@ public class Stopwatch implements Serializable, Comparable<Stopwatch>, Runnable
 
     public void recordLap()
     {
-        Duration elapsed = Duration.ofNanos(elapsed());
+        Duration elapsed = Duration.of(elapsedNanos(System.nanoTime()), ChronoUnit.SECONDS); //Duration.ofNanos(elapsed());
         Lap lap = new Lap(laps.size() + 1, elapsed, this);
         String hhmmssms = String.format("%02d:%02d:%02d.%03d",
                 lap.getLapTime() / 3600,
@@ -279,6 +278,12 @@ public class Stopwatch implements Serializable, Comparable<Stopwatch>, Runnable
         laps.add(lap);
     }
 
+    /**
+     * This method returns the elapsed time in nanoseconds
+     * since the last start or lap event. It also updates
+     * the accumulated time.
+     * @return the elapsed time since the last event
+     */
     public synchronized long elapsed()
     {
         long now  = System.nanoTime();
