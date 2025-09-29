@@ -203,27 +203,27 @@ public class DisplayTimePanel extends JPanel implements Runnable {
         //Duration duration = stopwatch == null ? Duration.ZERO : Duration.ofSeconds(stopwatch.elapsed());
         //double totalSeconds = stopwatch == null ? 0 : duration.getSeconds();
         double milliseconds = Double.parseDouble(parts[2]); //(totalSeconds - Math.floor(totalSeconds)) * 1000+14;
-        long minutes = Long.parseLong(parts[1]); // stopwatch == null ? 0L : duration.toMinutes();
-        int seconds = Integer.parseInt(parts[0]); // (int) totalSeconds % 60;
+        long minutes = Long.parseLong(parts[0]); // stopwatch == null ? 0L : duration.toMinutes();
+        int seconds = Integer.parseInt(parts[1]); // (int) totalSeconds % 60;
 
-// Millisecond hand (1 rotation = 1000 ms)
+        // Millisecond hand (1 rotation = 1000 ms)
         double millisecondAngle = (milliseconds) * 2 * Math.PI - Math.PI / 2;
         int xmillisecond = (int) (Math.cos(millisecondAngle) * (radius * 0.8) + xcenter);
         int ymillisecond = (int) (Math.sin(millisecondAngle) * (radius * 0.8) + ycenter);
 
-// Second hand (1 rotation = 60 s, includes ms for smoothness)
+        // Second hand (1 rotation = 60 s, includes ms for smoothness)
         double secondAngle = ((seconds + milliseconds / 1000) / 60) * 2 * Math.PI - Math.PI / 2;
         int xsecond = (int) (Math.cos(secondAngle) * (radius * 0.65) + xcenter);
         int ysecond = (int) (Math.sin(secondAngle) * (radius * 0.65) + ycenter);
 
-// Minute hand (1 rotation = 60 min, includes seconds for smoothness)
+        // Minute hand (1 rotation = 60 min, includes seconds for smoothness)
         double minuteAngle = ((minutes + (seconds + milliseconds / 1000) / 60) / 60) * 2 * Math.PI - Math.PI / 2;
         int xminute = (int) (Math.cos(minuteAngle) * (radius * 0.45) + xcenter);
         int yminute = (int) (Math.sin(minuteAngle) * (radius * 0.45) + ycenter);
 
-// Draw hands
-        g.setColor(Color.RED);
-        g.drawLine(xcenter, ycenter, xmillisecond, ymillisecond);
+        // Draw hands
+        //g.setColor(Color.RED);
+        //g.drawLine(xcenter, ycenter, xmillisecond, ymillisecond);
         g.setColor(Color.BLUE);
         g.drawLine(xcenter, ycenter, xsecond, ysecond);
         g.setColor(Color.GREEN);
