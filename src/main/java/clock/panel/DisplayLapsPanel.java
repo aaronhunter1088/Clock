@@ -19,6 +19,7 @@ class DisplayLapsPanel extends JPanel implements Runnable {
     public Thread thread;
     private Stopwatch stopwatch;
     private JTable stopwatchTable;
+    private final String[] columnNames = {"Lap #", "Time", "Recorded"};
 
     public DisplayLapsPanel()
     {
@@ -90,7 +91,6 @@ class DisplayLapsPanel extends JPanel implements Runnable {
             label.setForeground(Color.WHITE);
             label.setFont(ClockFrame.font20);
             // generate table to display laps.
-            String[] columnNames = {"Lap #", "Time", "Recorded"};
             Object[][] data = new Object[stopwatch.getLaps().size()][3];
             // TODO: Reverse the order of the laps so the latest is on top.
             for (int i = 0; i < stopwatch.getLaps().size(); i++) {
@@ -116,14 +116,12 @@ class DisplayLapsPanel extends JPanel implements Runnable {
         JLabel label = new JLabel("Sw1");
         label.setForeground(Color.WHITE);
         label.setFont(ClockFrame.font20);
-
-        String[] columnNames = {"Lap #", "Time", "Recorded"};
         // add a space or some gap, if needed
         constraints.anchor = GridBagConstraints.FIRST_LINE_START;
         addComponent(label, 0, 0, 1, 1, 5,5,1,0, GridBagConstraints.NONE, new Insets(5,5,5,5));
+
         stopwatchTable = new JTable(new Object[0][0], columnNames);
         JScrollPane scrollPane = new JScrollPane(stopwatchTable);
-        //constraints = new GridBagConstraints();
         addComponent(scrollPane, 1, 0, 1, 1, 5,5,1,1, GridBagConstraints.BOTH, new Insets(5,5,5,5));
     }
 
