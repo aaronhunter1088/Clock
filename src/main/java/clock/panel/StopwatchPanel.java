@@ -12,6 +12,7 @@ import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.FocusEvent;
 import java.awt.event.FocusListener;
+import java.util.List;
 
 import static clock.panel.DisplayTimePanel.startText;
 import static clock.util.Constants.*;
@@ -109,6 +110,28 @@ public class StopwatchPanel extends ClockPanel
            public void focusGained(FocusEvent e) {
                if (stopwatchNameField.getText().equals("Sw" + (Stopwatch.stopwatchCounter + 1))) {
                    stopwatchNameField.setText(EMPTY);
+               }
+               // Logic for showing Resume versus Start
+               // If currentStopwatch name is same as in textField, show Resume
+               // If textField text does not exist for any stopwatch, show Start (creating a new one)
+               String text = stopwatchNameField.getText();
+               String currentName = currentStopwatch != null ? currentStopwatch.getName() : EMPTY;
+                   List<String> allNames = clock.getListOfStopwatches().stream().map(Stopwatch::getName).toList();
+               if (currentName.equals(text)) {
+                   if (currentStopwatch != null && currentStopwatch.isStarted()) {
+                       startButton.setText(RESUME);
+                   } else {
+                       startButton.setText(STOP);
+                   }
+               }
+               else if (allNames.contains(text)) {
+                   currentStopwatch = clock.getListOfStopwatches().stream().filter(stopwatch -> stopwatch.getName().equals(text)).findFirst().get();
+                   displayTimePanel.setStopwatch(currentStopwatch);
+                   displayLapsPanel.setStopwatch(currentStopwatch);
+                   startButton.setText(RESUME);
+               }
+               else {
+                   startButton.setText(START);
                }
                logger.debug("Focus gained on name field");
            }
@@ -299,10 +322,24 @@ addComponent(stopwatchNameField, 1, 1, 1, 1, 0, 0, 1, 0, GridBagConstraints.HORI
         String chosenName = stopwatchNameField.getText();
         // sets the current stopwatch to the chosen name if it exists
         // otherwise currentStopwatch remains the same
-        clock.getListOfStopwatches().stream().filter(stopwatch -> stopwatch.getName().equals(chosenName)).findFirst().ifPresent(resumeSpecificWatch -> currentStopwatch = resumeSpecificWatch);
+        clock.getListOfStopwatches().stream().filter(stopwatch -> stopwatch.getName().equals(chosenName))
+                .findFirst().ifPresent(resumeSpecificWatch -> currentStopwatch = resumeSpecificWatch);
+        //currentStopwatch.resumeStopwatch();
         currentStopwatch.resumeStopwatch();
+        // because the chosenName may not be the same as the resuming stopwatch, update it there
+        stopwatchNameField.setText(currentStopwatch.getName());
+        //displayTimePanel.start();
+        //displayLapsPanel.updateLabelsAndStopwatchTable();
+        //startButton.setText(STOP);
+        //lapButton.setText(LAP);
+        displayTimePanel.setStopwatch(currentStopwatch); // current
+        //displayTimePanel.setListOfStopwatches(clock.getListOfStopwatches());
         displayTimePanel.start();
+        displayLapsPanel.setStopwatch(currentStopwatch); // current
+        //displayLapsPanel.setListOfStopwatches(clock.getListOfStopwatches());
+        //displayLapsPanel.start();
         displayLapsPanel.updateLabelsAndStopwatchTable();
+        displayTimePanel.setClockText(currentStopwatch.elapsedFormatted());
         startButton.setText(STOP);
         lapButton.setText(LAP);
     }

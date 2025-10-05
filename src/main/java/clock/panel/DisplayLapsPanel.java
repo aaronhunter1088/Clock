@@ -90,21 +90,22 @@ class DisplayLapsPanel extends JPanel { //implements Runnable {
     public void updateLabelsAndStopwatchTable()
     {
         resetPanel();
-        List<Stopwatch> stopwatches = getStopwatch().getClock().getListOfStopwatches();
-        stopwatches.forEach(stopwatch -> {
-            // generate label or something clickable.
-            JButton viewAll = new JButton("View All");
-            viewAll.setFont(ClockFrame.font20);
-            viewAll.setOpaque(true);
-            viewAll.setName(VIEW_STOPWATCH + "es" + BUTTON);
-            viewAll.setBackground(Color.BLACK);
-            viewAll.setForeground(Color.BLUE);
-            viewAll.addActionListener(this::viewStopwatchesTable);
-            addComponent(viewAll, 0, 0, 1, 1, 5,5,1,0, GridBagConstraints.NONE, new Insets(5,5,5,5));
+        // generate label or something clickable.
+        JButton viewAll = new JButton("View All");
+        viewAll.setFont(ClockFrame.font20);
+        viewAll.setOpaque(true);
+        viewAll.setName(VIEW_STOPWATCH + "es" + BUTTON);
+        viewAll.setBackground(Color.BLACK);
+        viewAll.setForeground(Color.BLUE);
+        viewAll.addActionListener(this::viewStopwatchesTable);
+        addComponent(viewAll, 0, 0, 1, 1, 5,5,1,0, GridBagConstraints.NONE, new Insets(5,5,5,5));
 
-            JLabel label = new JLabel(stopwatch.getName());
-            label.setForeground(Color.WHITE);
-            label.setFont(ClockFrame.font20);
+        JLabel label = new JLabel(stopwatch.getName());
+        label.setForeground(Color.WHITE);
+        label.setFont(ClockFrame.font20);
+
+        List<Stopwatch> stopwatches = List.of(stopwatch); //getStopwatch().getClock().getListOfStopwatches();
+        stopwatches.forEach(stopwatch -> {
             // generate table to display laps.
             Object[][] data = new Object[stopwatch.getLaps().size()][3];
             // TODO: Reverse the order of the laps so the latest is on top.

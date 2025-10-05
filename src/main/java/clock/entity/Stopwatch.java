@@ -197,6 +197,7 @@ public class Stopwatch implements Serializable, Comparable<Stopwatch>, Runnable
         {
             setSelfThread(new Thread(this));
             selfThread.start();
+            started = true;
         }
     }
 
@@ -219,6 +220,7 @@ public class Stopwatch implements Serializable, Comparable<Stopwatch>, Runnable
         logger.info("pausing {}", this);
         pauseStartMilli = System.currentTimeMillis();
         setPaused(true);
+        //setStopped(false);
     }
 
     /**
@@ -252,7 +254,6 @@ public class Stopwatch implements Serializable, Comparable<Stopwatch>, Runnable
 
     /**
      * Records a lap for the stopwatch.
-     * TODO: Fix lap to include length of lap. Currently recording time lap was recorded.
      * Logic: Take the time (now), get the minutes, seconds and milliseconds since last lap.
      * Subtract the now from the last lap to get duration of lap.
      */
@@ -262,8 +263,9 @@ public class Stopwatch implements Serializable, Comparable<Stopwatch>, Runnable
         //long el = elapsed(now); // now - startMilli
         //Duration elapsed = Duration.ofMillis(el);
         //Duration length = Duration.ofMillis(now - lastLapMarkMilli);
-        Lap lap = new Lap(laps.size() + 1, elapsed(now), (now - lastLapMarkMilli), this);
+        Lap lap = new Lap(laps.size() + 1, elapsed(now), (now - lastLapMarkMilli - pausedAccumMilli), this);
         lastLapMarkMilli = now;
+        pausedAccumMilli = 0L; // reset
         String mmssms = lap.getFormattedDuration();
         logger.info("Recording lap {}, time: {} for stopwatch:{}", lap.getLapNumber(), mmssms, this.getName());
         laps.add(lap);
@@ -277,7 +279,7 @@ public class Stopwatch implements Serializable, Comparable<Stopwatch>, Runnable
      */
     public synchronized long elapsed(long now)
     {
-        return now - startMilli; // currentElapsed
+        return now - startMilli - totalPausedMilli; // currentElapsed
     }
 
     /**
