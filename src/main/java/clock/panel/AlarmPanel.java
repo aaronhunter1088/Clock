@@ -669,7 +669,18 @@ public class AlarmPanel extends ClockPanel implements Runnable
             if (!clock.getListOfAlarms().contains(alarm))
             {
                 clock.getListOfAlarms().add(alarm);
-                resetAlarmPanel();
+                nameTextField.setText(EMPTY);
+                hoursTextField.setText(EMPTY);
+                minutesTextField.setText(EMPTY);
+                sundayCheckBox.setSelected(false);
+                mondayCheckBox.setSelected(false);
+                tuesdayCheckBox.setSelected(false);
+                wednesdayCheckBox.setSelected(false);
+                thursdayCheckBox.setSelected(false);
+                fridayCheckBox.setSelected(false);
+                saturdayCheckBox.setSelected(false);
+                weekdaysCheckBox.setSelected(false);
+                weekendsCheckBox.setSelected(false);
             }
             else
             {
