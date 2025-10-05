@@ -14,15 +14,15 @@ public class Lap implements Serializable, Comparable<Lap>
     private static final long serialVersionUID = 1L;
     private static final Logger logger = LogManager.getLogger(Lap.class);
     private int lapNumber;
-    private Duration duration;
+    private long duration;
     private long lapTime;
     private Stopwatch stopwatch;
 
-    public Lap(int lapNumber, Duration duration, Stopwatch stopwatch)
+    public Lap(int lapNumber, long duration, long lapTime, Stopwatch stopwatch)
     {
         setLapNumber(lapNumber);
         setDuration(duration);
-        setLapTime(duration.getSeconds());
+        setLapTime(lapTime);
         setStopwatch(stopwatch);
     }
 
@@ -41,15 +41,33 @@ public class Lap implements Serializable, Comparable<Lap>
         return sb.toString();
     }
 
+    public String getFormattedDuration()
+    {
+        long msTotal = duration;
+        long minutes = msTotal / 60_000;
+        long seconds = (msTotal % 60_000) / 1000;
+        long hundredths = msTotal % 1000; // 3 decimals: .000
+        return String.format("%02d:%02d.%03d", minutes, seconds, hundredths);
+    }
+
+    public String getFormattedLapTime()
+    {
+        long msTotal = lapTime;
+        long minutes = msTotal / 60_000;
+        long seconds = (msTotal % 60_000) / 1000;
+        long hundredths = msTotal % 1000; // 3 decimals: .000
+        return String.format("%02d:%02d.%03d", minutes, seconds, hundredths);
+    }
+
     /* Getters */
     public int getLapNumber() { return lapNumber; }
-    public Duration getDuration() { return duration; }
+    public long getDuration() { return duration; }
     public long getLapTime() { return lapTime; }
     public Stopwatch getStopwatch() { return stopwatch; }
 
     /* Setters */
     public void setLapNumber(int lapNumber) { this.lapNumber = lapNumber; logger.debug("lapNumber set to {}", lapNumber); }
-    public void setDuration(Duration duration) { this.duration = duration; logger.debug("lapTime set to {}", duration); }
+    public void setDuration(long duration) { this.duration = duration; logger.debug("duration set to {} seconds", duration); }
     public void setLapTime(long lapTime) { this.lapTime = lapTime; logger.debug("lapTime set to {}", lapTime); }
     public void setStopwatch(Stopwatch stopwatch) { this.stopwatch = stopwatch; logger.debug("stopwatch set to {}", stopwatch); }
 }

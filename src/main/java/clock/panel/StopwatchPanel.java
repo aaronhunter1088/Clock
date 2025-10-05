@@ -13,6 +13,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.FocusEvent;
 import java.awt.event.FocusListener;
 
+import static clock.panel.DisplayTimePanel.startText;
 import static clock.util.Constants.*;
 import static java.lang.Thread.sleep;
 
@@ -151,7 +152,7 @@ public class StopwatchPanel extends ClockPanel
         } else {
             startButton.setText(START);
             lapButton.setText(LAP);
-            displayTimePanel.setClockText(DisplayTimePanel.clockText);
+            displayTimePanel.setClockText(startText);
         }
     }
 
@@ -324,9 +325,11 @@ addComponent(stopwatchNameField, 1, 1, 1, 1, 0, 0, 1, 0, GridBagConstraints.HORI
         logger.debug("resetting stopwatch panel");
         Stopwatch watchToStop = displayTimePanel.getStopwatch();
         watchToStop.getClock().getListOfStopwatches().remove(watchToStop);
+        watchToStop.stopStopwatch();
+        currentStopwatch = watchToStop;
         displayTimePanel.stop();
         displayTimePanel.setStopwatch(null);
-        displayTimePanel.setClockText(DisplayTimePanel.startText);
+        displayTimePanel.setClockText(startText);
         displayTimePanel.repaint();
         displayLapsPanel.resetPanel();
         displayLapsPanel.setDefaultLayout();

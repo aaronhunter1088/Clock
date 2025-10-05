@@ -6,6 +6,7 @@ import org.apache.logging.log4j.Logger;
 
 import javax.swing.*;
 import java.awt.*;
+import java.time.Duration;
 import java.util.List;
 
 import static java.lang.Thread.sleep;
@@ -89,11 +90,13 @@ class DisplayLapsPanel extends JPanel implements Runnable {
             label.setForeground(Color.WHITE);
             label.setFont(ClockFrame.font20);
             // generate table to display laps.
-            String[] columnNames = {"Lap #", "Time"};
-            Object[][] data = new Object[stopwatch.getLaps().size()][2];
+            String[] columnNames = {"Lap #", "Time", "Recorded"};
+            Object[][] data = new Object[stopwatch.getLaps().size()][3];
+            // TODO: Reverse the order of the laps so the latest is on top.
             for (int i = 0; i < stopwatch.getLaps().size(); i++) {
                 data[i][0] = stopwatch.getLaps().get(i).getLapNumber();
-                data[i][1] = stopwatch.getLaps().get(i).getLapTime();
+                data[i][1] = stopwatch.getLaps().get(i).getFormattedLapTime();
+                data[i][2] = stopwatch.getLaps().get(i).getFormattedDuration();
             }
             stopwatchTable = new JTable(data, columnNames);
             //stopwatchTable.setModel(new javax.swing.table.DefaultTableModel(data, columnNames));
@@ -114,7 +117,7 @@ class DisplayLapsPanel extends JPanel implements Runnable {
         label.setForeground(Color.WHITE);
         label.setFont(ClockFrame.font20);
 
-        String[] columnNames = {"Lap #", "Time"};
+        String[] columnNames = {"Lap #", "Time", "Recorded"};
         // add a space or some gap, if needed
         constraints.anchor = GridBagConstraints.FIRST_LINE_START;
         addComponent(label, 0, 0, 1, 1, 5,5,1,0, GridBagConstraints.NONE, new Insets(5,5,5,5));

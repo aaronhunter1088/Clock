@@ -17,7 +17,7 @@ public class DisplayTimePanel extends JPanel implements Runnable {
     // TODO: Make private, add get/set methods
     public Thread thread;
     private boolean showAnaloguePanel = false;
-    public static String clockText = "00:00.000";
+    public String clockText = "00:00.000";
     public static String startText = "00:00.000"; // default text
     private Stopwatch stopwatch;
 
@@ -52,7 +52,7 @@ public class DisplayTimePanel extends JPanel implements Runnable {
         logger.debug("stopping digital stopwatch panel");
         // TODO: Is this right? Is there a better way to do this?
         thread = null;
-        setClockText(DisplayTimePanel.clockText);
+        setClockText(DisplayTimePanel.startText);
         if (stopwatch != null)
         {
             stopwatch.pauseStopwatch();
@@ -127,7 +127,7 @@ public class DisplayTimePanel extends JPanel implements Runnable {
         String timeStr;
 
         // TODO: Fix
-        dateStr = stopwatch == null ? startText : clockText; // stopwatch.elapsedTotalTimeString(); // stopwatch.getCountUpString(); //clock.defaultText(1); // time
+        dateStr = stopwatch == null ? startText : clockText;
         timeStr = ""; //clock.defaultText(2); // stopwatch status
         // Calculate centered x positions
         int dateWidth = fm.stringWidth(dateStr);
