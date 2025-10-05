@@ -313,10 +313,16 @@ addComponent(stopwatchNameField, 1, 1, 1, 1, 0, 0, 1, 0, GridBagConstraints.HORI
     /** Records a lap for the current stopwatch */
     private void recordLap()
     {
-        logger.debug("recording lap");
-        //currentStopwatch;
-        displayTimePanel.getStopwatch().recordLap();
-        displayLapsPanel.updateLabelsAndStopwatchTable();
+        if (currentStopwatch != null)
+        {
+            logger.debug("recording lap");
+            currentStopwatch.recordLap();
+            displayLapsPanel.updateLabelsAndStopwatchTable();
+        }
+        else
+        {
+            logger.warn("No current stopwatch to record lap for");
+        }
     }
 
     /** Resets the stopwatch panel to its default state */
