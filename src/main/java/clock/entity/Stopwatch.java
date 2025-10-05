@@ -81,7 +81,7 @@ public class Stopwatch implements Serializable, Comparable<Stopwatch>, Runnable
         long minutes = msTotal / 60_000;
         long seconds = (msTotal % 60_000) / 1000;
         long hundredths = msTotal % 1000; // 3 decimals: .000
-        return String.format("%02d:%02d.%03d", minutes, seconds, hundredths);
+        return String.format("%02d:%02d:%03d", minutes, seconds, hundredths);
     }
 
     // end here

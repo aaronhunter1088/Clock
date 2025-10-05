@@ -126,7 +126,6 @@ public class DisplayTimePanel extends JPanel implements Runnable {
         String dateStr;
         String timeStr;
 
-        // TODO: Fix
         dateStr = stopwatch == null ? startText : clockText;
         timeStr = ""; //clock.defaultText(2); // stopwatch status
         // Calculate centered x positions
@@ -134,14 +133,10 @@ public class DisplayTimePanel extends JPanel implements Runnable {
         int timeWidth = fm.stringWidth(timeStr);
         int panelWidth = this.getWidth();
 
-//        int dateX = (panelWidth - dateWidth);
-//        int timeX = (panelWidth - timeWidth);
         int dateX = (panelWidth - dateWidth) / 2;
 
         int timeX = (panelWidth - timeWidth) / 2;
 
-        //int baseY = ClockFrame.clockDefaultSize.height / 2;
-        //int baseY = this.getHeight();
         int baseY = this.getHeight() / 2;
 
         /*
@@ -195,21 +190,18 @@ public class DisplayTimePanel extends JPanel implements Runnable {
 
         g.setColor(Color.BLACK);
 
-        // Example hands (all zero for now)
-        //int millisecond = stopwatch == null ? 0 : getStopwatch().getSeconds();
         // Derive milliseconds from seconds (assuming getStopwatch().getSeconds() returns total seconds with millisecond precision)
         String time = stopwatch == null ? "00:00:000" : getStopwatch().elapsedAccumulated();
         String[] parts = time.split(COLON);
-        //Duration duration = stopwatch == null ? Duration.ZERO : Duration.ofSeconds(stopwatch.elapsed());
-        //double totalSeconds = stopwatch == null ? 0 : duration.getSeconds();
-        double milliseconds = Double.parseDouble(parts[2]); //(totalSeconds - Math.floor(totalSeconds)) * 1000+14;
-        long minutes = Long.parseLong(parts[0]); // stopwatch == null ? 0L : duration.toMinutes();
-        int seconds = Integer.parseInt(parts[1]); // (int) totalSeconds % 60;
+
+        double milliseconds = Double.parseDouble(parts[2]);
+        long minutes = Long.parseLong(parts[0]);
+        int seconds = Integer.parseInt(parts[1]);
 
         // Millisecond hand (1 rotation = 1000 ms)
-        double millisecondAngle = (milliseconds) * 2 * Math.PI - Math.PI / 2;
-        int xmillisecond = (int) (Math.cos(millisecondAngle) * (radius * 0.8) + xcenter);
-        int ymillisecond = (int) (Math.sin(millisecondAngle) * (radius * 0.8) + ycenter);
+        //double millisecondAngle = (milliseconds) * 2 * Math.PI - Math.PI / 2;
+        //int xmillisecond = (int) (Math.cos(millisecondAngle) * (radius * 0.8) + xcenter);
+        //int ymillisecond = (int) (Math.sin(millisecondAngle) * (radius * 0.8) + ycenter);
 
         // Second hand (1 rotation = 60 s, includes ms for smoothness)
         double secondAngle = ((seconds + milliseconds / 1000) / 60) * 2 * Math.PI - Math.PI / 2;
