@@ -108,32 +108,35 @@ public class StopwatchPanel extends ClockPanel
         stopwatchNameField.addFocusListener(new FocusListener() {
            @Override
            public void focusGained(FocusEvent e) {
-               if (stopwatchNameField.getText().equals("Sw" + (Stopwatch.stopwatchCounter + 1))) {
-                   stopwatchNameField.setText(EMPTY);
-               }
-               // Logic for showing Resume versus Start
-               // If currentStopwatch name is same as in textField, show Resume
-               // If textField text does not exist for any stopwatch, show Start (creating a new one)
-               String text = stopwatchNameField.getText();
-               String currentName = currentStopwatch != null ? currentStopwatch.getName() : EMPTY;
-                   List<String> allNames = clock.getListOfStopwatches().stream().map(Stopwatch::getName).toList();
-               if (currentName.equals(text)) {
-                   if (currentStopwatch != null && currentStopwatch.isStarted()) {
-                       startButton.setText(RESUME);
-                   } else {
-                       startButton.setText(STOP);
+               if (currentStopwatch.isPaused())
+               {
+                   if (stopwatchNameField.getText().equals("Sw" + (Stopwatch.stopwatchCounter + 1))) {
+                       stopwatchNameField.setText(EMPTY);
                    }
+                   // Logic for showing Resume versus Start
+                   // If currentStopwatch name is same as in textField, show Resume
+                   // If textField text does not exist for any stopwatch, show Start (creating a new one)
+                   String text = stopwatchNameField.getText();
+                   String currentName = currentStopwatch != null ? currentStopwatch.getName() : EMPTY;
+                   List<String> allNames = clock.getListOfStopwatches().stream().map(Stopwatch::getName).toList();
+                   if (currentName.equals(text)) {
+                       if (currentStopwatch != null && currentStopwatch.isStarted()) {
+                           startButton.setText(RESUME);
+                       } else {
+                           startButton.setText(STOP);
+                       }
+                   }
+                   else if (allNames.contains(text)) {
+                       currentStopwatch = clock.getListOfStopwatches().stream().filter(stopwatch -> stopwatch.getName().equals(text)).findFirst().get();
+                       displayTimePanel.setStopwatch(currentStopwatch);
+                       displayLapsPanel.setStopwatch(currentStopwatch);
+                       startButton.setText(RESUME);
+                   }
+                   else {
+                       startButton.setText(START);
+                   }
+                   logger.debug("Focus gained on name field");
                }
-               else if (allNames.contains(text)) {
-                   currentStopwatch = clock.getListOfStopwatches().stream().filter(stopwatch -> stopwatch.getName().equals(text)).findFirst().get();
-                   displayTimePanel.setStopwatch(currentStopwatch);
-                   displayLapsPanel.setStopwatch(currentStopwatch);
-                   startButton.setText(RESUME);
-               }
-               else {
-                   startButton.setText(START);
-               }
-               logger.debug("Focus gained on name field");
            }
 
            @Override
@@ -372,14 +375,14 @@ addComponent(stopwatchNameField, 1, 1, 1, 1, 0, 0, 1, 0, GridBagConstraints.HORI
     private void resetStopwatchPanel()
     {
         logger.debug("resetting stopwatch panel");
-        Stopwatch watchToStop = displayTimePanel.getStopwatch();
-        watchToStop.getClock().getListOfStopwatches().remove(watchToStop);
-        watchToStop.stopStopwatch();
-        currentStopwatch = watchToStop;
-        displayTimePanel.stop();
+        getClock().getListOfStopwatches().clear();
+        currentStopwatch.stopStopwatch();
+        currentStopwatch = null;
         displayTimePanel.setStopwatch(null);
+        displayTimePanel.stop();
         displayTimePanel.setClockText(startText);
         displayTimePanel.repaint();
+        displayLapsPanel.setStopwatch(null);
         displayLapsPanel.resetPanel();
         displayLapsPanel.setDefaultLayout();
         startButton.setText(START);
