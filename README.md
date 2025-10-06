@@ -1,9 +1,9 @@
 # Clock v2.9
 
 This is a Java Swing GUI application which displays the date and time to the user in
-both digital and analogue modes. It also has the capability to set multiple alarms and
-multiple timers. You can also start the clock specifying a panel or a specific date
-and time. The following is the default java command to run the clock:
+both digital and analogue modes. It also has the capability to set multiple alarms,
+timers and stopwatches. You can also start the clock specifying a panel or a specific
+date and time. The following is the default java command to run the clock:
 
 ```
 # Both commands achieve the same result:
@@ -26,6 +26,7 @@ By clicking on Features, you can change the panel. The panels are:
 * (Ctrl + C) View Analogue Clock
 * (Ctrl + A) View Alarm
 * (Ctrl + T) View Timers
+* (Ctrl + S) View Stopwatches
 
 On the Digital Clock panel, you can change the following settings:
 * (Ctrl + M) Show Military/Standard Time: Toggles the time to show in military time (like 1030 hours 45)
@@ -69,9 +70,19 @@ On the Timers panel, you can change the following settings:
 * (Ctrl + P) Pause/Resume All Timers: This will pause or resume all timers at once.
 * (Ctrl + R) Reset Panel: This will reset the timers panel, removing all timers and resetting the list.
 
+On the Stopwatches panel, you can set multiple stopwatches. Here you can enter the Name of a Stopwatch,
+click start, pause and resume it, create a new one, switch between stopwatches, and reset the panel. You
+can also reverse the order of the laps (for all stopwatches). Each stopwatch can have its own laps, which
+is displayed in a table to the right of the stopwatch. You can view the elapsed time of the stopwatch in
+digital or analogue mode. The default is digital mode.
+
+On the Stopwatches panel, you can change the following settings:
+* (Ctrl + T) Show Analogue/Digital Time: This will toggle the stopwatch time between analogue and digital modes.
+* (Ctrl + R) Reverse Laps Order: This toggle will reverse the order of the laps for all stopwatches.
+
 # History
 v2.9 Updated to use my parent pom. Multiple timers. Multiple ways to start the application.
-Java was upgraded to 21.
+Java was upgraded to 21. Multiple stopwatches were added.
 
 v2.8 Added Javadocs and cleaned up the code quite a bit. When running the application, you
 can set this envVar: logLevel to be DEBUG, or INFO depending on how much info you want.
