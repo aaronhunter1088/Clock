@@ -46,6 +46,7 @@ public class Constants {
     public static final String NO = "No";
     public static final String No_Alarms = "No Alarms";
     public static final String No_Timers = "No Timers";
+    public static final String of = "of";
     public static final String off = "off";
     public static final String on = "on";
     public static final String ONE = "1";
@@ -61,6 +62,7 @@ public class Constants {
     public static final String STANDARD_TIME_SETTING = "standard time";
     public static final String STAR = "*";
     public static final String STOPWATCH = "Stopwatch";
+    public static final String STOPWATCHES = "Stopwatches";
     public static final String SLASH = "/";
     public static final String TEN = "10";
     public static final String TEST = "Test";
@@ -105,6 +107,7 @@ public class Constants {
     public static final String RESUME_TIMER = "Resume Timer";
     public static final String SEC = "Sec";
     public static final String SET = "Set";
+    public static final String TIME = "Time";
     public static final String TIMER = "Timer";
     public static final String TIMER_HOUR_ERROR_12 = "0 <= "+HOUR+" > 12";
     public static final String TIMER_HOUR_ERROR_24 = "0 <= "+HOUR+" > 24";
@@ -143,7 +146,11 @@ public class Constants {
     public static final String VIEW_ANALOGUE_CLOCK = "View Analogue Clock";
 
     // Stopwatch
+    public static final String ELAPSED = "Elapsed";
     public static final String LAP = "Lap";
+    public static final String LAPS = "Laps";
     public static final String LAP_TIME = "Lap Time";
+    public static final String RESTORE = "Restore";
+    public static final String REVERSE = "Reverse";
     public static final String START = "Start";
 }

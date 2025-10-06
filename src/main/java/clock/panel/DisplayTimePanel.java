@@ -6,24 +6,34 @@ import org.apache.logging.log4j.Logger;
 
 import javax.swing.*;
 import java.awt.*;
-import java.time.Duration;
 
 import static clock.util.Constants.*;
 import static java.lang.Thread.sleep;
 
-public class DisplayTimePanel extends JPanel implements Runnable {
-
+/**
+ * DisplayTimePanel
+ * <p>
+ * A DisplayTimePanel is a JPanel that displays the time of a Stopwatch
+ * in either digital or analogue format. It implements Runnable to allow
+ * for continuous updating of the display while the stopwatch is running.
+ *
+ * @author michael ball
+ * @version 2.9
+ */
+public class DisplayTimePanel extends JPanel implements Runnable
+{
     private static final Logger logger = LogManager.getLogger(DisplayTimePanel.class);
-    // TODO: Make private, add get/set methods
     public Thread thread;
     private boolean showAnaloguePanel = false;
     public String clockText = "00:00.000";
     public static String startText = "00:00.000"; // default text
     private Stopwatch stopwatch;
+    private StopwatchPanel stopwatchPanel;
 
-    public DisplayTimePanel()
+    public DisplayTimePanel(StopwatchPanel stopwatchPanel)
     {
         super();
+        this.stopwatchPanel = stopwatchPanel;
         setPreferredSize(ClockFrame.analogueSize);
         setMinimumSize(ClockFrame.analogueSize);
         setMaximumSize(ClockFrame.analogueSize);
@@ -53,9 +63,9 @@ public class DisplayTimePanel extends JPanel implements Runnable {
         // TODO: Is this right? Is there a better way to do this?
         thread = null;
         setClockText(DisplayTimePanel.startText);
-        if (stopwatch != null)
+        if (stopwatchPanel.getCurrentStopwatch() != null)
         {
-            stopwatch.pauseStopwatch();
+            stopwatchPanel.getCurrentStopwatch().pauseStopwatch();
         }
     }
 
@@ -82,30 +92,25 @@ public class DisplayTimePanel extends JPanel implements Runnable {
                 repaint(); // goes to paint
                 sleep(1);
             }
-            catch (InterruptedException e)
-            {}
+            catch (Exception e)
+            {
+                logger.error("Exception in DisplayTimePanel run: {}", e.getMessage());
+            }
         }
     }
 
+    /** Paints the appropriate clock for the stopwatch panel */
     @Override
     public void paint(Graphics g)
     {
         super.paint(g);
+        setClockText(getStopwatch() == null ? clockText : getStopwatch().elapsedFormatted());
         if (showAnaloguePanel)
         {
-            setClockText(getStopwatch() == null ? clockText : getStopwatch().elapsedFormatted());
             drawAnalogueClock(g);
         }
         else
         {
-            if (stopwatch == null) {
-                logger.debug("stopwatch is null");
-                setClockText(clockText);
-            }
-            else {
-                logger.debug("emptying clock text");
-                setClockText(stopwatch.elapsedFormatted());
-            }
             drawDigitalClock(g);
         }
     }
@@ -114,7 +119,6 @@ public class DisplayTimePanel extends JPanel implements Runnable {
     {
         logger.info("drawing display time panel");
         g.setFont(ClockFrame.font20);
-        //if (clock.isShowFullDate()) g.setFont(ClockFrame.font40);
 
         g.setColor(Color.BLACK);
         g.fillRect(0, 0, 350, 400);

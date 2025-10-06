@@ -1,7 +1,6 @@
 package clock.entity;
 
 import clock.panel.ClockFrame;
-import clock.panel.DisplayTimePanel;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -41,6 +40,7 @@ public class ClockMenuBar extends JMenuBar
                       pauseResumeAllAlarmsSetting,
                       resetAlarmsPanelSetting,
                       showAnalogueTimePanel,
+                      reverseLapsSetting,
     // Options for Features
                       digitalClockFeature,
                       analogueClockFeature,
@@ -117,10 +117,15 @@ public class ClockMenuBar extends JMenuBar
         getResetAlarmsPanelSetting().setForeground(Color.WHITE);
         getResetAlarmsPanelSetting().addActionListener(this::toggleResetAlarmsPanelSetting);
 
-        setShowAnalogueTimePanel(new JMenuItem(SHOW+SPACE+ANALOGUE+SPACE+"Time"));
+        setShowAnalogueTimePanel(new JMenuItem(SHOW+SPACE+ANALOGUE+SPACE+TIME));
         getShowAnalogueTimePanel().setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_T, InputEvent.CTRL_DOWN_MASK));
         getShowAnalogueTimePanel().setForeground(Color.WHITE);
         getShowAnalogueTimePanel().addActionListener(this::toggleTimePanels);
+
+        setReverseLaps(new JMenuItem(REVERSE+SPACE+LAPS));
+        getReverseLaps().setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_R, InputEvent.CTRL_DOWN_MASK));
+        getReverseLaps().setForeground(Color.WHITE);
+        getReverseLaps().addActionListener(this::toggleReverseLapsSetting);
 
         // Features menu choices
         setDigitalClockFeature(new JMenuItem(VIEW_DIGITAL_CLOCK));
@@ -355,7 +360,7 @@ public class ClockMenuBar extends JMenuBar
     /** Toggles between digital and analogue panels */
     protected void toggleTimePanels(ActionEvent action)
     {
-        clockFrame.getStopwatchPanel().switchPanels();
+        clockFrame.getStopwatchPanel().toggleStopwatchClockPanel();
         if (!clockFrame.getStopwatchPanel().getDisplayTimePanel().isShowAnaloguePanel())
         {
             getShowAnalogueTimePanel().setText(SHOW+SPACE+ANALOGUE+SPACE+"Time");
@@ -364,6 +369,22 @@ public class ClockMenuBar extends JMenuBar
         {
             getShowAnalogueTimePanel().setText(SHOW+SPACE+DIGITAL+SPACE+"Time");
         }
+    }
+
+    /** Toggles the reverse laps setting for the stopwatch panel. */
+    protected void toggleReverseLapsSetting(ActionEvent action)
+    {
+        logger.debug("clicked reverse laps setting");
+        if (!clockFrame.getStopwatchPanel().getDisplayLapsPanel().isLapsReversed)
+        {
+            clockFrame.getStopwatchPanel().getDisplayLapsPanel().isLapsReversed = true;
+            getReverseLaps().setText(RESTORE+SPACE+LAPS);
+        } else {
+            clockFrame.getStopwatchPanel().getDisplayLapsPanel().isLapsReversed = false;
+            getReverseLaps().setText(REVERSE+SPACE+LAPS);
+        }
+        clockFrame.getStopwatchPanel().getDisplayLapsPanel().updateLabelsAndStopwatchTable();
+        repaint();
     }
 
     /* Getters */
@@ -380,6 +401,7 @@ public class ClockMenuBar extends JMenuBar
     public JMenuItem getResetAlarmsPanelSetting() { return resetAlarmsPanelSetting; }
     public JMenuItem getShowDigitalTimeOnAnalogueClockSetting() { return this.showDigitalTimeSettingOnAnalogueClockSetting; }
     public JMenuItem getShowAnalogueTimePanel() { return this.showAnalogueTimePanel; }
+    public JMenuItem getReverseLaps() { return this.reverseLapsSetting; }
     public JMenu getChangeTimeZoneMenu() { return this.changeTimeZoneMenuSetting; }
     public java.util.List<JMenuItem> getTimezones() { return this.timezones; }
     public JMenuItem getDigitalClockFeature() { return this.digitalClockFeature; }
@@ -406,6 +428,7 @@ public class ClockMenuBar extends JMenuBar
     protected void setChangeTimeZoneMenu(JMenu changeTimeZone) { this.changeTimeZoneMenuSetting = changeTimeZone; logger.debug("change time zone menu"); }
     protected void setDigitalClockFeature(JMenuItem digitalClockFeature) { this.digitalClockFeature = digitalClockFeature; logger.debug("digital clock feature"); }
     protected void setAnalogueClockFeature(JMenuItem analogueClockFeature) { this.analogueClockFeature = analogueClockFeature; logger.debug("analogue clock feature"); }
+    protected void setReverseLaps(JMenuItem reverseLapsSetting) { this.reverseLapsSetting = reverseLapsSetting; logger.debug("reverse laps setting"); }
     protected void setTimeZones(java.util.List<JMenuItem> timezones) { this.timezones = timezones; logger.debug("timezones list"); }
     protected void setTimerFeature(JMenuItem timerFeature) { this.timerFeature = timerFeature; logger.debug("timer feature"); }
     protected void setStopwatchFeature(JMenuItem stopwatchFeature) { this.stopwatchFeature = stopwatchFeature; logger.debug("stopwatch feature");}

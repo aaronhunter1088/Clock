@@ -52,32 +52,6 @@ public class Stopwatch implements Serializable, Comparable<Stopwatch>, Runnable
     private long pauseStartMilli = 0L;   // when Pause was pressed
     private List<Lap> laps;
 
-    // Convenience
-    public String elapsedFormatted() {
-        logger.debug("elapsedFormatted");
-        long msTotal = accumMilli;
-        long minutes = msTotal / 60_000;
-        long seconds = (msTotal % 60_000) / 1000;
-        long hundredths = msTotal % 1000; // 3 decimals: .000
-        return String.format("%02d:%02d.%03d", minutes, seconds, hundredths);
-    }
-
-    /**
-     * Returns the accumulated elapsed time as a string in MM:SS:MS format
-     * for easy reading and parsing.
-     * @return the accumulated elapsed time as a string in MM:SS:MS format
-     */
-    public String elapsedAccumulated() {
-        logger.debug("elapsedAccumulated");
-        long msTotal = accumMilli;
-        long minutes = msTotal / 60_000;
-        long seconds = (msTotal % 60_000) / 1000;
-        long hundredths = msTotal % 1000; // 3 decimals: .000
-        return String.format("%02d:%02d:%03d", minutes, seconds, hundredths);
-    }
-
-    // end here
-
     /**
      * The main constructor for creating a Stopwatch
      * @param name the name of the stopwatch
@@ -104,16 +78,6 @@ public class Stopwatch implements Serializable, Comparable<Stopwatch>, Runnable
     }
 
     /**
-     * Compares this stopwatch to another stopwatch based
-     * on the string representation of the stopwatch.
-     * Used for sorting stopwatches.
-     * @return a negative integer, zero, or a positive integer
-     */
-    @Override
-    public int compareTo(Stopwatch o)
-    { return this.toString().compareTo(o.toString()); }
-
-    /**
      * This method executes the logic for the stopwatch
      */
     @Override
@@ -123,15 +87,6 @@ public class Stopwatch implements Serializable, Comparable<Stopwatch>, Runnable
         {
             try {
                 performCountUp(System.currentTimeMillis());
-//                if (!paused && !stopped) {
-//                    performCountUp(System.currentTimeMillis());
-//                } else {
-//                    if (paused) {
-//                        //logger.debug("{} is paused", this.getName());
-//                    } else { // if (stopped) {
-//                        //logger.debug("{} is stopped", this.getName());
-//                    }
-//                }
                 sleep(1);
             } catch (InterruptedException e) {
                 throw new RuntimeException(e);
@@ -140,57 +95,39 @@ public class Stopwatch implements Serializable, Comparable<Stopwatch>, Runnable
     }
 
     /**
-     * This method performs the count up
-     * by increasing the seconds, minutes and hours
-     * accordingly. If the stopwatch reaches 24 hours,
-     * it will be deleted.
+     * This method performs the count up logic for the stopwatch.
+     * It checks if the stopwatch is paused, started, or stopped,
+     * and updates the accumulated time accordingly.
      */
     private void performCountUp(long now)
     {
         if (pauseStartMilli != 0L) {
-            logger.debug("{} paused", this.getName());
             // we were paused; add paused duration
             pausedAccumMilli = (now - pauseStartMilli);
-            //pauseStartMilli = 0L;
         } else if (startMilli == 0L) {
-            // first ever start
-            logger.debug("startMilli set to {}", now);
+            // first start
             startMilli = now;
             lastLapMarkMilli = now;
         } else {
-            logger.debug("{} ticking up...", this.getName());
-            accumMilli = elapsedMillis(now); // elapsed(now);
+            accumMilli = (now - startMilli) - totalPausedMilli;
+            endIfMaxAccumMilli();
         }
     }
 
-    // True elapsed, independent of refresh rate
-    public long elapsedMillis(long now)
-    {
-        return (now - startMilli) - totalPausedMilli;
-    }
-
-    @Override
-    public String toString()
-    {
-        final StringBuffer sb = new StringBuffer("Stopwatch {");
-        sb.append("name='").append(name).append('\'');
-        sb.append(", started=").append(started);
-        sb.append(", paused=").append(paused);
-        sb.append(", stopped=").append(stopped);
-        sb.append(", accumulatedNano=").append(accumMilli);
-        sb.append(", laps=").append(laps.size());
-//        sb.append("hours=").append(hours);
-//        sb.append(", minutes=").append(minutes);
-//        sb.append(", seconds=").append(seconds);
-//        sb.append(", name='").append(name).append('\'');
-        sb.append('}');
-        return sb.toString();
-    }
-
     /**
-     * This method begins the thread
-     * that runs the stopwatch.
+     * This method checks if the accumulated time has reached the maximum value.
+     * If it has, the stopwatch is stopped.
      */
+    private void endIfMaxAccumMilli()
+    {
+        if (accumMilli >= Duration.of(1, ChronoUnit.HOURS).toMillis())
+        {
+            logger.info("{} has reached max time of 1 hour, stopping", this);
+            stopStopwatch();
+        }
+    }
+
+    /** This method begins the thread that runs the stopwatch. */
     public synchronized void startStopwatch()
     {
         if (selfThread == null)
@@ -206,21 +143,17 @@ public class Stopwatch implements Serializable, Comparable<Stopwatch>, Runnable
      */
     public synchronized void stopStopwatch()
     {
-        logger.info("stopping {}", this);
         setStopped(true);
-        setSelfThread(null); // TODO: Check if this is best way to stop thread
+        setSelfThread(null);
         logger.info("{} stopwatch stopped", this);
     }
 
-    /**
-     * Pauses the stopwatch
-     */
+    /** Pauses the stopwatch */
     public synchronized void pauseStopwatch()
     {
-        logger.info("pausing {}", this);
         pauseStartMilli = System.currentTimeMillis();
         setPaused(true);
-        //setStopped(false);
+        logger.info("{} paused", this);
     }
 
     /**
@@ -228,28 +161,13 @@ public class Stopwatch implements Serializable, Comparable<Stopwatch>, Runnable
      */
     public synchronized void resumeStopwatch()
     {
-        logger.info("resuming {}", this);
-        if (pauseStartMilli != 0L) {
+        if (pauseStartMilli != 0L)
+        {
             pauseStartMilli = 0L;
             totalPausedMilli += pausedAccumMilli;
         }
         setPaused(false);
-    }
-
-    /**
-     * Resets the stopwatch to its initial state.
-     */
-    public synchronized void resetStopwatch()
-    {
-        logger.info("resetting {}", this);
-        setStarted(false);
-        setStopped(false);
-        setPaused(false);
-        startMilli = 0L;
-        accumMilli = 0L;
-        pausedAccumMilli = 0L;
-        pauseStartMilli = 0L;
-        logger.info("{} stopwatch reset", this);
+        logger.info("resuming {}", this);
     }
 
     /**
@@ -260,10 +178,8 @@ public class Stopwatch implements Serializable, Comparable<Stopwatch>, Runnable
     public void recordLap()
     {
         long now = System.currentTimeMillis();
-        //long el = elapsed(now); // now - startMilli
-        //Duration elapsed = Duration.ofMillis(el);
-        //Duration length = Duration.ofMillis(now - lastLapMarkMilli);
-        Lap lap = new Lap(laps.size() + 1, elapsed(now), (now - lastLapMarkMilli - pausedAccumMilli), this);
+        Lap lap = new Lap(laps.size() + 1, (now - startMilli - totalPausedMilli),
+                          (now - lastLapMarkMilli - pausedAccumMilli), this);
         lastLapMarkMilli = now;
         pausedAccumMilli = 0L; // reset
         String mmssms = lap.getFormattedDuration();
@@ -272,30 +188,59 @@ public class Stopwatch implements Serializable, Comparable<Stopwatch>, Runnable
     }
 
     /**
-     * This method returns the elapsed time in milliseconds
-     * since the last start or lap event. It also updates
-     * the accumulated time.
-     * @return the elapsed time since the last event
+     * Returns the elapsed time as a formatted string in MM:SS.MiS format.
+     * @return the elapsed time as a formatted string in MM:SS.MiS format
      */
-    public synchronized long elapsed(long now)
+    public String elapsedFormatted()
     {
-        return now - startMilli - totalPausedMilli; // currentElapsed
+        logger.debug("elapsedFormatted");
+        long msTotal = accumMilli;
+        long minutes = msTotal / 60_000;
+        long seconds = (msTotal % 60_000) / 1000;
+        long hundredths = msTotal % 1000;
+        return String.format("%02d:%02d.%03d", minutes, seconds, hundredths);
     }
 
     /**
-     * This method prints the stack trace of an exception
-     * that may occur when the digital panel is in use.
-     * @param e the exception
-     * @param message the message to print
+     * Returns the accumulated elapsed time as a string in MM:SS:MiS format.
+     * @return the accumulated elapsed time as a string in MM:SS:MiS format
      */
-    private void printStackTrace(Exception e, String message)
+    public String elapsedAccumulated()
     {
-        if (null != message)
-            logger.error(message);
-        else
-            logger.error(e.getMessage());
-        for(StackTraceElement ste : e.getStackTrace())
-        { logger.error(ste.toString()); }
+        logger.debug("elapsedAccumulated");
+        long msTotal = accumMilli;
+        long minutes = msTotal / 60_000;
+        long seconds = (msTotal % 60_000) / 1000;
+        long hundredths = msTotal % 1000;
+        return String.format("%02d:%02d:%03d", minutes, seconds, hundredths);
+    }
+
+    /**
+     * Compares this stopwatch to another stopwatch based
+     * on the string representation of the stopwatch.
+     * Used for sorting stopwatches.
+     * @return a negative integer, zero, or a positive integer
+     */
+    @Override
+    public int compareTo(Stopwatch o)
+    { return this.toString().compareTo(o.toString()); }
+
+    /**
+     * Provides a string representation of the Stopwatch
+     * @return a string representation of the Stopwatch
+     */
+    @Override
+    public String toString()
+    {
+        final StringBuffer sb = new StringBuffer("Stopwatch {");
+        sb.append("name='").append(name).append('\'');
+        sb.append(", started=").append(started);
+        sb.append(", paused=").append(paused);
+        sb.append(", stopped=").append(stopped);
+        sb.append(", accumulatedNano=").append(accumMilli);
+        sb.append(", laps=").append(laps.size());
+        sb.append('}');
+        return sb.toString();
     }
 
     /* Getters */
