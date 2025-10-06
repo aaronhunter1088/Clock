@@ -219,7 +219,7 @@ public class ClockMenuBar extends JMenuBar
     @Override
     protected void paintComponent(Graphics g)
     {
-        logger.info("paint component");
+        logger.debug("paint component");
         super.paintComponent(g);
         Graphics2D g2d = (Graphics2D) g;
         g2d.setColor(Color.BLACK);

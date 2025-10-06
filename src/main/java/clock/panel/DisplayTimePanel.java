@@ -117,7 +117,7 @@ public class DisplayTimePanel extends JPanel implements Runnable
 
     public void drawDigitalClock(Graphics g)
     {
-        logger.info("drawing display time panel");
+        logger.debug("drawing display time panel");
         g.setFont(ClockFrame.font20);
 
         g.setColor(Color.BLACK);
@@ -163,7 +163,7 @@ public class DisplayTimePanel extends JPanel implements Runnable
      */
     public void drawAnalogueClock(Graphics g)
     {
-        logger.info("painting analogue clock panel");
+        logger.debug("painting analogue clock panel");
         int width = getWidth();
         int height = getHeight();
         int diameter = Math.min(width, height) - 20; // leave some margin

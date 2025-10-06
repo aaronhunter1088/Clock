@@ -475,7 +475,7 @@ public class Clock implements Serializable, Comparable<Clock>, Runnable
      */
     public void tick(int seconds, int minutes, int hours)
     {
-        logger.info("tick rate: sec: {} min: {} hrs: {}", seconds, minutes, hours);
+        logger.debug("tick rate: sec: {} min: {} hrs: {}", seconds, minutes, hours);
         performTick(seconds, minutes, hours);
         setActiveAlarms();
         setActiveTimers();
@@ -493,7 +493,7 @@ public class Clock implements Serializable, Comparable<Clock>, Runnable
      */
     private void performTick(Integer seconds, Integer minutes, Integer hours)
     {
-        logger.info("performing tick...");
+        logger.debug("performing tick...");
         setSeconds(this.seconds+seconds);
         if (this.seconds >= 60)
         {

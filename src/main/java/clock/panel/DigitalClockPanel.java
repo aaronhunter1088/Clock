@@ -127,7 +127,7 @@ public class DigitalClockPanel extends ClockPanel implements Runnable
     @Override
     public void paint(Graphics g)
     {
-        logger.info("painting digital clock panel");
+        logger.debug("painting digital clock panel");
         drawStructure(g);
     }
 
@@ -137,7 +137,7 @@ public class DigitalClockPanel extends ClockPanel implements Runnable
      */
     public void drawStructure(Graphics g)
     {
-        logger.info("drawing structure");
+        logger.debug("drawing structure");
         g.setFont(ClockFrame.font60);
         if (clock.isShowFullDate()) g.setFont(ClockFrame.font40);
 

@@ -46,6 +46,7 @@ public class Stopwatch implements Serializable, Comparable<Stopwatch>, Runnable
     private Thread selfThread;
     private long startMilli = 0L;           // last start() nano timestamp
     private long accumMilli = 0L;     // time accumulated across previous runs
+    private long accumMilliInSec = 0L;
     private long lastLapMarkMilli = 0L;     // elapsed ns at last lap
     private long pausedAccumMilli = 0L;  // total paused duration accumulated
     private long totalPausedMilli = 0L;   // total paused duration accumulated
@@ -74,56 +75,6 @@ public class Stopwatch implements Serializable, Comparable<Stopwatch>, Runnable
         if (stopwatchCounter == 100L) {
             logger.info("Restarting counter for stopwatchCounter");
             stopwatchCounter = 0L;
-        }
-    }
-
-    /**
-     * This method executes the logic for the stopwatch
-     */
-    @Override
-    public void run()
-    {
-        while (selfThread != null)
-        {
-            try {
-                performCountUp(System.currentTimeMillis());
-                sleep(1);
-            } catch (InterruptedException e) {
-                throw new RuntimeException(e);
-            }
-        }
-    }
-
-    /**
-     * This method performs the count up logic for the stopwatch.
-     * It checks if the stopwatch is paused, started, or stopped,
-     * and updates the accumulated time accordingly.
-     */
-    private void performCountUp(long now)
-    {
-        if (pauseStartMilli != 0L) {
-            // we were paused; add paused duration
-            pausedAccumMilli = (now - pauseStartMilli);
-        } else if (startMilli == 0L) {
-            // first start
-            startMilli = now;
-            lastLapMarkMilli = now;
-        } else {
-            accumMilli = (now - startMilli) - totalPausedMilli;
-            endIfMaxAccumMilli();
-        }
-    }
-
-    /**
-     * This method checks if the accumulated time has reached the maximum value.
-     * If it has, the stopwatch is stopped.
-     */
-    private void endIfMaxAccumMilli()
-    {
-        if (accumMilli >= Duration.of(1, ChronoUnit.HOURS).toMillis())
-        {
-            logger.info("{} has reached max time of 1 hour, stopping", this);
-            stopStopwatch();
         }
     }
 
@@ -171,6 +122,62 @@ public class Stopwatch implements Serializable, Comparable<Stopwatch>, Runnable
     }
 
     /**
+     * This method executes the logic for the stopwatch
+     */
+    @Override
+    public void run()
+    {
+        while (selfThread != null)
+        {
+            try {
+                performCountUp(System.currentTimeMillis());
+                sleep(1);
+            } catch (InterruptedException e) {
+                throw new RuntimeException(e);
+            }
+        }
+    }
+
+    /**
+     * This method performs the count up logic for the stopwatch.
+     * It checks if the stopwatch is paused, started, or stopped,
+     * and updates the accumulated time accordingly.
+     */
+    private void performCountUp(long now)
+    {
+        if (pauseStartMilli != 0L) {
+            // we were paused; add paused duration
+            pausedAccumMilli = (now - pauseStartMilli);
+        } else if (startMilli == 0L) {
+            // first start
+            startMilli = now;
+            lastLapMarkMilli = now;
+        } else {
+            accumMilli = (now - startMilli) - totalPausedMilli;
+            long accumMilliAsSeconds = Duration.ofMillis(accumMilli).getSeconds();
+            if (accumMilliInSec < accumMilliAsSeconds)
+            {
+                accumMilliInSec = accumMilliAsSeconds;
+                logger.info("{} elapsed time: {}", this.getName(), elapsedFormatted());
+            }
+            endIfMaxAccumMilli();
+        }
+    }
+
+    /**
+     * This method checks if the accumulated time has reached the maximum value.
+     * If it has, the stopwatch is stopped.
+     */
+    private void endIfMaxAccumMilli()
+    {
+        if (accumMilli >= Duration.of(1, ChronoUnit.HOURS).toMillis())
+        {
+            logger.info("{} has reached max time of 1 hour, stopping", this);
+            stopStopwatch();
+        }
+    }
+
+    /**
      * Records a lap for the stopwatch.
      * Logic: Take the time (now), get the minutes, seconds and milliseconds since last lap.
      * Subtract the now from the last lap to get duration of lap.
@@ -183,7 +190,7 @@ public class Stopwatch implements Serializable, Comparable<Stopwatch>, Runnable
         lastLapMarkMilli = now;
         pausedAccumMilli = 0L; // reset
         String mmssms = lap.getFormattedDuration();
-        logger.info("Recording lap {}, time: {} for stopwatch:{}", lap.getLapNumber(), mmssms, this.getName());
+        logger.info("Recording lap #{}, time: {} for stopwatch:{}", lap.getLapNumber(), mmssms, this.getName());
         laps.add(lap);
     }
 

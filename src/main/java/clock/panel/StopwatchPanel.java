@@ -297,6 +297,7 @@ public class StopwatchPanel extends ClockPanel
         displayLapsPanel.updateLabelsAndStopwatchTable();
         startButton.setText(PAUSE);
         lapButton.setText(LAP);
+        logger.info("Started new stopwatch with name: {}", name);
     }
 
     /** Resumes the current stopwatch */
@@ -315,6 +316,7 @@ public class StopwatchPanel extends ClockPanel
         displayTimePanel.setClockText(currentStopwatch.elapsedFormatted());
         startButton.setText(PAUSE);
         lapButton.setText(LAP);
+        logger.info("Resuming stopwatch with name: {}", currentStopwatch.getName());
     }
 
     /** Pauses the current stopwatch */
@@ -323,6 +325,7 @@ public class StopwatchPanel extends ClockPanel
         displayTimePanel.stop(); // also pauses the stopwatch
         startButton.setText(RESUME);
         lapButton.setText(RESET);
+        logger.info("Paused stopwatch with name: {}", currentStopwatch.getName());
     }
 
     /** Records a lap for the current stopwatch */
