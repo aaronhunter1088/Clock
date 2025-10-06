@@ -40,53 +40,11 @@ class DisplayLapsPanel extends JPanel { //implements Runnable {
         setDefaultLayout();
     }
 
-//    /**
-//     * Starts the display laps panel thread
-//     * and internally calls the run method.
-//     */
-//    public void start()
-//    {
-//        logger.debug("starting display laps panel");
-//        if (thread == null)
-//        {
-//            thread = new Thread(this);
-//            thread.start();
-//        }
-//    }
-//
-//    /** Stops the display laps panel thread. */
-//    public void stop()
-//    {
-//        logger.debug("stopping laps display panel");
-//        thread = null;
-//    }
-//
-//    // TODO: Does this need to be 'running'?
-//    /** Repaints the display laps panel */
-//    @Override
-//    public void run()
-//    {
-//        while (thread != null)
-//        {
-//            try
-//            {
-//                resetPanel();
-//                // TODO: Add table of laps with stopwatch name
-//                updateLabelsAndStopwatchTable();
-//                // Label should be clickable.
-//                sleep(50);
-//            }
-//            catch (InterruptedException e)
-//            {}
-//        }
-//    }
-
     @Override
     public void paint(Graphics g) {
         super.paint(g);
     }
 
-    // TODO: We only create one table, but it's a table per stopwatch
     public void updateLabelsAndStopwatchTable()
     {
         resetPanel();
@@ -98,11 +56,14 @@ class DisplayLapsPanel extends JPanel { //implements Runnable {
         viewAll.setBackground(Color.BLACK);
         viewAll.setForeground(Color.BLUE);
         viewAll.addActionListener(this::viewStopwatchesTable);
+        constraints.anchor = GridBagConstraints.FIRST_LINE_START;
         addComponent(viewAll, 0, 0, 1, 1, 5,5,1,0, GridBagConstraints.NONE, new Insets(5,5,5,5));
 
         JLabel label = new JLabel(stopwatch.getName());
         label.setForeground(Color.WHITE);
         label.setFont(ClockFrame.font20);
+        constraints.anchor = GridBagConstraints.CENTER;
+        addComponent(label, 0, 1, 1, 1, 5,5,1,0, GridBagConstraints.NONE, new Insets(5,5,5,5));
 
         List<Stopwatch> stopwatches = List.of(stopwatch); //getStopwatch().getClock().getListOfStopwatches();
         stopwatches.forEach(stopwatch -> {
@@ -115,20 +76,16 @@ class DisplayLapsPanel extends JPanel { //implements Runnable {
                 data[i][2] = stopwatch.getLaps().get(i).getFormattedDuration();
             }
             lapsTable = new JTable(data, columnNames);
-            constraints.anchor = GridBagConstraints.FIRST_LINE_START;
-            addComponent(label, 0, 1, 1, 1, 5,5,1,0, GridBagConstraints.NONE, new Insets(5,5,5,5));
             JScrollPane scrollPane = new JScrollPane(lapsTable);
             constraints = new GridBagConstraints();
             addComponent(scrollPane, 1, 0, 2, 1, 5,5,1,1, GridBagConstraints.BOTH, new Insets(5,5,5,5));
         });
-        // called immediately after returning
-        //revalidate();
-        //repaint();
     }
 
+    /** The default layout of the panel */
     public void setDefaultLayout()
     {
-        JLabel label = new JLabel("Sw1");
+        JLabel label = new JLabel("Sw" + (Stopwatch.stopwatchCounter + 1));
         label.setForeground(Color.WHITE);
         label.setFont(ClockFrame.font20);
         // add a space or some gap, if needed
@@ -169,8 +126,8 @@ class DisplayLapsPanel extends JPanel { //implements Runnable {
      * The main method used for adding components
      * to the alarm panel
      * @param cpt       the component to add
-     * @param gridy     the y position
-     * @param gridx     the x position
+     * @param rowy     the y position
+     * @param rowx     the x position
      * @param gwidth    the width
      * @param gheight   the height
      * @param ipadx     the x padding
@@ -178,12 +135,12 @@ class DisplayLapsPanel extends JPanel { //implements Runnable {
      * @param fill      the fill
      * @param insets    the insets
      */
-    public void addComponent(Component cpt, int gridy, int gridx, double gwidth, double gheight,
+    public void addComponent(Component cpt, int rowy, int rowx, double gwidth, double gheight,
                              int ipadx, int ipady, int weightx, int weighty, int fill, Insets insets)
     {
         logger.debug("add component");
-        constraints.gridx = gridx;
-        constraints.gridy = gridy;
+        constraints.gridx = rowx;
+        constraints.gridy = rowy;
         constraints.gridwidth = (int)Math.ceil(gwidth);
         constraints.gridheight = (int)Math.ceil(gheight);
         constraints.fill = fill;
