@@ -35,21 +35,17 @@ public class Stopwatch implements Serializable, Comparable<Stopwatch>, Runnable
     private static final long serialVersionUID = 1L;
     private static final Logger logger = LogManager.getLogger(Stopwatch.class);
     public static long stopwatchCounter = 0L;
-    private String name,
-                   hoursAsStr,
-                   minutesAsStr,
-                   secondsAsStr;
+    private String name;
     private boolean paused,
-                    started,
-                    stopped;
+                    started;
     private Clock clock;
-    private Thread selfThread;
-    private long startMilli = 0L;           // last start() nano timestamp
-    private long accumMilli = 0L;     // time accumulated across previous runs
-    private long accumMilliInSec = 0L;
-    private long lastLapMarkMilli = 0L;     // elapsed ns at last lap
+    private volatile Thread selfThread;
+    private long startMilli = 0L;        // start time in milliseconds
+    private long accumMilli = 0L;        // time accumulated across previous runs
+    private long accumMilliInSec = 0L;   // accum in seconds for logging
+    private long lastLapMarkMilli = 0L;  // elapsed ns at last lap
     private long pausedAccumMilli = 0L;  // total paused duration accumulated
-    private long totalPausedMilli = 0L;   // total paused duration accumulated
+    private long totalPausedMilli = 0L;  // total paused duration accumulated
     private long pauseStartMilli = 0L;   // when Pause was pressed
     private List<Lap> laps;
 
@@ -58,15 +54,13 @@ public class Stopwatch implements Serializable, Comparable<Stopwatch>, Runnable
      * @param name the name of the stopwatch
      * @param started whether the stopwatch has been started
      * @param paused whether the stopwatch is paused
-     * @param stopped whether the stopwatch has been stopped
      * @param clock the clock object associated with this stopwatch
      * @throws IllegalArgumentException if the input values are invalid
      */
-    public Stopwatch(String name, boolean started, boolean paused, boolean stopped, Clock clock)
+    public Stopwatch(String name, boolean started, boolean paused, Clock clock)
     {
         setName(name);
         setStarted(started);
-        setStopped(stopped);
         setPaused(paused);
         setClock(clock);
         setLaps(new ArrayList<>());
@@ -94,7 +88,6 @@ public class Stopwatch implements Serializable, Comparable<Stopwatch>, Runnable
      */
     public synchronized void stopStopwatch()
     {
-        setStopped(true);
         setSelfThread(null);
         logger.info("{} stopwatch stopped", this);
     }
@@ -158,8 +151,8 @@ public class Stopwatch implements Serializable, Comparable<Stopwatch>, Runnable
             if (accumMilliInSec < accumMilliAsSeconds)
             {
                 accumMilliInSec = accumMilliAsSeconds;
-                logger.info("{} elapsed time: {}", this.getName(), elapsedFormatted());
             }
+            logger.info("{} elapsed time: {}", this.getName(), elapsedFormatted());
             endIfMaxAccumMilli();
         }
     }
@@ -224,13 +217,12 @@ public class Stopwatch implements Serializable, Comparable<Stopwatch>, Runnable
 
     /**
      * Compares this stopwatch to another stopwatch based
-     * on the string representation of the stopwatch.
-     * Used for sorting stopwatches.
+     * on the stopwatch name.
      * @return a negative integer, zero, or a positive integer
      */
     @Override
     public int compareTo(Stopwatch o)
-    { return this.toString().compareTo(o.toString()); }
+    { return this.getName().compareTo(o.getName()); }
 
     /**
      * Provides a string representation of the Stopwatch
@@ -243,7 +235,6 @@ public class Stopwatch implements Serializable, Comparable<Stopwatch>, Runnable
         sb.append("name='").append(name).append('\'');
         sb.append(", started=").append(started);
         sb.append(", paused=").append(paused);
-        sb.append(", stopped=").append(stopped);
         sb.append(", accumulatedNano=").append(accumMilli);
         sb.append(", laps=").append(laps.size());
         sb.append('}');
@@ -253,20 +244,19 @@ public class Stopwatch implements Serializable, Comparable<Stopwatch>, Runnable
     /* Getters */
     public Clock getClock() { return clock; }
     public boolean isPaused() { return paused; }
-    public String getSecondsAsStr() { return secondsAsStr; }
     public String getName() { return name; }
     public boolean isStarted() { return started; }
-    public boolean isStopped() { return stopped; }
     public Thread getSelfThread() { return selfThread; }
     public List<Lap> getLaps() { return laps; }
+    public long getPauseStartMilli() { return pauseStartMilli; }
+    public long getTotalPausedMilli() { return totalPausedMilli; }
+    public long getLastLapMarkMilli() { return lastLapMarkMilli; }
 
     /* Setters */
     public void setClock(Clock clock) { this.clock = clock; logger.debug("clock set"); }
-    public void setSecondsAsStr(String secondsAsStr) { this.secondsAsStr = secondsAsStr; logger.debug("secondsAsStr set to {}", secondsAsStr); }
     public void setPaused(boolean paused) { this.paused = paused; logger.debug("paused set to {}", paused); }
     public void setName(String name) { this.name = name; logger.debug("name set to {}", name); }
     public void setStarted(boolean started) { this.started = started; logger.debug("started set to {}", started); }
-    public void setStopped(boolean stopped) { this.stopped = stopped; logger.debug("stopped set to {}", stopped); }
     public void setSelfThread(Thread selfThread) { this.selfThread = selfThread; logger.debug("selfThread set to {}", selfThread); }
     public void setLaps(List<Lap> laps) { this.laps = laps; logger.debug("laps set"); }
 }

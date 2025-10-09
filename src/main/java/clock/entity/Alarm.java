@@ -51,7 +51,7 @@ public class Alarm implements Serializable, Comparable<Alarm>, Runnable
                     isSnoozing,
                     isPaused;
     private Clock clock;
-    private Thread selfThread;
+    private volatile Thread selfThread;
     private AdvancedPlayer musicPlayer;
 
     /**
@@ -104,7 +104,7 @@ public class Alarm implements Serializable, Comparable<Alarm>, Runnable
      */
     public void setupMusicPlayer()
     {
-        logger.info("setup music player");
+        logger.debug("setup music player");
         InputStream inputStream = null;
         try
         {
@@ -125,7 +125,7 @@ public class Alarm implements Serializable, Comparable<Alarm>, Runnable
      */
     public void stopAlarm()
     {
-        logger.info("stop alarm");
+        logger.debug("stopping alarm");
         musicPlayer = null;
         alarmGoingOff = false;
         selfThread = null;
@@ -178,6 +178,7 @@ public class Alarm implements Serializable, Comparable<Alarm>, Runnable
     {
         if (selfThread == null)
         {
+            logger.debug("starting alarm");
             setSelfThread(selfThread = new Thread(this));
             selfThread.start();
         }

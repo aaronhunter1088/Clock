@@ -43,7 +43,7 @@ public class Timer implements Serializable, Comparable<Timer>, Runnable
                     started, triggered,
                     stopped;
     private Clock clock;
-    private Thread selfThread;
+    private volatile Thread selfThread;
     private LocalTime countDown;
     private AdvancedPlayer musicPlayer;
 

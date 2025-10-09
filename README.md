@@ -80,6 +80,11 @@ On the Stopwatches panel, you can change the following settings:
 * (Ctrl + T) Show Analogue/Digital Time: This will toggle the stopwatch time between analogue and digital modes.
 * (Ctrl + R) Reverse Laps Order: This toggle will reverse the order of the laps for all stopwatches.
 
+Tests
+The application is tested using JUnit 5 and Mockito. Some tests requires user interaction to 
+continue. Simply close any popups to allow the tests to continue.
+```
+
 # History
 v2.9 Updated to use my parent pom. Multiple timers. Multiple ways to start the application.
 Java was upgraded to 21. Multiple stopwatches were added.

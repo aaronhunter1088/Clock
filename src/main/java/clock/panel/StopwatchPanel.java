@@ -288,7 +288,7 @@ public class StopwatchPanel extends ClockPanel
     private void startStopwatch()
     {
         String name = stopwatchNameField.getText();
-        Stopwatch stopwatch = new Stopwatch(name, false, false, false, clock);
+        Stopwatch stopwatch = new Stopwatch(name, false, false, clock);
         clock.getListOfStopwatches().add(stopwatch);
         currentStopwatch = stopwatch;
         displayTimePanel.setStopwatch(currentStopwatch);

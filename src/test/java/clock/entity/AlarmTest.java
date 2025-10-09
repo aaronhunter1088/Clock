@@ -41,10 +41,9 @@ class AlarmTest {
 
     private Clock clock;
     private final List<DayOfWeek> weekDays = List.of(DayOfWeek.MONDAY, TUESDAY, WEDNESDAY, THURSDAY, DayOfWeek.FRIDAY),
-            weekendDays = List.of(DayOfWeek.SATURDAY, DayOfWeek.SUNDAY);
+                                  weekendDays = List.of(DayOfWeek.SATURDAY, DayOfWeek.SUNDAY);
     @InjectMocks
     private Alarm alarm1, alarm2, weekDays730AmAlarm, weekend10AmAlarm;
-
     @Mock
     private AdvancedPlayer musicPlayerMock;
 
@@ -63,7 +62,14 @@ class AlarmTest {
 
     @AfterEach
     void afterEach()
-    {}
+    {
+        javax.swing.SwingUtilities.invokeLater(() -> {
+            alarm1.stopAlarm();
+            alarm2.stopAlarm();
+            weekDays730AmAlarm.stopAlarm();
+            weekend10AmAlarm.stopAlarm();
+        });
+    }
 
     @AfterAll
     static void afterAll() { logger.info("Concluding {}", AlarmTest.class.getSimpleName()); }
