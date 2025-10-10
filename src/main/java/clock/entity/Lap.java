@@ -18,7 +18,7 @@ import java.io.Serializable;
  * @author michael ball
  * @version 2.9
  */
-public class Lap implements Serializable, Comparable<Lap>
+public class Lap implements Serializable, Comparable<Lap>, Cloneable
 {
     @Serial
     private static final long serialVersionUID = 1L;
@@ -70,7 +70,7 @@ public class Lap implements Serializable, Comparable<Lap>
     }
 
     /**
-     * Compares this Lap to another Lap based on their lap numbers.
+     * Compares this Lap to another Lap based on their lapNumber.
      * @param o the object to be compared.
      * @return a negative integer, zero, or a positive integer
      */
@@ -104,4 +104,15 @@ public class Lap implements Serializable, Comparable<Lap>
     public void setDuration(long duration) { this.duration = duration; logger.debug("duration set to {} seconds", duration); }
     public void setLapTime(long lapTime) { this.lapTime = lapTime; logger.debug("lapTime set to {}", lapTime); }
     public void setStopwatch(Stopwatch stopwatch) { this.stopwatch = stopwatch; logger.debug("stopwatch set to {}", stopwatch); }
+
+    @Override
+    public Lap clone() {
+        try {
+            Lap clone = (Lap) super.clone();
+            clone.setStopwatch(new Stopwatch(stopwatch.getName(), stopwatch.isStarted(), stopwatch.isPaused(), stopwatch.getClock()));
+            return clone;
+        } catch (CloneNotSupportedException e) {
+            throw new InternalError();
+        }
+    }
 }
