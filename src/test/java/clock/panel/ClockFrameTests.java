@@ -51,7 +51,12 @@ public class ClockFrameTests
 
     @AfterEach
     void afterEach()
-    {}
+    {
+        clockFrame.stop();
+    }
+
+    @AfterAll
+    static void afterAll() { logger.info("Concluding {}", ClockFrameTests.class.getSimpleName()); }
 
     @Test
     @DisplayName("Test ClockFrame no-args constructor")

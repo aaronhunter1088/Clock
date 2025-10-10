@@ -53,7 +53,12 @@ public class AnalogueClockPanelTests
 
     @AfterEach
     void afterEach()
-    {}
+    {
+        analogueClockPanel.getClockFrame().stop();
+    }
+
+    @AfterAll
+    static void afterAll() { logger.info("Concluding {}", AnalogueClockPanelTests.class.getSimpleName()); }
 
     @Test
     @DisplayName("Test AnalogueClockPanel Initialization")

@@ -57,7 +57,9 @@ class TimerPanelTests
 
     @AfterEach
     void afterEach()
-    {}
+    {
+        timerPanel.getClockFrame().stop();
+    }
 
     @AfterAll
     static void afterAll() { logger.info("Concluding {}", TimerPanelTests.class.getSimpleName()); }

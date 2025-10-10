@@ -25,14 +25,20 @@ public class Main
 {
     private final static Logger logger = LogManager.getLogger(Main.class);
 
+    private static ClockFrame clockFrame;
+
     /**
      * Main method to start the Clock
      *
      * @param args command line arguments
      */
-    public static void main(String[] args) {
+    public static void main(String[] args)
+    {
         startMain(args);
-        Runtime.getRuntime().addShutdownHook(new Thread(() -> logger.info("Closing Clock")));
+        Runtime.getRuntime().addShutdownHook(new Thread(() -> {
+            clockFrame.stop();
+            logger.info("Closing Clock");
+        }));
     }
 
     /**
@@ -90,7 +96,9 @@ public class Main
     public static void specificPanelStart(String[] args)
     {
         Panel type = Panel.valueOf(List.of(args[0].split(COMMA)).get(1).toUpperCase());
-        SwingUtilities.invokeLater(() -> ClockFrame.createAndShowGUI(type));
+        SwingUtilities.invokeLater(() -> {
+            clockFrame = ClockFrame.createAndShowGUI(type);
+        });
     }
 
     /**

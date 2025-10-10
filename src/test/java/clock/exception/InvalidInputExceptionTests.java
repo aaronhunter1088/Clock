@@ -2,10 +2,7 @@ package clock.exception;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.*;
 
 import java.time.Month;
 
@@ -35,6 +32,9 @@ class InvalidInputExceptionTests
 
     @AfterEach
     void afterEach() {}
+
+    @AfterAll
+    static void afterAll() { logger.info("Concluding {}", InvalidInputExceptionTests.class.getSimpleName()); }
 
     @Test
     void whenAValidMonthIsGivenReturnAValidInteger()

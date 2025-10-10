@@ -55,7 +55,7 @@ class AlarmPanelTests
     @AfterEach
     void afterEach()
     {
-        alarmPanel = null;
+        alarmPanel.getClockFrame().stop();
     }
 
     @AfterAll

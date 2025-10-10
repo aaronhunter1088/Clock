@@ -50,8 +50,7 @@ public class ClockMenuBarTests
     {}
 
     @AfterAll
-    static void afterAll()
-    { logger.info("Concluding {}", ClockMenuBarTests.class.getSimpleName()); }
+    static void afterAll() { logger.info("Concluding {}", ClockMenuBarTests.class.getSimpleName()); }
 
     @ParameterizedTest
     @DisplayName("Test Toggle Military Time Setting")

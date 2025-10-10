@@ -34,6 +34,9 @@ class PanelTypeTests
     @AfterEach
     void afterEach() {}
 
+    @AfterAll
+    static void afterAll() { logger.info("Concluding {}", PanelTypeTests.class.getSimpleName()); }
+
     @Test
     @DisplayName("Panel Types are Different")
     void testClockFacesAreDifferent()

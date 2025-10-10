@@ -39,9 +39,7 @@ public class StopwatchTests {
 
     @AfterEach
     void afterEach()
-    {
-
-    }
+    {}
 
     @AfterAll
     static void afterAll() { logger.info("Concluding {}", StopwatchTests.class.getSimpleName()); }

@@ -324,11 +324,12 @@ public class ClockFrame extends JFrame
      * with a specific panel type.
      * @param panelType the panel type to display
      */
-    public static void createAndShowGUI(Panel panelType)
+    public static ClockFrame createAndShowGUI(Panel panelType)
     {
         logger.info("Starting Clock with panel type: {}", panelType);
         ClockFrame clockFrame = new ClockFrame(panelType);
         clockFrame.start();
+        return clockFrame;
     }
 
     /**

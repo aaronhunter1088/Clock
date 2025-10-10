@@ -3,10 +3,7 @@ package clock.panel;
 import clock.entity.Clock;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.*;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
 import org.mockito.MockitoAnnotations;
@@ -47,6 +44,9 @@ public class ClockPanelTests
     @AfterEach
     void afterEach()
     {}
+
+    @AfterAll
+    static void afterAll() { logger.info("Concluding {}", ClockPanelTests.class.getSimpleName()); }
 
     @ParameterizedTest
     @DisplayName("Test Display Popup Message")

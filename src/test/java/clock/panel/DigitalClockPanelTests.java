@@ -1,6 +1,5 @@
 package clock.panel;
 
-import clock.entity.Panel;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.junit.jupiter.api.*;
@@ -30,6 +29,9 @@ public class DigitalClockPanelTests
 
     @AfterEach
     void afterEach() {}
+
+    @AfterAll
+    static void afterAll() { logger.info("Concluding {}", DigitalClockPanelTests.class.getSimpleName()); }
 
     @Test
     @DisplayName("Test DigitalClockPanel Initialization")

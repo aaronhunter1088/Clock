@@ -63,12 +63,10 @@ class AlarmTests {
     @AfterEach
     void afterEach()
     {
-        javax.swing.SwingUtilities.invokeLater(() -> {
-            alarm1.stopAlarm();
-            alarm2.stopAlarm();
-            weekDays730AmAlarm.stopAlarm();
-            weekend10AmAlarm.stopAlarm();
-        });
+        alarm1.stopAlarm();
+        alarm2.stopAlarm();
+        weekDays730AmAlarm.stopAlarm();
+        weekend10AmAlarm.stopAlarm();
     }
 
     @AfterAll

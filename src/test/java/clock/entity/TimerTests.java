@@ -41,7 +41,10 @@ class TimerTests
 
     @AfterEach
     void afterEach()
-    {}
+    {
+        if (timer1 != null) timer1.stopTimer();
+        if (timer2 != null) timer2.stopTimer();
+    }
 
     @AfterAll
     static void afterAll() { logger.info("Concluding {}", TimerTests.class.getSimpleName()); }

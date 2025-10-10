@@ -34,9 +34,7 @@ class LapTests {
 
     @AfterEach
     void afterEach()
-    {
-
-    }
+    {}
 
     @AfterAll
     static void afterAll() { logger.info("Concluding {}", LapTests.class.getSimpleName()); }
