@@ -34,6 +34,7 @@ public class DisplayTimePanel extends JPanel implements Runnable
     {
         super();
         this.stopwatchPanel = stopwatchPanel;
+        this.stopwatch = stopwatchPanel.getCurrentStopwatch();
         setPreferredSize(ClockFrame.analogueSize);
         setMinimumSize(ClockFrame.analogueSize);
         setMaximumSize(ClockFrame.analogueSize);
@@ -104,7 +105,7 @@ public class DisplayTimePanel extends JPanel implements Runnable
     public void paint(Graphics g)
     {
         super.paint(g);
-        setClockText(getStopwatch() == null ? clockText : getStopwatch().elapsedFormatted());
+        setClockText(stopwatchPanel.getCurrentStopwatch() == null ? clockText : stopwatchPanel.getCurrentStopwatch().elapsedFormatted());
         if (showAnaloguePanel)
         {
             drawAnalogueClock(g);
@@ -195,7 +196,7 @@ public class DisplayTimePanel extends JPanel implements Runnable
         g.setColor(Color.BLACK);
 
         // Derive milliseconds from seconds (assuming getStopwatch().getSeconds() returns total seconds with millisecond precision)
-        String time = stopwatch == null ? "00:00:000" : getStopwatch().elapsedAccumulated();
+        String time = stopwatch == null ? "00:00:000" : stopwatchPanel.getCurrentStopwatch().elapsedAccumulated();
         String[] parts = time.split(COLON);
 
         double milliseconds = Double.parseDouble(parts[2]);
@@ -228,10 +229,11 @@ public class DisplayTimePanel extends JPanel implements Runnable
 
     public void setShowAnaloguePanel(boolean showAnaloguePanel) { this.showAnaloguePanel = showAnaloguePanel; logger.debug("showAnaloguePanel set to {}", showAnaloguePanel); }
     public void setClockText(String clockText) { this.clockText = clockText; logger.debug("clockText set to {}", clockText); }
-    public void setStopwatch(Stopwatch stopwatch) { this.stopwatch = stopwatch; logger.debug("stopwatch set to {}", stopwatch); }
+    public void setStopwatch(Stopwatch currentStopwatch) { this.stopwatch = currentStopwatch; logger.debug("stopwatch set to {}", currentStopwatch); }
 
     public boolean isShowAnaloguePanel() { return showAnaloguePanel; }
     public String getClockText() { return clockText; }
     public Stopwatch getStopwatch() { return stopwatch; }
+    public boolean isRunning() { return thread != null; }
 }
 

@@ -1,7 +1,6 @@
 package clock.panel;
 
 import clock.entity.Clock;
-import clock.entity.Panel;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.junit.jupiter.api.*;
@@ -59,6 +58,9 @@ class TimerPanelTests
     @AfterEach
     void afterEach()
     {}
+
+    @AfterAll
+    static void afterAll() { logger.info("Concluding {}", TimerPanelTests.class.getSimpleName()); }
 
     @ParameterizedTest
     @DisplayName("Test Validate Hours Text Field")

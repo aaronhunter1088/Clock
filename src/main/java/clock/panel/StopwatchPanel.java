@@ -29,10 +29,9 @@ import static clock.util.Constants.*;
  * counting up until the user pauses it. (although it will
  * be stopped automatically if the stopwatch were to reach 1
  * hour). The left side of the panel will show the stopwatch's
- * time in digital and analogue format, allowing you to choose
- * which mode to view the time in. The right side of the panel
- * will show the Laps that have been recorded, and you can
- * reverse the order of the laps if desired.
+ * time in digital or analogue format. The right side of the
+ * panel will show the Laps that have been recorded. You can
+ * reverse the order of the laps if you desire.
  *
  * @author michael ball
  * @version 2.9
@@ -67,7 +66,7 @@ public class StopwatchPanel extends ClockPanel
      * Sets up the default actions for the analogue clock panel
      * @param clockFrame the clockFrame reference
      */
-    public void initialize(ClockFrame clockFrame)
+    private void initialize(ClockFrame clockFrame)
     {
         setClockFrame(clockFrame);
         setClock(clockFrame.getClock());
@@ -169,16 +168,9 @@ public class StopwatchPanel extends ClockPanel
         setupSettingsMenu();
         setBackground(Color.BLACK);
         clockFrame.setTitle(STOPWATCH+SPACE+PANEL);
-        if (currentStopwatch != null)
-        {
-            if (displayTimePanel.getStopwatch() != currentStopwatch) displayTimePanel.setStopwatch(currentStopwatch);
-        }
-        else
-        {
-            startButton.setText(START);
-            lapButton.setText(LAP);
-            displayTimePanel.setClockText(startText);
-        }
+        startButton.setText(START);
+        lapButton.setText(LAP);
+        displayTimePanel.setClockText(currentStopwatch != null ? currentStopwatch.elapsedFormatted() : startText);
     }
 
     /**
@@ -214,7 +206,7 @@ public class StopwatchPanel extends ClockPanel
      * @param fill      the fill
      * @param insets    the insets
      */
-    public void addComponent(Component cpt, int gridy, int gridx, double gwidth, double gheight,
+    private void addComponent(Component cpt, int gridy, int gridx, double gwidth, double gheight,
                              int ipadx, int ipady, double weightx, double weighty, int fill, Insets insets)
     {
         logger.debug("add component");
@@ -265,8 +257,9 @@ public class StopwatchPanel extends ClockPanel
      * on the text of the button since this button
      * toggles between lap and reset.
      * @param e the action event
+     *          Package private
      */
-    private void executeButtonAction(ActionEvent e)
+    void executeButtonAction(ActionEvent e)
     {
         String buttonText = ((JButton)e.getSource()).getText();
         switch (buttonText)
@@ -288,16 +281,32 @@ public class StopwatchPanel extends ClockPanel
     private void startStopwatch()
     {
         String name = stopwatchNameField.getText();
-        Stopwatch stopwatch = new Stopwatch(name, false, false, clock);
-        clock.getListOfStopwatches().add(stopwatch);
-        currentStopwatch = stopwatch;
-        displayTimePanel.setStopwatch(currentStopwatch);
+        if (currentStopwatch != null && !currentStopwatch.getName().equals(name))
+        {
+            currentStopwatch.resumeStopwatch();
+        }
+        else
+        {
+            Stopwatch stopwatch = new Stopwatch(name, false, false, clock);
+            clock.getListOfStopwatches().add(stopwatch);
+            setCurrentStopwatch(stopwatch);
+            displayTimePanel.setStopwatch(currentStopwatch);
+        }
         displayTimePanel.start();
         displayTimePanel.setClockText(currentStopwatch.elapsedFormatted());
         displayLapsPanel.updateLabelsAndStopwatchTable();
         startButton.setText(PAUSE);
         lapButton.setText(LAP);
         logger.info("Started new stopwatch with name: {}", name);
+    }
+
+    /** Pauses the current stopwatch */
+    private void pauseStopwatchPanel()
+    {
+        displayTimePanel.stop(); // also pauses the stopwatch
+        startButton.setText(RESUME);
+        lapButton.setText(RESET);
+        logger.info("Paused stopwatch with name: {}", currentStopwatch.getName());
     }
 
     /** Resumes the current stopwatch */
@@ -317,15 +326,6 @@ public class StopwatchPanel extends ClockPanel
         startButton.setText(PAUSE);
         lapButton.setText(LAP);
         logger.info("Resuming stopwatch with name: {}", currentStopwatch.getName());
-    }
-
-    /** Pauses the current stopwatch */
-    private void pauseStopwatchPanel()
-    {
-        displayTimePanel.stop(); // also pauses the stopwatch
-        startButton.setText(RESUME);
-        lapButton.setText(RESET);
-        logger.info("Paused stopwatch with name: {}", currentStopwatch.getName());
     }
 
     /** Records a lap for the current stopwatch */
@@ -349,6 +349,7 @@ public class StopwatchPanel extends ClockPanel
         logger.debug("resetting stopwatch panel");
         getClock().getListOfStopwatches().forEach(Stopwatch::stopStopwatch);
         getClock().getListOfStopwatches().clear();
+        Stopwatch.stopwatchCounter = 0L;
         stopwatchNameField.setText("Sw" + (Stopwatch.stopwatchCounter + 1));
         currentStopwatch = null;
         displayTimePanel.setStopwatch(null);
@@ -366,12 +367,15 @@ public class StopwatchPanel extends ClockPanel
     public void setClockFrame(ClockFrame clockFrame) { this.clockFrame = clockFrame; logger.debug("clockFrame set"); }
     private void setGridBagLayout(GridBagLayout layout) { setLayout(layout); this.layout = layout; logger.debug("GridBagLayout set"); }
     public void setGridBagConstraints(GridBagConstraints constraints) { this.constraints = constraints; logger.debug("constraints set"); }
+    private void setCurrentStopwatch(Stopwatch currentStopwatch) { this.currentStopwatch = currentStopwatch; logger.debug("currentStopwatch set"); }
 
     public Clock getClock() { return clock; }
     public ClockFrame getClockFrame() { return clockFrame; }
     public DisplayTimePanel getDisplayTimePanel() { return displayTimePanel; }
     public DisplayLapsPanel getDisplayLapsPanel() { return displayLapsPanel; }
     public JButton getStartButton() { return startButton; }
+    public JButton getLapButton() { return lapButton; }
+    public JTextField getStopwatchNameField() { return stopwatchNameField; }
     public Stopwatch getCurrentStopwatch() { return currentStopwatch; }
 }
 

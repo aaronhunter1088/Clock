@@ -12,7 +12,7 @@ import static org.junit.jupiter.api.Assertions.*;
  * @author Michael Ball
  * @version 2.9
  */
-public class LapTests {
+class LapTests {
 
     private static final Logger logger = LogManager.getLogger(LapTests.class);
 

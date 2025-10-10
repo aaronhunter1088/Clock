@@ -54,7 +54,12 @@ class AlarmPanelTests
 
     @AfterEach
     void afterEach()
-    {}
+    {
+        alarmPanel = null;
+    }
+
+    @AfterAll
+    static void afterAll() { logger.info("Concluding {}", AlarmPanelTests.class.getSimpleName()); }
 
     @Test
     @DisplayName("Alarm Panel starts with PM in dropdown when clock is in PM")
