@@ -18,16 +18,16 @@ import static org.junit.jupiter.api.Assertions.*;
  * @author Michael Ball
  * @version 2.9
  */
-public class StopwatchTest {
+public class StopwatchTests {
 
-    private static final Logger logger = LogManager.getLogger(StopwatchTest.class);
+    private static final Logger logger = LogManager.getLogger(StopwatchTests.class);
 
     private static Clock clock;
 
     @BeforeAll
     static void beforeClass()
     {
-        logger.info("Starting {}...", StopwatchTest.class.getSimpleName());
+        logger.info("Starting {}...", StopwatchTests.class.getSimpleName());
         Stopwatch.stopwatchCounter = 0L;
     }
 
@@ -44,7 +44,7 @@ public class StopwatchTest {
     }
 
     @AfterAll
-    static void afterAll() { logger.info("Concluding {}", StopwatchTest.class.getSimpleName()); }
+    static void afterAll() { logger.info("Concluding {}", StopwatchTests.class.getSimpleName()); }
 
     @Test
     @DisplayName("Test Stopwatch Creation")

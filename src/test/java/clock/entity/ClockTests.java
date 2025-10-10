@@ -26,9 +26,9 @@ import static org.junit.jupiter.api.Assertions.*;
  * @author Michael Ball
  * @version 1.0
  */
-class ClockTest
+class ClockTests
 {
-    private static final Logger logger = LogManager.getLogger(ClockTest.class);
+    private static final Logger logger = LogManager.getLogger(ClockTests.class);
 
     private static final LocalDate DATE_NOW = LocalDate.now();
     private static final LocalTime AM_TIME = LocalTime.of(10, 30, 45); // 10:30:45 AM
@@ -39,7 +39,7 @@ class ClockTest
     @BeforeAll
     static void beforeClass()
     {
-        logger.info("Starting {}...", ClockTest.class.getSimpleName());
+        logger.info("Starting {}...", ClockTests.class.getSimpleName());
         clockWEDJAN12025_103000AM = new Clock(10, 30, 0, JANUARY, WEDNESDAY, 1, 2025, AM);
         clockWEDJAN12025_103000PM = new Clock(10, 30, 0, JANUARY, WEDNESDAY, 1, 2025, PM);
     }
@@ -56,7 +56,7 @@ class ClockTest
 
     @AfterAll
     static void afterAll()
-    { logger.info("Concluding {}", ClockTest.class.getSimpleName()); }
+    { logger.info("Concluding {}", ClockTests.class.getSimpleName()); }
 
     @Test
     void testDefaultClock()

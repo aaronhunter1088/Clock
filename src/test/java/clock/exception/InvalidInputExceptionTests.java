@@ -18,15 +18,15 @@ import static org.junit.jupiter.api.Assertions.*;
  * @author Michael Ball
  * @version 2.0
  */
-class InvalidInputExceptionTest
+class InvalidInputExceptionTests
 {
-    private static final Logger logger = LogManager.getLogger(InvalidInputExceptionTest.class);
+    private static final Logger logger = LogManager.getLogger(InvalidInputExceptionTests.class);
 
     private Month goodMonth;
     private final String INVALID_MONTH = "Invalid month";
 
     @BeforeAll
-    static void beforeClass() { logger.info("Starting InvalidInputExceptionTest..."); }
+    static void beforeClass() { logger.info("Starting InvalidInputExceptionTests..."); }
 
     @BeforeEach
     void beforeEach() {

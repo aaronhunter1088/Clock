@@ -35,9 +35,9 @@ import static org.mockito.Mockito.*;
  * @author Michael Ball
  * @version 2.9
  */
-class AlarmTest {
+class AlarmTests {
 
-    private static final Logger logger = LogManager.getLogger(AlarmTest.class);
+    private static final Logger logger = LogManager.getLogger(AlarmTests.class);
 
     private Clock clock;
     private final List<DayOfWeek> weekDays = List.of(DayOfWeek.MONDAY, TUESDAY, WEDNESDAY, THURSDAY, DayOfWeek.FRIDAY),
@@ -49,7 +49,7 @@ class AlarmTest {
 
     @BeforeAll
     static void beforeClass()
-    { logger.info("Starting {}...", AlarmTest.class.getSimpleName()); }
+    { logger.info("Starting {}...", AlarmTests.class.getSimpleName()); }
 
     @BeforeEach
     void beforeEach()
@@ -72,7 +72,7 @@ class AlarmTest {
     }
 
     @AfterAll
-    static void afterAll() { logger.info("Concluding {}", AlarmTest.class.getSimpleName()); }
+    static void afterAll() { logger.info("Concluding {}", AlarmTests.class.getSimpleName()); }
 
     @Test
     @DisplayName("Create an Alarm")
