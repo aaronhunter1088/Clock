@@ -102,7 +102,7 @@ public class Alarm implements Serializable, Comparable<Alarm>, Runnable
     /**
      * Defines the music player object
      */
-    public void setupMusicPlayer()
+    private void setupMusicPlayer()
     {
         logger.debug("setup music player");
         InputStream inputStream = null;
@@ -123,7 +123,7 @@ public class Alarm implements Serializable, Comparable<Alarm>, Runnable
     /**
      * Stops an actively going off alarm
      */
-    public void stopAlarm()
+    public synchronized void stopAlarm()
     {
         logger.debug("stopping alarm");
         musicPlayer = null;
@@ -133,7 +133,7 @@ public class Alarm implements Serializable, Comparable<Alarm>, Runnable
     }
 
     /** Pauses the alarm */
-    public void pauseAlarm()
+    public synchronized void pauseAlarm()
     {
         logger.debug("pause alarm");
         setIsPaused(true);
@@ -146,7 +146,7 @@ public class Alarm implements Serializable, Comparable<Alarm>, Runnable
      * that if you resume all timers, or that one,
      * and it is still time to trigger the alarm,
      */
-    public void resumeAlarm()
+    public synchronized void resumeAlarm()
     {
         logger.debug("resume alarm");
         setIsPaused(false);
@@ -155,7 +155,7 @@ public class Alarm implements Serializable, Comparable<Alarm>, Runnable
     /**
      * Sets an alarm to go off
      */
-    public void triggerAlarm()
+    public synchronized void triggerAlarm()
     {
         logger.debug("trigger {}", this);
         try
@@ -174,7 +174,7 @@ public class Alarm implements Serializable, Comparable<Alarm>, Runnable
      * This method begins the thread
      * that runs the alarm.
      */
-    public void startAlarm()
+    public synchronized void startAlarm()
     {
         if (selfThread == null)
         {
@@ -220,7 +220,7 @@ public class Alarm implements Serializable, Comparable<Alarm>, Runnable
      * time and day. And, if the alarm is not
      * already going off, set it to going off.
      */
-    private void activateAlarm()
+    private synchronized void activateAlarm()
     {
         if (getAlarmAsString().equals(clock.getClockTimeAsAlarmString())
                 && this.getDays().contains(clock.getDayOfWeek()))
@@ -235,7 +235,7 @@ public class Alarm implements Serializable, Comparable<Alarm>, Runnable
      * Snoozing this alarm will stop the alarm
      * from playing its sound for 7 minutes.
      */
-    public void snooze()
+    public synchronized void snooze()
     {
         logger.info("snoozing for {} minutes", SNOOZE_TIME / 60000);
         setIsSnoozing(true);

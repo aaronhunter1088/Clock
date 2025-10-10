@@ -276,7 +276,6 @@ class AlarmTests {
         LocalDateTime dateTime = LocalDateTime.of(date, time);
         clock.setTheTime(dateTime);
 
-        doNothing().when(alarm1).setupMusicPlayer();
         doThrow(new RuntimeException("Mocked Music player error"))
             .when(musicPlayerMock).play();
 

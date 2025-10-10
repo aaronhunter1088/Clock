@@ -1,6 +1,6 @@
 package clock.examples;
 
-import clock.entity.ButtonColumn;
+import clock.panel.ButtonColumn;
 import clock.panel.ClockFrame;
 
 import java.awt.*;

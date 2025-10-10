@@ -1,4 +1,4 @@
-package clock.entity;
+package clock.panel;
 
 import java.awt.*;
 import java.awt.event.*;

@@ -1,7 +1,6 @@
 package clock.panel;
 
 import clock.entity.Alarm;
-import clock.entity.ButtonColumn;
 import clock.entity.Clock;
 import clock.exception.InvalidInputException;
 import org.apache.logging.log4j.LogManager;

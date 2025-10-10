@@ -1,6 +1,5 @@
 package clock.panel;
 
-import clock.entity.ButtonColumn;
 import clock.entity.Clock;
 import clock.entity.Timer;
 import clock.exception.InvalidInputException;

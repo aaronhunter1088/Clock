@@ -169,7 +169,7 @@ public class Timer implements Serializable, Comparable<Timer>, Runnable
      * This method begins the thread
      * that runs the timer.
      */
-    public void startTimer()
+    public synchronized void startTimer()
     {
         if (selfThread == null)
         {
@@ -193,11 +193,9 @@ public class Timer implements Serializable, Comparable<Timer>, Runnable
                 } else if (timerGoingOff && !stopped) {
                     triggerTimer();
                     sleep(1000);
-                } else { //if (stopTimer) {
+                } else { // if (stopTimer) {
                     sleep(1000);
                 }
-
-
             }
             catch (InterruptedException e) { printStackTrace(e, e.getMessage());}
         }
@@ -228,59 +226,10 @@ public class Timer implements Serializable, Comparable<Timer>, Runnable
     }
 
     /**
-     * Pauses the timer
-     */
-    public void pauseTimer()
-    {
-        logger.info("pausing {}", this);
-        setPaused(true);
-    }
-
-    /**
-     * Resumes the timer
-     */
-    public void resumeTimer()
-    {
-        logger.info("resuming {}", this);
-        setPaused(false);
-    }
-
-    /**
-     * Resets the timer to its initial state.
-     */
-    public void resetTimer()
-    {
-        logger.info("resetting {}", this);
-        setPaused(false);
-        setStarted(false);
-        setTriggered(false);
-        setHoursAsStr(ZERO + getHours());
-        setMinutesAsStr(ZERO + getMinutes());
-        setSecondsAsStr(ZERO + getSeconds());
-        setCountDown(LocalTime.of(getHours(), getMinutes(), getSeconds()));
-        setTimerGoingOff(false);
-        logger.info("{} timer reset", this);
-    }
-
-    /**
-     * Stop the timer
-     */
-    public void stopTimer()
-    {
-        logger.info("stopping {}", this);
-        setMusicPlayer(null);
-        setTimerGoingOff(false);
-        setStarted(false);
-        setTriggered(false);
-        setStopped(true);
-        logger.info("{} timer stopped", this);
-    }
-
-    /**
      * Plays the timer sound as long
      * as the timer is not paused.
      */
-    public void triggerTimer()
+    private void triggerTimer()
     {
         try
         {
@@ -294,6 +243,48 @@ public class Timer implements Serializable, Comparable<Timer>, Runnable
         {
             logger.error(e.getCause().getClass().getName() + " - " + e.getMessage());
         }
+    }
+
+    /** Pauses the timer */
+    public synchronized void pauseTimer()
+    {
+        logger.info("pausing {}", this);
+        setPaused(true);
+    }
+
+    /** Resumes a paused timer */
+    public synchronized void resumeTimer()
+    {
+        logger.info("resuming {}", this);
+        setPaused(false);
+    }
+
+    /** Resets the timer to its initial state. */
+    public synchronized void resetTimer()
+    {
+        logger.info("resetting {}", this);
+        setPaused(false);
+        setStarted(false);
+        setTriggered(false);
+        setHoursAsStr(ZERO + getHours());
+        setMinutesAsStr(ZERO + getMinutes());
+        setSecondsAsStr(ZERO + getSeconds());
+        setCountDown(LocalTime.of(getHours(), getMinutes(), getSeconds()));
+        setTimerGoingOff(false);
+        logger.info("{} timer reset", this);
+    }
+
+    /** Stops the timer */
+    public synchronized void stopTimer()
+    {
+        logger.info("stopping {}", this);
+        setMusicPlayer(null);
+        setTimerGoingOff(false);
+        setStarted(false);
+        setTriggered(false);
+        setStopped(true);
+        setSelfThread(null);
+        logger.info("{} timer stopped", this);
     }
 
     /* Getters */
