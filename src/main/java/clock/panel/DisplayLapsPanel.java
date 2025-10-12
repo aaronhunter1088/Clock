@@ -32,7 +32,7 @@ public class DisplayLapsPanel extends JPanel
     private JTable lapsTable,
                    stopwatchTable;
     private final String[] lapTableColumnNames = {LAP_SYM, TIME, RECORDED};
-    private final String[] stopwatchTableColumnNames = {NAME, ELAPSED, RESUME, REMOVE};
+    private final String[] stopwatchTableColumnNames = {NAME, ELAPSED, SELECT, REMOVE};
     public boolean isLapsReversed = false;
 
     public DisplayLapsPanel(StopwatchPanel stopwatchPanel)
@@ -192,7 +192,7 @@ public class DisplayLapsPanel extends JPanel
                 .map(stopwatch -> new Object[] {
                         stopwatch.getName(),
                         stopwatch.elapsedFormatted(stopwatch.getAccumMilli(), STOPWATCH_PARSE_FORMAT),
-                        RELOAD,
+                        SELECT,
                         REMOVE
                 })
                 .toArray(Object[][]::new);
@@ -253,7 +253,7 @@ public class DisplayLapsPanel extends JPanel
                 String buttonAction = (String) stopwatchTable.getModel().getValueAt(modelRow, columnIndex);
                 Stopwatch stopwatch = stopwatchPanel.getClock().getListOfStopwatches().get(modelRow);
                 logger.debug("{} {} at row: {}", buttonAction, stopwatch, modelRow);
-                if (buttonAction.equals(RELOAD))
+                if (buttonAction.equals(SELECT))
                 {
                     stopwatchPanel.setCurrentStopwatch(stopwatch);
                     stopwatchPanel.getStopwatchNameField().setText(stopwatch.getName());
