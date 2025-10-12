@@ -603,6 +603,15 @@ public class AlarmPanel extends ClockPanel implements Runnable
     }
 
     /**
+     * Validates the name text field
+     * @return boolean true if the name text field is valid
+     */
+    boolean validateNameTextField()
+    {
+        return !nameTextField.getText().isEmpty() && nameTextField.getText().length() <= 10;
+    }
+
+    /**
      * Validates that at least one checkbox is selected
      * @return boolean true if at least one checkbox is selected
      */
@@ -642,16 +651,17 @@ public class AlarmPanel extends ClockPanel implements Runnable
     /** Validates all the inputs used to create an alarm */
     public boolean validateAllInputs()
     {
-        boolean allInputsAreValid;
-        boolean validHours = validateHoursTextField();
-        boolean validMinutes = validateMinutesTextField();
-        if (areAllBlank() && !nameTextField.getText().isEmpty())
+        if (areAllBlank())
         {
             return false;
         }
+        boolean allInputsAreValid;
+        boolean validHours = validateHoursTextField();
+        boolean validMinutes = validateMinutesTextField();
+        boolean validName = validateNameTextField();
         boolean validCheckboxes = validateTheCheckBoxes(getDaysChecked());
         allInputsAreValid = validHours && validMinutes && validCheckboxes
-                && areAllNotZeroes() && !areAllBlank();
+                && validName && areAllNotZeroes() && !areAllBlank();
         logger.debug("all inputs are valid: {}", allInputsAreValid);
         return allInputsAreValid;
     }
@@ -717,10 +727,12 @@ public class AlarmPanel extends ClockPanel implements Runnable
         else {
             boolean validHours = validateHoursTextField();
             boolean validMinutes = validateMinutesTextField();
+            boolean validName = validateNameTextField();
             boolean validCheckboxes = validateTheCheckBoxes(getDaysChecked());
             if (areAllBlank()) throw new InvalidInputException("Hours and minutes must not be blank");
             if (!validHours) throw new InvalidInputException("Invalid hours input");
             if (!validMinutes) throw new InvalidInputException("Invalid minutes input");
+            if (!validName) throw new InvalidInputException("Name must be between 1 and 10 characters");
             if (!validCheckboxes) throw new InvalidInputException("At least one checkbox must be selected");
         }
         return alarm;
@@ -814,52 +826,95 @@ public class AlarmPanel extends ClockPanel implements Runnable
         }
     }
 
-    /* Getters */
+    /** Return the clock frame */
     public ClockFrame getClockFrame() { return this.clockFrame; }
+    /** Return the layout manager */
     public GridBagLayout getGridBagLayout() { return this.layout; }
+    /** Return the constraints */
     public GridBagConstraints getGridBagConstraints() { return this.constraints; }
+    /** Return the clock */
     public Clock getClock() { return this.clockFrame.getClock(); }
+    /** Return the name label */
     public JLabel getNameLabel() { return this.nameLabel; }
+    /** Return the hours label */
     public JLabel getHoursLabel() { return this.hoursLabel; }
+    /** Return the minutes label */
     public JLabel getMinutesLabel() { return this.minutesLabel; }
+    /** Return the ampm label */
     public JLabel getAmpmLabel() { return this.ampmLabel; }
+    /** Return the name text field */
     public JTextField getNameTextField() { return this.nameTextField; }
+    /** Return the hours text field */
     public JTextField getHoursTextField() { return this.hoursTextField; }
+    /** Return the minutes text field */
     public JTextField getMinutesTextField() { return this.minutesTextField; }
+    /** Return the ampm drop down */
     public JComboBox<String> getAmpmDropDown() { return this.ampmDropDown; }
+    /** Return the set alarm button */
     public JButton getSetAlarmButton() { return this.setAlarmButton; }
+    /** Returns the Monday checkbox */
     public JCheckBox getMondayCheckBox() { return mondayCheckBox; }
+    /** Returns the Tuesday checkbox */
     public JCheckBox getTuesdayCheckBox() { return tuesdayCheckBox; }
+    /** Returns the Wednesday checkbox */
     public JCheckBox getWednesdayCheckBox() { return wednesdayCheckBox; }
+    /** Returns the Thursday checkbox */
     public JCheckBox getThursdayCheckBox() { return thursdayCheckBox; }
+    /** Returns the Friday checkbox */
     public JCheckBox getFridayCheckBox() { return fridayCheckBox; }
+    /** Returns the Saturday checkbox */
     public JCheckBox getSaturdayCheckBox() { return saturdayCheckBox; }
+    /** Returns the Sunday checkbox */
     public JCheckBox getSundayCheckBox() { return sundayCheckBox; }
+    /** Returns the Weekdays checkbox */
     public JCheckBox getWeekdaysCheckBox() { return weekdaysCheckBox; }
+    /** Returns the Weekends checkbox */
     public JCheckBox getWeekendsCheckBox() { return weekendsCheckBox; }
+    /** Returns the alarms table */
     public JTable getAlarmsTable() { return this.alarmsTable; }
 
-    /* Setters */
+    /** Sets the clock */
     public void setClock(Clock clock) { this.clock = clock; logger.info("clock set"); }
+    /** Sets the clock frame */
     protected void setClockFrame(ClockFrame clockFrame) { this.clockFrame = clockFrame; logger.debug("clockFrame set"); }
+    /** Sets the layout manager */
     protected void setGridBagLayout(GridBagLayout layout) { this.layout = layout; logger.debug("layout set"); }
+    /** Sets the constraints */
     protected void setGridBagConstraints(GridBagConstraints constraints) { this.constraints = constraints; logger.debug("constraints set"); }
+    /** Sets the name label */
     protected void setNameLabel(JLabel nameLabel) { this.nameLabel = nameLabel; logger.debug("nameLabel set"); }
+    /** Sets the hours label */
     protected void setHoursLabel(JLabel alarmLabel1) { this.hoursLabel = alarmLabel1; logger.debug("hoursLabel set"); }
+    /** Sets the minutes label */
     protected void setMinutesLabel(JLabel alarmLabel2) { this.minutesLabel = alarmLabel2; logger.debug("minutesLabel set"); }
+    /** Sets the ampm label */
     protected void setAmpmLabel(JLabel alarmLabel3) { this.ampmLabel = alarmLabel3; logger.debug("ampmLabel set"); }
+    /** Sets the ampm drop down */
     protected void setAmpmDropDown(JComboBox<String> ampmDropDown) { this.ampmDropDown = ampmDropDown; logger.debug("ampmDropDown set"); }
+    /** Sets the name text field */
     protected void setNameTextField(JTextField nameTextField) { this.nameTextField = nameTextField; logger.debug("nameTextField set"); }
+    /** Sets the hours text field */
     protected void setHoursTextField(JTextField textField1) { this.hoursTextField = textField1; logger.debug("hoursTextField set"); }
+    /** Sets the minutes text field */
     protected void setMinutesTextField(JTextField textField2) { this.minutesTextField = textField2; logger.debug("minutesTextField set"); }
+    /** Sets the set alarm button */
     protected void setSetAlarmButton(JButton setAlarmButton) { this.setAlarmButton = setAlarmButton; logger.debug("setAlarmButton set"); }
+    /** Sets the Monday checkbox */
     protected void setMondayCheckBox(JCheckBox mondayCheckBox) { this.mondayCheckBox = mondayCheckBox; logger.debug("mondayCheckBox set"); }
+    /** Sets the Tuesday checkbox */
     protected void setTuesdayCheckBox(JCheckBox tuesdayCheckBox) { this.tuesdayCheckBox = tuesdayCheckBox; logger.debug("tuesdayCheckBox set"); }
+    /** Sets the Wednesday checkbox */
     protected void setWednesdayCheckBox(JCheckBox wednesdayCheckBox) { this.wednesdayCheckBox = wednesdayCheckBox; logger.debug("wednesdayCheckBox set"); }
+    /** Sets the Thursday checkbox */
     protected void setThursdayCheckBox(JCheckBox thursdayCheckBox) { this.thursdayCheckBox = thursdayCheckBox; logger.debug("thursdayCheckBox set"); }
+    /** Sets the Friday checkbox */
     protected void setFridayCheckBox(JCheckBox fridayCheckBox) { this.fridayCheckBox = fridayCheckBox; logger.debug("fridayCheckBox set"); }
+    /** Sets the Saturday checkbox */
     protected void setSaturdayCheckBox(JCheckBox saturdayCheckBox) { this.saturdayCheckBox = saturdayCheckBox; logger.debug("saturdayCheckBox set"); }
+    /** Sets the Sunday checkbox */
     protected void setSundayCheckBox(JCheckBox sundayCheckBox) { this.sundayCheckBox = sundayCheckBox; logger.debug("sundayCheckBox set"); }
+    /** Sets the Weekdays checkbox */
     protected void setWeekdaysCheckBox(JCheckBox weekdaysCheckBox) { this.weekdaysCheckBox = weekdaysCheckBox; logger.debug("weekCheckBox set"); }
+    /** Sets the Weekends checkbox */
     protected void setWeekendsCheckBox(JCheckBox weekendsCheckBox) { this.weekendsCheckBox = weekendsCheckBox; logger.debug("weekendCheckBox set"); }
 }

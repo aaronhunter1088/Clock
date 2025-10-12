@@ -697,27 +697,39 @@ public class Clock implements Serializable, Comparable<Clock>, Runnable
         setTheDateAndTime();
     }
 
-    /* Getters */
+    /** Returns the date */
     public LocalDate getDate() { return date; }
+    /** Returns the time */
     public LocalTime getTime() { return time; }
+    /** Returns the beginDaylightSavingsTimeDate */
     public LocalDate getBeginDaylightSavingsTimeDate() { return this.beginDaylightSavingsTimeDate; }
+    /** Returns the endDaylightSavingsTimeDate */
     public LocalDate getEndDaylightSavingsTimeDate() { return this.endDaylightSavingsTimeDate; }
+    /** Returns the seconds */
     public int getSeconds() { return seconds; }
+    /** Returns the minutes */
     public int getMinutes() { return minutes; }
+    /** Returns the hours */
     public int getHours() { return hours; }
+    /** Returns the AMPM */
     public String getAMPM() { return ampm; }
+    /** Returns the timezone */
     public ZoneId getTimezone() { return timezone; }
+    /** Returns the day of the week */
     public DayOfWeek getDayOfWeek() { return dayOfWeek; }
+    /** Returns the day of the month: 1-31 */
     public int getDayOfMonth() { return dayOfMonth; }
+    /** Returns the month */
     public Month getMonth() { return month; }
+    /** Returns the year */
     public int getYear() { return year; }
+    /** Returns the hour as a string */
     public String getHoursAsStr() { return hoursAsStr; }
+    /** Returns the minute as a string */
     public String getMinutesAsStr() { return minutesAsStr; }
+    /** Returns the second as a string */
     public String getSecondsAsStr() { return secondsAsStr; }
-    /**
-     * Returns the current time in the selected timezone
-     * @return LocalDateTime the currentTime in the selected timezone
-     */
+    /** Returns the current time in the selected timezone */
     public LocalDateTime getCurrentDateTime() { return currentDateTime; }
     /**
      * This method returns the clock's current hour, minute, second, and time.
@@ -725,12 +737,13 @@ public class Clock implements Serializable, Comparable<Clock>, Runnable
      * @return 'HH:MM:SS AMPM' ex: 05:15:24 PM
      */
     public String getTimeAsStr() { return hoursAsStr+COLON+minutesAsStr+COLON+secondsAsStr+SPACE+ampm; }
+    /** Returns the clock's time as an alarm string */
     public String getClockTimeAsAlarmString() {
         if (showMilitaryTime) {
             if (hours > 12) {
                 var hours = this.hours - 12;
                 if (hours <= 9) {
-                    return "0"+hours+COLON+minutesAsStr+SPACE+ampm;
+                    return ZERO+hours+COLON+minutesAsStr+SPACE+ampm;
                 } else {
                     return hours+COLON+minutesAsStr+SPACE+ampm;
                 }
@@ -741,25 +754,37 @@ public class Clock implements Serializable, Comparable<Clock>, Runnable
             return hoursAsStr+COLON+minutesAsStr+SPACE+ampm;
         }
     }
-    /**
-     * Returns the date like: MAY 4, 2000
-     * @return the date as a formatted string
-     */
+    /** Returns the date like: MAY 4, 2000 */
     public String getDateAsStr() { return month+SPACE+dayOfMonth+COMMA+SPACE+year; }
+    /** Returns the full date like: FRIDAY MAY 4, 2000 */
     public String getFullDateAsStr() { return dayOfWeek+SPACE+month+SPACE+dayOfMonth+COMMA+SPACE+year; }
+    /** Returns the military time like: 17:15:24 */
     public String getMilitaryTimeAsStr() { return hoursAsStr+minutesAsStr+SPACE+Hours.toLowerCase()+SPACE+secondsAsStr; }
+    /** Returns the partial date: FRI MAY 4, 2000 */
     public String getPartialDateAsStr() { return dayOfWeek.toString().substring(0,3)+SPACE+month.toString().substring(0,3)+SPACE+dayOfMonth+COMMA+SPACE+year; }
+    /** Returns isLeapYear */
     public boolean isLeapYear() { return isLeapYear; }
+    /** Returns todayMatchesDSTDate */
     public boolean isTodayMatchesDSTDate() { return todayMatchesDSTDate; }
+    /** Returns dateChanged */
     public boolean isDateChanged() { return dateChanged; }
+    /** Returns isNewYear */
     public boolean isNewYear() { return isNewYear; }
+    /** Returns showFullDate */
     public boolean isShowFullDate() { return showFullDate; }
+    /** Returns showPartialDate */
     public boolean isShowPartialDate() { return showPartialDate; }
+    /** Returns showMilitaryTime */
     public boolean isShowMilitaryTime() { return showMilitaryTime; }
+    /** Returns testingClock */
     public boolean isTestingClock() { return testingClock; }
+    /** Returns daylightSavingsTimeEnabled */
     public boolean isDaylightSavingsTimeEnabled() { return daylightSavingsTimeEnabled; }
+    /** Returns the list of alarms */
     public List<Alarm> getListOfAlarms() { return listOfAlarms; }
+    /** Returns the list of timers */
     public List<Timer> getListOfTimers() { return listOfTimers; }
+    /** Returns the list of stopwatches */
     public List<Stopwatch> getListOfStopwatches() { return listOfStopwatches; }
     /**
      * Returns the timezone from the selected timezone button text
@@ -779,7 +804,6 @@ public class Clock implements Serializable, Comparable<Clock>, Runnable
         };
     }
 
-    /* Setters */
     /**
      * Sets and logs the new second value
      * Also sets secondsAsStr
@@ -910,7 +934,8 @@ public class Clock implements Serializable, Comparable<Clock>, Runnable
      * @return a negative integer, zero, or a positive integer
      */
     @Override
-    public int compareTo(Clock o) {
+    public int compareTo(Clock o)
+    {
         return this.getCurrentDateTime().compareTo(o.getCurrentDateTime());
     }
 
@@ -920,15 +945,21 @@ public class Clock implements Serializable, Comparable<Clock>, Runnable
      * @return true if the clocks are equal, false otherwise.
      */
     @Override
-    public boolean equals(Object o) {
+    public boolean equals(Object o)
+    {
         if (!(o instanceof Clock clock)) return false;
         return getSeconds() == clock.getSeconds() && getMinutes() == clock.getMinutes() &&
                 getHours() == clock.getHours() && getDayOfMonth() == clock.getDayOfMonth() &&
                 getYear() == clock.getYear();
     }
 
+    /**
+     * Returns a hash code value for the clock.
+     * @return a hash code value for the clock.
+     */
     @Override
-    public int hashCode() {
+    public int hashCode()
+    {
         return Objects.hash(getDate(), getDayOfWeek(), getMonth(), getTime(), getSeconds(), getMinutes(), getHours(), getDayOfMonth(), getYear(), ampm, getTimezone(), getHoursAsStr(), getMinutesAsStr(), getSecondsAsStr(), getBeginDaylightSavingsTimeDate(), getEndDaylightSavingsTimeDate(), getCurrentDateTime(), getListOfAlarms(), getListOfTimers(), isLeapYear(), isTodayMatchesDSTDate(), isDateChanged(), isNewYear(), isTestingClock(), isShowFullDate(), isShowPartialDate(), isShowMilitaryTime(), isDaylightSavingsTimeEnabled());
     }
 
@@ -938,7 +969,8 @@ public class Clock implements Serializable, Comparable<Clock>, Runnable
      * @return a clock string
      */
     @Override
-    public String toString() {
+    public String toString()
+    {
         String shortenedDayOfWeek = dayOfWeek.toString().charAt(0)+dayOfWeek.toString().substring(1,3).toLowerCase();
         return shortenedDayOfWeek + SPACE +
                 DateTimeFormatter.ofPattern("MMM d, yyyy hh:mm:ss a").format(getCurrentDateTime());

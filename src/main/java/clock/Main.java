@@ -37,7 +37,7 @@ public class Main
         startMain(args);
         Runtime.getRuntime().addShutdownHook(new Thread(() -> {
             clockFrame.stop();
-            logger.info("Closing Clock");
+            logger.info("Closing Clock application");
         }));
     }
 
@@ -85,7 +85,7 @@ public class Main
      * Starts the clock application with the default panel and clock settings.
      */
     public static void defaultStart()
-    { SwingUtilities.invokeLater(ClockFrame::createAndShowGUI); }
+    { SwingUtilities.invokeLater(() -> clockFrame = ClockFrame.createAndShowGUI()); }
 
     /**
      * Starts the clock application with a specific panel.
@@ -96,9 +96,7 @@ public class Main
     public static void specificPanelStart(String[] args)
     {
         Panel type = Panel.valueOf(List.of(args[0].split(COMMA)).get(1).toUpperCase());
-        SwingUtilities.invokeLater(() -> {
-            clockFrame = ClockFrame.createAndShowGUI(type);
-        });
+        SwingUtilities.invokeLater(() -> clockFrame = ClockFrame.createAndShowGUI(type));
     }
 
     /**
@@ -128,6 +126,6 @@ public class Main
         int year = Integer.parseInt(values.get(7));
         String ampm = values.get(8).toUpperCase();
         Clock testClock = new Clock(hours, minutes, seconds, month, dayOfWeek, dayOfMonth, year, ampm);
-        SwingUtilities.invokeLater(() -> ClockFrame.createAndShowGUI(testClock));
+        SwingUtilities.invokeLater(() -> clockFrame = ClockFrame.createAndShowGUI(testClock));
     }
 }

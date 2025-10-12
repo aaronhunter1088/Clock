@@ -228,39 +228,31 @@ public class TimerPanel extends ClockPanel implements Runnable
         {
             public void actionPerformed(ActionEvent e)
             {
-                int modelRow = Integer.parseInt( e.getActionCommand() );
-                String buttonAction = (String) timersTable.getModel().getValueAt(modelRow, columnIndex);
-                // find the correct timer
-                Timer timer = clock.getListOfTimers().get(modelRow);
-                switch (buttonAction) {
-                    case RESET -> {
-                        // set button text to "Pause"
-                        timersTable.getModel().setValueAt(PAUSE, modelRow, columnIndex);
-                        timer.resetTimer();
-                        clock.getListOfTimers().set(modelRow, timer);
-                    }
-                    case PAUSE -> {
-                        logger.info("Pausing {} at row: {}", timer, modelRow);
-                        // pause timer
-                        timer.pauseTimer();
-                        // set button text to "Resume"
-                        timersTable.getModel().setValueAt(RESUME, modelRow, columnIndex);
-                        clock.getListOfTimers().set(modelRow, timer);
-                    }
-                    case RESUME -> {
-                        logger.info("Resuming {} at row: {}", timer, modelRow);
-                        // resume timer
-                        timer.resumeTimer();
-                        // set button text to "Pause"
-                        timersTable.getModel().setValueAt(PAUSE, modelRow, columnIndex);
-                        clock.getListOfTimers().set(modelRow, timer);
-                    }
-                    case REMOVE -> {
-                        logger.info("Removing {} at row: {}", timer, modelRow);
-                        timer.stopTimer();
-                        clock.getListOfTimers().remove(timer);
-                    }
+            int modelRow = Integer.parseInt( e.getActionCommand() );
+            String buttonAction = (String) timersTable.getModel().getValueAt(modelRow, columnIndex);
+            Timer timer = clock.getListOfTimers().get(modelRow);
+            logger.debug("{} {} at row: {}", buttonAction, timer, modelRow);
+            switch (buttonAction) {
+                case RESET -> {
+                    timersTable.getModel().setValueAt(PAUSE, modelRow, columnIndex);
+                    timer.resetTimer();
+                    clock.getListOfTimers().set(modelRow, timer);
                 }
+                case PAUSE -> {
+                    timer.pauseTimer();
+                    timersTable.getModel().setValueAt(RESUME, modelRow, columnIndex);
+                    clock.getListOfTimers().set(modelRow, timer);
+                }
+                case RESUME -> {
+                    timer.resumeTimer();
+                    timersTable.getModel().setValueAt(PAUSE, modelRow, columnIndex);
+                    clock.getListOfTimers().set(modelRow, timer);
+                }
+                case REMOVE -> {
+                    timer.stopTimer();
+                    clock.getListOfTimers().remove(timer);
+                }
+            }
             }
         };
     }
@@ -318,7 +310,7 @@ public class TimerPanel extends ClockPanel implements Runnable
                     if (currentTimer.equals(timer.getName())) {
                         timersTable.setValueAt(timer.getCountDownString(), rowIndex.get(), 1);
                     }
-                    // update buttons to show restart or remove
+                    // update buttons to show pause/resume/reset
                     if (timer.isTimerGoingOff()) {
                         timersTable.getModel().setValueAt(RESET, rowIndex.get(), 2);
                         new ButtonColumn(timersTable, buttonAction(2), 2);
@@ -658,27 +650,45 @@ public class TimerPanel extends ClockPanel implements Runnable
         }
     }
 
-    /* Getters */
+    /** Returns the clock frame */
     public ClockFrame getClockFrame() { return this.clockFrame; }
+    /** Returns the layout manager */
     public GridBagLayout getGridBagLayout() { return this.layout; }
+    /** Returns the layout constraints */
     public GridBagConstraints getGridBagConstraints() { return this.constraints; }
+    /** Returns the clock */
     public Clock getClock() { return clockFrame.getClock(); }
+    /** Returns the name text field */
     public JTextField getNameTextField() { return this.nameTextField; }
+    /** Returns the hours text field */
     public JTextField getHoursTextField() { return hoursTextField; }
+    /** Returns the minutes text field */
     public JTextField getMinutesTextField() { return minutesTextField; }
+    /** Returns the seconds text field */
     public JTextField getSecondsTextField() { return secondsTextField; }
+    /** Returns the set timer button */
     public JButton getSetTimerButton() { return setTimerButton; }
+    /** Returns the timers table */
     public JTable getTimersTable() { return timersTable; }
 
-    /* Setters */
+    /** Sets the clock frame */
     private void setClockFrame(ClockFrame clockFrame) { this.clockFrame = clockFrame; logger.debug("clockFrame set"); }
+    /** Sets the layout manager */
     protected void setGridBagLayout(GridBagLayout layout) { this.layout = layout; logger.debug("layout set"); }
+    /** Sets the layout constraints */
     protected void setGridBagConstraints(GridBagConstraints constraints) { this.constraints = constraints; logger.debug("constraints set"); }
+    /** Sets the clock */
     public void setClock(Clock clock) { this.clock = clock; logger.debug("Clock set in TimerPanel"); }
+    /** Sets the name text field */
     public void setNameTextField(JTextField nameTextField) { this.nameTextField = nameTextField; logger.debug("nameTextField set in TimerPanel"); }
+    /** Sets the hours text field */
     public void setHoursTextField(JTextField hoursTextField) { this.hoursTextField = hoursTextField; logger.debug("hoursTextField set in TimerPanel"); }
+    /** Sets the minutes text field */
     public void setMinutesTextField(JTextField minutesTextField) { this.minutesTextField = minutesTextField; logger.debug("minutesTextField set in TimerPanel"); }
+    /** Sets the seconds text field */
     public void setSecondsTextField(JTextField secondsTextField) { this.secondsTextField = secondsTextField; logger.debug("secondsTextField set in TimerPanel"); }
+    /** Sets the set timer button */
     public void setSetTimerButton(JButton setTimerButton) { this.setTimerButton = setTimerButton; logger.debug("setTimerButton set in TimerPanel");}
+    /** Sets the timers table */
     public void setTimersTable(JTable timersTable) { this.timersTable = timersTable; logger.debug("timersTable set in TimerPanel");  }
 }

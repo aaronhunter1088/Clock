@@ -27,14 +27,12 @@ public class DisplayTimePanel extends JPanel implements Runnable
     private boolean showAnaloguePanel = false;
     public String clockText = "00:00.000";
     public static String startText = "00:00.000"; // default text
-    private Stopwatch stopwatch;
     private StopwatchPanel stopwatchPanel;
 
     public DisplayTimePanel(StopwatchPanel stopwatchPanel)
     {
         super();
         this.stopwatchPanel = stopwatchPanel;
-        this.stopwatch = stopwatchPanel.getCurrentStopwatch();
         setPreferredSize(ClockFrame.analogueSize);
         setMinimumSize(ClockFrame.analogueSize);
         setMaximumSize(ClockFrame.analogueSize);
@@ -85,9 +83,9 @@ public class DisplayTimePanel extends JPanel implements Runnable
         {
             try
             {
-                if (!stopwatch.isStarted())
+                if (!stopwatchPanel.getCurrentStopwatch().isStarted())
                 {
-                    stopwatch.startStopwatch();
+                    stopwatchPanel.getCurrentStopwatch().startStopwatch();
                 }
                 revalidate();
                 repaint(); // goes to paint
@@ -105,13 +103,14 @@ public class DisplayTimePanel extends JPanel implements Runnable
     public void paint(Graphics g)
     {
         super.paint(g);
-        setClockText(stopwatchPanel.getCurrentStopwatch() == null ? clockText : stopwatchPanel.getCurrentStopwatch().elapsedFormatted());
         if (showAnaloguePanel)
         {
+            setClockText(stopwatchPanel.getCurrentStopwatch() == null ? clockText : stopwatchPanel.getCurrentStopwatch().elapsedFormatted(stopwatchPanel.getCurrentStopwatch().getAccumMilli(), STOPWATCH_PARSE_FORMAT));
             drawAnalogueClock(g);
         }
         else
         {
+            setClockText(stopwatchPanel.getCurrentStopwatch() == null ? clockText : stopwatchPanel.getCurrentStopwatch().elapsedFormatted(stopwatchPanel.getCurrentStopwatch().getAccumMilli(), STOPWATCH_READING_FORMAT));
             drawDigitalClock(g);
         }
     }
@@ -131,7 +130,7 @@ public class DisplayTimePanel extends JPanel implements Runnable
         String dateStr;
         String timeStr;
 
-        dateStr = stopwatch == null ? startText : clockText;
+        dateStr = stopwatchPanel.getCurrentStopwatch() == null ? startText : clockText;
         timeStr = ""; //clock.defaultText(2); // stopwatch status
         // Calculate centered x positions
         int dateWidth = fm.stringWidth(dateStr);
@@ -196,7 +195,7 @@ public class DisplayTimePanel extends JPanel implements Runnable
         g.setColor(Color.BLACK);
 
         // Derive milliseconds from seconds (assuming getStopwatch().getSeconds() returns total seconds with millisecond precision)
-        String time = stopwatch == null ? "00:00:000" : stopwatchPanel.getCurrentStopwatch().elapsedAccumulated();
+        String time = stopwatchPanel.getCurrentStopwatch() == null ? startText : clockText;
         String[] parts = time.split(COLON);
 
         double milliseconds = Double.parseDouble(parts[2]);
@@ -227,13 +226,16 @@ public class DisplayTimePanel extends JPanel implements Runnable
         g.drawLine(xcenter, ycenter, xminute, yminute);
     }
 
-    public void setShowAnaloguePanel(boolean showAnaloguePanel) { this.showAnaloguePanel = showAnaloguePanel; logger.debug("showAnaloguePanel set to {}", showAnaloguePanel); }
-    public void setClockText(String clockText) { this.clockText = clockText; logger.debug("clockText set to {}", clockText); }
-    public void setStopwatch(Stopwatch currentStopwatch) { this.stopwatch = currentStopwatch; logger.debug("stopwatch set to {}", currentStopwatch); }
-
+    /** Returns isShowAnaloguePanel */
     public boolean isShowAnaloguePanel() { return showAnaloguePanel; }
+    /** Returns the clock text */
     public String getClockText() { return clockText; }
-    public Stopwatch getStopwatch() { return stopwatch; }
+    /** Returns if the thread is running */
     public boolean isRunning() { return thread != null; }
+
+    /** Sets the showAnaloguePanel flag */
+    public void setShowAnaloguePanel(boolean showAnaloguePanel) { this.showAnaloguePanel = showAnaloguePanel; logger.debug("showAnaloguePanel set to {}", showAnaloguePanel); }
+    /** Sets the clock text */
+    public void setClockText(String clockText) { this.clockText = clockText; logger.debug("clockText set to {}", clockText); }
 }
 

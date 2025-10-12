@@ -216,15 +216,21 @@ public class DigitalClockPanel extends ClockPanel implements Runnable
         g.setColor(Color.BLACK);
     }
 
-    /* Getters */
+    /** Returns the clock frame */
     public ClockFrame getClockFrame() { return this.clockFrame; }
+    /** Returns the layout manager */
     public GridBagLayout getGridBagLayout() { return this.layout; }
+    /** Returns the grid bag constraints */
     public GridBagConstraints getGridBagConstraints() { return this.constraints; }
+    /** Returns the clock */
     public Clock getClock() { return this.clock; }
 
-    /* Setters */
+    /** Sets the clock frame */
     private void setClockFrame(ClockFrame clockFrame) { this.clockFrame = clockFrame; logger.debug("clockFrame set"); }
+    /** Sets the layout manager */
     protected void setGridBagLayout(GridBagLayout layout) { this.layout = layout; }
+    /** Sets the grid bag constraints */
     protected void setGridBagConstraints(GridBagConstraints constraints) { this.constraints = constraints; }
+    /** Sets the clock */
     public void setClock(Clock clock) { this.clock = clock; logger.debug("clock set in DigitalClockPanel"); }
 }

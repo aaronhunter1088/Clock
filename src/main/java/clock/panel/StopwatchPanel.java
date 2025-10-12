@@ -107,41 +107,24 @@ public class StopwatchPanel extends ClockPanel
            public void focusGained(FocusEvent e) {
                if (currentStopwatch.isPaused())
                {
-                   if (stopwatchNameField.getText().equals("Sw" + (Stopwatch.stopwatchCounter + 1))) {
+                   if (stopwatchNameField.getText().equals("Sw" + (Stopwatch.stopwatchCounter + 1)))
+                   {
                        stopwatchNameField.setText(EMPTY);
                    }
-                   // Logic for showing Resume versus Start
-                   // If currentStopwatch name is same as in textField, show Resume
-                   // If textField text does not exist for any stopwatch, show Start (creating a new one)
-                   String text = stopwatchNameField.getText();
-                   String currentName = currentStopwatch != null ? currentStopwatch.getName() : EMPTY;
-                   List<String> allNames = clock.getListOfStopwatches().stream().map(Stopwatch::getName).toList();
-                   if (currentName.equals(text))
-                   {
-                       if (currentStopwatch != null && currentStopwatch.isStarted()) {
-                           startButton.setText(RESUME);
-                       } else {
-                           startButton.setText(PAUSE);
-                       }
-                   }
-                   else if (allNames.contains(text))
-                   {
-                       currentStopwatch = clock.getListOfStopwatches().stream().filter(stopwatch -> stopwatch.getName().equals(text)).findFirst().get();
-                       displayTimePanel.setStopwatch(currentStopwatch);
-                       startButton.setText(RESUME);
-                   }
-                   else
-                   {
-                       startButton.setText(START);
-                   }
+                   updateStartButtonText();
                    logger.debug("Focus gained on name field");
                }
            }
 
            @Override
            public void focusLost(FocusEvent e) {
-               if (StringUtils.isBlank(stopwatchNameField.getText())) {
+               if (StringUtils.isBlank(stopwatchNameField.getText()))
+               {
                    stopwatchNameField.setText("Sw" + (Stopwatch.stopwatchCounter + 1));
+               }
+               else
+               {
+                   updateStartButtonText();
                }
                logger.debug("Focus lost on name field");
            }
@@ -160,6 +143,31 @@ public class StopwatchPanel extends ClockPanel
     }
 
     /**
+     * Updates the text of the start button based on
+     * whether the text field matches an existing stopwatch name
+     * or not. If it matches, it shows Resume, otherwise Start.
+     */
+    private void updateStartButtonText()
+    {
+        String newTextName = stopwatchNameField.getText();
+        String currentName = currentStopwatch != null ? currentStopwatch.getName() : EMPTY;
+        List<String> allNames = clock.getListOfStopwatches().stream().map(Stopwatch::getName).toList();
+        if (currentName.equals(newTextName))
+        {
+            startButton.setText(RESUME);
+        }
+        else if (allNames.contains(newTextName))
+        {
+            currentStopwatch = clock.getListOfStopwatches().stream().filter(stopwatch -> stopwatch.getName().equals(newTextName)).findFirst().get();
+            startButton.setText(RESUME);
+        }
+        else
+        {
+            startButton.setText(START);
+        }
+    }
+
+    /**
      * Sets up the default values for the stopwatch panel
      */
     public void setupDefaults()
@@ -170,7 +178,7 @@ public class StopwatchPanel extends ClockPanel
         clockFrame.setTitle(STOPWATCH+SPACE+PANEL);
         startButton.setText(START);
         lapButton.setText(LAP);
-        displayTimePanel.setClockText(currentStopwatch != null ? currentStopwatch.elapsedFormatted() : startText);
+        displayTimePanel.setClockText(currentStopwatch != null ? currentStopwatch.elapsedFormatted(currentStopwatch.getAccumMilli(), STOPWATCH_READING_FORMAT) : startText);
     }
 
     /**
@@ -278,10 +286,10 @@ public class StopwatchPanel extends ClockPanel
      * Starts a new stopwatch and changes
      * the start button to a stop button
      */
-    private void startStopwatch()
+    void startStopwatch()
     {
         String name = stopwatchNameField.getText();
-        if (currentStopwatch != null && !currentStopwatch.getName().equals(name))
+        if (currentStopwatch != null && currentStopwatch.getName().equals(name))
         {
             currentStopwatch.resumeStopwatch();
         }
@@ -290,10 +298,9 @@ public class StopwatchPanel extends ClockPanel
             Stopwatch stopwatch = new Stopwatch(name, false, false, clock);
             clock.getListOfStopwatches().add(stopwatch);
             setCurrentStopwatch(stopwatch);
-            displayTimePanel.setStopwatch(currentStopwatch);
         }
         displayTimePanel.start();
-        displayTimePanel.setClockText(currentStopwatch.elapsedFormatted());
+        displayTimePanel.setClockText(currentStopwatch.elapsedFormatted(currentStopwatch.getAccumMilli(), STOPWATCH_READING_FORMAT));
         displayLapsPanel.updateLabelsAndStopwatchTable();
         startButton.setText(PAUSE);
         lapButton.setText(LAP);
@@ -301,7 +308,7 @@ public class StopwatchPanel extends ClockPanel
     }
 
     /** Pauses the current stopwatch */
-    private void pauseStopwatchPanel()
+    void pauseStopwatchPanel()
     {
         displayTimePanel.stop(); // also pauses the stopwatch
         startButton.setText(RESUME);
@@ -310,26 +317,25 @@ public class StopwatchPanel extends ClockPanel
     }
 
     /** Resumes the current stopwatch */
-    private void resumeStopwatch()
+    void resumeStopwatch()
     {
         String chosenName = stopwatchNameField.getText();
         // sets the current stopwatch to the chosen name if it exists otherwise currentStopwatch remains the same
         clock.getListOfStopwatches().stream().filter(stopwatch -> stopwatch.getName().equals(chosenName))
                 .findFirst().ifPresent(resumeSpecificWatch -> currentStopwatch = resumeSpecificWatch);
-        currentStopwatch.resumeStopwatch();
         // because the chosenName may not be the same as the resuming stopwatch, update it there
         stopwatchNameField.setText(currentStopwatch.getName());
-        displayTimePanel.setStopwatch(currentStopwatch);
         displayTimePanel.start();
+        currentStopwatch.resumeStopwatch();
         displayLapsPanel.updateLabelsAndStopwatchTable();
-        displayTimePanel.setClockText(currentStopwatch.elapsedFormatted());
+        displayTimePanel.setClockText(currentStopwatch.elapsedFormatted(currentStopwatch.getAccumMilli(), STOPWATCH_READING_FORMAT));
         startButton.setText(PAUSE);
         lapButton.setText(LAP);
         logger.info("Resuming stopwatch with name: {}", currentStopwatch.getName());
     }
 
     /** Records a lap for the current stopwatch */
-    private void recordLap()
+    void recordLap()
     {
         if (currentStopwatch != null)
         {
@@ -344,7 +350,7 @@ public class StopwatchPanel extends ClockPanel
     }
 
     /** Resets the stopwatch panel to its default state */
-    private void resetStopwatchPanel()
+    void resetStopwatchPanel()
     {
         logger.debug("resetting stopwatch panel");
         getClock().getListOfStopwatches().forEach(Stopwatch::stopStopwatch);
@@ -352,7 +358,6 @@ public class StopwatchPanel extends ClockPanel
         Stopwatch.stopwatchCounter = 0L;
         stopwatchNameField.setText("Sw" + (Stopwatch.stopwatchCounter + 1));
         currentStopwatch = null;
-        displayTimePanel.setStopwatch(null);
         displayTimePanel.stop();
         displayTimePanel.setClockText(startText);
         displayTimePanel.repaint();
@@ -362,21 +367,33 @@ public class StopwatchPanel extends ClockPanel
         lapButton.setText(LAP);
     }
 
-    @Override
-    public void setClock(Clock clock) { this.clock = clock; logger.debug("clock set"); }
-    public void setClockFrame(ClockFrame clockFrame) { this.clockFrame = clockFrame; logger.debug("clockFrame set"); }
-    private void setGridBagLayout(GridBagLayout layout) { setLayout(layout); this.layout = layout; logger.debug("GridBagLayout set"); }
-    public void setGridBagConstraints(GridBagConstraints constraints) { this.constraints = constraints; logger.debug("constraints set"); }
-    private void setCurrentStopwatch(Stopwatch currentStopwatch) { this.currentStopwatch = currentStopwatch; logger.debug("currentStopwatch set"); }
-
+    /** Returns the clock */
     public Clock getClock() { return clock; }
+    /** Returns the clockFrame */
     public ClockFrame getClockFrame() { return clockFrame; }
+    /** Returns the displayTimePanel */
     public DisplayTimePanel getDisplayTimePanel() { return displayTimePanel; }
+    /** Returns the displayLapsPanel */
     public DisplayLapsPanel getDisplayLapsPanel() { return displayLapsPanel; }
+    /** Returns the start button */
     public JButton getStartButton() { return startButton; }
+    /** Returns the lap button */
     public JButton getLapButton() { return lapButton; }
+    /** Returns the stopwatch name text field */
     public JTextField getStopwatchNameField() { return stopwatchNameField; }
+    /** Returns the current stopwatch */
     public Stopwatch getCurrentStopwatch() { return currentStopwatch; }
+
+    /** Sets the clock */
+    public void setClock(Clock clock) { this.clock = clock; logger.debug("clock set"); }
+    /** Sets the clockFrame */
+    public void setClockFrame(ClockFrame clockFrame) { this.clockFrame = clockFrame; logger.debug("clockFrame set"); }
+    /** Sets the layout manager */
+    private void setGridBagLayout(GridBagLayout layout) { setLayout(layout); this.layout = layout; logger.debug("GridBagLayout set"); }
+    /** Sets the grid bag constraints */
+    public void setGridBagConstraints(GridBagConstraints constraints) { this.constraints = constraints; logger.debug("constraints set"); }
+    /** Sets the current stopwatch */
+    public void setCurrentStopwatch(Stopwatch currentStopwatch) { this.currentStopwatch = currentStopwatch; logger.debug("currentStopwatch set"); }
 }
 
 

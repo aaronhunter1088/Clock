@@ -5,8 +5,10 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import javax.swing.*;
+import javax.swing.table.DefaultTableModel;
 import java.awt.*;
 import java.awt.event.ActionEvent;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import static clock.util.Constants.*;
 
@@ -29,7 +31,8 @@ public class DisplayLapsPanel extends JPanel
     public Thread thread;
     private JTable lapsTable,
                    stopwatchTable;
-    private final String[] columnNames = {"Lap #", "Time", "Recorded"};
+    private final String[] lapTableColumnNames = {LAP_SYM, TIME, RECORDED};
+    private final String[] stopwatchTableColumnNames = {NAME, ELAPSED, RESUME, REMOVE};
     public boolean isLapsReversed = false;
 
     public DisplayLapsPanel(StopwatchPanel stopwatchPanel)
@@ -56,7 +59,7 @@ public class DisplayLapsPanel extends JPanel
         constraints.anchor = GridBagConstraints.FIRST_LINE_START;
         addComponent(label, 0, 0, 1, 1, 5,5,1,0, GridBagConstraints.NONE, new Insets(5,5,5,5));
 
-        lapsTable = new JTable(new Object[0][0], columnNames);
+        createDataTable("lapsTable", new Object[0][0], lapTableColumnNames);
         JScrollPane scrollPane = new JScrollPane(lapsTable);
         addComponent(scrollPane, 1, 0, 1, 1, 5,5,1,1, GridBagConstraints.BOTH, new Insets(5,5,5,5));
     }
@@ -65,7 +68,7 @@ public class DisplayLapsPanel extends JPanel
     {
         resetPanel();
         // generate label or something clickable.
-        JButton viewAll = new JButton("View All");
+        JButton viewAll = new JButton(VIEW_ALL);
         viewAll.setFont(ClockFrame.font20);
         viewAll.setOpaque(true);
         viewAll.setName(VIEW_STOPWATCH + "es" + BUTTON);
@@ -82,7 +85,6 @@ public class DisplayLapsPanel extends JPanel
         addComponent(label, 0, 1, 1, 1, 5,5,1,0, GridBagConstraints.NONE, new Insets(5,5,5,5));
 
         Object[][] data = new Object[stopwatchPanel.getCurrentStopwatch().getLaps().size()][3];
-
         if (isLapsReversed)
         {
             for (int i = stopwatchPanel.getCurrentStopwatch().getLaps().size()-1, j=0; i >= 0; i--) {
@@ -101,18 +103,55 @@ public class DisplayLapsPanel extends JPanel
             }
         }
 
-        lapsTable = new JTable(data, columnNames);
+        createDataTable("lapsTable", data, lapTableColumnNames);
         JScrollPane scrollPane = new JScrollPane(lapsTable);
         constraints = new GridBagConstraints();
         addComponent(scrollPane, 1, 0, 2, 1, 5,5,1,1, GridBagConstraints.BOTH, new Insets(5,5,5,5));
+    }
 
+    /**
+     * Creates a JTable to display the laps of the current stopwatch.
+     * @param data the data to be displayed in the table
+     * @param columnNames the names of the columns
+     * @return the JTable displaying the data
+     */
+    private JTable createDataTable(String tableName, Object[][] data, String[] columnNames)
+    {
+        JTable table = createTable(tableName, data, columnNames);
+        table.setPreferredScrollableViewportSize(table.getPreferredSize()); //thanks mKorbel +1 http://stackoverflow.com/questions/10551995/how-to-set-jscrollpane-layout-to-be-the-same-as-jtable
+        table.setFont(ClockFrame.font10);
+        table.setBackground(Color.BLACK);
+        table.setForeground(Color.WHITE);
+        table.setFillsViewportHeight(true);
+        return table;
+    }
+
+    /**
+     * Creates a JTable based on the table name provided.
+     * @param tableName the name of the table to create
+     * @param data the data to be displayed in the table
+     * @param columnNames the names of the columns
+     * @return the JTable created
+     */
+    private JTable createTable(String tableName, Object[][] data, String[] columnNames)
+    {
+        if ("lapsTable".equals(tableName))
+        {
+            lapsTable = new JTable(new DefaultTableModel(data, columnNames));
+            return lapsTable;
+        }
+        else // if ("stopwatchTable".equals(tableName))
+        {
+            stopwatchTable = new JTable(new DefaultTableModel(data, columnNames));
+            return stopwatchTable;
+        }
     }
 
     /** Displays all the stopwatches in a table */
-    public void viewStopwatchesTable(ActionEvent e)
+    private void viewStopwatchesTable(ActionEvent e)
     {
         resetPanel();
-        stopwatchPanel.getCurrentStopwatch().pauseStopwatch();
+        stopwatchPanel.getClock().getListOfStopwatches().forEach(Stopwatch::pauseStopwatch);
         stopwatchPanel.getStartButton().setText(RESUME);
         JLabel label = new JLabel(ALL + SPACE + STOPWATCHES);
         label.setForeground(Color.WHITE);
@@ -121,17 +160,42 @@ public class DisplayLapsPanel extends JPanel
         constraints.anchor = GridBagConstraints.FIRST_LINE_START;
         addComponent(label, 0, 0, 1, 1, 5,5,1,0, GridBagConstraints.NONE, new Insets(5,5,5,5));
 
-        String[] stopwatchColumnNames = {NAME + SPACE + of + SPACE + STOPWATCH, ELAPSED};
         // generate table to display laps.
-        Object[][] data = new Object[stopwatchPanel.getClock().getListOfStopwatches().size()][2];
-        for (int i = 0; i < stopwatchPanel.getClock().getListOfStopwatches().size(); i++) {
-            data[i][0] = stopwatchPanel.getClock().getListOfStopwatches().get(i).getName();
-            data[i][1] = stopwatchPanel.getClock().getListOfStopwatches().get(i).elapsedAccumulated();
+        Object[][] data = getStopwatchesData();
+        stopwatchTable = createDataTable("stopwatchTable", data, stopwatchTableColumnNames);
+        if (stopwatchTable.getModel().getRowCount() != data.length) {
+            stopwatchTable.setModel(new javax.swing.table.DefaultTableModel(data, stopwatchTableColumnNames));
+            new ButtonColumn(stopwatchTable, buttonAction(2), 2);
+            new ButtonColumn(stopwatchTable, buttonAction(3), 3);
+        } else {
+            AtomicInteger rowIndex = new AtomicInteger();
+            stopwatchPanel.getClock().getListOfStopwatches().forEach(stopwatch -> {
+                stopwatchTable.setValueAt(stopwatch.getName(), rowIndex.get(), 0);
+                stopwatchTable.setValueAt(stopwatch.elapsedFormatted(stopwatch.getAccumMilli(), STOPWATCH_PARSE_FORMAT), rowIndex.get(), 1);
+                new ButtonColumn(stopwatchTable, buttonAction(2), 2);
+                new ButtonColumn(stopwatchTable, buttonAction(3), 3);
+                rowIndex.getAndIncrement();
+            });
         }
-        stopwatchTable = new JTable(data, stopwatchColumnNames);
         JScrollPane scrollPane = new JScrollPane(stopwatchTable);
         addComponent(scrollPane, 1, 0, 1, 1, 5,5,1,1, GridBagConstraints.BOTH, new Insets(5,5,5,5));
         repaint();
+    }
+
+    /**
+     * Generates the data for the stopwatches table.
+     * @return the data for the stopwatches table
+     */
+    private Object[][] getStopwatchesData()
+    {
+        return stopwatchPanel.getClock().getListOfStopwatches().stream()
+                .map(stopwatch -> new Object[] {
+                        stopwatch.getName(),
+                        stopwatch.elapsedFormatted(stopwatch.getAccumMilli(), STOPWATCH_PARSE_FORMAT),
+                        RELOAD,
+                        REMOVE
+                })
+                .toArray(Object[][]::new);
     }
 
     /**
@@ -173,7 +237,49 @@ public class DisplayLapsPanel extends JPanel
         repaint();
     }
 
-    /** Setters */
+    /**
+     * This method creates the button action for the
+     * buttons in the stopwatches table.
+     * @param columnIndex the index of the column where the button
+     *                    is located
+     * @return the action to be performed when the button is clicked
+     */
+    public Action buttonAction(int columnIndex)
+    {
+        return new AbstractAction()
+        {
+            public void actionPerformed(ActionEvent e) {
+                int modelRow = Integer.parseInt(e.getActionCommand());
+                String buttonAction = (String) stopwatchTable.getModel().getValueAt(modelRow, columnIndex);
+                Stopwatch stopwatch = stopwatchPanel.getClock().getListOfStopwatches().get(modelRow);
+                logger.debug("{} {} at row: {}", buttonAction, stopwatch, modelRow);
+                if (buttonAction.equals(RELOAD))
+                {
+                    stopwatchPanel.setCurrentStopwatch(stopwatch);
+                    stopwatchPanel.getStopwatchNameField().setText(stopwatch.getName());
+                    stopwatchPanel.getDisplayTimePanel().setClockText(stopwatch.elapsedFormatted(stopwatchPanel.getCurrentStopwatch().getAccumMilli(), STOPWATCH_READING_FORMAT));
+                    stopwatchPanel.getDisplayLapsPanel().updateLabelsAndStopwatchTable();
+                    stopwatchPanel.getStartButton().setText(RESUME);
+                    stopwatchPanel.getLapButton().setText(LAP);
+                }
+                if (buttonAction.equals(REMOVE))
+                {
+                    stopwatch.stopStopwatch();
+                    stopwatchPanel.getClock().getListOfStopwatches().remove(stopwatch);
+                    if (stopwatchPanel.getClock().getListOfStopwatches().isEmpty()) {
+                        stopwatchPanel.setCurrentStopwatch(null);
+                        stopwatchPanel.getStartButton().setText(START);
+                    } else {
+                        // set the current stopwatch to the last stopwatch in the list
+                        stopwatchPanel.setCurrentStopwatch(stopwatchPanel.getClock().getListOfStopwatches().getLast());
+                    }
+                }
+            }
+        };
+    }
+
+    /** Sets the grid bay layout manager */
     private void setGridBagLayout(GridBagLayout layout) { setLayout(layout); this.layout = layout; logger.debug("GridBagLayout set"); }
-    public void setGridBagConstraints(GridBagConstraints constraints) { this.constraints = constraints; logger.debug("constraints set"); }
+    /** Sets the grid bag constraints */
+    private void setGridBagConstraints(GridBagConstraints constraints) { this.constraints = constraints; logger.debug("constraints set"); }
 }

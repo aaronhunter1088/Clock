@@ -40,8 +40,7 @@ public class Timer implements Serializable, Comparable<Timer>, Runnable
                    minutesAsStr,
                    secondsAsStr;
     private boolean timerGoingOff, paused,
-                    started, triggered,
-                    stopped;
+                    started, triggered;
     private Clock clock;
     private volatile Thread selfThread;
     private LocalTime countDown;
@@ -187,10 +186,10 @@ public class Timer implements Serializable, Comparable<Timer>, Runnable
         while (selfThread != null)
         {
             try {
-                if (!timerGoingOff && !stopped) {
+                if (!timerGoingOff && !paused) {
                     performCountDown();
                     sleep(1000);
-                } else if (timerGoingOff && !stopped) {
+                } else if (timerGoingOff && !paused) {
                     triggerTimer();
                     sleep(1000);
                 } else { // if (stopTimer) {
@@ -233,11 +232,9 @@ public class Timer implements Serializable, Comparable<Timer>, Runnable
     {
         try
         {
-            if (!paused) {
-                logger.debug("triggering timer...");
-                setupMusicPlayer();
-                musicPlayer.play();
-            }
+            logger.debug("triggering timer...");
+            setupMusicPlayer();
+            musicPlayer.play();
         }
         catch (Exception e)
         {
@@ -266,11 +263,11 @@ public class Timer implements Serializable, Comparable<Timer>, Runnable
         setPaused(false);
         setStarted(false);
         setTriggered(false);
+        setTimerGoingOff(false);
         setHoursAsStr(ZERO + getHours());
         setMinutesAsStr(ZERO + getMinutes());
         setSecondsAsStr(ZERO + getSeconds());
         setCountDown(LocalTime.of(getHours(), getMinutes(), getSeconds()));
-        setTimerGoingOff(false);
         logger.info("{} timer reset", this);
     }
 
@@ -279,69 +276,95 @@ public class Timer implements Serializable, Comparable<Timer>, Runnable
     {
         logger.info("stopping {}", this);
         setMusicPlayer(null);
-        setTimerGoingOff(false);
         setStarted(false);
-        setTriggered(false);
-        setStopped(true);
         setSelfThread(null);
+        setTriggered(false);
+        setTimerGoingOff(false);
         logger.info("{} timer stopped", this);
     }
 
-    /* Getters */
+    /** Returns the clock */
     public Clock getClock() { return clock; }
+    /** Returns the hours */
     public int getHours() { return hours; }
+    /** Returns the hours as a string */
     public String getHoursAsStr() { return hoursAsStr; }
+    /** Returns the minutes */
     public int getMinutes() { return minutes; }
+    /** Returns the minutes as a string */
     public String getMinutesAsStr() { return minutesAsStr; }
+    /** Returns the seconds */
+    public int getSeconds() { return seconds; }
+    /** Returns the seconds as a string */
+    public String getSecondsAsStr() { return secondsAsStr; }
+    /** Returns the countdown */
     public LocalTime getCountDown() { return countDown; }
+    /** Returns the countdown as a formatted string HH:MM:SS */
     public String getCountDownString() {
         String countdownHours = countDown.getHour() < 10 ? ZERO + countDown.getHour() : String.valueOf(countDown.getHour());
         String countdownMinutes = countDown.getMinute() < 10 ? ZERO + countDown.getMinute() : String.valueOf(countDown.getMinute());
         String countdownSeconds = countDown.getSecond() < 10 ? ZERO + countDown.getSecond() : String.valueOf(countDown.getSecond());
         return String.format("%s:%s:%s", countdownHours, countdownMinutes, countdownSeconds);
     }
+    /** Returns paused */
     public boolean isPaused() { return paused; }
-    public int getSeconds() { return seconds; }
-    public String getSecondsAsStr() { return secondsAsStr; }
+    /** Returns the name of the timer */
     public String getName() { return name; }
+    /** Returns the timerGoingOff flag */
     public boolean isTimerGoingOff() { return timerGoingOff; }
+    /** Returns the started flag */
     public boolean isStarted() { return started; }
+    /** Returns the triggered flag */
     public boolean isTriggered() { return triggered; }
+    /** Returns the music player */
     public AdvancedPlayer getMusicPlayer() { return musicPlayer; }
-    public boolean isStopped() { return stopped; }
+    /** Returns the self thread */
     public Thread getSelfThread() { return selfThread; }
 
-    /* Setters */
+    /** Sets the clock */
     public void setClock(Clock clock) { this.clock = clock; logger.debug("clock set"); }
+    /** Sets the hours, also updates the hoursAsStr */
     public void setHours(int hour) {
         this.hours = hour;
         if (hour < 10) setHoursAsStr(ZERO+hour);
         else setHoursAsStr(EMPTY+hour);
         logger.debug("hours set to {}", hour);
     }
+    /** Sets the hours as a string */
     public void setHoursAsStr(String hoursAsStr) { this.hoursAsStr = hoursAsStr; logger.debug("hoursAsStr set to {}", hoursAsStr); }
+    /** Sets the minutes, also updates the minutesAsStr */
     public void setMinutes(int minutes) {
         this.minutes = minutes;
         if (minutes < 10) setMinutesAsStr(ZERO+ minutes);
         else setMinutesAsStr(EMPTY+ minutes);
         logger.debug("minutes set to {}", minutes);
     }
+    /** Sets the minutes as a string */
     public void setMinutesAsStr(String minutesAsStr) { this.minutesAsStr = minutesAsStr; logger.debug("minutesAsStr set to {}", minutesAsStr); }
+    /** Sets the seconds, also updates the secondsAsStr */
     public void setSeconds(int seconds) {
         this.seconds = seconds;
         if (seconds < 10) setSecondsAsStr(ZERO+ seconds);
         else setSecondsAsStr(EMPTY+ seconds);
         logger.debug("seconds set to {}", seconds);
     }
+    /** Sets the seconds as a string */
     public void setSecondsAsStr(String secondsAsStr) { this.secondsAsStr = secondsAsStr; logger.debug("secondsAsStr set to {}", secondsAsStr); }
+    /** Sets the countdown */
     public void setCountDown(LocalTime countDown) { this.countDown = countDown; logger.debug("countDown set to {}", countDown); }
+    /** Sets the paused flag */
     public void setPaused(boolean paused) { this.paused = paused; logger.debug("paused set to {}", paused); }
+    /** Sets the name of the timer */
     public void setName(String name) { this.name = name; logger.debug("name set to {}", name); }
+    /** Sets the timerGoingOff flag */
     public void setTimerGoingOff(boolean timerGoingOff) { this.timerGoingOff = timerGoingOff; logger.debug("timerGoingOff set to {}", timerGoingOff); }
+    /** Sets the started flag */
     public void setStarted(boolean started) { this.started = started; logger.debug("hasBeenStarted set to {}", started); }
+    /** Sets the triggered flag */
     public void setTriggered(boolean triggered) { this.triggered = triggered; logger.debug("hasBeenTriggered set to {}", triggered); }
+    /** Sets the music player */
     public void setMusicPlayer(AdvancedPlayer musicPlayer) { this.musicPlayer = musicPlayer; logger.debug("musicPlayer set"); }
-    public void setStopped(boolean stopped) { this.stopped = stopped; logger.debug("stopTimer set to {}", stopped); }
+    /** Sets the self thread */
     public void setSelfThread(Thread selfThread) { this.selfThread = selfThread; logger.debug("selfThread set to {}", selfThread); }
 
     /**
@@ -369,6 +392,10 @@ public class Timer implements Serializable, Comparable<Timer>, Runnable
                 getSeconds() == timer.getSeconds();
     }
 
+    /**
+     * Generates a hash code for the timer.
+     * @return the hash code
+     */
     @Override
     public int hashCode()
     { return Objects.hash(getHours(), getMinutes(), getSeconds(), getName()); }

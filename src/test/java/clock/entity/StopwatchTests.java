@@ -9,6 +9,7 @@ import org.junit.jupiter.params.provider.MethodSource;
 
 import java.util.stream.Stream;
 
+import static clock.util.Constants.STOPWATCH_READING_FORMAT;
 import static java.lang.Thread.sleep;
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -66,8 +67,7 @@ public class StopwatchTests {
         assertTrue(stopwatch.isStarted());
         assertNotNull(stopwatch.getSelfThread());
 
-        assertNotNull(stopwatch.elapsedAccumulated());
-        assertNotNull(stopwatch.elapsedFormatted()); // used for parsing in analogue panel
+        assertNotNull(stopwatch.elapsedFormatted(stopwatch.getAccumMilli(), STOPWATCH_READING_FORMAT)); // used for parsing in analogue panel
     }
 
     @Test
@@ -103,7 +103,7 @@ public class StopwatchTests {
         stopwatch.pauseStopwatch();
 
         assertTrue(stopwatch.isPaused());
-        assertNotEquals(0L, stopwatch.getPauseStartMilli());
+        assertNotEquals(0L, stopwatch.getStartPauseMilli());
     }
 
     @Test
@@ -119,7 +119,7 @@ public class StopwatchTests {
         stopwatch.resumeStopwatch();
 
         assertFalse(stopwatch.isPaused());
-        assertEquals(0L, stopwatch.getPauseStartMilli());
+        assertEquals(0L, stopwatch.getStartPauseMilli());
         assertNotEquals(0L, stopwatch.getTotalPausedMilli());
     }
 

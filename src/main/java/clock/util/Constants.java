@@ -148,9 +148,15 @@ public class Constants {
     // Stopwatch
     public static final String ELAPSED = "Elapsed";
     public static final String LAP = "Lap";
+    public static final String LAP_SYM = "Lap #";
     public static final String LAPS = "Laps";
     public static final String LAP_TIME = "Lap Time";
+    public static final String RECORDED = "Recorded";
+    public static final String RELOAD = "Reload";
     public static final String RESTORE = "Restore";
     public static final String REVERSE = "Reverse";
     public static final String START = "Start";
+    public static final String STOPWATCH_PARSE_FORMAT = "%02d:%02d:%03d";
+    public static final String STOPWATCH_READING_FORMAT = "%02d:%02d.%03d";
+    public static final String VIEW_ALL = "View All";
 }

@@ -387,51 +387,93 @@ public class ClockMenuBar extends JMenuBar
         repaint();
     }
 
-    /* Getters */
+    /** Returns the settings menu */
     public JMenu getSettingsMenu() { return this.settingsMenu; }
+    /** Returns the features menu */
     public JMenu getFeaturesMenu() { return this.featuresMenu; }
+    /** Returns the alarms feature menu item */
     public JMenuItem getAlarmsFeature() { return this.alarmsFeature; }
+    /** Returns the military time setting menu item */
     public JMenuItem getMilitaryTimeSetting() { return this.militaryTimeSetting; }
+    /** Returns the full time setting menu item */
     public JMenuItem getFullTimeSetting() { return this.fullTimeSetting; }
+    /** Returns the partial time setting menu item */
     public JMenuItem getPartialTimeSetting() { return this.partialTimeSetting; }
+    /** Returns the toggle DST setting menu item */
     public JMenuItem getToggleDSTSetting() { return toggleDSTSetting; }
+    /** Returns the pause/resume all timers setting menu item */
     public JMenuItem getPauseResumeAllTimersSetting() { return pauseResumeAllTimersSetting; }
+    /** Returns the reset timers panel setting menu item */
     public JMenuItem getResetTimersPanelSetting() { return resetTimersPanelSetting; }
+    /** Returns the pause/resume all alarms setting menu item */
     public JMenuItem getPauseResumeAllAlarmsSetting() { return pauseResumeAllAlarmsSetting; }
+    /** Returns the reset alarms panel setting menu item */
     public JMenuItem getResetAlarmsPanelSetting() { return resetAlarmsPanelSetting; }
+    /** Returns the show digital time on analogue clock setting menu item */
     public JMenuItem getShowDigitalTimeOnAnalogueClockSetting() { return this.showDigitalTimeSettingOnAnalogueClockSetting; }
+    /** Returns the show analogue time panel menu item */
     public JMenuItem getShowAnalogueTimePanel() { return this.showAnalogueTimePanel; }
+    /** Returns the reverse laps setting menu item */
     public JMenuItem getReverseLaps() { return this.reverseLapsSetting; }
+    /** Returns the change time zone menu */
     public JMenu getChangeTimeZoneMenu() { return this.changeTimeZoneMenuSetting; }
+    /** Returns the list of timezone menu items */
     public java.util.List<JMenuItem> getTimezones() { return this.timezones; }
+    /** Returns the digital clock feature menu item */
     public JMenuItem getDigitalClockFeature() { return this.digitalClockFeature; }
+    /** Returns the analogue clock feature menu item */
     public JMenuItem getAnalogueClockFeature() { return this.analogueClockFeature; }
+    /** Returns the timer feature menu item */
     public JMenuItem getTimerFeature() { return this.timerFeature; }
+    /** Returns the stopwatch feature menu item */
     public JMenuItem getStopwatchFeature() { return this.stopwatchFeature; }
+    /** Returns the clock frame */
     public ClockFrame getClockFrame() { return this.clockFrame; }
+    /** Returns the clock */
     public Clock getClock() { return this.clock; }
 
-    /* Setters */
+    /** Sets the settings menu */
     protected void setSettingsMenu(JMenu settingsMenu) { this.settingsMenu = settingsMenu; logger.debug("settings menu"); }
+    /** Sets the features menu */
     protected void setFeaturesMenu(JMenu featuresMenu) { this.featuresMenu = featuresMenu; logger.debug("features menu"); }
+    /** Sets the alarms feature menu item */
     protected void setAlarmsFeature(JMenuItem alarmsFeature) { this.alarmsFeature = alarmsFeature; logger.debug("alarms feature"); }
+    /** Sets the military time setting menu item */
     protected void setMilitaryTimeSetting(JMenuItem militaryTimeSetting) { this.militaryTimeSetting = militaryTimeSetting; logger.debug("military time setting"); }
+    /** Sets the full time setting menu item */
     protected void setFullTimeSetting(JMenuItem fullTimeSetting) { this.fullTimeSetting = fullTimeSetting; logger.debug("full time setting"); }
+    /** Sets the partial time setting menu item */
     protected void setPartialTimeSetting(JMenuItem partialTimeSetting) { this.partialTimeSetting = partialTimeSetting; logger.debug("partial time setting"); }
+    /** Sets the toggle DST setting menu item */
     protected void setToggleDSTSetting(JMenuItem toggleDSTSetting) { this.toggleDSTSetting = toggleDSTSetting; logger.debug("toggle dst setting"); }
+    /** Sets the pause/resume all timers setting menu item */
     protected void setPauseResumeAllTimersSetting(JMenuItem pauseResumeAllTimersSetting) { this.pauseResumeAllTimersSetting = pauseResumeAllTimersSetting; logger.debug("pause/resume all timers setting"); }
+    /** Sets the reset timers panel setting menu item */
     protected void setResetTimersPanelSetting(JMenuItem resetTimersPanelSetting) { this.resetTimersPanelSetting = resetTimersPanelSetting; logger.debug("reset timers panel setting"); }
+    /** Sets the pause/resume all alarms setting menu item */
     protected void setPauseResumeAllAlarmsSetting(JMenuItem pauseResumeAllAlarmsSetting) { this.pauseResumeAllAlarmsSetting = pauseResumeAllAlarmsSetting; logger.debug("pause/resume all alarms setting"); }
+    /** Sets the reset alarms panel setting menu item */
     protected void setResetAlarmsPanelSetting(JMenuItem resetAlarmsPanelSetting) { this.resetAlarmsPanelSetting = resetAlarmsPanelSetting; logger.debug("reset alarms panel setting"); }
+    /** Sets the show digital time on analogue clock setting menu item */
     protected void setShowDigitalTimeOnAnalogueClockSetting(JMenuItem showDigitalTimeSettingOnAnalogueClockSetting) { this.showDigitalTimeSettingOnAnalogueClockSetting = showDigitalTimeSettingOnAnalogueClockSetting; logger.debug("show digital time on analogue clock setting"); }
+    /** Sets the show analogue time panel menu item */
     protected void setShowAnalogueTimePanel(JMenuItem showAnalogueTimePanel) { this.showAnalogueTimePanel = showAnalogueTimePanel; logger.debug("show analogue time panel"); }
+    /** Sets the change time zone menu */
     protected void setChangeTimeZoneMenu(JMenu changeTimeZone) { this.changeTimeZoneMenuSetting = changeTimeZone; logger.debug("change time zone menu"); }
+    /** Sets the digital clock feature menu item */
     protected void setDigitalClockFeature(JMenuItem digitalClockFeature) { this.digitalClockFeature = digitalClockFeature; logger.debug("digital clock feature"); }
+    /** Sets the analogue clock feature menu item */
     protected void setAnalogueClockFeature(JMenuItem analogueClockFeature) { this.analogueClockFeature = analogueClockFeature; logger.debug("analogue clock feature"); }
+    /** Sets the reverse laps setting menu item */
     protected void setReverseLaps(JMenuItem reverseLapsSetting) { this.reverseLapsSetting = reverseLapsSetting; logger.debug("reverse laps setting"); }
+    /** Sets the list of timezone menu items */
     protected void setTimeZones(java.util.List<JMenuItem> timezones) { this.timezones = timezones; logger.debug("timezones list"); }
+    /** Sets the timer feature menu item */
     protected void setTimerFeature(JMenuItem timerFeature) { this.timerFeature = timerFeature; logger.debug("timer feature"); }
+    /** Sets the stopwatch feature menu item */
     protected void setStopwatchFeature(JMenuItem stopwatchFeature) { this.stopwatchFeature = stopwatchFeature; logger.debug("stopwatch feature");}
+    /** Sets the clock frame */
     protected void setClockFrame(ClockFrame clockFrame) { this.clockFrame = clockFrame; logger.debug("clock frame"); }
+    /** Sets the clock */
     protected void setClock(Clock clock) { this.clock = clock; logger.debug("clock"); }
 }

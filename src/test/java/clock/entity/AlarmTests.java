@@ -99,6 +99,24 @@ class AlarmTests {
         assertFalse(alarm1.isActivatedToday(), "Alarm should not yet be triggered today");
     }
 
+    @Test
+    @DisplayName("Create an Alarm with a name longer than 10 characters")
+    void testCreateAnAlarmWithNameLongerThan10Characters()
+    {
+        String name = "This is a very long alarm name";
+        assertThrows(InvalidInputException.class, () -> new Alarm(name, 7, 0, AM, weekDays, false, clock));
+    }
+
+    @Test
+    @DisplayName("Test Snoozing an Alarm")
+    void testSnoozingAnAlarm()
+    {
+        alarm1 = new Alarm("Snooze Test Alarm", 7, 0, AM, weekDays, false, clock);
+        assertDoesNotThrow(() -> alarm1.snooze(), "Snoozing an alarm that is not going off should not throw an exception");
+        assertTrue(alarm1.isSnoozing(), "Alarm should be snoozing");
+        assertFalse(alarm1.isAlarmGoingOff(), "Alarm should not yet be triggered today");
+    }
+
     @ParameterizedTest
     @ValueSource(ints = {-1, 25})
     @DisplayName("Test Creating Alarm with Invalid Hours")

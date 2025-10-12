@@ -216,22 +216,33 @@ public class AnalogueClockPanel extends ClockPanel implements Runnable
         g.setColor(Color.BLACK); // needed to avoid second hand delay UI issue
     }
 
-    /* Getters */
+    /** Returns the clock frame */
     public ClockFrame getClockFrame() { return this.clockFrame; }
+    /** Returns the clock */
     public Clock getClock() { return this.clock; }
+    /** Returns the layout manager */
     public GridBagLayout getGridBagLayout() { return this.layout; }
+    /** Returns the grid bag constraints */
     public GridBagConstraints getGridBagConstraints() { return this.constraints; }
+    /** Returns the clock text */
     public String getClockText() { return this.clockText; }
+    /** Returns isShowDigitalTimeOnAnalogueClock */
     public boolean isShowDigitalTimeOnAnalogueClock() { return showDigitalTimeOnAnalogueClock; }
+    /** Returns the self thread */
     public Thread getThread() { return this.thread; }
 
-    /* Setters */
+    /** Sets the clock frame */
     private void setClockFrame(ClockFrame clockFrame) { this.clockFrame = clockFrame; logger.debug("clockFrame set"); }
+    /** Sets the layout manager */
     private void setGridBagLayout(GridBagLayout layout) { this.layout = layout; logger.debug("GridBagLayout set"); }
+    /** Sets the grid bag constraints */
     private void setGridBagConstraints(GridBagConstraints constraints) { this.constraints = constraints; logger.debug("GridBagConstraints set"); }
+    /** Sets the clock text */
     private void setClockText(String clockText) { this.clockText = clockText; logger.debug("clockText set"); }
-    @Override
+    /** Sets the clock */
     public void setClock(Clock clock) { this.clock = clock; logger.debug("clock set"); }
+    /** Sets isShowDigitalTimeOnAnalogueClock */
     public void setShowDigitalTimeOnAnalogueClock(boolean showDigitalTimeOnAnalogueClock)  { this.showDigitalTimeOnAnalogueClock = showDigitalTimeOnAnalogueClock; logger.debug("showDigitalTimeOnAnalogueClock set to " + showDigitalTimeOnAnalogueClock); }
+    /** Sets the self thread */
     private void setThread(Thread thread) { this.thread = thread; logger.debug("thread set");  }
 }

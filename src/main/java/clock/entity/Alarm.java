@@ -4,6 +4,7 @@ import java.io.InputStream;
 import java.io.Serial;
 import java.io.Serializable;
 import java.time.DayOfWeek;
+import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -37,13 +38,13 @@ public class Alarm implements Serializable, Comparable<Alarm>, Runnable
     private static final long serialVersionUID = 2L;
     private static final Logger logger = LogManager.getLogger(Alarm.class);
     public static long alarmsCounter = 0L;
-    public static final long SNOOZE_TIME = 7 * 60 * 1000; // 7 minutes in milliseconds
+    private static final long SNOOZE_TIME = Duration.ofSeconds(7).getSeconds(); // 7 minutes in milliseconds
     private int hours,
                 minutes;
     private String minutesAsStr,
                    hoursAsStr,
                    ampm,
-                   name; // limited to 10 characters
+                   name; // limited to 20 characters
     private List<DayOfWeek> days;
     private boolean alarmGoingOff,
                     updatingAlarm,
@@ -83,6 +84,7 @@ public class Alarm implements Serializable, Comparable<Alarm>, Runnable
     {
         if (hours < 0 || hours > 12) throw new InvalidInputException("Hours must be between 0 and 12");
         if (minutes < 0 || minutes > 59) throw new InvalidInputException("Minutes must be between 0 and 59");
+        if (name.length() > 20) throw new InvalidInputException("Alarm name cannot be longer than 10 characters");
         setClock(clock);
         setHours(hours);
         setMinutes(minutes);
@@ -117,56 +119,6 @@ public class Alarm implements Serializable, Comparable<Alarm>, Runnable
             logger.error("Music Player not set!");
             if (null == inputStream) printStackTrace(e, "An issue occurred while reading the alarm file.");
             else printStackTrace(e, "A JavaLayerException occurred: " + e.getMessage());
-        }
-    }
-
-    /**
-     * Stops an actively going off alarm
-     */
-    public synchronized void stopAlarm()
-    {
-        logger.debug("stopping alarm");
-        musicPlayer = null;
-        alarmGoingOff = false;
-        selfThread = null;
-        logger.info("{} alarm turned off", this);
-    }
-
-    /** Pauses the alarm */
-    public synchronized void pauseAlarm()
-    {
-        logger.debug("pause alarm");
-        setIsPaused(true);
-    }
-
-    /**
-     * Resumes the alarm after it has been paused.
-     * This will reset the alarm to not going off,
-     * and not triggered today. This is to ensure
-     * that if you resume all timers, or that one,
-     * and it is still time to trigger the alarm,
-     */
-    public synchronized void resumeAlarm()
-    {
-        logger.debug("resume alarm");
-        setIsPaused(false);
-    }
-
-    /**
-     * Sets an alarm to go off
-     */
-    public synchronized void triggerAlarm()
-    {
-        logger.debug("trigger {}", this);
-        try
-        {
-            logger.debug("playing sound");
-            setupMusicPlayer();
-            musicPlayer.play();
-        }
-        catch (Exception e)
-        {
-            printStackTrace(e, e.getMessage());
         }
     }
 
@@ -232,12 +184,62 @@ public class Alarm implements Serializable, Comparable<Alarm>, Runnable
     }
 
     /**
+     * Stops an actively going off alarm
+     */
+    public synchronized void stopAlarm()
+    {
+        logger.debug("stopping alarm");
+        musicPlayer = null;
+        alarmGoingOff = false;
+        selfThread = null;
+        logger.info("{} alarm turned off", this);
+    }
+
+    /** Pauses the alarm */
+    public synchronized void pauseAlarm()
+    {
+        logger.debug("pause alarm");
+        setIsPaused(true);
+    }
+
+    /**
+     * Resumes the alarm after it has been paused.
+     * This will reset the alarm to not going off,
+     * and not triggered today. This is to ensure
+     * that if you resume all timers, or that one,
+     * and it is still time to trigger the alarm,
+     */
+    public synchronized void resumeAlarm()
+    {
+        logger.debug("resume alarm");
+        setIsPaused(false);
+    }
+
+    /**
+     * Sets an alarm to go off
+     */
+    public synchronized void triggerAlarm()
+    {
+        logger.debug("trigger {}", this);
+        try
+        {
+            logger.debug("playing sound");
+            setupMusicPlayer();
+            musicPlayer.play();
+        }
+        catch (Exception e)
+        {
+            printStackTrace(e, e.getMessage());
+        }
+    }
+
+    /**
      * Snoozing this alarm will stop the alarm
      * from playing its sound for 7 minutes.
      */
     public synchronized void snooze()
     {
-        logger.info("snoozing for {} minutes", SNOOZE_TIME / 60000);
+        logger.info("snoozing for {} minutes", Duration.ofMinutes(SNOOZE_TIME).toMinutes());
         setIsSnoozing(true);
         setIsAlarmGoingOff(false);
     }
@@ -297,45 +299,72 @@ public class Alarm implements Serializable, Comparable<Alarm>, Runnable
         return shortenedDays;
     }
 
-    /* Getters */
+    /** Returns the clock reference */
     public Clock getClock() { return this.clock; }
+    /** Returns whether the alarm is going off */
     public boolean isAlarmGoingOff() { return alarmGoingOff; }
+    /** Returns whether the alarm is being updated */
     public boolean isUpdatingAlarm() { return updatingAlarm; }
+    /** Returns whether the alarm is snoozing */
     public boolean isSnoozing() { return isSnoozing; }
+    /** Returns whether the alarm is paused */
     public boolean isPaused() { return isPaused; }
+    /** Returns the days of the alarm */
     public List<DayOfWeek> getDays() { return this.days; }
+    /** Returns the hours of the alarm */
     public int getHours() { return this.hours; }
+    /** Returns the hours as a string with leading zero if needed */
     public String getHoursAsStr() { return this.hoursAsStr; }
+    /** Returns the minutes of the alarm */
     public int getMinutes() { return this.minutes; }
+    /** Returns the minutes as a string with leading zero if needed */
     public String getMinutesAsStr() { return this.minutesAsStr; }
+    /** Returns the AM or PM value */
     public String getAMPM() { return this.ampm; }
+    /** Returns the name of the alarm */
     public String getName() { return this.name; }
+    /** Returns the music player object */
     public AdvancedPlayer getMusicPlayer() { return this.musicPlayer; }
+    /** Returns the alarm as a string in the format HH:MM AM/PM */
     public String getAlarmAsString() { return hoursAsStr+COLON+minutesAsStr+SPACE+ampm; }
+    /** Returns whether the alarm has been activated today */
     public boolean isActivatedToday() { return activatedToday; }
+    /** Returns the thread reference to itself */
     public Thread getSelfThread() { return selfThread; }
 
-    /* Setters */
+    /** Sets the clock reference */
     public void setClock(Clock clock) { this.clock = clock; logger.debug("clock set to: {}", clock); }
+    /** Sets whether the alarm is going off */
     public void setIsAlarmGoingOff(boolean alarmGoingOff) { this.alarmGoingOff = alarmGoingOff; logger.debug("alarmGoingOff: {}", alarmGoingOff); }
+    /** Sets whether the alarm is being updated */
     public void setUpdatingAlarm(boolean updatingAlarm) { this.updatingAlarm = updatingAlarm; logger.debug("updatingAlarm: {}", updatingAlarm); }
+    /** Sets whether the alarm is snoozing */
     public void setIsSnoozing(boolean isSnoozing) { this.isSnoozing = isSnoozing; logger.debug("isSnoozing: {}", isSnoozing); }
+    /** Sets whether the alarm is paused */
     public void setIsPaused(boolean isPaused) { this.isPaused = isPaused; logger.debug("isPaused: {}", isPaused); }
+    /** Sets the days of the alarm */
     public void setDays(List<DayOfWeek> days) { this.days = days; logger.debug("days: {}", days); }
+    /** Sets the hours of the alarm */
     public void setHours(int hours) {
         this.hours = hours;
         this.hoursAsStr = (hours < 10) ? "0"+this.hours : String.valueOf(this.hours);
         logger.debug("hours: {}", hours);
     }
+    /** Sets the minutes of the alarm */
     public void setMinutes(int minutes) {
         this.minutes = minutes;
         this.minutesAsStr = (minutes < 10) ? "0"+this.minutes : String.valueOf(this.minutes);
         logger.debug("minutes: {}", minutes);
     }
+    /** Sets the AM or PM value */
     public void setAMPM(String ampm) { this.ampm = ampm; logger.debug("ampm: {}", ampm); }
+    /** Sets the name of the alarm */
     public void setName(String name) { this.name = name; logger.debug("name set to {}", name); }
+    /** Sets the music player object */
     public void setMusicPlayer(AdvancedPlayer musicPlayer) { this.musicPlayer = musicPlayer; logger.debug("musicPlayer set"); }
+    /** Sets whether the alarm has been activated today */
     public void setActivatedToday(boolean activatedToday) { this.activatedToday = activatedToday; logger.debug("triggeredToday: {}", activatedToday); }
+    /** Sets the thread reference to itself */
     public void setSelfThread(Thread selfThread) { this.selfThread = selfThread; logger.debug("selfThread set"); }
 
     /**
@@ -366,6 +395,10 @@ public class Alarm implements Serializable, Comparable<Alarm>, Runnable
                 Objects.equals(getDays(), alarm.getDays());
     }
 
+    /**
+     * Generates a hash code for the alarm.
+     * @return the hash code
+     */
     @Override
     public int hashCode() {
         return Objects.hash(getHours(), getMinutes(),

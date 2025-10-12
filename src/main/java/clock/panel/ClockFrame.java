@@ -292,18 +292,19 @@ public class ClockFrame extends JFrame
      * Quickly clears all options from the
      * settings menu.
      */
-    public void clearSettingsMenu()
+    void clearSettingsMenu()
     { getClockMenuBar().getSettingsMenu().removeAll(); }
 
     /**
      * Creates and shows the GUI for the Clock application.
      * This method is invoked in Main.
      */
-    public static void createAndShowGUI()
+    public static ClockFrame createAndShowGUI()
     {
         logger.info("Starting Clock...");
         ClockFrame clockFrame = new ClockFrame();
         clockFrame.start();
+        return clockFrame;
     }
 
     /**
@@ -312,11 +313,12 @@ public class ClockFrame extends JFrame
      * application with a specific clock.
      * @param clock the clock to use for testing
      */
-    public static void createAndShowGUI(Clock clock)
+    public static ClockFrame createAndShowGUI(Clock clock)
     {
         logger.info("Starting TestClock...");
         ClockFrame clockFrame = new ClockFrame(clock);
         clockFrame.start();
+        return clockFrame;
     }
 
     /**
@@ -336,23 +338,9 @@ public class ClockFrame extends JFrame
      * Starts the clock and schedules the
      * tasks to run at a fixed rate.
      */
-    public void start()
+    void start()
     {
-        // Wrap tasks to prevent exceptions from killing scheduled execution
-        Function<Runnable, Runnable> taskRunner = task -> () -> {
-            try {
-                task.run();
-            } catch (Exception e) {
-                logger.error("Scheduled task failed: {}", task, e);
-                logger.fatal("""
-                        Because the schedule task failed, the application will now exit.
-                        Please check the logs for more information.
-                        """);
-                System.exit(1);
-            }
-        };
-
-        scheduler.schedule(taskRunner.apply(clock), 0, TimeUnit.SECONDS);
+        scheduler.execute(clock);
     }
 
     /**
@@ -360,33 +348,48 @@ public class ClockFrame extends JFrame
      */
     public void stop()
     {
-        if (scheduler != null && !scheduler.isShutdown())
-        {
-            scheduler.shutdownNow();
-        }
+        setClock(null);
+        setScheduler(null);
     }
 
-    /** Getters */
+    /** Returns the panel type */
     public clock.entity.Panel getPanelType() { return panelType; }
+    /** Returns the current panel */
     public ClockPanel getCurrentPanel() { return currentPanel; }
+    /** Returns the digital clock panel */
     public DigitalClockPanel getDigitalClockPanel() { return (DigitalClockPanel) digitalClockPanel; }
+    /** Returns the analogue clock panel */
     public AnalogueClockPanel getAnalogueClockPanel() { return (AnalogueClockPanel) analogueClockPanel; }
+    /** Returns the alarm panel */
     public AlarmPanel getAlarmPanel() { return (AlarmPanel) alarmPanel; }
-    public ClockMenuBar getClockMenuBar() { return menuBar; }
+    /** Returns the timer panel */
     public TimerPanel getTimerPanel() { return (TimerPanel) timerPanel; }
+    /** Returns the stopwatch panel */
     public StopwatchPanel getStopwatchPanel() { return (StopwatchPanel) stopwatchPanel; }
+    /** Returns the menu bar */
+    public ClockMenuBar getClockMenuBar() { return menuBar; }
+    /** Returns the clock */
     public Clock getClock() { return clock; }
+    /** Returns the scheduler */
     public ScheduledExecutorService getScheduler() { return scheduler; }
 
-    /** Setters */
+    /** Sets the panel type */
     public void setPanelType(Panel panelType) { this.panelType = panelType; logger.debug("set panel type to {}", panelType); }
+    /** Sets the current panel */
     public void setCurrentPanel(ClockPanel currentPanel) { this.currentPanel = currentPanel; logger.debug("currentPanel set"); }
+    /** Sets the digital clock panel */
     public void setDigitalClockPanel(DigitalClockPanel digitalClockPanel) { this.digitalClockPanel = digitalClockPanel; logger.debug("digitalClockPanel set"); }
+    /** Sets the analogue clock panel */
     public void setAnalogueClockPanel(AnalogueClockPanel analogueClockPanel) { this.analogueClockPanel = analogueClockPanel; logger.debug("analogueClockPanel set"); }
+    /** Sets the alarm panel */
     public void setAlarmPanel(AlarmPanel alarmPanel) { this.alarmPanel = alarmPanel; logger.debug("alarmPanel set"); }
+    /** Sets the timer panel */
     public void setTimerPanel(TimerPanel timerPanel) { this.timerPanel = timerPanel; logger.debug("timerPanel set"); }
+    /** Sets the stopwatch panel */
     public void setStopwatchPanel(StopwatchPanel stopwatchPanel) { this.stopwatchPanel = stopwatchPanel; logger.debug("stopwatchPanel set"); }
-    public void setClock(Clock clock) { this.clock = clock; logger.debug("clock set"); }
+    /** Sets the clock */
+    public void setClock(Clock clock) { this.clock = clock; logger.debug("clock set to {}", clock); }
+    /** Sets the scheduler */
     public void setScheduler(ScheduledExecutorService scheduler) { this.scheduler = scheduler; logger.debug("scheduler set"); }
 }
 

@@ -31,14 +31,14 @@ public class Lap implements Serializable, Comparable<Lap>, Cloneable
     /**
      * The main constructor for creating a Lap
      * @param lapNumber the lap number
-     * @param duration the total duration of the stopwatch at the time of the lap
-     * @param lapTime the duration of the lap itself
+     * @param recordedAt the recordedAt of the stopwatch at the time of the lap
+     * @param lapTime the recordedAt of the lap itself
      * @param stopwatch the stopwatch to which this lap belongs
      */
-    public Lap(int lapNumber, long duration, long lapTime, Stopwatch stopwatch)
+    public Lap(int lapNumber, long recordedAt, long lapTime, Stopwatch stopwatch)
     {
         setLapNumber(lapNumber);
-        setDuration(duration);
+        setDuration(recordedAt);
         setLapTime(lapTime);
         setStopwatch(stopwatch);
     }
@@ -95,16 +95,28 @@ public class Lap implements Serializable, Comparable<Lap>, Cloneable
         return sb.toString();
     }
 
-    /* Getters */
+    /** Get the lap number */
     public int getLapNumber() { return lapNumber; }
+    /** Get the duration */
+    public long getDuration() { return duration; }
+    /** Get the lap time */
+    public long getLapTime() { return lapTime; }
+    /** Get the stopwatch */
     public Stopwatch getStopwatch() { return stopwatch; }
 
-    /* Setters */
+    /** Set the lap number */
     public void setLapNumber(int lapNumber) { this.lapNumber = lapNumber; logger.debug("lapNumber set to {}", lapNumber); }
+    /** Set the duration */
     public void setDuration(long duration) { this.duration = duration; logger.debug("duration set to {} seconds", duration); }
+    /** Set the lap time */
     public void setLapTime(long lapTime) { this.lapTime = lapTime; logger.debug("lapTime set to {}", lapTime); }
+    /** Set the stopwatch */
     public void setStopwatch(Stopwatch stopwatch) { this.stopwatch = stopwatch; logger.debug("stopwatch set to {}", stopwatch); }
 
+    /**
+     * Creates and returns a copy of this Lap.
+     * Used in tests.
+     */
     @Override
     public Lap clone() {
         try {
