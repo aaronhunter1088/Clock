@@ -8,7 +8,7 @@ date and time. The following is the default java command to run the clock:
 ```
 # Both commands achieve the same result:
 java -jar Clock-2.9-jar-with-dependencies.jar
-or
+or with 0 as the argument:
 java -jar Clock-2.9-jar-with-dependencies.jar 0
 
 # Start the jar file with a specific panel:
@@ -80,11 +80,11 @@ On the Stopwatches panel, you can change the following settings:
 * (Ctrl + T) Show Analogue/Digital Time: This will toggle the stopwatch time between analogue and digital modes.
 * (Ctrl + R) Reverse Laps Order: This toggle will reverse the order of the laps for all stopwatches.
 
-Tests
-The application is tested using JUnit 5 and Mockito. Some tests requires user interaction to 
-continue. Simply close any popups to allow the tests to continue.
-```
+Running The Tests:<br>
+The application is tested using JUnit 5 and Mockito. Some tests have popups that requires you to close them.
+Without the tests will 'pause' until that popup is closed.
 
+```
 # History
 v2.9 Updated to use my parent pom. Multiple timers. Multiple ways to start the application.
 Java was upgraded to 21. Multiple stopwatches were added.
