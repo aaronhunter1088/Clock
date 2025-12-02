@@ -4,10 +4,11 @@ import clock.panel.ClockFrame;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.junit.jupiter.api.*;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
 import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
+import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.awt.event.ActionEvent;
 import java.time.DayOfWeek;
@@ -23,9 +24,10 @@ import static org.junit.jupiter.api.Assertions.*;
  * @author michael ball
  * @version since 2.9
  */
-public class ClockMenuBarTests
+@ExtendWith(MockitoExtension.class)
+public class ClockMenuBarTest
 {
-    private static final Logger logger = LogManager.getLogger(ClockMenuBarTests.class);
+    private static final Logger logger = LogManager.getLogger(ClockMenuBarTest.class);
 
     private ClockFrame clockFrame;
 
@@ -35,13 +37,12 @@ public class ClockMenuBarTests
     @BeforeAll
     static void beforeClass()
     {
-        logger.info("Starting {}...", ClockMenuBarTests.class.getSimpleName());
+        logger.info("Starting {}...", ClockMenuBarTest.class.getSimpleName());
     }
 
     @BeforeEach
     void beforeEach()
     {
-        MockitoAnnotations.initMocks(this);
         clockFrame = new ClockFrame();
     }
 
@@ -50,7 +51,7 @@ public class ClockMenuBarTests
     {}
 
     @AfterAll
-    static void afterAll() { logger.info("Concluding {}", ClockMenuBarTests.class.getSimpleName()); }
+    static void afterAll() { logger.info("Concluding {}", ClockMenuBarTest.class.getSimpleName()); }
 
     @ParameterizedTest
     @DisplayName("Test Toggle Military Time Setting")

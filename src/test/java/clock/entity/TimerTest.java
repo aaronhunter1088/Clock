@@ -22,16 +22,16 @@ import static org.junit.jupiter.api.Assertions.*;
  * @author michael ball
  * @version since 2.0
  */
-class TimerTests
+class TimerTest
 {
-    private static final Logger logger = LogManager.getLogger(TimerTests.class);
+    private static final Logger logger = LogManager.getLogger(TimerTest.class);
 
     private Clock clock;
     private Timer timer1, timer2;
 
     @BeforeAll
     static void beforeClass()
-    { logger.info("Starting {}...", TimerTests.class.getSimpleName()); }
+    { logger.info("Starting {}...", TimerTest.class.getSimpleName()); }
 
     @BeforeEach
     void beforeEach()
@@ -47,7 +47,7 @@ class TimerTests
     }
 
     @AfterAll
-    static void afterAll() { logger.info("Concluding {}", TimerTests.class.getSimpleName()); }
+    static void afterAll() { logger.info("Concluding {}", TimerTest.class.getSimpleName()); }
 
     @Test
     @DisplayName("Create a Timer")

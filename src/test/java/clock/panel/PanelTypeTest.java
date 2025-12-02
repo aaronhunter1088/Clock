@@ -18,14 +18,14 @@ import static org.junit.jupiter.api.Assertions.*;
  * @author michael ball
  * @version since 2.9
  */
-class PanelTypeTests
+class PanelTypeTest
 {
-    private static final Logger logger = LogManager.getLogger(PanelTypeTests.class);
+    private static final Logger logger = LogManager.getLogger(PanelTypeTest.class);
 
     @BeforeAll
     static void beforeClass()
     {
-        logger.info("Starting PanelTypeTests...");
+        logger.info("Starting PanelTypeTest...");
     }
 
     @BeforeEach
@@ -35,7 +35,7 @@ class PanelTypeTests
     void afterEach() {}
 
     @AfterAll
-    static void afterAll() { logger.info("Concluding {}", PanelTypeTests.class.getSimpleName()); }
+    static void afterAll() { logger.info("Concluding {}", PanelTypeTest.class.getSimpleName()); }
 
     @Test
     @DisplayName("Panel Types are Different")

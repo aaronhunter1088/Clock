@@ -12,9 +12,9 @@ import static org.junit.jupiter.api.Assertions.*;
  * @author michael ball
  * @version since 2.9
  */
-class LapTests {
+class LapTest {
 
-    private static final Logger logger = LogManager.getLogger(LapTests.class);
+    private static final Logger logger = LogManager.getLogger(LapTest.class);
 
     private static Clock clock;
     private static Stopwatch stopwatch;
@@ -22,7 +22,7 @@ class LapTests {
     @BeforeAll
     static void beforeClass()
     {
-        logger.info("Starting {}...", LapTests.class.getSimpleName());
+        logger.info("Starting {}...", LapTest.class.getSimpleName());
     }
 
     @BeforeEach
@@ -37,7 +37,7 @@ class LapTests {
     {}
 
     @AfterAll
-    static void afterAll() { logger.info("Concluding {}", LapTests.class.getSimpleName()); }
+    static void afterAll() { logger.info("Concluding {}", LapTest.class.getSimpleName()); }
 
     @Test
     @DisplayName("Test Lap Creation")

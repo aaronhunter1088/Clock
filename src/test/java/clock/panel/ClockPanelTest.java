@@ -6,7 +6,6 @@ import org.apache.logging.log4j.Logger;
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
-import org.mockito.MockitoAnnotations;
 
 import static clock.util.Constants.AM;
 import static java.time.DayOfWeek.WEDNESDAY;
@@ -19,9 +18,9 @@ import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
  * @author michael ball
  * @version since 2.9
  */
-public class ClockPanelTests
+public class ClockPanelTest
 {
-    private static final Logger logger = LogManager.getLogger(ClockPanelTests.class);
+    private static final Logger logger = LogManager.getLogger(ClockPanelTest.class);
 
     Clock clock;
 
@@ -30,13 +29,12 @@ public class ClockPanelTests
     @BeforeAll
     static void beforeClass()
     {
-        logger.info("Starting ClockPanelTests...");
+        logger.info("Starting ClockPanelTest...");
     }
 
     @BeforeEach
     void beforeEach()
     {
-        MockitoAnnotations.initMocks(this);
         clock = new Clock(11, 30, 0, JANUARY, WEDNESDAY, 1, 2025, AM); // 11:30 AM
         clockPanel = new AlarmPanel(new ClockFrame(clock));
     }
@@ -46,7 +44,7 @@ public class ClockPanelTests
     {}
 
     @AfterAll
-    static void afterAll() { logger.info("Concluding {}", ClockPanelTests.class.getSimpleName()); }
+    static void afterAll() { logger.info("Concluding {}", ClockPanelTest.class.getSimpleName()); }
 
     @ParameterizedTest
     @DisplayName("Test Display Popup Message")

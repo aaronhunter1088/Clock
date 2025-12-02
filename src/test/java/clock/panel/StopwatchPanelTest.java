@@ -6,11 +6,12 @@ import clock.entity.Stopwatch;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.junit.jupiter.api.*;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
+import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.awt.event.ActionEvent;
 import java.util.stream.Stream;
@@ -28,9 +29,10 @@ import static org.mockito.Mockito.when;
  * @author michael ball
  * @version since 2.9
  */
-class StopwatchPanelTests {
+@ExtendWith(MockitoExtension.class)
+class StopwatchPanelTest {
 
-    private static final Logger logger = LogManager.getLogger(TimerPanelTests.class);
+    private static final Logger logger = LogManager.getLogger(TimerPanelTest.class);
 
     Clock clock;
 
@@ -41,12 +43,11 @@ class StopwatchPanelTests {
 
     @BeforeAll
     static void beforeClass()
-    { logger.info("Starting TimerPanelTests..."); }
+    { logger.info("Starting TimerPanelTest..."); }
 
     @BeforeEach
     void beforeEach()
     {
-        MockitoAnnotations.initMocks(this);
         clock = new Clock();
         Stopwatch.stopwatchCounter = 0L;
         stopwatchPanel = new StopwatchPanel(new ClockFrame(clock));
@@ -60,7 +61,7 @@ class StopwatchPanelTests {
     }
 
     @AfterAll
-    static void afterAll() { logger.info("Concluding {}", StopwatchPanelTests.class.getSimpleName()); }
+    static void afterAll() { logger.info("Concluding {}", StopwatchPanelTest.class.getSimpleName()); }
 
     @Test
     @DisplayName("Panel starts with default values")

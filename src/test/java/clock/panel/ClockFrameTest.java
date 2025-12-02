@@ -28,9 +28,9 @@ import static org.junit.jupiter.api.Assertions.*;
  * @author michael ball
  * @version since 2.9
  */
-public class ClockFrameTests
+public class ClockFrameTest
 {
-    private static final Logger logger = LogManager.getLogger(ClockFrameTests.class);
+    private static final Logger logger = LogManager.getLogger(ClockFrameTest.class);
 
     Clock clock;
 
@@ -39,7 +39,7 @@ public class ClockFrameTests
     @BeforeAll
     static void beforeClass()
     {
-        logger.info("Starting ClockFrameTests...");
+        logger.info("Starting ClockFrameTest...");
     }
 
     @BeforeEach
@@ -56,7 +56,7 @@ public class ClockFrameTests
     }
 
     @AfterAll
-    static void afterAll() { logger.info("Concluding {}", ClockFrameTests.class.getSimpleName()); }
+    static void afterAll() { logger.info("Concluding {}", ClockFrameTest.class.getSimpleName()); }
 
     @Test
     @DisplayName("Test ClockFrame no-args constructor")

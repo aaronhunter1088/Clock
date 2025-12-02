@@ -14,14 +14,14 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
  * @author michael ball
  * @version since 2.9
  */
-public class DigitalClockPanelTests
+public class DigitalClockPanelTest
 {
-    private static final Logger logger = LogManager.getLogger(DigitalClockPanelTests.class);
+    private static final Logger logger = LogManager.getLogger(DigitalClockPanelTest.class);
 
     @BeforeAll
     static void beforeClass()
     {
-        logger.info("Starting DigitalClockPanelTests...");
+        logger.info("Starting DigitalClockPanelTest...");
     }
 
     @BeforeEach
@@ -31,7 +31,7 @@ public class DigitalClockPanelTests
     void afterEach() {}
 
     @AfterAll
-    static void afterAll() { logger.info("Concluding {}", DigitalClockPanelTests.class.getSimpleName()); }
+    static void afterAll() { logger.info("Concluding {}", DigitalClockPanelTest.class.getSimpleName()); }
 
     @Test
     @DisplayName("Test DigitalClockPanel Initialization")

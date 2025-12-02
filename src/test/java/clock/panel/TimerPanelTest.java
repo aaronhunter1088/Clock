@@ -35,9 +35,9 @@ import static org.mockito.Mockito.when;
  * @author michael ball
  * @version since 2.9
  */
-class TimerPanelTests
+class TimerPanelTest
 {
-    private static final Logger logger = LogManager.getLogger(TimerPanelTests.class);
+    private static final Logger logger = LogManager.getLogger(TimerPanelTest.class);
 
     Clock clock;
 
@@ -45,7 +45,7 @@ class TimerPanelTests
 
     @BeforeAll
     static void beforeClass()
-    { logger.info("Starting TimerPanelTests..."); }
+    { logger.info("Starting TimerPanelTest..."); }
 
     @BeforeEach
     void beforeEach()
@@ -62,7 +62,7 @@ class TimerPanelTests
     }
 
     @AfterAll
-    static void afterAll() { logger.info("Concluding {}", TimerPanelTests.class.getSimpleName()); }
+    static void afterAll() { logger.info("Concluding {}", TimerPanelTest.class.getSimpleName()); }
 
     @ParameterizedTest
     @DisplayName("Test Validate Hours Text Field")

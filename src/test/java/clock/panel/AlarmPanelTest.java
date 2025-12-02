@@ -30,9 +30,9 @@ import static org.junit.jupiter.api.Assertions.*;
  * @author michael ball
  * @version since 2.9
  */
-class AlarmPanelTests
+class AlarmPanelTest
 {
-    private static final Logger logger = LogManager.getLogger(AlarmPanelTests.class);
+    private static final Logger logger = LogManager.getLogger(AlarmPanelTest.class);
 
     Clock clock;
 
@@ -41,7 +41,7 @@ class AlarmPanelTests
     @BeforeAll
     static void beforeClass()
     {
-        logger.info("Starting AlarmPanelTests...");
+        logger.info("Starting AlarmPanelTest...");
     }
 
     @BeforeEach
@@ -59,7 +59,7 @@ class AlarmPanelTests
     }
 
     @AfterAll
-    static void afterAll() { logger.info("Concluding {}", AlarmPanelTests.class.getSimpleName()); }
+    static void afterAll() { logger.info("Concluding {}", AlarmPanelTest.class.getSimpleName()); }
 
     @Test
     @DisplayName("Alarm Panel starts with PM in dropdown when clock is in PM")

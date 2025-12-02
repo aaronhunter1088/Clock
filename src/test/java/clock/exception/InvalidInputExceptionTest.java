@@ -15,15 +15,15 @@ import static org.junit.jupiter.api.Assertions.*;
  * @author michael ball
  * @version since 2.0
  */
-class InvalidInputExceptionTests
+class InvalidInputExceptionTest
 {
-    private static final Logger logger = LogManager.getLogger(InvalidInputExceptionTests.class);
+    private static final Logger logger = LogManager.getLogger(InvalidInputExceptionTest.class);
 
     private Month goodMonth;
     private final String INVALID_MONTH = "Invalid month";
 
     @BeforeAll
-    static void beforeClass() { logger.info("Starting InvalidInputExceptionTests..."); }
+    static void beforeClass() { logger.info("Starting InvalidInputExceptionTest..."); }
 
     @BeforeEach
     void beforeEach() {
@@ -34,7 +34,7 @@ class InvalidInputExceptionTests
     void afterEach() {}
 
     @AfterAll
-    static void afterAll() { logger.info("Concluding {}", InvalidInputExceptionTests.class.getSimpleName()); }
+    static void afterAll() { logger.info("Concluding {}", InvalidInputExceptionTest.class.getSimpleName()); }
 
     @Test
     void whenAValidMonthIsGivenReturnAValidInteger()

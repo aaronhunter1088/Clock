@@ -4,8 +4,9 @@ import clock.entity.Clock;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.junit.jupiter.api.*;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
+import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.awt.*;
 
@@ -25,9 +26,10 @@ import static org.mockito.Mockito.doNothing;
  * @author michael ball
  * @version since 2.9
  */
-public class AnalogueClockPanelTests
+@ExtendWith(MockitoExtension.class)
+public class AnalogueClockPanelTest
 {
-    private static final Logger logger = LogManager.getLogger(AnalogueClockPanelTests.class);
+    private static final Logger logger = LogManager.getLogger(AnalogueClockPanelTest.class);
 
     Clock clock;
 
@@ -39,13 +41,12 @@ public class AnalogueClockPanelTests
     @BeforeAll
     static void beforeClass()
     {
-        logger.info("Starting AnalogueClockPanelTests...");
+        logger.info("Starting AnalogueClockPanelTest...");
     }
 
     @BeforeEach
     void beforeEach()
     {
-        MockitoAnnotations.initMocks(this);
         clock = new Clock(11, 30, 0, JANUARY, WEDNESDAY, 1, 2025, AM); // 11:30 AM
         analogueClockPanel = new AnalogueClockPanel(new ClockFrame(clock));
         analogueClockPanel.getClockFrame().changePanels(PANEL_ANALOGUE_CLOCK);
@@ -58,7 +59,7 @@ public class AnalogueClockPanelTests
     }
 
     @AfterAll
-    static void afterAll() { logger.info("Concluding {}", AnalogueClockPanelTests.class.getSimpleName()); }
+    static void afterAll() { logger.info("Concluding {}", AnalogueClockPanelTest.class.getSimpleName()); }
 
     @Test
     @DisplayName("Test AnalogueClockPanel Initialization")

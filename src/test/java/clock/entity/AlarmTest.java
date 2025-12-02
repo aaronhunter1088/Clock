@@ -6,13 +6,14 @@ import javazoom.jl.player.advanced.AdvancedPlayer;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.junit.jupiter.api.*;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
+import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.time.DayOfWeek;
 import java.time.LocalDate;
@@ -35,9 +36,10 @@ import static org.mockito.Mockito.*;
  * @author michael ball
  * @version since 2.9
  */
-class AlarmTests {
+@ExtendWith(MockitoExtension.class)
+class AlarmTest {
 
-    private static final Logger logger = LogManager.getLogger(AlarmTests.class);
+    private static final Logger logger = LogManager.getLogger(AlarmTest.class);
 
     private Clock clock;
     private final List<DayOfWeek> weekDays = List.of(DayOfWeek.MONDAY, TUESDAY, WEDNESDAY, THURSDAY, DayOfWeek.FRIDAY),
@@ -49,12 +51,11 @@ class AlarmTests {
 
     @BeforeAll
     static void beforeClass()
-    { logger.info("Starting {}...", AlarmTests.class.getSimpleName()); }
+    { logger.info("Starting {}...", AlarmTest.class.getSimpleName()); }
 
     @BeforeEach
     void beforeEach()
     {
-        MockitoAnnotations.initMocks(this);
         clock = new Clock();
         weekDays730AmAlarm = new Alarm("Weekdays Alarm", 7, 30, AM, weekDays, false, clock);
         weekend10AmAlarm = new Alarm("Weekends Alarm", 10, 0, AM, weekendDays, false, clock);
@@ -70,7 +71,7 @@ class AlarmTests {
     }
 
     @AfterAll
-    static void afterAll() { logger.info("Concluding {}", AlarmTests.class.getSimpleName()); }
+    static void afterAll() { logger.info("Concluding {}", AlarmTest.class.getSimpleName()); }
 
     @Test
     @DisplayName("Create an Alarm")
