@@ -26,7 +26,7 @@ import static clock.util.Constants.*;
  * The main panel used to display the clock application.
  *
  * @author michael ball
- * @version 2.9
+ * @version since 2.9
  */
 public class ClockFrame extends JFrame
 {

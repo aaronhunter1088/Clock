@@ -18,7 +18,7 @@ import static java.lang.Thread.sleep;
  * Used to view the date and time.
  *
  * @author michael ball
- * @version 1.0
+ * @version since 1.0
  */
 public class DigitalClockPanel extends ClockPanel implements Runnable
 {

@@ -20,7 +20,7 @@ import static clock.entity.Panel.PANEL_ANALOGUE_CLOCK;
  * there is a setting to change that.
  *
  * @author michael ball
- * @version 2.6
+ * @version since 2.6
  */
 public class AnalogueClockPanel extends ClockPanel implements Runnable
 {

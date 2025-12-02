@@ -4,8 +4,8 @@ package clock.util;
  * Constants
  * <p>
  * Alphabetized for easy reference in each section.
- * @author Michael Ball
- * @version 2.0
+ * @author michael ball
+ * @version since 2.0
  */
 public class Constants {
 

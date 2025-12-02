@@ -24,7 +24,7 @@ import static java.lang.Thread.sleep;
  * create the countdown and start counting down.
  *
  * @author michael ball
- * @version 2.0
+ * @version since 2.0
  */
 public class Timer implements Serializable, Comparable<Timer>, Runnable
 {

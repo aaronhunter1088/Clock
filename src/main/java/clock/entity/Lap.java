@@ -16,7 +16,7 @@ import java.io.Serializable;
  * without stopping the overall time measurement.
  *
  * @author michael ball
- * @version 2.9
+ * @version since 2.9
  */
 public class Lap implements Serializable, Comparable<Lap>, Cloneable
 {

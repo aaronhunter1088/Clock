@@ -16,8 +16,8 @@ import static org.junit.jupiter.api.Assertions.*;
 /**
  * Tests for the {@link Stopwatch} class
  *
- * @author Michael Ball
- * @version 2.9
+ * @author michael ball
+ * @version since 2.9
  */
 public class StopwatchTests {
 

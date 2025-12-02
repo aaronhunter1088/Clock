@@ -1,6 +1,5 @@
 package clock.panel;
 
-import clock.entity.Stopwatch;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -18,7 +17,7 @@ import static java.lang.Thread.sleep;
  * for continuous updating of the display while the stopwatch is running.
  *
  * @author michael ball
- * @version 2.9
+ * @version since 2.9
  */
 public class DisplayTimePanel extends JPanel implements Runnable
 {

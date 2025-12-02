@@ -15,7 +15,7 @@ import java.io.Serializable;
  * report the error to the user as necessary.
  *
  * @author michael ball
- * @version 2.0
+ * @version since 2.0
  */
 public class InvalidInputException extends RuntimeException implements Serializable
 {

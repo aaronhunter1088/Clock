@@ -6,31 +6,34 @@
     <parent>
         <groupId>com.skvllprodvctions</groupId>
         <artifactId>parent</artifactId>
-        <version>0.0.1-SNAPSHOT</version>
+        <version>0.0.2-SNAPSHOT</version>
     </parent>
 
     <artifactId>Clock</artifactId>
-    <version>2.9</version>
+    <version>3.0</version>
     <packaging>jar</packaging>
     <name>Clock</name>
-    <description>This is a simple Clock GUI which displays the date and time, and can set alarms and timers.</description>
+    <description>A simple Clock GUI which displays the date and time,
+        and can set alarms, timers, and stopwatches.</description>
     
     <properties>
         <outputDirectory>${basedir}/dist</outputDirectory>
         <finalName>${project.artifactId}-${project.version}</finalName>
+        <main.class>clock.Main</main.class>
     </properties>
 
-    <!-- NOTES
-         Assembly:single creates Clock-#.jar
-         mvn package creates Clock-#-jar-with-dependencies.jar
-         mvn package -Dmaven.test.skip=true skips checking tests and creates jar
-         mvn install adds Clock-#-jar-with-dependencies.jar to local repo -->
     <dependencies>
         <!-- https://mvnrepository.com/artifact/javazoom/jlayer -->
         <dependency>
             <groupId>javazoom</groupId>
             <artifactId>jlayer</artifactId>
             <version>1.0.1</version>
+        </dependency>
+        <!-- https://mvnrepository.com/artifact/com.google.code.gson/gson -->
+        <dependency>
+            <groupId>com.google.code.gson</groupId>
+            <artifactId>gson</artifactId>
+            <version>2.10.1</version>
         </dependency>
         <!-- Managed in Parent Dependency Management section -->
         <dependency>
@@ -46,22 +49,8 @@
             <groupId>org.apache.commons</groupId>
             <artifactId>commons-lang3</artifactId>
         </dependency>
-        <!-- https://mvnrepository.com/artifact/com.google.code.gson/gson -->
-        <dependency>
-            <groupId>com.google.code.gson</groupId>
-            <artifactId>gson</artifactId>
-            <version>2.10.1</version>
-        </dependency>
 
         <!-- Testing dependencies -->
-
-        <!-- jacoco -->
-        <dependency>
-            <groupId>org.jacoco</groupId>
-            <artifactId>jacoco-maven-plugin</artifactId>
-            <version>${jacoco.version}</version>
-            <!--<scope>test</scope>-->
-        </dependency>
 
         <!-- junit jupiter -->
         <dependency>
@@ -80,7 +69,6 @@
             <artifactId>junit-jupiter-params</artifactId>
             <scope>test</scope>
         </dependency>
-
         <!-- mockito -->
         <dependency>
             <groupId>org.mockito</groupId>
@@ -92,144 +80,34 @@
             <artifactId>mockito-junit-jupiter</artifactId>
             <scope>test</scope>
         </dependency>
-
-
     </dependencies>
-    
-    <build>
-        <sourceDirectory>src/main/java</sourceDirectory>
-        <testSourceDirectory>src/test/java</testSourceDirectory>
-        <resources>
-            <resource>
-                <directory>src/main/resources</directory>
-                <filtering>false</filtering>
-                <includes>
-                    <include>**/**</include>
-                    <!--<include>**/sounds/*.mp3</include>-->
-                </includes>
-            </resource>
-        </resources>
 
+    <build>
+        <!-- source and test directories defined in parent -->
+        <!-- resources defined in parent -->
+
+        <!-- NOTES -->
+        <!-- Assembly:single creates Clock-#.jar -->
+        <!-- Mvn:package creates Clock-#-jar-with-dependencies.jar -->
+        <!-- Mvn:install adds Clock-#-jar-with-dependencies.jar to local repo -->
         <plugins>
-            <!-- Compile -->
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-compiler-plugin</artifactId>
-                <configuration>
-                    <source>${maven.compiler.source}</source>
-                    <target>${maven.compiler.target}</target>
-                    <release>${java.version}</release>
-                    <compilerArgs>
-                        <arg>-verbose</arg>
-                        <arg>-Xlint:all,-options,-path</arg>
-                    </compilerArgs>
-                    <!-- for surefire plugin -->
-                </configuration>
-                <executions>
-                    <execution>
-                        <id>default-testCompile</id>
-                        <phase>test-compile</phase>
-                        <goals>
-                            <goal>testCompile</goal>
-                        </goals>
-                    </execution>
-                </executions>
-            </plugin>
-            <!-- Test-compile -->
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-surefire-plugin</artifactId>
-            </plugin>
-            <!-- Generate resources -->
-            <plugin>
-                <groupId>org.codehaus.mojo</groupId>
-                <artifactId>properties-maven-plugin</artifactId>
-                <executions>
-                    <execution>
-                        <phase>generate-resources</phase>
-                        <goals>
-                            <goal>write-project-properties</goal>
-                        </goals>
-                        <configuration>
-                            <outputFile>${basedir}/src/main/resources/pom.properties</outputFile>
-                        </configuration>
-                    </execution>
-                </executions>
-            </plugin>
-            <!-- Binds to Package phase, but will not run... -->
-            <!-- When creating a jar, update MANIFEST.MF file and place JAR in specified outputDirectory
-                 Run Command: mvn install -DskipTests -DskipITs -->
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-jar-plugin</artifactId>
-                <executions>
-                    <execution>
-                        <id>default-jar</id>
-                        <phase>compile</phase>
-                        <goals>
-                            <goal>jar</goal>
-                        </goals>
-                    </execution>
-                </executions>
-                <configuration>
-                    <finalName>${finalName}</finalName>
-                    <outputDirectory>${outputDirectory}</outputDirectory>
-                    <archive>
-                        <index>true</index>
-                        <manifest>
-                            <addDefaultImplementationEntries>true</addDefaultImplementationEntries>
-                            <addClasspath>true</addClasspath>
-                            <mainClass>clock.Main</mainClass>
-                        </manifest>
-                        <manifestEntries>
-                            <Implementation-Version>${project.version}</Implementation-Version>
-                            <Creation-Time-Format>yyyy-MM-dd HH:mm:ss</Creation-Time-Format>
-                            <!--suppress UnresolvedMavenProperty -->
-                            <Creation-Time>${build.time}</Creation-Time>
-                            <mainClass>clock.Main</mainClass>
-                        </manifestEntries>
-                    </archive>
-                    <includes>
-                        <include>**/*</include>
-                    </includes>
-                </configuration>
-            </plugin>
-            <!-- Assembly:Single creates runnable jar with dependencies
-                 Run Command: mvn clean package (-Dmaven.test.skip=true) -->
-            <plugin>
-                <!-- don't need group id since org.apache.maven.plugins is assumed -->
-                <artifactId>maven-assembly-plugin</artifactId>
-                <executions>
-                    <execution>
-                        <id>build-clock</id>
-                        <phase>package</phase>
-                        <goals>
-                            <goal>single</goal>
-                        </goals>
-                        <configuration>
-                            <descriptorRefs>
-                                <descriptorRef>jar-with-dependencies</descriptorRef>
-                            </descriptorRefs>
-                            <appendAssemblyId>true</appendAssemblyId> <!-- If false, jar-with-dependencies is not appended to jar name -->
-                            <!-- archive required to create executable jar -->
-                            <archive>
-                                <index>true</index>
-                                <manifest>
-                                    <addDefaultImplementationEntries>true</addDefaultImplementationEntries>
-                                    <addClasspath>true</addClasspath>
-                                    <mainClass>clock.Main</mainClass>
-                                </manifest>
-                                <manifestEntries>
-                                    <Creation-Time>${maven.build.timestamp}</Creation-Time>
-                                    <Creation-Time-Format>yyyy-MM-dd HH:mm:ss</Creation-Time-Format>
-                                </manifestEntries>
-                            </archive>
-                            <finalName>${finalName}</finalName>
-                            <outputDirectory>${outputDirectory}</outputDirectory>
-                        </configuration>
-                    </execution>
-                </executions>
-            </plugin>
+            <!-- Compile found in parent -->
+            <!-- Test-compile found in parent -->
+            <!-- Generate resources found in parent -->
+            <!-- Defined in parent
+                 Binds to Package phase, but will not run...
+                 When creating a jar, update MANIFEST.MF file
+                 and place JAR in specified outputDirectory
+                 Run command: mvn install -DskipTests -DskipITs -->
+            <!-- Assembly:Single creates Clock-version.jar
+                 mvn package creates Clock-#-jar-with-dependencies.jar
+                 mvn package -Dmaven.test.skip=true skips checking tests and creates jar
+                 mvn install adds Clock-#-jar-with-dependencies.jar to local repo
+                 Found in parent -->
+            <!-- Attach sources
+                 Found in parent -->
+            <!-- JaCoCo configuration for code analysis
+                 Found in parent -->
         </plugins>
     </build>
 </project>

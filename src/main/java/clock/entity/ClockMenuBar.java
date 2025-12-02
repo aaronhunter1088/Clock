@@ -17,8 +17,8 @@ import static clock.entity.Panel.*;
 /**
  * The menu bar for the Clock.
  *
- * @author Michael Ball
-*  @version 1.0
+ * @author michael ball
+*  @version since 1.0
  */
 public class ClockMenuBar extends JMenuBar
 {

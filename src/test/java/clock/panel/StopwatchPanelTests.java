@@ -25,8 +25,8 @@ import static org.mockito.Mockito.when;
 /**
  * Tests for the {@link StopwatchPanel} class
  *
- * @author Michael Ball
- * @version 2.9
+ * @author michael ball
+ * @version since 2.9
  */
 class StopwatchPanelTests {
 

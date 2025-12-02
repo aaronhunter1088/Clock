@@ -23,8 +23,8 @@ import static org.junit.jupiter.api.Assertions.*;
 /**
  * Tests for the {@link Clock} class
  *
- * @author Michael Ball
- * @version 1.0
+ * @author michael ball
+ * @version since 1.0
  */
 class ClockTests
 {

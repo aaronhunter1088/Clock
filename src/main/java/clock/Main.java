@@ -18,8 +18,8 @@ import static clock.util.Constants.COMMA;
 /**
  * Main class to start the application.
  *
- * @author Michael Ball
- * @version 1.0
+ * @author michael ball
+ * @version since 1.0
  */
 public class Main
 {

@@ -30,7 +30,7 @@ import static clock.util.Constants.*;
  * reset, stopped, or removed.
  *
  * @author michael ball
-*  @version 2.0
+*  @version since 2.0
  */
 public class Alarm implements Serializable, Comparable<Alarm>, Runnable
 {

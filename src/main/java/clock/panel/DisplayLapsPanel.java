@@ -20,7 +20,7 @@ import static clock.util.Constants.*;
  * elapsed times, as well as the laps of the currently selected stopwatch.
  *
  * @author michael ball
- * @version 2.9
+ * @version since 2.9
  */
 public class DisplayLapsPanel extends JPanel
 {

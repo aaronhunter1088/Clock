@@ -32,8 +32,8 @@ import static org.mockito.Mockito.*;
 /**
  * Tests for the {@link Alarm} class
  *
- * @author Michael Ball
- * @version 2.9
+ * @author michael ball
+ * @version since 2.9
  */
 class AlarmTests {
 

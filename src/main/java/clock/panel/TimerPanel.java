@@ -5,7 +5,6 @@ import clock.entity.Timer;
 import clock.exception.InvalidInputException;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.codehaus.plexus.util.StringUtils;
 
 import javax.swing.*;
 import javax.swing.border.LineBorder;
@@ -33,7 +32,7 @@ import static clock.util.Constants.*;
  * a settings that allows you to pause or resume
  * all existing timers at once.
  *
- * @author Michael Ball
+ * @author michael ball
  * @version since 2.9
  */
 public class TimerPanel extends ClockPanel implements Runnable
@@ -579,9 +578,9 @@ public class TimerPanel extends ClockPanel implements Runnable
      */
     public boolean areAllBlank()
     {
-        boolean hoursIsBlank = StringUtils.isBlank(hoursTextField.getText());
-        boolean minutesIsBlank = StringUtils.isBlank(minutesTextField.getText());
-        boolean secondsIsBlank = StringUtils.isBlank(secondsTextField.getText());
+        boolean hoursIsBlank = hoursTextField.getText().isBlank();
+        boolean minutesIsBlank = minutesTextField.getText().isBlank();
+        boolean secondsIsBlank = secondsTextField.getText().isBlank();
         boolean allBlank = hoursIsBlank && minutesIsBlank && secondsIsBlank;
         logger.debug("are all blank: {}", allBlank);
         return allBlank;

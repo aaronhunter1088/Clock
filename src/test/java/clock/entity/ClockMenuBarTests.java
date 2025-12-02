@@ -20,8 +20,8 @@ import static org.junit.jupiter.api.Assertions.*;
 /**
  * Tests for the {@link ClockMenuBar} class
  *
- * @author Michael Ball
- * @version 2.9
+ * @author michael ball
+ * @version since 2.9
  */
 public class ClockMenuBarTests
 {

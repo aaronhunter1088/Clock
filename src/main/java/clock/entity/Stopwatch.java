@@ -28,7 +28,7 @@ import static java.lang.Thread.sleep;
  * A lap is the time elapsed between one start and stop event.
  *
  * @author michael ball
- * @version 2.9
+ * @version since 2.9
  */
 public class Stopwatch implements Serializable, Comparable<Stopwatch>, Runnable
 {

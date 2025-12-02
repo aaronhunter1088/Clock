@@ -5,8 +5,8 @@ import clock.entity.Clock;
 /**
  * A contract for the clock's panels.
  * <p>
- * @author Michael Ball
-*  @version 2.8
+ * @author michael ball
+*  @version since 2.8
  */
 public interface IClockPanel
 {

@@ -3,7 +3,6 @@ package clock.panel;
 import clock.contract.IClockPanel;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import javax.swing.*;
 import java.awt.*;
@@ -11,7 +10,7 @@ import java.awt.*;
 /**
  * Abstract class for clock panels, implementing the IClockPanel interface.
  * <p>
- * @author Michael Ball
+ * @author michael ball
  * @version since 2.9
  */
 public abstract class ClockPanel extends JPanel implements IClockPanel

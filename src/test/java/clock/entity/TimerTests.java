@@ -19,8 +19,8 @@ import static org.junit.jupiter.api.Assertions.*;
 /**
  * Tests for the {@link Timer} class
  *
- * @author Michael Ball
- * @version 2.0
+ * @author michael ball
+ * @version since 2.0
  */
 class TimerTests
 {

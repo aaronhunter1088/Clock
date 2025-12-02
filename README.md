@@ -1,4 +1,4 @@
-# Clock v2.9
+# Clock v3.0
 
 This is a Java Swing GUI application which displays the date and time to the user in
 both digital and analogue modes. It also has the capability to set multiple alarms,
@@ -7,15 +7,15 @@ date and time. The following is the default java command to run the clock:
 
 ```
 # Both commands achieve the same result:
-java -jar Clock-2.9-jar-with-dependencies.jar
+java -jar Clock-3.0-jar-with-dependencies.jar
 or with 0 as the argument:
-java -jar Clock-2.9-jar-with-dependencies.jar 0
+java -jar Clock-3.0-jar-with-dependencies.jar 0
 
 # Start the jar file with a specific panel:
-java -jar Clock-2.9-jar-with-dependencies.jar 1,panel_alarm
+java -jar Clock-3.0-jar-with-dependencies.jar 1,panel_alarm
 
 # Start the jar file with a specific date and time:
-java -jar Clock-2.9-jar-with-dependencies.jar 2,10,30,0,august,wednesday,6,2025,pm
+java -jar Clock-3.0-jar-with-dependencies.jar 2,10,30,0,august,wednesday,6,2025,pm
 ```
 
 The clock defaults on the Digital Clock panel, displaying the current date like
@@ -86,6 +86,8 @@ Without the tests will 'pause' until that popup is closed.
 
 ```
 # History
+v3.0 Updated POM to use the parent pom more effectively.
+
 v2.9 Updated to use my parent pom. Multiple timers. Multiple ways to start the application.
 Java was upgraded to 21. Multiple stopwatches were added.
 

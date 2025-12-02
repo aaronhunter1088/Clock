@@ -27,7 +27,7 @@ import static clock.util.Constants.*;
  * date and time but also perform the necessary functions
  * to update alarms, timers, and itself if necessary.
  * 
- * @author Michael Ball 
+ * @author michael ball 
  * @version since 1.0
  */
 public class Clock implements Serializable, Comparable<Clock>, Runnable

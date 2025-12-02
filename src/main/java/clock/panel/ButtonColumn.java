@@ -19,7 +19,7 @@ import static clock.util.Constants.EMPTY;
  * source of the Action will be the table. The action command will contain
  * the model row number of the button that was clicked.
  *
- * @author Michael Ball
+ * @author michael ball
  * @version since 2.9
  */
 public class ButtonColumn extends AbstractCellEditor

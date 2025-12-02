@@ -4,7 +4,6 @@ import clock.entity.Clock;
 import clock.entity.Stopwatch;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.codehaus.plexus.util.StringUtils;
 
 import javax.swing.*;
 import javax.swing.border.LineBorder;
@@ -34,7 +33,7 @@ import static clock.util.Constants.*;
  * reverse the order of the laps if you desire.
  *
  * @author michael ball
- * @version 2.9
+ * @version since 2.9
  */
 public class StopwatchPanel extends ClockPanel
 {
@@ -118,7 +117,7 @@ public class StopwatchPanel extends ClockPanel
 
            @Override
            public void focusLost(FocusEvent e) {
-               if (StringUtils.isBlank(stopwatchNameField.getText()))
+               if (stopwatchNameField.getText().isBlank())
                {
                    stopwatchNameField.setText("Sw" + (Stopwatch.stopwatchCounter + 1));
                }

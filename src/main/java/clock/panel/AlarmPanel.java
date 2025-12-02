@@ -5,7 +5,6 @@ import clock.entity.Clock;
 import clock.exception.InvalidInputException;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.codehaus.plexus.util.StringUtils;
 
 import javax.swing.*;
 import javax.swing.border.LineBorder;
@@ -44,7 +43,7 @@ import static java.time.DayOfWeek.*;
  * will stop the sound but the alarm will remain on the table.
  *
  * @author michael ball
- * @version 2.0
+ * @version since 2.0
  */
 public class AlarmPanel extends ClockPanel implements Runnable
 {
@@ -641,8 +640,8 @@ public class AlarmPanel extends ClockPanel implements Runnable
      */
     public boolean areAllBlank()
     {
-        boolean hoursIsBlank = StringUtils.isBlank(hoursTextField.getText());
-        boolean minutesIsBlank = StringUtils.isBlank(minutesTextField.getText());
+        boolean hoursIsBlank = hoursTextField.getText().isBlank();
+        boolean minutesIsBlank = minutesTextField.getText().isBlank();
         boolean allBlank = hoursIsBlank && minutesIsBlank;
         logger.debug("are all blank: {}", allBlank);
         return allBlank;

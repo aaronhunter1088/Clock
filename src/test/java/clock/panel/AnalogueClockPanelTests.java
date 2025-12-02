@@ -22,8 +22,8 @@ import static org.mockito.Mockito.doNothing;
 /**
  * Tests for the {@link AnalogueClockPanel} class
  *
- * @author Michael Ball
- * @version 2.9
+ * @author michael ball
+ * @version since 2.9
  */
 public class AnalogueClockPanelTests
 {
