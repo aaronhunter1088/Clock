@@ -59,6 +59,8 @@ class AlarmTest {
         clock = new Clock();
         weekDays730AmAlarm = new Alarm("Weekdays Alarm", 7, 30, AM, weekDays, false, clock);
         weekend10AmAlarm = new Alarm("Weekends Alarm", 10, 0, AM, weekendDays, false, clock);
+        weekDays730AmAlarm.setMusicPlayer(musicPlayerMock);
+        weekend10AmAlarm.setMusicPlayer(musicPlayerMock);
     }
 
     @AfterEach
@@ -284,11 +286,9 @@ class AlarmTest {
 
     @Test
     @DisplayName("Trigger An Alarm Throws An Exception But Is Handled")
-    void testTriggerAnAlarmThrowsExceptionButIsHandled() throws JavaLayerException
+    void testTriggerAnAlarmThrowsExceptionButIsHandled()
     {
         alarm1 = spy(weekDays730AmAlarm);
-        alarm1.setMusicPlayer(musicPlayerMock);
-
         // Simulate the clock reaching the alarm time
         LocalDate date = LocalDateTime.now().toLocalDate();
         LocalTime time = LocalDateTime.now().toLocalTime().withHour(7).withMinute(30);
@@ -296,7 +296,7 @@ class AlarmTest {
         clock.setTheTime(dateTime);
 
         doThrow(new RuntimeException("Mocked Music player error"))
-            .when(musicPlayerMock).play();
+            .when(alarm1).setupMusicPlayer();
 
         assertDoesNotThrow(() -> alarm1.triggerAlarm(), "An exception was thrown");
     }

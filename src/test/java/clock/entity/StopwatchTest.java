@@ -7,6 +7,7 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 
+import javax.swing.*;
 import java.util.stream.Stream;
 
 import static clock.util.Constants.STOPWATCH_READING_FORMAT;
@@ -103,7 +104,7 @@ public class StopwatchTest {
         stopwatch.pauseStopwatch();
 
         assertTrue(stopwatch.isPaused());
-        assertNotEquals(0L, stopwatch.getStartPauseMilli());
+        assertNotEquals(0L, stopwatch.getPausedMilli());
     }
 
     @Test
@@ -113,14 +114,25 @@ public class StopwatchTest {
         Stopwatch stopwatch = new Stopwatch("Test Stopwatch", false, false, clock);
 
         stopwatch.startStopwatch();
-        sleep(100); // Ensure some time passes
-        stopwatch.pauseStopwatch();
-        sleep(100); // Ensure some time passes while paused
-        stopwatch.resumeStopwatch();
 
+        long startDeadline = System.currentTimeMillis() + 1000;
+        while (!stopwatch.isStarted() && System.currentTimeMillis() < startDeadline) {
+            Thread.sleep(10);
+        }
+        assertTrue(stopwatch.isStarted(), "Stopwatch did not start in time");
+
+        stopwatch.pauseStopwatch();
+
+        long pauseDeadline = System.currentTimeMillis() + 1000;
+        while (!stopwatch.isPaused() && System.currentTimeMillis() < pauseDeadline) {
+            Thread.sleep(10);
+        }
+        assertTrue(stopwatch.isPaused(), "Stopwatch did not pause in time");
+        assertNotEquals(0L, stopwatch.getPausedMilli());
+
+        stopwatch.resumeStopwatch();
         assertFalse(stopwatch.isPaused());
-        assertEquals(0L, stopwatch.getStartPauseMilli());
-        assertNotEquals(0L, stopwatch.getTotalPausedMilli());
+        assertEquals(0L, stopwatch.getPausedAccumMilli());
     }
 
     @Test

@@ -104,7 +104,7 @@ public class Alarm implements Serializable, Comparable<Alarm>, Runnable
     /**
      * Defines the music player object
      */
-    private void setupMusicPlayer()
+    protected void setupMusicPlayer()
     {
         logger.debug("setup music player");
         InputStream inputStream = null;

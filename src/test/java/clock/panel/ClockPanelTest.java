@@ -24,7 +24,7 @@ public class ClockPanelTest
 
     Clock clock;
 
-    ClockPanel clockPanel;
+    AlarmPanel clockPanel;
 
     @BeforeAll
     static void beforeClass()
@@ -41,7 +41,9 @@ public class ClockPanelTest
 
     @AfterEach
     void afterEach()
-    {}
+    {
+        clockPanel.getClockFrame().dispose();
+    }
 
     @AfterAll
     static void afterAll() { logger.info("Concluding {}", ClockPanelTest.class.getSimpleName()); }

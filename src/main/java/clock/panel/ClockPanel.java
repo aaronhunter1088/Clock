@@ -54,4 +54,5 @@ public abstract class ClockPanel extends JPanel implements IClockPanel
         for(StackTraceElement ste : e.getStackTrace())
         { logger.error(ste.toString()); }
     }
+
 }

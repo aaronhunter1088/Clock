@@ -59,6 +59,7 @@ class TimerPanelTest
     void afterEach()
     {
         timerPanel.getClockFrame().stop();
+        timerPanel.getClockFrame().dispose();
     }
 
     @AfterAll
@@ -416,7 +417,7 @@ class TimerPanelTest
 
     @Test
     @DisplayName("Create 2 Timers Using GUI")
-    void testCreateTwoTimersUsingGUI() throws InterruptedException, InvocationTargetException
+    void testCreateTwoTimersUsingGUI()
     {
         AtomicReference<clock.entity.Timer> timer1 = new AtomicReference<>(new clock.entity.Timer(0, 4, 0, clock));
         AtomicReference<clock.entity.Timer> timer2 = new AtomicReference<>(new clock.entity.Timer(0, 5, 0, clock));
@@ -495,7 +496,7 @@ class TimerPanelTest
                 {TIMER+NAME, "00:05:00", "Pause", "Remove"},
         };
         String[] columnNames = timerPanel.getTimersTableColumnNames();
-        //DefaultTableModel model = timersTableModel(data, columnNames);
+
         when(timersTable.getModel()).thenReturn(timersTableModel);
         when(timersTableModel.getValueAt(anyInt(), anyInt())).thenReturn(buttonText);
         clock.getListOfTimers().add(new clock.entity.Timer(0, 4, 0, clock));
@@ -516,8 +517,5 @@ class TimerPanelTest
                 Arguments.of(3, REMOVE)
         );
     }
-    private DefaultTableModel timersTableModel(Object[][] data, String[] columnNames)
-    {
-        return new DefaultTableModel(data, columnNames);
-    }
+
 }

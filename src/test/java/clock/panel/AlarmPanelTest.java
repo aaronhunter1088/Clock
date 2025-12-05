@@ -56,6 +56,7 @@ class AlarmPanelTest
     void afterEach()
     {
         alarmPanel.getClockFrame().stop();
+        alarmPanel.getClockFrame().dispose();
     }
 
     @AfterAll
@@ -153,27 +154,27 @@ class AlarmPanelTest
     @ParameterizedTest
     @CsvSource({
             "'', '', ''",
-            "'name', '', ''"
+            "' ', '', ''"
     })
-    @DisplayName("Alarm Panel allows empty text fields")
+    @DisplayName("Alarm Panel does not allow empty text fields")
     void testEmptyHourAndMinutesFieldsIsOk(String name, String minutes, String hours)
     {
         // set up
         alarmPanel.getNameTextField().setText(name);
         alarmPanel.getMinutesTextField().setText(minutes);
-
-        // test
         alarmPanel.getHoursTextField().setText(hours);
 
         // assert
-        assertTrue(alarmPanel.validateHoursTextField(), "Should allow empty text fields");
+        assertFalse(alarmPanel.validateNameTextField(), "Should not allow empty name field");
+        assertFalse(alarmPanel.validateHoursTextField(), "Should not allow empty hour field");
+        assertFalse(alarmPanel.validateMinutesTextField(), "Should not allow empty minute field");
     }
 
     @ParameterizedTest
     @DisplayName("Test validate fields when we click Set Alarm")
     @CsvSource({
             "'name', '5', '5', true", // Valid: name given, HR:5, MIN:5
-            "'', '5', '5', true", // Valid: name field empty, HR:5, MIN:5
+            "'ALARM1', '5', '5', true", // Valid: name field empty, name auto populates, HR:5, MIN:5
 
             "'name', '', '', false", // Valid: all fields empty
             "'', '', '', false", // Valid: all fields empty including name
@@ -196,7 +197,7 @@ class AlarmPanelTest
         boolean result = alarmPanel.validateAllInputs();
 
         // assert
-        assertEquals(expecting, result, "expecting " + expecting + " for input: " + name + ", " + minutes + ", " + hours);
+        assertEquals(expecting, result, "expecting " + expecting + " for input: '" + name + "', " + minutes + ", " + hours);
     }
 
     @ParameterizedTest

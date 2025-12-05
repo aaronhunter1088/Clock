@@ -146,7 +146,7 @@ public class AlarmPanel extends ClockPanel implements Runnable
                     switch (e.getSource() instanceof JTextField textField ? textField.getName() : null)
                     {
                         case NAME+TEXT_FIELD -> {
-                            if (nameTextField.getText().isBlank() || nameTextField.getText().isEmpty())
+                            if (nameTextField.getText().isBlank())
                             { nameTextField.setText(ALARM+(Alarm.alarmsCounter+1)); }
                             else if (nameTextField.getText().length() > 10)
                             { nameTextField.setText(nameTextField.getText().substring(0, 10)); }
@@ -547,11 +547,12 @@ public class AlarmPanel extends ClockPanel implements Runnable
     boolean validateHoursTextField()
     {
         boolean result = false;
-        if (areAllBlank())
-        {
-            return true;
-        }
-        else if (!hoursTextField.getText().isEmpty())
+//        if (areAllBlank())
+//        {
+//            return true;
+//        }
+//        else
+        if (!hoursTextField.getText().isEmpty())
         {
             int upperLimit = clockFrame.getClock().isShowMilitaryTime() ? 23 : 12;
             try
@@ -564,10 +565,10 @@ public class AlarmPanel extends ClockPanel implements Runnable
             }
             catch (NumberFormatException nfe)
             {
-                logger.debug("Invalid input in hours text field: {}", nfe.getMessage());
+                logger.debug("Invalid input in hours text field: '{}'", nfe.getMessage());
             }
         }
-        logger.debug("validate hours {} text field: {}", hoursTextField.getText(), result);
+        logger.debug("text field:'{}' validated:'{}'", hoursTextField.getText(), result);
         return result;
     }
 
@@ -578,11 +579,12 @@ public class AlarmPanel extends ClockPanel implements Runnable
     boolean validateMinutesTextField()
     {
         boolean result = false;
-        if (areAllBlank())
-        {
-            return true;
-        }
-        else if (!minutesTextField.getText().isEmpty())
+//        if (areAllBlank())
+//        {
+//            return true;
+//        }
+//        else
+        if (!minutesTextField.getText().isEmpty())
         {
             try
             {
@@ -597,7 +599,7 @@ public class AlarmPanel extends ClockPanel implements Runnable
                 logger.debug("Invalid input in minutes text field: {}", nfe.getMessage());
             }
         }
-        logger.debug("validate minutes {} text field: {}", minutesTextField.getText(), result);
+        logger.debug("text field:'{}' validated:'{}'", minutesTextField.getText(), result);
         return result;
     }
 
@@ -607,7 +609,7 @@ public class AlarmPanel extends ClockPanel implements Runnable
      */
     boolean validateNameTextField()
     {
-        return !nameTextField.getText().isEmpty() && nameTextField.getText().length() <= 10;
+        return !nameTextField.getText().isBlank() && nameTextField.getText().length() <= 10;
     }
 
     /**
@@ -635,8 +637,8 @@ public class AlarmPanel extends ClockPanel implements Runnable
     }
 
     /**
-     * Checks if all text fields are blank or empty
-     * @return true if all text fields are blank or empty
+     * Checks if all required text fields are blank.
+     * @return true if all text fields are blank, otherwise false
      */
     public boolean areAllBlank()
     {
@@ -660,7 +662,7 @@ public class AlarmPanel extends ClockPanel implements Runnable
         boolean validName = validateNameTextField();
         boolean validCheckboxes = validateTheCheckBoxes(getDaysChecked());
         allInputsAreValid = validHours && validMinutes && validCheckboxes
-                && validName && areAllNotZeroes() && !areAllBlank();
+                && validName && areAllNotZeroes();
         logger.debug("all inputs are valid: {}", allInputsAreValid);
         return allInputsAreValid;
     }

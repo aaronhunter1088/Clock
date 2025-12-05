@@ -45,8 +45,8 @@ public class Stopwatch implements Serializable, Comparable<Stopwatch>, Runnable
     private long accumMilli = 0L;        // time accumulated across previous runs
     private long lastLapMarkMilli = 0L;  // elapsed ns at last lap
     private long pausedAccumMilli = 0L;  // total paused duration accumulated
-    private long totalPausedMilli = 0L;  // total paused duration accumulated
-    private long startPauseMilli = 0L;   // when Pause was pressed
+    private long totalPausedMilli = 0L;  // total paused duration with previous pauses
+    private long pausedMilli = 0L;        // when Pause was pressed in milliseconds
     private Duration duration;
     private List<Lap> laps;
 
@@ -100,7 +100,7 @@ public class Stopwatch implements Serializable, Comparable<Stopwatch>, Runnable
         lastLapMarkMilli = 0L;
         pausedAccumMilli = 0L;
         totalPausedMilli = 0L;
-        startPauseMilli = 0L;
+        pausedMilli = 0L;
         laps = null;
         logger.info("{} stopwatch stopped", this);
     }
@@ -108,7 +108,7 @@ public class Stopwatch implements Serializable, Comparable<Stopwatch>, Runnable
     /** Pauses the stopwatch */
     public synchronized void pauseStopwatch()
     {
-        startPauseMilli = System.currentTimeMillis();
+        pausedMilli = System.currentTimeMillis();
         setPaused(true);
         logger.info("{} paused", this);
     }
@@ -122,7 +122,7 @@ public class Stopwatch implements Serializable, Comparable<Stopwatch>, Runnable
         {
             logger.debug("paused for {} seconds", Duration.ofMillis(pausedAccumMilli).getSeconds());
             totalPausedMilli += pausedAccumMilli;
-            pausedAccumMilli = 0L;
+            setPausedAccumMilli(0L);
             setPaused(false);
             logger.info("resuming {}", this);
         }
@@ -154,7 +154,7 @@ public class Stopwatch implements Serializable, Comparable<Stopwatch>, Runnable
     {
         if (paused) {
             logger.debug("{} paused", this);
-            pausedAccumMilli = (now - startPauseMilli);
+            pausedAccumMilli = (now - pausedMilli);
         } else if (startMilli == 0L) {
             // first start
             startMilli = now;
@@ -264,9 +264,11 @@ public class Stopwatch implements Serializable, Comparable<Stopwatch>, Runnable
     /** Returns the start time in milliseconds */
     public long getStartMilli() { return startMilli; }
     /** Returns when Pause was pressed in milliseconds */
-    public long getStartPauseMilli() { return startPauseMilli; }
+    public long getPausedMilli() { return pausedMilli; }
     /** Returns the accumulated paused milliseconds */
     public long getAccumMilli() { return accumMilli; }
+    /** Returns the accumulated paused milliseconds */
+    public long getPausedAccumMilli() { return pausedAccumMilli; }
 
     /** Set the clock */
     public void setClock(Clock clock) { this.clock = clock; logger.debug("clock set"); }
@@ -282,5 +284,8 @@ public class Stopwatch implements Serializable, Comparable<Stopwatch>, Runnable
     public void setLaps(List<Lap> laps) { this.laps = laps; logger.debug("laps set"); }
     /** Set the duration */
     public void setDuration(Duration duration) { this.duration = duration; logger.debug("duration set to {}", duration); }
+    /** Set the accumulated paused milliseconds */
+    public void setPausedAccumMilli(long pausedAccumMilli) { this.pausedAccumMilli = pausedAccumMilli; logger.debug("pausedAccumMilli set to {}", pausedAccumMilli); }
+
 }
 

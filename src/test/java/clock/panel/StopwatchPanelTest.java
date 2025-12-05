@@ -20,8 +20,7 @@ import static clock.entity.Panel.*;
 import static clock.util.Constants.*;
 import static java.lang.Thread.sleep;
 import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 /**
  * Tests for the {@link StopwatchPanel} class
@@ -151,15 +150,12 @@ class StopwatchPanelTest {
 
     @Test
     @DisplayName("Test that with 3 stopwatches, the panel is reset")
-    void testResettingWith3StopwatchesWorks() throws InterruptedException {
-        // Create 2 mock stopwatches and add them to the clock
-        Stopwatch sw1 = mock(Stopwatch.class);
-        when(sw1.isStarted()).thenReturn(true);
-        when(sw1.isPaused()).thenReturn(true);
-        Stopwatch sw2 = mock(Stopwatch.class);
-        when(sw2.isStarted()).thenReturn(true);
-        when(sw2.isPaused()).thenReturn(true);
-        Stopwatch.stopwatchCounter = 2L; // so the next stopwatch created is Sw3
+    void testResettingWith3StopwatchesWorks() throws InterruptedException
+    {
+        // Create 2 stopwatches and add them to the clock
+        Stopwatch sw1 = new Stopwatch("Sw1", true, true, clock);
+        Stopwatch sw2 = new Stopwatch("Sw2", true, true, clock);
+
         clock.getListOfStopwatches().add(sw1);
         clock.getListOfStopwatches().add(sw2);
 

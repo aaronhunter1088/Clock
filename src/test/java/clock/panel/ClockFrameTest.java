@@ -53,6 +53,7 @@ public class ClockFrameTest
     void afterEach()
     {
         clockFrame.stop();
+        clockFrame.dispose();
     }
 
     @AfterAll

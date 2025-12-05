@@ -17,7 +17,6 @@ import static java.time.Month.JANUARY;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.Mockito.doNothing;
 
 /**
@@ -56,6 +55,7 @@ public class AnalogueClockPanelTest
     void afterEach()
     {
         analogueClockPanel.getClockFrame().stop();
+        analogueClockPanel.getClockFrame().dispose();
     }
 
     @AfterAll
@@ -72,11 +72,8 @@ public class AnalogueClockPanelTest
 
         doNothing().when(g).setFont(any());
         doNothing().doNothing().doNothing().when(g).setColor(any());
-        doNothing().when(g).fillRect(anyInt(), anyInt(), anyInt(), anyInt());
 
-        assertDoesNotThrow(() -> {
-            analogueClockPanel.paint(g);
-        }, "Painting the AnalogueClockPanel should not throw an exception");
+        assertDoesNotThrow(() -> analogueClockPanel.paint(g), "Painting the AnalogueClockPanel should not throw an exception");
     }
 
     @Test
@@ -91,11 +88,8 @@ public class AnalogueClockPanelTest
 
         doNothing().when(g).setFont(any());
         doNothing().doNothing().doNothing().when(g).setColor(any());
-        doNothing().when(g).fillRect(anyInt(), anyInt(), anyInt(), anyInt());
 
-        assertDoesNotThrow(() -> {
-            analogueClockPanel.paint(g);
-        }, "Painting the AnalogueClockPanel should not throw an exception");
+        assertDoesNotThrow(() -> analogueClockPanel.paint(g), "Painting the AnalogueClockPanel should not throw an exception");
     }
 
     @Test
