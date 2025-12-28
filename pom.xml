@@ -10,31 +10,35 @@
     </parent>
 
     <artifactId>Clock</artifactId>
-    <version>3.0</version>
+    <version>3.0.1</version>
     <name>Clock</name>
     <description>A simple Clock GUI which displays the date and time,
         and can set alarms, timers, and stopwatches.</description>
     
     <properties>
-        <outputDirectory>${basedir}/dist</outputDirectory>
+        <outputDirectory>${basedir}/dist/${project.version}</outputDirectory>
         <finalName>${project.artifactId}-${project.version}</finalName>
+        <java.version>25</java.version>
         <main.class>clock.Main</main.class>
     </properties>
 
     <dependencies>
-        <!-- https://mvnrepository.com/artifact/javazoom/jlayer -->
+        <!-- javazoom.jlayer --><!--
+        https://mvnrepository.com/artifact/javazoom/jlayer -->
         <dependency>
             <groupId>javazoom</groupId>
             <artifactId>jlayer</artifactId>
             <version>1.0.1</version>
         </dependency>
-        <!-- https://mvnrepository.com/artifact/com.google.code.gson/gson -->
+        <!-- google.gson --><!--
+        https://mvnrepository.com/artifact/com.google.code.gson/gson -->
         <dependency>
             <groupId>com.google.code.gson</groupId>
             <artifactId>gson</artifactId>
             <version>2.10.1</version>
         </dependency>
-        <!-- Managed in Parent Dependency Management section -->
+        <!-- log4j2 --><!--
+        Managed in Parent Dependency Management section -->
         <dependency>
             <groupId>org.apache.logging.log4j</groupId>
             <artifactId>log4j-core</artifactId>
@@ -43,7 +47,8 @@
             <groupId>org.apache.logging.log4j</groupId>
             <artifactId>log4j-api</artifactId>
         </dependency>
-        <!-- Managed in Parent Dependency Management section -->
+        <!-- commons-lang3 --><!--
+        Managed in Parent Dependency Management section -->
         <dependency>
             <groupId>org.apache.commons</groupId>
             <artifactId>commons-lang3</artifactId>
@@ -51,7 +56,8 @@
 
         <!-- Testing dependencies -->
 
-        <!-- Managed in Parent Test Dependency Management section -->
+        <!-- jupiter junit --><!--
+        Managed in Parent Test Dependency Management section -->
         <dependency>
             <groupId>org.junit.jupiter</groupId>
             <artifactId>junit-jupiter-api</artifactId>
@@ -67,7 +73,8 @@
             <artifactId>junit-jupiter-params</artifactId>
             <scope>test</scope>
         </dependency>
-        <!-- Managed in Parent Test Dependency Management section -->
+        <!-- mockito --><!--
+        Managed in Parent Test Dependency Management section -->
         <dependency>
             <groupId>org.mockito</groupId>
             <artifactId>mockito-core</artifactId>

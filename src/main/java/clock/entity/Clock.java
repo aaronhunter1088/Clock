@@ -439,7 +439,7 @@ public class Clock implements Serializable, Comparable<Clock>, Runnable
     public void run()
     {
         logger.info("Clock is running");
-        while (true)
+        while (!Thread.currentThread().isInterrupted())
         {
             try
             {
@@ -448,7 +448,7 @@ public class Clock implements Serializable, Comparable<Clock>, Runnable
             }
             catch (InterruptedException e)
             {
-                logger.error("Clock thread interrupted", e);
+                printStackTrace(e, "Clock thread interrupted");
                 Thread.currentThread().interrupt(); // Restore the interrupted status
                 break; // Exit the loop if interrupted
             }
@@ -505,7 +505,6 @@ public class Clock implements Serializable, Comparable<Clock>, Runnable
                 logger.debug("updating minute");
                 setMinutes(this.minutes-60);
                 setHours(this.hours+hours);
-                logger.debug("time: " + getTimeAsStr());
                 if (this.hours >= 12 && this.minutes == 0 && this.seconds == 0 && !showMilitaryTime)
                 {
                     logger.debug("updating hour");
@@ -523,7 +522,7 @@ public class Clock implements Serializable, Comparable<Clock>, Runnable
                         setDateChanged(false);
                     }
                 }
-                else if (this.hours >= 24 && this.minutes == 0 && this.seconds == 0)
+                else if (this.hours == 0 && this.minutes == 0 && this.seconds == 0 && showMilitaryTime)
                 {
                     setHours(0);
                     setAMPM(AM);
@@ -539,11 +538,12 @@ public class Clock implements Serializable, Comparable<Clock>, Runnable
                     setHours(this.hours);
                     setDateChanged(false);
                 }
+                logger.debug("isMilitary: {} time: {}", isShowMilitaryTime(), getTimeAsStr());
             }
         }
         else { setDateChanged(false); }
-        if (!showMilitaryTime) { logger.info(getTimeAsStr()); }
-        else { logger.info(getMilitaryTimeAsStr()); }
+//        if (!showMilitaryTime) { logger.info(getTimeAsStr()); }
+//        else { logger.info(getMilitaryTimeAsStr()); }
 
         if (dateChanged) {
             logger.info("date has changed");
@@ -695,6 +695,22 @@ public class Clock implements Serializable, Comparable<Clock>, Runnable
             { logger.debug("!! today is not dst !!"); }
         }
         setTheDateAndTime();
+    }
+
+    /**
+     * This method prints the stack trace of an exception
+     * that may occur when the digital panel is in use.
+     * @param e the exception
+     * @param message a custom message to print out
+     */
+    public void printStackTrace(Exception e, String message)
+    {
+        if (message != null)
+            logger.error(message);
+        if (e.getMessage() != null)
+            logger.error(e.getMessage());
+        for(StackTraceElement ste : e.getStackTrace())
+        { logger.error(ste.toString()); }
     }
 
     /** Returns the date */
@@ -852,7 +868,22 @@ public class Clock implements Serializable, Comparable<Clock>, Runnable
     /** Sets and logs the new time value
      * @param time the new time value
      */
-    private void setTime(LocalTime time) { this.time = time; logger.debug("time: {}", getTimeAsStr()); }
+    private void setTime(LocalTime time) { this.time = time; printTime(); }
+    private void printTime()
+    {
+        if (logger.isInfoEnabled())
+        {
+            logger.info("time: {} (isMilitary:{})",
+                    !isShowMilitaryTime() ? getTimeAsStr() : getMilitaryTimeAsStr(),
+                    isShowMilitaryTime());
+        }
+        else
+        {
+            logger.debug("time: {} (isMilitary:{})",
+                    !isShowMilitaryTime() ? getTimeAsStr() : getMilitaryTimeAsStr(),
+                    isShowMilitaryTime());
+        }
+    }
     /**
      * Sets and logs the new dayOfWeek value
      * @param dayOfWeek the new dayOfWeek value
@@ -878,12 +909,24 @@ public class Clock implements Serializable, Comparable<Clock>, Runnable
      * Example log: FRIDAY MAY 4, 2000
      * @param date the new date value
      */
-    protected void setDate(LocalDate date) { this.date = date; logger.debug("date: {} {}", dayOfWeek!=null?dayOfWeek.toString():"DayOfWeekUnset", getDateAsStr()); }
+    protected void setDate(LocalDate date) { this.date = date; printDate(); }
+    private void printDate()
+    {
+        if (logger.isInfoEnabled())
+        {
+            logger.info("date: {} {}", dayOfWeek!=null?dayOfWeek.toString():"DayOfWeekUnset", getDateAsStr());
+        }
+        else
+        {
+            logger.debug("date: {} {}", dayOfWeek!=null?dayOfWeek.toString():"DayOfWeekUnset", getDateAsStr());
+        }
+    }
     /**
      * Sets and logs the new current time
      * @param currentDateTime the new current time
      */
-    protected void setCurrentDateTime(LocalDateTime currentDateTime) { this.currentDateTime = currentDateTime; logger.debug("currentTime: {}", DateTimeFormatter.ofPattern("dd-MM-yyyy hh:mm:ss a").format(currentDateTime)); }
+    protected void setCurrentDateTime(LocalDateTime currentDateTime) { this.currentDateTime = currentDateTime; printDateTime(); }
+    private void printDateTime() { logger.debug("{}", DateTimeFormatter.ofPattern("MMM dd, yyyy hh:mm:ss a").format(currentDateTime)); }
     /**
      * Sets and logs the new begin dst date value
      * @param beginDaylightSavingsTimeDate the new begin dst date value

@@ -823,7 +823,10 @@ public class AlarmPanel extends ClockPanel implements Runnable
                 sleep(1000);
             }
             catch (InterruptedException e)
-            { printStackTrace(e, e.getMessage()); }
+            {
+                printStackTrace(e, null);
+                Thread.currentThread().interrupt();
+            }
         }
     }
 

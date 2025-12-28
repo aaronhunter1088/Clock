@@ -277,6 +277,9 @@ class TimerTest
         try {
             Thread.sleep(time);
         }
-        catch (InterruptedException e) { throw new RuntimeException(e); }
+        catch (InterruptedException e)
+        {
+            Thread.currentThread().interrupt();
+        }
     }
 }

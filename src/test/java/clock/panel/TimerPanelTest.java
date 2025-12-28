@@ -461,8 +461,9 @@ class TimerPanelTest
                 assertSame(4, timer2.get().getMinutes());
                 assertSame(55, timer2.get().getSeconds());
             }
-            catch (InterruptedException e) {
-                throw new RuntimeException(e);
+            catch (InterruptedException e)
+            {
+                Thread.currentThread().interrupt();
             }
         });
     }

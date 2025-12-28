@@ -647,6 +647,7 @@ class ClockTest
             }
         } catch (InterruptedException e) {
             logger.error("Interrupted while ticking clock", e);
+            Thread.currentThread().interrupt();
         }
     }
 

@@ -132,7 +132,7 @@ public class Alarm implements Serializable, Comparable<Alarm>, Runnable
         {
             logger.debug("starting alarm");
             setSelfThread(selfThread = new Thread(this));
-            selfThread.start();
+            selfThread.start(); // a thread starting itself
         }
     }
 
@@ -142,7 +142,7 @@ public class Alarm implements Serializable, Comparable<Alarm>, Runnable
     @Override
     public void run()
     {
-        while (selfThread != null)
+        while (!selfThread.isInterrupted())
         {
             try {
                 if (!alarmGoingOff && !activatedToday && !isPaused && !isSnoozing) {
@@ -161,7 +161,11 @@ public class Alarm implements Serializable, Comparable<Alarm>, Runnable
                     sleep(1000);
                 }
             }
-            catch (InterruptedException e) { printStackTrace(e, e.getMessage());}
+            catch (InterruptedException e)
+            {
+                printStackTrace(e, null);
+                Thread.currentThread().interrupt();
+            }
         }
     }
 
@@ -189,9 +193,9 @@ public class Alarm implements Serializable, Comparable<Alarm>, Runnable
     public synchronized void stopAlarm()
     {
         logger.debug("stopping alarm");
-        musicPlayer = null;
-        alarmGoingOff = false;
-        selfThread = null;
+        setMusicPlayer(null);
+        setIsAlarmGoingOff(false);
+        setSelfThread(null);
         logger.info("{} alarm turned off", this);
     }
 
@@ -229,7 +233,7 @@ public class Alarm implements Serializable, Comparable<Alarm>, Runnable
         }
         catch (Exception e)
         {
-            printStackTrace(e, e.getMessage());
+            printStackTrace(e, "Error while playing sound");
         }
     }
 
@@ -248,13 +252,13 @@ public class Alarm implements Serializable, Comparable<Alarm>, Runnable
      * This method prints the stack trace of an exception
      * that may occur when the digital panel is in use.
      * @param e the exception
-     * @param message the message to print
+     * @param message a custom message to print out
      */
     public void printStackTrace(Exception e, String message)
     {
-        if (null != message)
+        if (message != null)
             logger.error(message);
-        else
+        if (e.getMessage() != null)
             logger.error(e.getMessage());
         for(StackTraceElement ste : e.getStackTrace())
         { logger.error(ste.toString()); }

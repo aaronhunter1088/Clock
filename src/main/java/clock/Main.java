@@ -10,10 +10,12 @@ import org.apache.logging.log4j.Logger;
 import javax.swing.*;
 
 import java.time.DayOfWeek;
+import java.time.LocalDate;
 import java.time.Month;
+import java.util.Arrays;
 import java.util.List;
 
-import static clock.util.Constants.COMMA;
+import static clock.util.Constants.*;
 
 /**
  * Main class to start the application.
@@ -32,7 +34,7 @@ public class Main
      *
      * @param args command line arguments
      */
-    public static void main(String[] args)
+    public static void main(String[] args) throws Exception
     {
         startMain(args);
         Runtime.getRuntime().addShutdownHook(new Thread(() -> {
@@ -43,41 +45,27 @@ public class Main
 
     /**
      * Starts the clock application based on the provided arguments.
-     * The first argument determines the start type:
-     * - "0" for default start
-     * - "1" for specific panel start with an additional argument
-     * - "2" for specific clock start with additional arguments
-     *
+     * - 0 args for default start
+     * - 1 args: a specific panel to start up in
+     * - 7 args: month, dateOfMonth, year, hours, minutes, seconds, am/pm
      * @param args command line arguments
+     * @throws Exception if the number of arguments is invalid
+     * or if the arguments are provided incorrectly.
      */
-    public static void startMain(String[] args)
+    public static void startMain(String[] args) throws Exception
     {
-        int startValue = 0;
-        try {
-            int starting = Integer.parseInt(List.of(args[0].split(COMMA)).getFirst());
-            startValue = Math.max(0, starting);
-        } catch (ArrayIndexOutOfBoundsException e) {
-            logger.info("No arguments provided, starting default clock.");
-        } catch (Exception e) {
-            logger.warn("Error: {}", e.getMessage());
-        }
+        int startValue = args != null ? args.length : 0;
         if (startValue == 0) {
             defaultStart();
         }
         else if (startValue == 1) {
-            try {
-                specificPanelStart(args);
-            } catch (InvalidInputException | IllegalArgumentException e) {
-                defaultStart();
-            }
-
+            specificPanelStart(args);
         }
-        else if (startValue == 2) {
-            try {
-                specificClockStart(args);
-            } catch (InvalidInputException | IllegalArgumentException e) {
-                defaultStart();
-            }
+        else if (startValue == 7) {
+            specificClockStart(args);
+        }
+        else {
+            throw new InvalidInputException("Invalid number of arguments provided.");
         }
     }
 
@@ -95,37 +83,34 @@ public class Main
      */
     public static void specificPanelStart(String[] args)
     {
-        Panel type = Panel.valueOf(List.of(args[0].split(COMMA)).get(1).toUpperCase());
+        Panel type = Panel.valueOf(List.of(args).getFirst().toUpperCase());
         SwingUtilities.invokeLater(() -> clockFrame = ClockFrame.createAndShowGUI(type));
     }
 
     /**
      * Starts the clock application at a specific time.
      * The args should be in the format:
-     * "2","23","55","10","JULY","WEDNESDAY","30","2025","PM"
-     * where: "2" is the start value
-     * "23" is the hour (in 24-hour format),
-     * "55" is the minutes,
-     * "10" is the seconds,
-     * "JULY" is the month,
-     * "WEDNESDAY" is the day of the week,
-     * "30" is the day of the month,
-     * "2025" is the year,
-     * "PM" is the AM/PM designation.
+     * month day year hour minute second ampm
+     * This is a space separated list of values.
+     * Last option will enforce military time if hours >= 12 so, the
+     * AM/PM will be ignored in that case. But if it is less than 12, it
+     * could be either or, so AM/PM
      * @param args list of strings containing the clock settings
      */
     public static void specificClockStart(String[] args)
     {
-        List<String> values = List.of(args[0].split(COMMA));
-        int hours = Integer.parseInt(values.get(1)); // hours more than 12 will enforce showMilitaryTime
-        int minutes = Integer.parseInt(values.get(2));
-        int seconds = Integer.parseInt(values.get(3));
-        Month month = Month.valueOf(values.get(4).toUpperCase());
-        DayOfWeek dayOfWeek = DayOfWeek.valueOf(values.get(5).toUpperCase());
-        int dayOfMonth = Integer.parseInt(values.get(6));
-        int year = Integer.parseInt(values.get(7));
-        String ampm = values.get(8).toUpperCase();
-        Clock testClock = new Clock(hours, minutes, seconds, month, dayOfWeek, dayOfMonth, year, ampm);
+        List<String> values = Arrays.stream(args).toList();
+        Month month = Month.valueOf(values.get(0).toUpperCase());
+        int dayOfMonth = Integer.parseInt(values.get(1));
+        int year = Integer.parseInt(values.get(2));
+        LocalDate localDate = LocalDate.of(year, month, dayOfMonth);
+
+        int hours = Integer.parseInt(values.get(3)); // hours more than 12 will enforce showMilitaryTime
+        int minutes = Integer.parseInt(values.get(4));
+        int seconds = Integer.parseInt(values.get(5));
+
+        String ampm = hours < 12 ? values.get(6).toUpperCase() : PM;
+        Clock testClock = new Clock(hours, minutes, seconds, month, localDate.getDayOfWeek(), dayOfMonth, year, ampm);
         SwingUtilities.invokeLater(() -> clockFrame = ClockFrame.createAndShowGUI(testClock));
     }
 }

@@ -80,8 +80,8 @@ public class Stopwatch implements Serializable, Comparable<Stopwatch>, Runnable
         if (selfThread == null)
         {
             setSelfThread(new Thread(this));
-            selfThread.start();
-            started = true;
+            selfThread.start(); // thread starting itself
+            setStarted(true);
         }
     }
 
@@ -101,8 +101,8 @@ public class Stopwatch implements Serializable, Comparable<Stopwatch>, Runnable
         pausedAccumMilli = 0L;
         totalPausedMilli = 0L;
         pausedMilli = 0L;
-        laps = null;
-        logger.info("{} stopwatch stopped", this);
+        setLaps(null);
+        logger.debug("{} stopwatch stopped", this);
     }
 
     /** Pauses the stopwatch */
@@ -110,7 +110,7 @@ public class Stopwatch implements Serializable, Comparable<Stopwatch>, Runnable
     {
         pausedMilli = System.currentTimeMillis();
         setPaused(true);
-        logger.info("{} paused", this);
+        logger.debug("{} paused", this);
     }
 
     /**
@@ -124,7 +124,7 @@ public class Stopwatch implements Serializable, Comparable<Stopwatch>, Runnable
             totalPausedMilli += pausedAccumMilli;
             setPausedAccumMilli(0L);
             setPaused(false);
-            logger.info("resuming {}", this);
+            logger.debug("resuming {}", this);
         }
     }
 
@@ -134,13 +134,17 @@ public class Stopwatch implements Serializable, Comparable<Stopwatch>, Runnable
     @Override
     public void run()
     {
-        while (selfThread != null)
+        while (!selfThread.isInterrupted())
         {
-            try {
+            try
+            {
                 performCountUp(System.currentTimeMillis());
                 sleep(1);
-            } catch (InterruptedException e) {
-                throw new RuntimeException(e);
+            }
+            catch (InterruptedException e)
+            {
+                printStackTrace(e, null);
+                Thread.currentThread().interrupt();
             }
         }
     }
@@ -217,6 +221,22 @@ public class Stopwatch implements Serializable, Comparable<Stopwatch>, Runnable
     }
 
     /**
+     * This method prints the stack trace of an exception
+     * that may occur when the digital panel is in use.
+     * @param e the exception
+     * @param message a custom message to print out
+     */
+    public void printStackTrace(Exception e, String message)
+    {
+        if (message != null)
+            logger.error(message);
+        if (e.getMessage() != null)
+            logger.error(e.getMessage());
+        for(StackTraceElement ste : e.getStackTrace())
+        { logger.error(ste.toString()); }
+    }
+
+    /**
      * Compares this stopwatch to another stopwatch based
      * on the stopwatch name.
      * @return a negative integer, zero, or a positive integer
@@ -281,7 +301,7 @@ public class Stopwatch implements Serializable, Comparable<Stopwatch>, Runnable
     /** Set the selfThread */
     public void setSelfThread(Thread selfThread) { this.selfThread = selfThread; logger.debug("selfThread set to {}", selfThread); }
     /** Set the laps */
-    public void setLaps(List<Lap> laps) { this.laps = laps; logger.debug("laps set"); }
+    public void setLaps(List<Lap> laps) { this.laps = laps; if (laps != null) logger.debug("laps set"); else logger.debug("laps set to null"); }
     /** Set the duration */
     public void setDuration(Duration duration) { this.duration = duration; logger.debug("duration set to {}", duration); }
     /** Set the accumulated paused milliseconds */

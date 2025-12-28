@@ -149,22 +149,6 @@ public class Timer implements Serializable, Comparable<Timer>, Runnable
     }
 
     /**
-     * This method prints the stack trace of an exception
-     * that may occur when the digital panel is in use.
-     * @param e the exception
-     * @param message the message to print
-     */
-    private void printStackTrace(Exception e, String message)
-    {
-        if (null != message)
-            logger.error(message);
-        else
-            logger.error(e.getMessage());
-        for(StackTraceElement ste : e.getStackTrace())
-        { logger.error(ste.toString()); }
-    }
-
-    /**
      * This method begins the thread
      * that runs the timer.
      */
@@ -173,7 +157,7 @@ public class Timer implements Serializable, Comparable<Timer>, Runnable
         if (selfThread == null)
         {
             setSelfThread(new Thread(this));
-            selfThread.start();
+            selfThread.start(); // thread starting itself
         }
     }
 
@@ -183,7 +167,7 @@ public class Timer implements Serializable, Comparable<Timer>, Runnable
     @Override
     public void run()
     {
-        while (selfThread != null)
+        while (!selfThread.isInterrupted())
         {
             try {
                 if (!timerGoingOff && !paused) {
@@ -196,7 +180,11 @@ public class Timer implements Serializable, Comparable<Timer>, Runnable
                     sleep(1000);
                 }
             }
-            catch (InterruptedException e) { printStackTrace(e, e.getMessage());}
+            catch (InterruptedException e)
+            {
+                printStackTrace(e, null);
+                Thread.currentThread().interrupt();
+            }
         }
     }
 
@@ -210,7 +198,7 @@ public class Timer implements Serializable, Comparable<Timer>, Runnable
     {
         if (!started || !paused) {
             setStarted(true);
-            logger.info("{} ticking down...", this);
+            logger.debug("{} ticking down...", this);
             if (countDown.getSecond() > 0 || countDown.getMinute() > 0 || countDown.getHour() > 0)
             {
                 countDown = countDown.minusSeconds(1);
@@ -218,7 +206,7 @@ public class Timer implements Serializable, Comparable<Timer>, Runnable
             logger.debug("CountDown: {}", getCountDownString());
             if (countDown.getHour() == 0 && countDown.getMinute() == 0 && countDown.getSecond() == 0)
             {
-                logger.info("{} has reached zero", this);
+                logger.debug("{} has reached zero", this);
                 setTimerGoingOff(true);
             }
         }
@@ -238,21 +226,21 @@ public class Timer implements Serializable, Comparable<Timer>, Runnable
         }
         catch (Exception e)
         {
-            logger.error(e.getCause().getClass().getName() + " - " + e.getMessage());
+            printStackTrace(e, null);
         }
     }
 
     /** Pauses the timer */
     public synchronized void pauseTimer()
     {
-        logger.info("pausing {}", this);
+        logger.debug("pausing {}", this);
         setPaused(true);
     }
 
     /** Resumes a paused timer */
     public synchronized void resumeTimer()
     {
-        logger.info("resuming {}", this);
+        logger.debug("resuming {}", this);
         setPaused(false);
     }
 
@@ -281,6 +269,22 @@ public class Timer implements Serializable, Comparable<Timer>, Runnable
         setTriggered(false);
         setTimerGoingOff(false);
         logger.info("{} timer stopped", this);
+    }
+
+    /**
+     * This method prints the stack trace of an exception
+     * that may occur when the digital panel is in use.
+     * @param e the exception
+     * @param message a custom message to print out
+     */
+    public void printStackTrace(Exception e, String message)
+    {
+        if (message != null)
+            logger.error(message);
+        if (e.getMessage() != null)
+            logger.error(e.getMessage());
+        for(StackTraceElement ste : e.getStackTrace())
+        { logger.error(ste.toString()); }
     }
 
     /** Returns the clock */

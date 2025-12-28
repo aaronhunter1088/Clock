@@ -44,13 +44,15 @@ public abstract class ClockPanel extends JPanel implements IClockPanel
      * This method prints the stack trace of an exception
      * that may occur when the digital panel is in use.
      * @param e the exception
-     * @param message the message to print
+     * @param message a custom message to print out
      */
     @Override
     public void printStackTrace(Exception e, String message)
     {
-        if (null != message) logger.error(message);
-        else logger.error(e.getMessage());
+        if (message != null)
+            logger.error(message);
+        if (e.getMessage() != null)
+            logger.error(e.getMessage());
         for(StackTraceElement ste : e.getStackTrace())
         { logger.error(ste.toString()); }
     }

@@ -123,7 +123,10 @@ public class AnalogueClockPanel extends ClockPanel implements Runnable
                 sleep(1000);
             }
             catch (InterruptedException e)
-            { printStackTrace(e, e.getMessage()); }
+            {
+                printStackTrace(e, e.getMessage());
+                Thread.currentThread().interrupt();
+            }
         }
     }
 
