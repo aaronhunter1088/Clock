@@ -2,10 +2,10 @@
 
 ## Project Overview
 
-This is a Java Swing GUI application that displays date and time in both digital and analogue modes. The application supports multiple features including alarms, timers, and stopwatches.
+This is a Java Swing GUI application that displays date and time in both digital and analogue modes. The application also allows one to create multiple alarms, timers, and stopwatches.
 
 **Current Version:** 3.0.3  
-**Language:** Java 21  
+**Language:** Java 25
 **Build Tool:** Maven  
 **Testing Framework:** JUnit 5 and Mockito
 
@@ -67,7 +67,7 @@ java -jar dist/{version}/Clock-{version}-jar-with-dependencies.jar august 6 2025
 ## Code Style and Conventions
 
 ### General Guidelines
-- **Java Version:** Java 21
+- **Java Version:** Java 25
 - **Logging:** Use Log4j2 (logger instance per class)
 - **Code Style:** Follow existing patterns in the codebase
 - **Documentation:** Include Javadoc for public methods and classes
