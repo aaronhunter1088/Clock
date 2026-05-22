@@ -4,7 +4,7 @@
 
 This is a Java Swing GUI application that displays date and time in both digital and analogue modes. The application also allows one to create multiple alarms, timers, and stopwatches.
 
-**Current Version:** 3.0.3  
+**Current Version:** 3.0.4
 **Language:** Java 25
 **Build Tool:** Maven  
 **Testing Framework:** JUnit 5 and Mockito
@@ -25,6 +25,10 @@ src/
 │   └── resources/                 # Resources (sounds, images, config)
 └── test/
     └── java/clock/                # JUnit tests mirroring main structure
+    │   │   ├── entity/                # Core entities (Clock, Alarm, Timer, Stopwatch)
+    │   │   ├── exception/             # Custom exceptions
+    │   │   ├── panel/                 # GUI panels for different features
+    │   │   ├── <package name>/        # ...
 ```
 
 ## Build and Test

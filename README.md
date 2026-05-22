@@ -1,4 +1,4 @@
-# Clock v3.0.1
+# Clock v: 3.0.4
 
 This is a Java Swing GUI application which displays the date and time to the user in
 both digital and analogue modes. It also has the capability to set multiple alarms,
@@ -87,6 +87,17 @@ Without the tests will 'pause' until that popup is closed.
 
 ```
 # History
+
+v3.0.4:
+Added github instructions for better utilization of Copilot and other new AI tools. 
+
+v3.0.3:
+Generated this new version after cleaning up the pom.properties, and xml files. 
+
+v3.0.2:
+Updated the pom to exclude the openapi-generator-maven-plugin from the build process, as it is not necessary for this 
+project. 
+
 v3.0.1:
 Update arguments parsing when starting the application on the command line.
 Now, either provide nothing for default start, a panel for a specific start,
