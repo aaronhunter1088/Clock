@@ -90,7 +90,7 @@ public class Main
     /**
      * Starts the clock application at a specific time.
      * The args should be in the format:
-     * month day year hour minute second ampm
+     * month day year hour minute second ampm, or july 30 2025 8 30 55 pm
      * This is a space separated list of values.
      * Last option will enforce military time if hours >= 12 so, the
      * AM/PM will be ignored in that case. But if it is less than 12, it

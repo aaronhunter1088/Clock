@@ -154,7 +154,7 @@ public class Stopwatch implements Serializable, Comparable<Stopwatch>, Runnable
      * It checks if the stopwatch is paused, started, or stopped,
      * and updates the accumulated time accordingly.
      */
-    private void performCountUp(long now)
+    private synchronized void performCountUp(long now)
     {
         if (paused) {
             logger.debug("{} paused", this);

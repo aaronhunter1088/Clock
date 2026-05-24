@@ -24,13 +24,13 @@ mvn clean package -Dmaven.test.skip=true
 
 ```bash
 # Default start (digital clock panel)
-java -jar dist/{version}/Clock-{version}-jar-with-dependencies.jar
+java -jar dist/{version}/clock-{version}-jar-with-dependencies.jar
 
 # Start with specific panel
-java -jar dist/{version}/Clock-{version}-jar-with-dependencies.jar panel_alarm
+java -jar dist/{version}/clock-{version}-jar-with-dependencies.jar panel_alarm
 
 # Start with specific date/time
-java -jar dist/{version}/Clock-{version}-jar-with-dependencies.jar august 6 2025 10 30 0 pm
+java -jar dist/{version}/clock-{version}-jar-with-dependencies.jar august 6 2025 10 30 0 pm
 ```
 
 Set `logLevel` as an environment variable to control log verbosity. If unset, a warning is logged and `all` is used.

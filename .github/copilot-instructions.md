@@ -59,13 +59,13 @@ mvn test -Dtest=ClockTest
 ### Running the Application
 ```bash
 # Default start (digital clock panel)
-java -jar dist/{version}/Clock-{version}-jar-with-dependencies.jar
+java -jar dist/{version}/clock-{version}-jar-with-dependencies.jar
 
 # Start with specific panel
-java -jar dist/{version}/Clock-{version}-jar-with-dependencies.jar panel_alarm
+java -jar dist/{version}/clock-{version}-jar-with-dependencies.jar panel_alarm
 
 # Start with specific date/time
-java -jar dist/{version}/Clock-{version}-jar-with-dependencies.jar august 6 2025 10 30 0 pm
+java -jar dist/{version}/clock-{version}-jar-with-dependencies.jar august 6 2025 10 30 0 pm
 ```
 
 ## Code Style and Conventions
