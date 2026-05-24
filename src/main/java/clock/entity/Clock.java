@@ -59,30 +59,20 @@ public class Clock implements Serializable, Comparable<Clock>, Runnable
 
     /**
      * Default constructor for the Clock class.
+     * Uses the system's current date and time.
      */
     public Clock()
     {
-        //this(false);
         super();
-        initialize();
-    }
-
-    /**
-     * Creates a new Clock object with the testing flag set.
-     * @param testing if the clock is for testing purposes
-     */
-    public Clock(boolean testing)
-    {
-        super();
-        //setTestingClock(testing);
-        initialize();
+        initialize(null);
     }
 
     /**
      * Custom constructor which takes in values for all Clock
      * parameters and sets them based on those inputs.
      * If the hours provided is greater than 12, the clock
-     * will assume military time.
+     * will assume military time. All values are validated
+     * before being forwarded to {@link #initialize}.
      * @param hours      the hours to set, 0-12/23, depending
      * @param minutes    the minutes to set
      * @param seconds    the seconds to set
@@ -95,60 +85,96 @@ public class Clock implements Serializable, Comparable<Clock>, Runnable
     public Clock(int hours, int minutes, int seconds, Month month, DayOfWeek dayOfWeek,
                  int dayOfMonth, int year, String ampm)
     {
-        logger.info("Initializing Specific Clock");
-        //setTestingClock(true);
-        // Validate the inputs
+        super();
         if (hours < 0 || hours > 23) {
             if (hours > 12) throw new InvalidInputException("Hours must be between 0 and 23");
-            else throw new InvalidInputException("Hours must be between 0 and 12");
+            else            throw new InvalidInputException("Hours must be between 0 and 12");
         }
         if (minutes < 0 || minutes > 59) throw new InvalidInputException("Minutes must be between 0 and 59");
         if (seconds < 0 || seconds > 59) throw new InvalidInputException("Seconds must be between 0 and 59");
         if (year < 1582) throw new InvalidInputException("Year must be 1582 or later (Gregorian calendar did not exist before this)");
-        final boolean leapYear = Year.isLeap(year);
-        final int maxDay = month.length(leapYear);
+        final boolean isLeapYear = Year.isLeap(year);
+        final int maxDay = month.length(isLeapYear);
         if (dayOfMonth < 1 || dayOfMonth > maxDay) {
-            final String leapNote = month == FEBRUARY ? (leapYear ? " (leap year)" : " (non-leap year)") : "";
+            final String leapNote = month == FEBRUARY ? (isLeapYear ? " (leap year)" : " (non-leap year)") : EMPTY;
             throw new InvalidInputException("The day of month for " + month + " must be between 1 and " + maxDay + leapNote);
         }
-        if (year == 1582 && month == OCTOBER && dayOfMonth < 15) {
-            String chosenDate = month.toString().substring(0, 1).toUpperCase() + month.toString().substring(1).toLowerCase() + SPACE + dayOfMonth + COMMA + SPACE + year;
-            throw new InvalidInputException("Date must be on or after October 15, 1582 (Gregorian calendar start date). Your date: " + chosenDate);
+        final LocalDate gregorianStart = LocalDate.of(1582, OCTOBER, 15);
+        if (LocalDate.of(year, month, dayOfMonth).isBefore(gregorianStart)) {
+            throw new InvalidInputException("Date must be on or after October 15, 1582 (Gregorian calendar start date). Your date: " + formatMonthDay(month, dayOfMonth, year));
         }
-        if (hours > 12) setShowMilitaryTime(true);
-        setSeconds(seconds);
-        setMinutes(minutes);
-        setHours(hours);
-        setAMPM(ampm);
-        setMonth(month);
-        setDayOfWeek(dayOfWeek);
-        setDayOfMonth(dayOfMonth);
-        setYear(year);
-        setTimeZone(getZoneIdFromTimezoneButtonText(EMPTY));
-        setTheDateAndTime();
-        setDateChanged(false);
-        setDaylightSavingsTimeDates();
-        setLeapYear(date.isLeapYear());
-        setListOfAlarms(new ArrayList<>());
-        setListOfTimers(new ArrayList<>());
-        setDaylightSavingsTimeEnabled(true);
+        initialize(List.of(hours, minutes, seconds, month, dayOfWeek, dayOfMonth, year, ampm));
     }
 
     /**
-     * Initializes the clock with default settings, including setting the initial time,
-     * configuring the menu bar, setting up daylight savings time dates, and creating
-     * various clock panels. It also sets the clock's size, location, and icon.
+     * Shared initializer for all constructors.
+     * <p>
+     * When {@code arguments} is {@code null} the clock is initialised from the
+     * system's current date and time via {@link #setTheTime(LocalDateTime)}.
+     * When a list is supplied it must contain exactly eight pre-validated
+     * elements in the order:
+     * <ol>
+     *   <li>{@code Integer} hours</li>
+     *   <li>{@code Integer} minutes</li>
+     *   <li>{@code Integer} seconds</li>
+     *   <li>{@link Month}</li>
+     *   <li>{@link DayOfWeek}</li>
+     *   <li>{@code Integer} dayOfMonth</li>
+     *   <li>{@code Integer} year</li>
+     *   <li>{@code String}  ampm</li>
+     * </ol>
+     *
+     * @param arguments the ordered list of clock parameters, or {@code null}
+     *                  to use the current system date/time
      */
-    private void initialize()
+    private void initialize(List<?> arguments)
     {
-        //logger.info("Initializing {} Clock", testingClock ? "Test" : "Regular");
-        setTheTime(LocalDateTime.now());
+        if (arguments != null)
+        {
+            logger.info("Initializing Specific Clock");
+            extractArguments(arguments);
+        }
+        else
+        {
+            logger.info("Initializing Default Clock from system time");
+            setTheTime(LocalDateTime.now());
+        }
         setDaylightSavingsTimeDates();
         setLeapYear(date.isLeapYear());
         setListOfAlarms(new ArrayList<>());
         setListOfTimers(new ArrayList<>());
         setListOfStopwatches(new ArrayList<>());
         setDaylightSavingsTimeEnabled(true);
+    }
+
+    /**
+     * Extracts the arguments given by the user.
+     * @param arguments :hours, minutes, seconds,
+     *                   month, dayOfWeek, dayOfMonth,
+     *                   year, ampm
+     */
+    private void extractArguments(List<?> arguments)
+    {
+        final int hours      = (Integer)   arguments.get(0);
+        final int minutes    = (Integer)   arguments.get(1);
+        final int seconds    = (Integer)   arguments.get(2);
+        final Month month    = (Month)     arguments.get(3);
+        final DayOfWeek dow  = (DayOfWeek) arguments.get(4);
+        final int dayOfMonth = (Integer)   arguments.get(5);
+        final int year       = (Integer)   arguments.get(6);
+        final String ampm    = (String)    arguments.get(7);
+        if (hours > 12) setShowMilitaryTime(true);
+        setSeconds(seconds);
+        setMinutes(minutes);
+        setHours(hours);
+        setAMPM(ampm);
+        setMonth(month);
+        setDayOfWeek(dow);
+        setDayOfMonth(dayOfMonth);
+        setYear(year);
+        setTimeZone(getZoneIdFromTimezoneButtonText(EMPTY));
+        setTheDateAndTime();
+        setDateChanged(false);
     }
 
     /**
@@ -305,9 +331,8 @@ public class Clock implements Serializable, Comparable<Clock>, Runnable
      */
     protected String getAMPMFromTime(LocalDateTime now)
     {
-        ZonedDateTime zonedDateTime = getZonedDateTimeFromLocalDateTime(now);
-        String ampm = zonedDateTime.format(DateTimeFormatter.ofPattern("a"));
-        logger.debug("zdt: {} ampm: {}", zonedDateTime, ampm);
+        final String ampm = getZonedAmPm(now);
+        logger.debug("ampm: {}", ampm);
         return ampm;
     }
 
@@ -320,6 +345,29 @@ public class Clock implements Serializable, Comparable<Clock>, Runnable
     { return now == null ? ZonedDateTime.now(timezone) : ZonedDateTime.of(now, timezone); }
 
     /**
+     * Returns the AM or PM string for the given local date time,
+     * using the clock's active timezone.
+     * @param now the local date/time (null → use timezone's current instant)
+     * @return "AM" or "PM"
+     */
+    private String getZonedAmPm(LocalDateTime now)
+    { return getZonedDateTimeFromLocalDateTime(now).format(DateTimeFormatter.ofPattern("a")); }
+
+    /**
+     * Formats a month, dayOfMonth, and year as a title-cased string.
+     * Example: OCTOBER, 14, 1582 → "October 14, 1582"
+     * @param month the month
+     * @param dayOfMonth the day of the month
+     * @param year the year
+     * @return the formatted date string
+     */
+    private static String formatMonthDay(Month month, int dayOfMonth, int year)
+    {
+        final String monthStr = month.toString().charAt(0) + month.toString().substring(1).toLowerCase();
+        return monthStr + SPACE + dayOfMonth + COMMA + SPACE + year;
+    }
+
+    /**
      * Creates a zoned datetime object and then subtracts 12
      * hours from the result if we are in PM, we want standard
      * time display versus military time, and the hour is greater
@@ -330,7 +378,7 @@ public class Clock implements Serializable, Comparable<Clock>, Runnable
     {
         logger.debug("now: {}", now);
         ZonedDateTime zonedDateTime = getZonedDateTimeFromLocalDateTime(now);
-        String ampm = zonedDateTime.format(DateTimeFormatter.ofPattern("a"));
+        final String ampm = getZonedAmPm(now);
         logger.debug("zdt: {}", zonedDateTime);
         logger.debug("formatted ampm: {}", ampm);
         if (PM.equals(ampm) && !showMilitaryTime && zonedDateTime.getHour() > 12)
@@ -552,127 +600,43 @@ public class Clock implements Serializable, Comparable<Clock>, Runnable
             }
         }
         else { setDateChanged(false); }
-//        if (!showMilitaryTime) { logger.info(getTimeAsStr()); }
-//        else { logger.info(getMilitaryTimeAsStr()); }
 
         if (dateChanged) {
             logger.info("date has changed");
             setDayOfMonth(dayOfMonth+1);
             setTodayMatchesDSTDate(isTodayDaylightSavingsTime());
             switch(dayOfWeek) {
-                case SUNDAY -> setDayOfWeek(MONDAY);
-                case MONDAY -> setDayOfWeek(TUESDAY);
-                case TUESDAY -> setDayOfWeek(WEDNESDAY);
+                case SUNDAY    -> setDayOfWeek(MONDAY);
+                case MONDAY    -> setDayOfWeek(TUESDAY);
+                case TUESDAY   -> setDayOfWeek(WEDNESDAY);
                 case WEDNESDAY -> setDayOfWeek(THURSDAY);
-                case THURSDAY -> setDayOfWeek(FRIDAY);
-                case FRIDAY -> setDayOfWeek(SATURDAY);
-                case SATURDAY -> setDayOfWeek(SUNDAY);
-                default -> logger.error("Unknown DayOfWeek: " + getDayOfWeek());
+                case THURSDAY  -> setDayOfWeek(FRIDAY);
+                case FRIDAY    -> setDayOfWeek(SATURDAY);
+                case SATURDAY  -> setDayOfWeek(SUNDAY);
+                default        -> logger.error("Unknown DayOfWeek: " + getDayOfWeek());
             }
-            switch (month)
+            // Roll over the day/month using the month's actual length — fixes the January bug
+            // and removes the need for a per-month switch block.
+            final int rolloverDay = month.length(leapYear) + 1;
+            if (dayOfMonth >= rolloverDay)
             {
-                case JANUARY ->
+                setDayOfMonth(1);
+                if (month == DECEMBER)
                 {
-                    if (dayOfMonth == 31)
-                    {
-                        setDayOfMonth(1);
-                        setMonth(FEBRUARY);
-                    }
+                    setMonth(JANUARY);
+                    setYear(year + 1);
+                    setIsNewYear(true);
+                    setDaylightSavingsTimeDates();
+                    logIsNewYear();
                 }
-                case FEBRUARY ->
+                else
                 {
-                    if (!leapYear && dayOfMonth == 29 || leapYear && dayOfMonth == 30)
-                    {
-                        setDayOfMonth(1);
-                        setMonth(MARCH);
-                    }
-                    else if (leapYear && dayOfMonth == 29)
-                    { logger.info("happy leap day"); }
+                    setMonth(month.plus(1));
                 }
-                case MARCH ->
-                {
-                    if (dayOfMonth == 32)
-                    {
-                        setDayOfMonth(1);
-                        setMonth(APRIL);
-                    }
-                }
-                case APRIL ->
-                {
-                    if (dayOfMonth == 31)
-                    {
-                        setDayOfMonth(1);
-                        setMonth(MAY);
-                    }
-                }
-                case MAY ->
-                {
-                    if (dayOfMonth == 32)
-                    {
-                        setDayOfMonth(1);
-                        setMonth(JUNE);
-                    }
-                }
-                case JUNE ->
-                {
-                    if (dayOfMonth == 31)
-                    {
-                        setDayOfMonth(1);
-                        setMonth(JULY);
-                    }
-                }
-                case JULY ->
-                {
-                    if (dayOfMonth == 32)
-                    {
-                        setDayOfMonth(1);
-                        setMonth(AUGUST);
-                    }
-                }
-                case AUGUST ->
-                {
-                    if (dayOfMonth == 32)
-                    {
-                        setDayOfMonth(1);
-                        setMonth(SEPTEMBER);
-                    }
-                }
-                case SEPTEMBER ->
-                {
-                    if (dayOfMonth == 31)
-                    {
-                        setDayOfMonth(1);
-                        setMonth(OCTOBER);
-                    }
-                }
-                case OCTOBER ->
-                {
-                    if (dayOfMonth == 32)
-                    {
-                        setDayOfMonth(1);
-                        setMonth(NOVEMBER);
-                    }
-                }
-                case NOVEMBER ->
-                {
-                    if (dayOfMonth == 31)
-                    {
-                        setDayOfMonth(1);
-                        setMonth(DECEMBER);
-                    }
-                }
-                case DECEMBER ->
-                {
-                    if (dayOfMonth == 32)
-                    {
-                        setDayOfMonth(1);
-                        setMonth(JANUARY);
-                        setYear(year+1);
-                        setIsNewYear(true);
-                        setDaylightSavingsTimeDates();
-                        logIsNewYear();
-                    }
-                }
+            }
+            else if (month == FEBRUARY && leapYear && dayOfMonth == 29)
+            {
+                logger.info("happy leap day");
             }
             setDate(LocalDate.of(year, month, dayOfMonth));
             if (isTodayDaylightSavingsTime()) { setTodayMatchesDSTDate(true); }
@@ -1029,3 +993,5 @@ public class Clock implements Serializable, Comparable<Clock>, Runnable
                 DateTimeFormatter.ofPattern("MMM d, yyyy hh:mm:ss a").format(getCurrentDateTime());
     }
 }
+
+

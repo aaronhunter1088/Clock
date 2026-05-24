@@ -103,10 +103,10 @@ class AlarmTest {
     }
 
     @Test
-    @DisplayName("Create an Alarm with a name longer than 10 characters")
-    void testCreateAnAlarmWithNameLongerThan10Characters()
+    @DisplayName("Create an Alarm with a name longer than 20 characters")
+    void testCreateAnAlarmWithNameLongerThan20Characters()
     {
-        String name = "This is a very long alarm name";
+        String name = "a".repeat(21);
         assertThrows(InvalidInputException.class, () -> new Alarm(name, 7, 0, AM, weekDays, false, clock));
     }
 
@@ -427,6 +427,175 @@ class AlarmTest {
         Collections.sort(alarms);
 
         assertIterableEquals(expectedAlarms, alarms, "Alarms should match");
+    }
+
+    @Test
+    @DisplayName("Test toString contains alarm name and time")
+    void testToStringContainsNameAndTime()
+    {
+        alarm1 = new Alarm("Morning", 8, 5, AM, weekDays, false, clock);
+        final String result = alarm1.toString();
+
+        assertTrue(result.contains("Morning"), "toString should contain alarm name");
+        assertTrue(result.contains("08:05"), "toString should contain formatted time");
+        assertTrue(result.contains(AM), "toString should contain AM/PM");
+    }
+
+    @Test
+    @DisplayName("Test hashCode - equal alarms have the same hash code")
+    void testHashCodeEqualAlarms()
+    {
+        alarm1 = new Alarm("Weekdays Alarm", 7, 30, AM, weekDays, false, clock);
+        alarm2 = new Alarm("Weekdays Alarm", 7, 30, AM, weekDays, false, clock);
+
+        assertEquals(alarm1.hashCode(), alarm2.hashCode(), "Equal alarms should have same hash code");
+    }
+
+    @Test
+    @DisplayName("Test hashCode - different alarms have different hash codes")
+    void testHashCodeDifferentAlarms()
+    {
+        alarm1 = new Alarm("Weekdays Alarm", 7, 30, AM, weekDays, false, clock);
+        alarm2 = new Alarm("Weekend Alarm", 10, 0, AM, weekendDays, false, clock);
+
+        assertNotEquals(alarm1.hashCode(), alarm2.hashCode(), "Different alarms should have different hash codes");
+    }
+
+    @Test
+    @DisplayName("Test getAlarmAsString returns correct format")
+    void testGetAlarmAsString()
+    {
+        alarm1 = new Alarm("Test", 8, 5, AM, weekDays, false, clock);
+        assertEquals("08:05 AM", alarm1.getAlarmAsString());
+
+        alarm2 = new Alarm("Test2", 12, 0, PM, weekendDays, false, clock);
+        assertEquals("12:00 PM", alarm2.getAlarmAsString());
+    }
+
+    @ParameterizedTest
+    @DisplayName("Test getHoursAsStr has leading zero for single-digit hours")
+    @MethodSource("hoursFormatScenarios")
+    void testGetHoursAsStrLeadingZero(int hours, String expected)
+    {
+        alarm1 = new Alarm("Test", hours, 0, AM, weekDays, false, clock);
+        assertEquals(expected, alarm1.getHoursAsStr());
+    }
+    static Stream<Arguments> hoursFormatScenarios()
+    {
+        return Stream.of(
+            Arguments.of(0,  "00"),
+            Arguments.of(1,  "01"),
+            Arguments.of(9,  "09"),
+            Arguments.of(10, "10"),
+            Arguments.of(12, "12")
+        );
+    }
+
+    @ParameterizedTest
+    @DisplayName("Test getMinutesAsStr has leading zero for single-digit minutes")
+    @MethodSource("minutesFormatScenarios")
+    void testGetMinutesAsStrLeadingZero(int minutes, String expected)
+    {
+        alarm1 = new Alarm("Test", 7, minutes, AM, weekDays, false, clock);
+        assertEquals(expected, alarm1.getMinutesAsStr());
+    }
+    static Stream<Arguments> minutesFormatScenarios()
+    {
+        return Stream.of(
+            Arguments.of(0,  "00"),
+            Arguments.of(5,  "05"),
+            Arguments.of(9,  "09"),
+            Arguments.of(10, "10"),
+            Arguments.of(59, "59")
+        );
+    }
+
+    @Test
+    @DisplayName("Test printStackTrace with message logs without exception")
+    void testPrintStackTraceWithMessage()
+    {
+        alarm1 = weekDays730AmAlarm;
+        final Exception e = new Exception("test error");
+        assertDoesNotThrow(() -> alarm1.printStackTrace(e, "custom message"));
+    }
+
+    @Test
+    @DisplayName("Test printStackTrace with null message logs without exception")
+    void testPrintStackTraceWithNullMessage()
+    {
+        alarm1 = weekDays730AmAlarm;
+        final Exception e = new Exception("test error");
+        assertDoesNotThrow(() -> alarm1.printStackTrace(e, null));
+    }
+
+    @Test
+    @DisplayName("Test setters update alarm state correctly")
+    void testSettersUpdateState()
+    {
+        alarm1 = weekDays730AmAlarm;
+
+        alarm1.setActivatedToday(true);
+        assertTrue(alarm1.isActivatedToday(), "activatedToday should be true");
+
+        alarm1.setActivatedToday(false);
+        assertFalse(alarm1.isActivatedToday(), "activatedToday should be false");
+
+        alarm1.setIsAlarmGoingOff(true);
+        assertTrue(alarm1.isAlarmGoingOff(), "alarmGoingOff should be true");
+
+        alarm1.setIsAlarmGoingOff(false);
+        assertFalse(alarm1.isAlarmGoingOff(), "alarmGoingOff should be false");
+
+        alarm1.setUpdatingAlarm(true);
+        assertTrue(alarm1.isUpdatingAlarm(), "updatingAlarm should be true");
+
+        alarm1.setUpdatingAlarm(false);
+        assertFalse(alarm1.isUpdatingAlarm(), "updatingAlarm should be false");
+
+        alarm1.setIsSnoozing(true);
+        assertTrue(alarm1.isSnoozing(), "isSnoozing should be true");
+
+        alarm1.setIsSnoozing(false);
+        assertFalse(alarm1.isSnoozing(), "isSnoozing should be false");
+
+        alarm1.setName("Renamed Alarm");
+        assertEquals("Renamed Alarm", alarm1.getName());
+
+        alarm1.setAMPM(PM);
+        assertEquals(PM, alarm1.getAMPM());
+
+        final List<DayOfWeek> newDays = List.of(DayOfWeek.WEDNESDAY);
+        alarm1.setDays(newDays);
+        assertEquals(newDays, alarm1.getDays());
+
+        final Clock newClock = new Clock();
+        alarm1.setClock(newClock);
+        assertEquals(newClock, alarm1.getClock());
+    }
+
+    @Test
+    @DisplayName("Test stopAlarm does not reset activatedToday")
+    void testStopAlarmDoesNotResetActivatedToday()
+    {
+        alarm1 = weekDays730AmAlarm;
+        alarm1.setActivatedToday(true);
+
+        alarm1.stopAlarm();
+
+        assertTrue(alarm1.isActivatedToday(), "stopAlarm should not reset activatedToday");
+        assertFalse(alarm1.isAlarmGoingOff(), "stopAlarm should set alarmGoingOff to false");
+        assertNull(alarm1.getSelfThread(), "stopAlarm should clear the thread");
+    }
+
+    @Test
+    @DisplayName("Test getDaysShortened maps Tuesday, Thursday, and Saturday correctly")
+    void testGetShortenedDaysForTuesdayThursdaySaturday()
+    {
+        alarm1 = new Alarm("Mixed Days Alarm", 9, 0, AM,
+                List.of(TUESDAY, THURSDAY, DayOfWeek.SATURDAY), false, clock);
+        final List<String> expected = List.of(T, TH, S);
+        assertIterableEquals(expected, alarm1.getDaysShortened(),
+                "Shortened days should map Tuesday=T, Thursday=TH, Saturday=S");
     }
 
     // Helper methods

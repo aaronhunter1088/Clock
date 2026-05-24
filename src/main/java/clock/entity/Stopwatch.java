@@ -9,6 +9,7 @@ import java.time.Duration;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 import static clock.util.Constants.STOPWATCH_READING_FORMAT;
 import static java.lang.Thread.sleep;
@@ -243,7 +244,32 @@ public class Stopwatch implements Serializable, Comparable<Stopwatch>, Runnable
      */
     @Override
     public int compareTo(Stopwatch o)
-    { return this.getName().compareTo(o.getName()); }
+    {
+        if (this.getName() == null && o.getName() == null) return 0;
+        if (this.getName() == null) return -1;
+        if (o.getName() == null) return 1;
+        return this.getName().compareTo(o.getName());
+    }
+
+    /**
+     * Checks if two stopwatches are equal based on name.
+     * @param o the object to compare with
+     * @return true if the objects are equal, false otherwise
+     */
+    @Override
+    public boolean equals(Object o)
+    {
+        if (!(o instanceof Stopwatch sw)) return false;
+        return Objects.equals(getName(), sw.getName());
+    }
+
+    /**
+     * Generates a hash code for the stopwatch.
+     * @return the hash code
+     */
+    @Override
+    public int hashCode()
+    { return Objects.hash(getName()); }
 
     /**
      * Provides a string representation of the Stopwatch

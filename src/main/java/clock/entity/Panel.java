@@ -1,5 +1,8 @@
 package clock.entity;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 /**
  * Used to distinguish which panel the Clock is using
  *
@@ -14,7 +17,5 @@ public enum Panel
 	PANEL_TIMER,
 	PANEL_STOPWATCH;
 
-	Panel() {
-		
-	}
+	private static final Logger logger = LogManager.getLogger(Panel.class);
 }

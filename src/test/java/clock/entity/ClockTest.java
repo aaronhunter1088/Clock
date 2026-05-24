@@ -49,7 +49,7 @@ class ClockTest
     @BeforeEach
     void beforeEach()
     {
-        clock = new Clock(true);
+        clock = new Clock();
     }
 
     @AfterEach
@@ -641,17 +641,7 @@ class ClockTest
     }
 
     @Test
-    @DisplayName("September 30, 1582 is valid — Month enum prevents numeric month input; only OCTOBER is border-checked")
-    void testSeptember1582IsValidBecauseMonthEnumEnforcesType()
-    {
-        // The Clock constructor takes a Month enum, so numeric values (e.g. 9) cannot be
-        // passed directly — the compiler rejects them. Only OCTOBER days 1-14 are
-        // special-cased for 1582; all other months in 1582 are accepted once year >= 1582.
-        assertDoesNotThrow(() -> new Clock(10, 0, 0, SEPTEMBER, MONDAY, 30, 1582, AM));
-    }
-
-    @Test
-    @DisplayName("Month.of() with an out-of-range number throws DateTimeException — numeric month input is always rejected by Java")
+    @DisplayName("October 15, 1582 is valid as the Gregorian calendar start date")
     void testInvalidNumericMonthThrowsDateTimeException()
     {
         assertThrows(DateTimeException.class, () -> Month.of(0),
@@ -688,6 +678,454 @@ class ClockTest
             logger.error("Interrupted while ticking clock", e);
             Thread.currentThread().interrupt();
         }
+    }
+
+    // -------------------------------------------------------------------------
+    // Format string methods
+    // -------------------------------------------------------------------------
+
+    @Test
+    @DisplayName("getTimeAsStr returns correct HH:MM:SS AMPM format")
+    void testGetTimeAsStr()
+    {
+        clock = new Clock(10, 30, 45, AUGUST, SATURDAY, 15, 2023, AM);
+        assertEquals("10:30:45 AM", clock.getTimeAsStr());
+    }
+
+    @Test
+    @DisplayName("getDateAsStr returns MONTH day, year format")
+    void testGetDateAsStr()
+    {
+        clock = new Clock(10, 30, 0, AUGUST, SATURDAY, 15, 2023, AM);
+        assertEquals("AUGUST 15, 2023", clock.getDateAsStr());
+    }
+
+    @Test
+    @DisplayName("getFullDateAsStr returns DAYOFWEEK MONTH day, year format")
+    void testGetFullDateAsStr()
+    {
+        clock = new Clock(10, 30, 0, AUGUST, SATURDAY, 15, 2023, AM);
+        assertEquals("SATURDAY AUGUST 15, 2023", clock.getFullDateAsStr());
+    }
+
+    @Test
+    @DisplayName("getPartialDateAsStr returns 3-letter day and month abbreviations")
+    void testGetPartialDateAsStr()
+    {
+        clock = new Clock(10, 30, 0, AUGUST, SATURDAY, 15, 2023, AM);
+        assertEquals("SAT AUG 15, 2023", clock.getPartialDateAsStr());
+    }
+
+    @Test
+    @DisplayName("getMilitaryTimeAsStr returns HHMMhrs SS format")
+    void testGetMilitaryTimeAsStr()
+    {
+        clock = new Clock(13, 30, 45, AUGUST, SATURDAY, 15, 2023, PM); // 13 → military
+        assertEquals("1330 hours 45", clock.getMilitaryTimeAsStr());
+    }
+
+    // -------------------------------------------------------------------------
+    // getClockTimeAsAlarmString
+    // -------------------------------------------------------------------------
+
+    @Test
+    @DisplayName("getClockTimeAsAlarmString returns standard format in non-military mode")
+    void testGetClockTimeAsAlarmStringNonMilitary()
+    {
+        clock = new Clock(8, 5, 0, AUGUST, SATURDAY, 15, 2023, AM);
+        assertEquals("08:05 AM", clock.getClockTimeAsAlarmString());
+    }
+
+    @Test
+    @DisplayName("getClockTimeAsAlarmString converts hours > 12 in military mode (single digit)")
+    void testGetClockTimeAsAlarmStringMilitaryHoursAbove12SingleDigit()
+    {
+        clock = new Clock(13, 30, 0, AUGUST, SATURDAY, 15, 2023, PM); // military
+        assertEquals("01:30 PM", clock.getClockTimeAsAlarmString());
+    }
+
+    @Test
+    @DisplayName("getClockTimeAsAlarmString converts hours > 12 in military mode (double digit)")
+    void testGetClockTimeAsAlarmStringMilitaryHoursAbove12DoubleDigit()
+    {
+        clock = new Clock(22, 15, 0, AUGUST, SATURDAY, 15, 2023, PM); // military, 22-12=10
+        assertEquals("10:15 PM", clock.getClockTimeAsAlarmString());
+    }
+
+    @Test
+    @DisplayName("getClockTimeAsAlarmString uses hoursAsStr when hours <= 12 in military mode")
+    void testGetClockTimeAsAlarmStringMilitaryHoursAtOrBelow12()
+    {
+        clock = new Clock(9, 0, 0, AUGUST, SATURDAY, 15, 2023, AM);
+        clock.setShowMilitaryTime(true);
+        assertEquals("09:00 AM", clock.getClockTimeAsAlarmString());
+    }
+
+    // -------------------------------------------------------------------------
+    // defaultText
+    // -------------------------------------------------------------------------
+
+    @ParameterizedTest
+    @DisplayName("defaultText returns label string for each label version")
+    @MethodSource("defaultTextScenarios")
+    void testDefaultText(int labelVersion, String expected)
+    {
+        clock = new Clock(10, 30, 45, AUGUST, SATURDAY, 15, 2023, AM);
+        assertEquals(expected, clock.defaultText(labelVersion));
+    }
+    static Stream<Arguments> defaultTextScenarios()
+    {
+        return Stream.of(
+            Arguments.of(1,  "AUGUST 15, 2023"),      // no full/partial
+            Arguments.of(3,  Hours),
+            Arguments.of(4,  Minutes),
+            Arguments.of(5,  AM+SLASH+PM),
+            Arguments.of(6,  No_Alarms),
+            Arguments.of(7,  S),
+            Arguments.of(9,  is+SPACE+going_off),
+            Arguments.of(10, No_Timers),
+            Arguments.of(0,  EMPTY),                  // unknown version
+            Arguments.of(99, EMPTY)
+        );
+    }
+
+    @Test
+    @DisplayName("defaultText label 1 returns full date when showFullDate is true")
+    void testDefaultTextLabel1ShowFullDate()
+    {
+        clock = new Clock(10, 30, 45, AUGUST, SATURDAY, 15, 2023, AM);
+        clock.setShowFullDate(true);
+        assertEquals("SATURDAY AUGUST 15, 2023", clock.defaultText(1));
+    }
+
+    @Test
+    @DisplayName("defaultText label 1 returns partial date when showPartialDate is true")
+    void testDefaultTextLabel1ShowPartialDate()
+    {
+        clock = new Clock(10, 30, 45, AUGUST, SATURDAY, 15, 2023, AM);
+        clock.setShowPartialDate(true);
+        assertEquals("SAT AUG 15, 2023", clock.defaultText(1));
+    }
+
+    @Test
+    @DisplayName("defaultText label 2 returns standard time string")
+    void testDefaultTextLabel2StandardTime()
+    {
+        clock = new Clock(10, 30, 45, AUGUST, SATURDAY, 15, 2023, AM);
+        assertEquals("10:30:45 AM", clock.defaultText(2));
+    }
+
+    @Test
+    @DisplayName("defaultText label 2 returns military time string when showMilitaryTime is true")
+    void testDefaultTextLabel2MilitaryTime()
+    {
+        clock = new Clock(13, 30, 45, AUGUST, SATURDAY, 15, 2023, PM);
+        assertTrue(clock.isShowMilitaryTime());
+        assertEquals("1330 hours 45", clock.defaultText(2));
+    }
+
+    // -------------------------------------------------------------------------
+    // hashCode and toString
+    // -------------------------------------------------------------------------
+
+    @Test
+    @DisplayName("hashCode is consistent for two clocks with the same specific values")
+    void testHashCodeSameValues()
+    {
+        final Clock c1 = new Clock(10, 30, 0, AUGUST, SATURDAY, 15, 2023, AM);
+        final Clock c2 = new Clock(10, 30, 0, AUGUST, SATURDAY, 15, 2023, AM);
+        assertEquals(c1.hashCode(), c2.hashCode(), "Equal clocks should have same hash code");
+    }
+
+    @Test
+    @DisplayName("toString returns correctly formatted abbreviated clock string")
+    void testToString()
+    {
+        clock = new Clock(10, 30, 0, AUGUST, SATURDAY, 15, 2023, AM);
+        final String result = clock.toString();
+        assertTrue(result.startsWith("Sat"), "toString should start with abbreviated day");
+        assertTrue(result.contains("Aug"), "toString should contain abbreviated month");
+        assertTrue(result.contains("2023"), "toString should contain year");
+        assertTrue(result.contains("10:30:00"), "toString should contain time");
+        assertTrue(result.contains("AM"), "toString should contain AM/PM");
+    }
+
+    // -------------------------------------------------------------------------
+    // printStackTrace
+    // -------------------------------------------------------------------------
+
+    @Test
+    @DisplayName("printStackTrace with message logs without throwing")
+    void testPrintStackTraceWithMessage()
+    {
+        final Exception e = new Exception("test error");
+        assertDoesNotThrow(() -> clock.printStackTrace(e, "custom message"));
+    }
+
+    @Test
+    @DisplayName("printStackTrace with null message logs without throwing")
+    void testPrintStackTraceWithNullMessage()
+    {
+        final Exception e = new Exception("test error");
+        assertDoesNotThrow(() -> clock.printStackTrace(e, null));
+    }
+
+    // -------------------------------------------------------------------------
+    // shouldUpdateTime / updateOutdatedTime
+    // -------------------------------------------------------------------------
+
+    @Test
+    @DisplayName("shouldUpdateTime returns false when times are the same")
+    void testShouldUpdateTimeReturnsFalseWhenSameTime()
+    {
+        clock = new Clock(10, 30, 0, AUGUST, SATURDAY, 15, 2023, AM);
+        // Pass the clock's own currentDateTime — no update needed
+        final boolean updated = clock.shouldUpdateTime(clock.getCurrentDateTime());
+        assertFalse(updated, "shouldUpdateTime should return false when time has not changed");
+    }
+
+    @Test
+    @DisplayName("shouldUpdateTime returns true and updates clock when time differs")
+    void testShouldUpdateTimeReturnsTrueWhenDifferentTime()
+    {
+        clock = new Clock(10, 30, 0, AUGUST, SATURDAY, 15, 2023, AM);
+        final LocalDateTime different = LocalDateTime.of(2023, 8, 15, 11, 0, 0);
+        final boolean updated = clock.shouldUpdateTime(different);
+        assertTrue(updated, "shouldUpdateTime should return true when time differs");
+        assertEquals(11, clock.getHours(), "Clock should have updated to the new hour");
+    }
+
+    @Test
+    @DisplayName("updateOutdatedTime returns a non-null Runnable that executes without throwing")
+    void testUpdateOutdatedTimeReturnsRunnable()
+    {
+        final Runnable r = clock.updateOutdatedTime();
+        assertNotNull(r, "updateOutdatedTime should return a Runnable");
+        assertDoesNotThrow(r::run, "Running updateOutdatedTime Runnable should not throw");
+    }
+
+    // -------------------------------------------------------------------------
+    // logIsNewYear
+    // -------------------------------------------------------------------------
+
+    @Test
+    @DisplayName("logIsNewYear logs and resets the isNewYear flag when true")
+    void testLogIsNewYearWhenFlagIsTrue()
+    {
+        clock.setIsNewYear(true);
+        assertTrue(clock.isNewYear(), "isNewYear should be true before logIsNewYear");
+        clock.logIsNewYear();
+        assertFalse(clock.isNewYear(), "isNewYear should be false after logIsNewYear");
+    }
+
+    // -------------------------------------------------------------------------
+    // DST spring forward / fall back
+    // -------------------------------------------------------------------------
+
+    @Test
+    @DisplayName("DST spring forward: 2 AM in March advances to 3 AM")
+    void testDSTSpringForward()
+    {
+        clock.setHours(2);
+        clock.setMinutes(0);
+        clock.setSeconds(0);
+        clock.setMonth(MARCH);
+        clock.setDayOfMonth(13);
+        clock.setYear(2022);
+        clock.setAMPM(AM);
+        clock.setDaylightSavingsTimeEnabled(true);
+        clock.setTodayMatchesDSTDate(true);
+        clock.tick();
+        assertEquals(3, clock.getHours(), "Should spring forward to 3 AM");
+        assertFalse(clock.isTodayMatchesDSTDate(), "todayMatchesDSTDate should be cleared");
+    }
+
+    @Test
+    @DisplayName("DST fall back: 2 AM in November falls back to 1 AM")
+    void testDSTFallBack()
+    {
+        clock.setHours(2);
+        clock.setMinutes(0);
+        clock.setSeconds(0);
+        clock.setMonth(NOVEMBER);
+        clock.setDayOfMonth(6);
+        clock.setYear(2022);
+        clock.setAMPM(AM);
+        clock.setDaylightSavingsTimeEnabled(true);
+        clock.setTodayMatchesDSTDate(true);
+        clock.tick();
+        assertEquals(1, clock.getHours(), "Should fall back to 1 AM");
+        assertFalse(clock.isTodayMatchesDSTDate(), "todayMatchesDSTDate should be cleared");
+    }
+
+    @Test
+    @DisplayName("DST is not applied when daylightSavingsTimeEnabled is false")
+    void testDSTNotAppliedWhenDisabled()
+    {
+        clock.setHours(2);
+        clock.setMinutes(0);
+        clock.setSeconds(0);
+        clock.setMonth(MARCH);
+        clock.setDayOfMonth(13);
+        clock.setYear(2022);
+        clock.setAMPM(AM);
+        clock.setDaylightSavingsTimeEnabled(false);
+        clock.setTodayMatchesDSTDate(true);
+        clock.tick();
+        assertEquals(2, clock.getHours(), "Hours should remain 2 when DST is disabled");
+    }
+
+    // -------------------------------------------------------------------------
+    // JANUARY rollover fix
+    // -------------------------------------------------------------------------
+
+    @Test
+    @DisplayName("January 30 midnight does not roll over to February — stays January 31")
+    void testJanuaryDoesNotRolloverOnDay30()
+    {
+        clock.setHours(11);
+        clock.setMinutes(59);
+        clock.setSeconds(59);
+        clock.setMonth(JANUARY);
+        clock.setDayOfWeek(THURSDAY);
+        clock.setDayOfMonth(30);
+        clock.setYear(2025);
+        clock.setAMPM(PM);
+        clock.tick();
+        assertEquals(JANUARY, clock.getMonth(), "Should still be January after day 30 → 31");
+        assertEquals(31, clock.getDayOfMonth(), "Should advance to day 31, not roll to February");
+    }
+
+    @Test
+    @DisplayName("January 31 midnight rolls over to February 1")
+    void testJanuaryRollovesToFebruaryAfterDay31()
+    {
+        clock.setHours(11);
+        clock.setMinutes(59);
+        clock.setSeconds(59);
+        clock.setMonth(JANUARY);
+        clock.setDayOfWeek(FRIDAY);
+        clock.setDayOfMonth(31);
+        clock.setYear(2025);
+        clock.setAMPM(PM);
+        clock.tick();
+        assertEquals(FEBRUARY, clock.getMonth(), "Should roll to February after January 31");
+        assertEquals(1, clock.getDayOfMonth(), "Should reset to day 1");
+    }
+
+    // -------------------------------------------------------------------------
+    // Military time midnight
+    // -------------------------------------------------------------------------
+
+    @Test
+    @DisplayName("Military time midnight (23:59:59) rolls to 00:00:00 and advances date")
+    void testMilitaryTimeMidnight()
+    {
+        clock.setShowMilitaryTime(true);
+        clock.setHours(23);
+        clock.setMinutes(59);
+        clock.setSeconds(59);
+        clock.setMonth(JUNE);
+        clock.setDayOfWeek(SUNDAY);
+        clock.setDayOfMonth(15);
+        clock.setYear(2025);
+        clock.setAMPM(AM);
+        clock.tick();
+        assertEquals(0, clock.getHours(), "Hours should roll to 0 at military midnight");
+        assertEquals(AM, clock.getAMPM(), "AMPM should be AM at midnight");
+        assertEquals(16, clock.getDayOfMonth(), "Day should advance from 15 to 16");
+        assertEquals(MONDAY, clock.getDayOfWeek(), "Day of week should advance from Sunday to Monday");
+    }
+
+    // -------------------------------------------------------------------------
+    // Month rollovers
+    // -------------------------------------------------------------------------
+
+    @ParameterizedTest
+    @DisplayName("Month rollover at last day always advances to the 1st of the next month")
+    @MethodSource("monthRolloverScenarios")
+    void testMonthRollover(Month startMonth, int lastDay, DayOfWeek dayOfWeek, Month expectedMonth)
+    {
+        clock.setHours(11);
+        clock.setMinutes(59);
+        clock.setSeconds(59);
+        clock.setMonth(startMonth);
+        clock.setDayOfWeek(dayOfWeek);
+        clock.setDayOfMonth(lastDay);
+        clock.setYear(2025);
+        clock.setAMPM(PM);
+        clock.tick();
+        assertEquals(expectedMonth, clock.getMonth(), startMonth + " should roll to " + expectedMonth);
+        assertEquals(1, clock.getDayOfMonth(), "Day should reset to 1 after rollover");
+    }
+    static Stream<Arguments> monthRolloverScenarios()
+    {
+        return Stream.of(
+            Arguments.of(MARCH,     31, MONDAY,    APRIL),
+            Arguments.of(APRIL,     30, WEDNESDAY, MAY),
+            Arguments.of(MAY,       31, FRIDAY,    JUNE),
+            Arguments.of(JUNE,      30, MONDAY,    JULY),
+            Arguments.of(JULY,      31, WEDNESDAY, AUGUST),
+            Arguments.of(AUGUST,    31, SATURDAY,  SEPTEMBER),
+            Arguments.of(SEPTEMBER, 30, TUESDAY,   OCTOBER),
+            Arguments.of(OCTOBER,   31, THURSDAY,  NOVEMBER),
+            Arguments.of(NOVEMBER,  30, SUNDAY,    DECEMBER)
+        );
+    }
+
+    // -------------------------------------------------------------------------
+    // List setters
+    // -------------------------------------------------------------------------
+
+    @Test
+    @DisplayName("setListOfStopwatches stores and getListOfStopwatches retrieves the list")
+    void testSetAndGetListOfStopwatches()
+    {
+        final var sw = new Stopwatch("Test SW", false, false, clock);
+        final var list = new ArrayList<Stopwatch>();
+        list.add(sw);
+        clock.setListOfStopwatches(list);
+        assertEquals(1, clock.getListOfStopwatches().size());
+        assertSame(sw, clock.getListOfStopwatches().getFirst());
+    }
+
+    @Test
+    @DisplayName("setListOfAlarms and setListOfTimers store and retrieve their lists")
+    void testSetListOfAlarmsAndTimers()
+    {
+        final var alarmList = new ArrayList<Alarm>();
+        clock.setListOfAlarms(alarmList);
+        assertSame(alarmList, clock.getListOfAlarms());
+
+        final var timerList = new ArrayList<Timer>();
+        clock.setListOfTimers(timerList);
+        assertSame(timerList, clock.getListOfTimers());
+    }
+
+    // -------------------------------------------------------------------------
+    // Mountain timezone (previously uncovered in getZoneIdFromTimezoneButtonText)
+    // -------------------------------------------------------------------------
+
+    @Test
+    @DisplayName("getZoneIdFromTimezoneButtonText returns America/Denver for Mountain")
+    void testGetZoneIdFromTimezoneMountain()
+    {
+        assertEquals(ZoneId.of(AMERICA_DENVER), clock.getZoneIdFromTimezoneButtonText(MOUNTAIN));
+    }
+
+    @Test
+    @DisplayName("getPlainTimezoneFromZoneId returns Mountain for America/Denver")
+    void testGetPlainTimezoneFromZoneIdMountain()
+    {
+        assertEquals(MOUNTAIN, clock.getPlainTimezoneFromZoneId(ZoneId.of(AMERICA_DENVER)));
+    }
+
+    @Test
+    @DisplayName("getPlainTimezoneFromZoneId returns system default id for unknown zone")
+    void testGetPlainTimezoneFromZoneIdUnknown()
+    {
+        final String result = clock.getPlainTimezoneFromZoneId(ZoneId.of("Europe/London"));
+        assertEquals(ZoneId.systemDefault().getId(), result);
     }
 
 }

@@ -18,7 +18,7 @@ import static clock.entity.Panel.*;
  * The menu bar for the Clock.
  *
  * @author michael ball
-*  @version since 1.0
+ * @version since 1.0
  */
 public class ClockMenuBar extends JMenuBar
 {
@@ -166,8 +166,6 @@ public class ClockMenuBar extends JMenuBar
         getFeaturesMenu().setForeground(Color.WHITE);
         getFeaturesMenu().setBackground(Color.BLACK);
         // Menu Items for Settings and Features
-        getAlarmsFeature().setForeground(Color.WHITE);
-        getAlarmsFeature().setBackground(Color.BLACK);
         getDigitalClockFeature().setForeground(Color.WHITE);
         getAnalogueClockFeature().setForeground(Color.WHITE);
         getTimerFeature().setForeground(Color.WHITE);

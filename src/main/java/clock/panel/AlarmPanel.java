@@ -69,6 +69,7 @@ public class AlarmPanel extends ClockPanel implements Runnable
     private JScrollPane scrollTable;
     private ClockFrame clockFrame;
     private Clock clock;
+    private final int NAME_LENGTH_MAX = 20;
 
     /**
      * Main constructor for creating the AlarmPanel
@@ -609,7 +610,7 @@ public class AlarmPanel extends ClockPanel implements Runnable
      */
     boolean validateNameTextField()
     {
-        return !nameTextField.getText().isBlank() && nameTextField.getText().length() <= 10;
+        return !nameTextField.getText().isBlank() && nameTextField.getText().length() <= NAME_LENGTH_MAX;
     }
 
     /**
@@ -733,7 +734,7 @@ public class AlarmPanel extends ClockPanel implements Runnable
             if (areAllBlank()) throw new InvalidInputException("Hours and minutes must not be blank");
             if (!validHours) throw new InvalidInputException("Invalid hours input");
             if (!validMinutes) throw new InvalidInputException("Invalid minutes input");
-            if (!validName) throw new InvalidInputException("Name must be between 1 and 10 characters");
+            if (!validName) throw new InvalidInputException("Name must be between 1 and 20 characters");
             if (!validCheckboxes) throw new InvalidInputException("At least one checkbox must be selected");
         }
         return alarm;

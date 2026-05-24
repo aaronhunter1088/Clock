@@ -30,7 +30,7 @@ import static clock.util.Constants.*;
  * reset, stopped, or removed.
  *
  * @author michael ball
-*  @version since 2.0
+ * @version since 2.0
  */
 public class Alarm implements Serializable, Comparable<Alarm>, Runnable
 {
@@ -38,7 +38,7 @@ public class Alarm implements Serializable, Comparable<Alarm>, Runnable
     private static final long serialVersionUID = 2L;
     private static final Logger logger = LogManager.getLogger(Alarm.class);
     public static long alarmsCounter = 0L;
-    private static final long SNOOZE_TIME = Duration.ofSeconds(7).getSeconds(); // 7 minutes in milliseconds
+    private static final long SNOOZE_TIME = Duration.ofMinutes(7).toMillis(); // 7 minutes in milliseconds
     private int hours,
                 minutes;
     private String minutesAsStr,
@@ -84,7 +84,7 @@ public class Alarm implements Serializable, Comparable<Alarm>, Runnable
     {
         if (hours < 0 || hours > 12) throw new InvalidInputException("Hours must be between 0 and 12");
         if (minutes < 0 || minutes > 59) throw new InvalidInputException("Minutes must be between 0 and 59");
-        if (name.length() > 20) throw new InvalidInputException("Alarm name cannot be longer than 10 characters");
+        if (name.length() > 20) throw new InvalidInputException("Alarm name cannot be longer than 20 characters");
         setClock(clock);
         setHours(hours);
         setMinutes(minutes);
@@ -131,8 +131,8 @@ public class Alarm implements Serializable, Comparable<Alarm>, Runnable
         if (selfThread == null)
         {
             logger.debug("starting alarm");
-            setSelfThread(selfThread = new Thread(this));
-            selfThread.start(); // a thread starting itself
+            setSelfThread(new Thread(this));
+            selfThread.start();
         }
     }
 
@@ -151,6 +151,9 @@ public class Alarm implements Serializable, Comparable<Alarm>, Runnable
                 }
                 else if (isSnoozing) {
                     sleep(SNOOZE_TIME);
+                    // copilot added
+                    setIsSnoozing(false);
+                    setIsAlarmGoingOff(true);
                 }
                 else if (alarmGoingOff && !isPaused) {
                     triggerAlarm();
@@ -243,7 +246,7 @@ public class Alarm implements Serializable, Comparable<Alarm>, Runnable
      */
     public synchronized void snooze()
     {
-        logger.info("snoozing for {} minutes", Duration.ofMinutes(SNOOZE_TIME).toMinutes());
+        logger.info("snoozing for {} minutes", Duration.ofMillis(SNOOZE_TIME).toMinutes());
         setIsSnoozing(true);
         setIsAlarmGoingOff(false);
     }

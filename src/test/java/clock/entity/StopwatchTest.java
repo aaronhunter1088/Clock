@@ -7,7 +7,8 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 
-import javax.swing.*;
+import java.time.Duration;
+import java.util.ArrayList;
 import java.util.stream.Stream;
 
 import static clock.util.Constants.STOPWATCH_READING_FORMAT;
@@ -163,5 +164,240 @@ public class StopwatchTest {
                 Arguments.of(new Stopwatch("Stopwatch 2", false, false, clock), new Stopwatch("Stopwatch 2", false, false, clock), 0),
                 Arguments.of(new Stopwatch("Stopwatch 2", false, false, clock), new Stopwatch("Stopwatch 1", false, false, clock), 1)
         );
+    }
+
+    @Test
+    @DisplayName("Test compareTo when both stopwatches have null names")
+    void testCompareToWithBothNullNames()
+    {
+        final Stopwatch sw1 = new Stopwatch(null, false, false, clock);
+        final Stopwatch sw2 = new Stopwatch(null, false, false, clock);
+        assertEquals(0, sw1.compareTo(sw2), "Two null-named stopwatches should be equal");
+    }
+
+    @Test
+    @DisplayName("Test compareTo when left stopwatch has null name")
+    void testCompareToWithLeftNullName()
+    {
+        final Stopwatch sw1 = new Stopwatch(null, false, false, clock);
+        final Stopwatch sw2 = new Stopwatch("Stopwatch 2", false, false, clock);
+        assertEquals(-1, sw1.compareTo(sw2), "Null-named stopwatch should sort before named one");
+    }
+
+    @Test
+    @DisplayName("Test compareTo when right stopwatch has null name")
+    void testCompareToWithRightNullName()
+    {
+        final Stopwatch sw1 = new Stopwatch("Stopwatch 1", false, false, clock);
+        final Stopwatch sw2 = new Stopwatch(null, false, false, clock);
+        assertEquals(1, sw1.compareTo(sw2), "Named stopwatch should sort after null-named one");
+    }
+
+    @Test
+    @DisplayName("Test Stopwatch equals - same name are equal")
+    void testStopwatchEqualsSameName()
+    {
+        final Stopwatch sw1 = new Stopwatch("My Stopwatch", false, false, clock);
+        final Stopwatch sw2 = new Stopwatch("My Stopwatch", false, false, clock);
+        assertEquals(sw1, sw2);
+    }
+
+    @Test
+    @DisplayName("Test Stopwatch equals - different names are not equal")
+    void testStopwatchEqualsDifferentName()
+    {
+        final Stopwatch sw1 = new Stopwatch("Stopwatch A", false, false, clock);
+        final Stopwatch sw2 = new Stopwatch("Stopwatch B", false, false, clock);
+        assertNotEquals(sw1, sw2);
+    }
+
+    @Test
+    @DisplayName("Test Stopwatch equals - not equal to null")
+    void testStopwatchEqualsNull()
+    {
+        final Stopwatch sw = new Stopwatch("My Stopwatch", false, false, clock);
+        assertNotEquals(null, sw);
+    }
+
+    @Test
+    @DisplayName("Test Stopwatch equals - not equal to different type")
+    void testStopwatchEqualsDifferentType()
+    {
+        final Stopwatch sw = new Stopwatch("My Stopwatch", false, false, clock);
+        assertNotEquals("not a stopwatch", sw);
+    }
+
+    @Test
+    @DisplayName("Test hashCode - equal stopwatches share the same hash code")
+    void testHashCodeEqualStopwatches()
+    {
+        final Stopwatch sw1 = new Stopwatch("My Stopwatch", false, false, clock);
+        final Stopwatch sw2 = new Stopwatch("My Stopwatch", false, false, clock);
+        assertEquals(sw1.hashCode(), sw2.hashCode());
+    }
+
+    @Test
+    @DisplayName("Test hashCode - different stopwatches have different hash codes")
+    void testHashCodeDifferentStopwatches()
+    {
+        final Stopwatch sw1 = new Stopwatch("Stopwatch A", false, false, clock);
+        final Stopwatch sw2 = new Stopwatch("Stopwatch B", false, false, clock);
+        assertNotEquals(sw1.hashCode(), sw2.hashCode());
+    }
+
+    @Test
+    @DisplayName("Test toString contains expected content")
+    void testToStringContent()
+    {
+        final Stopwatch sw = new Stopwatch("My Stopwatch", false, false, clock);
+        final String result = sw.toString();
+        assertTrue(result.contains("My Stopwatch"), "toString should contain the name");
+        assertTrue(result.contains("started=false"), "toString should show started state");
+        assertTrue(result.contains("paused=false"), "toString should show paused state");
+        assertTrue(result.contains("laps=0"), "toString should show lap count");
+    }
+
+    @Test
+    @DisplayName("Test toString shows pausedAccumMilli when paused")
+    void testToStringWhenPaused() throws InterruptedException
+    {
+        final Stopwatch sw = new Stopwatch("My Stopwatch", false, false, clock);
+        sw.startStopwatch();
+        sleep(100);
+        sw.pauseStopwatch();
+
+        final String result = sw.toString();
+        assertTrue(result.contains("paused=true"), "toString should show paused=true");
+        assertTrue(result.contains("pausedAccumMilli="), "toString should include pausedAccumMilli when paused");
+
+        sw.stopStopwatch();
+    }
+
+    @Test
+    @DisplayName("Test stopStopwatch resets all fields")
+    void testStopStopwatchResetsAllFields() throws InterruptedException
+    {
+        final Stopwatch sw = new Stopwatch("My Stopwatch", false, false, clock);
+        sw.startStopwatch();
+        sleep(100);
+        sw.stopStopwatch();
+
+        assertNull(sw.getName(), "Name should be null after stop");
+        assertFalse(sw.isPaused(), "isPaused should be false after stop");
+        assertFalse(sw.isStarted(), "isStarted should be false after stop");
+        assertNull(sw.getClock(), "Clock should be null after stop");
+        assertNull(sw.getSelfThread(), "SelfThread should be null after stop");
+        assertNull(sw.getLaps(), "Laps should be null after stop");
+        assertEquals(0L, sw.getStartMilli(), "startMilli should be 0 after stop");
+        assertEquals(0L, sw.getAccumMilli(), "accumMilli should be 0 after stop");
+        assertEquals(0L, sw.getLastLapMarkMilli(), "lastLapMarkMilli should be 0 after stop");
+        assertEquals(0L, sw.getPausedAccumMilli(), "pausedAccumMilli should be 0 after stop");
+        assertEquals(0L, sw.getTotalPausedMilli(), "totalPausedMilli should be 0 after stop");
+        assertEquals(0L, sw.getPausedMilli(), "pausedMilli should be 0 after stop");
+    }
+
+    @Test
+    @DisplayName("Test elapsedFormatted produces correct output for known values")
+    void testElapsedFormattedKnownValues()
+    {
+        final Stopwatch sw = new Stopwatch("Test", false, false, clock);
+        assertEquals("00:00.000", sw.elapsedFormatted(0L, STOPWATCH_READING_FORMAT));
+        assertEquals("00:01.000", sw.elapsedFormatted(1000L, STOPWATCH_READING_FORMAT));
+        assertEquals("01:00.000", sw.elapsedFormatted(60000L, STOPWATCH_READING_FORMAT));
+        assertEquals("02:03.456", sw.elapsedFormatted(123456L, STOPWATCH_READING_FORMAT));
+    }
+
+    @Test
+    @DisplayName("Test recording multiple laps")
+    void testRecordingMultipleLaps() throws InterruptedException
+    {
+        final Stopwatch sw = new Stopwatch("Lap Stopwatch", false, false, clock);
+        sw.startStopwatch();
+        sleep(50);
+        sw.recordLap();
+        sleep(50);
+        sw.recordLap();
+        sleep(50);
+        sw.recordLap();
+
+        assertEquals(3, sw.getLaps().size(), "Should have 3 laps recorded");
+        assertEquals(1, sw.getLaps().get(0).getLapNumber());
+        assertEquals(2, sw.getLaps().get(1).getLapNumber());
+        assertEquals(3, sw.getLaps().get(2).getLapNumber());
+
+        sw.stopStopwatch();
+    }
+
+    @Test
+    @DisplayName("Test resumeStopwatch when not paused does nothing")
+    void testResumeWhenNotPausedDoesNothing()
+    {
+        final Stopwatch sw = new Stopwatch("Test", false, false, clock);
+        sw.startStopwatch();
+        assertFalse(sw.isPaused(), "Stopwatch should not be paused initially");
+
+        // resuming when not paused should be a no-op
+        sw.resumeStopwatch();
+
+        assertFalse(sw.isPaused(), "Stopwatch should still not be paused");
+        assertEquals(0L, sw.getPausedAccumMilli(), "pausedAccumMilli should remain 0");
+
+        sw.stopStopwatch();
+    }
+
+    @Test
+    @DisplayName("Test printStackTrace with message logs without exception")
+    void testPrintStackTraceWithMessage()
+    {
+        final Stopwatch sw = new Stopwatch("Test", false, false, clock);
+        final Exception e = new Exception("test error");
+        assertDoesNotThrow(() -> sw.printStackTrace(e, "custom message"));
+    }
+
+    @Test
+    @DisplayName("Test printStackTrace with null message logs without exception")
+    void testPrintStackTraceWithNullMessage()
+    {
+        final Stopwatch sw = new Stopwatch("Test", false, false, clock);
+        final Exception e = new Exception("test error");
+        assertDoesNotThrow(() -> sw.printStackTrace(e, null));
+    }
+
+    @Test
+    @DisplayName("Test setters update stopwatch state correctly")
+    void testSettersUpdateState()
+    {
+        final Stopwatch sw = new Stopwatch("Test", false, false, clock);
+
+        sw.setName("Renamed");
+        assertEquals("Renamed", sw.getName());
+
+        sw.setPaused(true);
+        assertTrue(sw.isPaused());
+        sw.setPaused(false);
+        assertFalse(sw.isPaused());
+
+        sw.setStarted(true);
+        assertTrue(sw.isStarted());
+        sw.setStarted(false);
+        assertFalse(sw.isStarted());
+
+        final Clock newClock = new Clock();
+        sw.setClock(newClock);
+        assertEquals(newClock, sw.getClock());
+
+        final Duration d = Duration.ofSeconds(30);
+        sw.setDuration(d);
+        assertEquals(d, sw.getDuration());
+
+        sw.setPausedAccumMilli(5000L);
+        assertEquals(5000L, sw.getPausedAccumMilli());
+
+        final var newLaps = new ArrayList<Lap>();
+        sw.setLaps(newLaps);
+        assertSame(newLaps, sw.getLaps());
+
+        sw.setLaps(null);
+        assertNull(sw.getLaps());
     }
 }

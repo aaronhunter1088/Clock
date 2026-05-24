@@ -36,7 +36,7 @@ class TimerTest
     @BeforeEach
     void beforeEach()
     {
-        clock = new Clock(true);
+        clock = new Clock();
     }
 
     @AfterEach
@@ -269,6 +269,200 @@ class TimerTest
         Collections.sort(timers);
 
         assertIterableEquals(expectedTimers, timers, "Timers should match");
+    }
+
+    @Test
+    @DisplayName("Test hashCode - equal timers have the same hash code")
+    void testHashCodeEqualTimers()
+    {
+        timer1 = new Timer(1, 2, 3, "Test Timer", clock);
+        timer2 = new Timer(1, 2, 3, "Test Timer", clock);
+        assertEquals(timer1.hashCode(), timer2.hashCode(), "Equal timers should have same hash code");
+    }
+
+    @Test
+    @DisplayName("Test hashCode - different timers have different hash codes")
+    void testHashCodeDifferentTimers()
+    {
+        timer1 = new Timer(1, 2, 3, "Timer A", clock);
+        timer2 = new Timer(0, 5, 0, "Timer B", clock);
+        assertNotEquals(timer1.hashCode(), timer2.hashCode(), "Different timers should have different hash codes");
+    }
+
+    @Test
+    @DisplayName("Test printStackTrace with message logs without exception")
+    void testPrintStackTraceWithMessage()
+    {
+        timer1 = new Timer(0, 1, 0, clock);
+        final Exception e = new Exception("test error");
+        assertDoesNotThrow(() -> timer1.printStackTrace(e, "custom message"));
+    }
+
+    @Test
+    @DisplayName("Test printStackTrace with null message logs without exception")
+    void testPrintStackTraceWithNullMessage()
+    {
+        timer1 = new Timer(0, 1, 0, clock);
+        final Exception e = new Exception("test error");
+        assertDoesNotThrow(() -> timer1.printStackTrace(e, null));
+    }
+
+    @ParameterizedTest
+    @DisplayName("Test getHoursAsStr leading zero for single-digit hours")
+    @MethodSource("hoursAsStrScenarios")
+    void testGetHoursAsStrLeadingZero(int hours, String expected)
+    {
+        timer1 = new Timer(hours, 0, 0, clock);
+        assertEquals(expected, timer1.getHoursAsStr());
+    }
+    static Stream<Arguments> hoursAsStrScenarios()
+    {
+        return Stream.of(
+            Arguments.of(0,  "00"),
+            Arguments.of(1,  "01"),
+            Arguments.of(9,  "09"),
+            Arguments.of(10, "10"),
+            Arguments.of(12, "12")
+        );
+    }
+
+    @ParameterizedTest
+    @DisplayName("Test getMinutesAsStr leading zero for single-digit minutes")
+    @MethodSource("minutesAsStrScenarios")
+    void testGetMinutesAsStrLeadingZero(int minutes, String expected)
+    {
+        timer1 = new Timer(0, minutes, 0, clock);
+        assertEquals(expected, timer1.getMinutesAsStr());
+    }
+    static Stream<Arguments> minutesAsStrScenarios()
+    {
+        return Stream.of(
+            Arguments.of(0,  "00"),
+            Arguments.of(5,  "05"),
+            Arguments.of(9,  "09"),
+            Arguments.of(10, "10"),
+            Arguments.of(59, "59")
+        );
+    }
+
+    @ParameterizedTest
+    @DisplayName("Test getSecondsAsStr leading zero for single-digit seconds")
+    @MethodSource("secondsAsStrScenarios")
+    void testGetSecondsAsStrLeadingZero(int seconds, String expected)
+    {
+        timer1 = new Timer(0, 0, seconds, clock);
+        assertEquals(expected, timer1.getSecondsAsStr());
+    }
+    static Stream<Arguments> secondsAsStrScenarios()
+    {
+        return Stream.of(
+            Arguments.of(0,  "00"),
+            Arguments.of(5,  "05"),
+            Arguments.of(9,  "09"),
+            Arguments.of(10, "10"),
+            Arguments.of(59, "59")
+        );
+    }
+
+    @Test
+    @DisplayName("Test getClock returns the expected clock reference")
+    void testGetClock()
+    {
+        timer1 = new Timer(0, 1, 0, clock);
+        assertEquals(clock, timer1.getClock());
+    }
+
+    @Test
+    @DisplayName("Test getCountDown returns the initial LocalTime")
+    void testGetCountDown()
+    {
+        timer1 = new Timer(1, 30, 45, clock);
+        assertNotNull(timer1.getCountDown());
+        assertEquals(1, timer1.getCountDown().getHour());
+        assertEquals(30, timer1.getCountDown().getMinute());
+        assertEquals(45, timer1.getCountDown().getSecond());
+    }
+
+    @Test
+    @DisplayName("Test setTriggered and isTriggered")
+    void testSetAndGetTriggered()
+    {
+        timer1 = new Timer(0, 1, 0, clock);
+        assertFalse(timer1.isTriggered(), "Timer should not be triggered initially");
+
+        timer1.setTriggered(true);
+        assertTrue(timer1.isTriggered(), "Timer should be triggered after setTriggered(true)");
+
+        timer1.setTriggered(false);
+        assertFalse(timer1.isTriggered(), "Timer should not be triggered after setTriggered(false)");
+    }
+
+    @Test
+    @DisplayName("Test startTimer when already started does not create a new thread")
+    void testStartTimerWhenAlreadyStartedDoesNothing()
+    {
+        timer1 = new Timer(0, 5, 0, clock);
+        timer1.startTimer();
+        final Thread firstThread = timer1.getSelfThread();
+
+        timer1.startTimer();
+
+        assertSame(firstThread, timer1.getSelfThread(), "Starting an already-started timer should not replace the thread");
+    }
+
+    @Test
+    @DisplayName("Test resetTimer restores countdown to initial values")
+    void testResetTimerRestoresCountdown()
+    {
+        timer1 = new Timer(0, 1, 0, "Reset Test", clock);
+        timer1.startTimer();
+        sleep(3000); // countdown ticks down a few seconds
+
+        timer1.resetTimer();
+
+        assertFalse(timer1.isTimerGoingOff(), "Timer should not be going off after reset");
+        assertFalse(timer1.isStarted(), "Timer should not be started after reset");
+        assertFalse(timer1.isPaused(), "Timer should not be paused after reset");
+        assertFalse(timer1.isTriggered(), "Timer should not be triggered after reset");
+        assertEquals(1, timer1.getCountDown().getMinute(), "Countdown minutes should be reset to 1");
+        assertEquals(0, timer1.getCountDown().getSecond(), "Countdown seconds should be reset to 0");
+    }
+
+    @Test
+    @DisplayName("Test setters update timer state correctly")
+    void testSettersUpdateState()
+    {
+        timer1 = new Timer(0, 5, 0, clock);
+        final Clock newClock = new Clock();
+
+        timer1.setClock(newClock);
+        assertEquals(newClock, timer1.getClock());
+
+        timer1.setName("Renamed Timer");
+        assertEquals("Renamed Timer", timer1.getName());
+
+        timer1.setPaused(true);
+        assertTrue(timer1.isPaused());
+        timer1.setPaused(false);
+        assertFalse(timer1.isPaused());
+
+        timer1.setTimerGoingOff(true);
+        assertTrue(timer1.isTimerGoingOff());
+        timer1.setTimerGoingOff(false);
+        assertFalse(timer1.isTimerGoingOff());
+
+        timer1.setStarted(true);
+        assertTrue(timer1.isStarted());
+        timer1.setStarted(false);
+        assertFalse(timer1.isStarted());
+
+        timer1.setTriggered(true);
+        assertTrue(timer1.isTriggered());
+        timer1.setTriggered(false);
+        assertFalse(timer1.isTriggered());
+
+        timer1.setMusicPlayer(null);
+        assertNull(timer1.getMusicPlayer());
     }
 
     // Helper methods

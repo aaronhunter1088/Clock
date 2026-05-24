@@ -5,6 +5,7 @@ import org.apache.logging.log4j.Logger;
 
 import java.io.Serial;
 import java.io.Serializable;
+import java.util.Objects;
 
 /**
  * Lap
@@ -70,6 +71,22 @@ public class Lap implements Serializable, Comparable<Lap>, Cloneable
     }
 
     /**
+     * This method prints the stack trace of an exception
+     * that may occur when the lap is in use.
+     * @param e the exception
+     * @param message a custom message to print out
+     */
+    public void printStackTrace(Exception e, String message)
+    {
+        if (message != null)
+            logger.error(message);
+        if (e.getMessage() != null)
+            logger.error(e.getMessage());
+        for (StackTraceElement ste : e.getStackTrace())
+        { logger.error(ste.toString()); }
+    }
+
+    /**
      * Compares this Lap to another Lap based on their lapNumber.
      * @param o the object to be compared.
      * @return a negative integer, zero, or a positive integer
@@ -77,6 +94,28 @@ public class Lap implements Serializable, Comparable<Lap>, Cloneable
     @Override
     public int compareTo(Lap o)
     { return Integer.compare(this.lapNumber, o.lapNumber); }
+
+    /**
+     * Checks if two laps are equal based on lap number, duration, and lap time.
+     * @param o the object to compare with
+     * @return true if the objects are equal, false otherwise
+     */
+    @Override
+    public boolean equals(Object o)
+    {
+        if (!(o instanceof Lap lap)) return false;
+        return getLapNumber() == lap.getLapNumber() &&
+                getDuration() == lap.getDuration() &&
+                getLapTime() == lap.getLapTime();
+    }
+
+    /**
+     * Generates a hash code for the lap.
+     * @return the hash code
+     */
+    @Override
+    public int hashCode()
+    { return Objects.hash(getLapNumber(), getDuration(), getLapTime()); }
 
     /**
      * Provides a string representation of a Lap, including

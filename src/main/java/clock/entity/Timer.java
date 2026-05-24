@@ -252,9 +252,9 @@ public class Timer implements Serializable, Comparable<Timer>, Runnable
         setStarted(false);
         setTriggered(false);
         setTimerGoingOff(false);
-        setHoursAsStr(ZERO + getHours());
-        setMinutesAsStr(ZERO + getMinutes());
-        setSecondsAsStr(ZERO + getSeconds());
+        setHours(getHours());
+        setMinutes(getMinutes());
+        setSeconds(getSeconds());
         setCountDown(LocalTime.of(getHours(), getMinutes(), getSeconds()));
         logger.info("{} timer reset", this);
     }
