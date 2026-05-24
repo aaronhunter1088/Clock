@@ -1,7 +1,11 @@
 package clock.panel;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 import java.awt.*;
 import java.awt.event.*;
+import java.io.Serial;
 import javax.swing.*;
 import javax.swing.border.*;
 import javax.swing.table.*;
@@ -25,6 +29,10 @@ import static clock.util.Constants.EMPTY;
 public class ButtonColumn extends AbstractCellEditor
         implements TableCellRenderer, TableCellEditor, ActionListener
 {
+    @Serial
+    private static final long serialVersionUID = 1L;
+    private static final Logger logger = LogManager.getLogger(ButtonColumn.class);
+
     private final JTable table;
     private final Action action;
     private int mnemonic;
@@ -187,16 +195,8 @@ public class ButtonColumn extends AbstractCellEditor
     public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected,
                                                    boolean hasFocus, int row, int column)
     {
-        if (isSelected)
-        {
-            renderButton.setForeground(Color.BLACK);
-            renderButton.setBackground(Color.WHITE);
-        }
-        else
-        {
-            renderButton.setForeground(Color.BLACK);
-            renderButton.setBackground(Color.WHITE);
-        }
+        renderButton.setForeground(Color.BLACK);
+        renderButton.setBackground(Color.WHITE);
 
         if (hasFocus)
         {
@@ -215,7 +215,7 @@ public class ButtonColumn extends AbstractCellEditor
         else if (value instanceof Icon)
         {
             renderButton.setText(EMPTY);
-            renderButton.setIcon((Icon)value);
+            renderButton.setIcon((Icon) value);
         }
         else
         {
@@ -230,9 +230,11 @@ public class ButtonColumn extends AbstractCellEditor
      * The button has been pressed. Stop editing
      * and invoke the custom Action.
      */
+    @Override
     public void actionPerformed(ActionEvent e)
     {
         int row = table.convertRowIndexToModel(table.getEditingRow());
+        logger.debug("Button clicked at row {}", row);
         fireEditingStopped();
 
         //  Invoke the Action
