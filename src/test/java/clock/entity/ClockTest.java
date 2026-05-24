@@ -14,6 +14,8 @@ import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.stream.Stream;
 
+import clock.exception.InvalidInputException;
+
 import static clock.util.Constants.*;
 import static java.lang.Thread.sleep;
 import static java.time.DayOfWeek.*;
@@ -121,8 +123,8 @@ class ClockTest
     @ValueSource(ints = {-1, 24})
     void testProvidedInvalidHoursThrowsIllegalArgumentException(int hours)
     {
-        final var exception = assertThrows(IllegalArgumentException.class, () -> new Clock(hours, 0, 0, JANUARY, MONDAY, 1, 2022, AM),
-                "Expected IllegalArgumentException for invalid hours: " + hours);
+        final var exception = assertThrows(InvalidInputException.class, () -> new Clock(hours, 0, 0, JANUARY, MONDAY, 1, 2022, AM),
+                "Expected InvalidInputException for invalid hours: " + hours);
         if (hours < 0) {
             assertEquals("Hours must be between 0 and 12", exception.getMessage(), "Expected message for hours < 0");
         } else {
@@ -134,8 +136,8 @@ class ClockTest
     @ValueSource(ints = {-1, 60})
     void testProvidedInvalidMinutesThrowsIllegalArgumentException(int minutes)
     {
-        final var exception = assertThrows(IllegalArgumentException.class, () -> new Clock(10, minutes, 0, JANUARY, MONDAY, 1, 2022, AM),
-                "Expected IllegalArgumentException for invalid minutes: " + minutes);
+        final var exception = assertThrows(InvalidInputException.class, () -> new Clock(10, minutes, 0, JANUARY, MONDAY, 1, 2022, AM),
+                "Expected InvalidInputException for invalid minutes: " + minutes);
         if (minutes < 0) {
             assertEquals("Minutes must be between 0 and 59", exception.getMessage(), "Expected message for minutes < 0");
         } else {
@@ -147,8 +149,8 @@ class ClockTest
     @ValueSource(ints = {-1, 60})
     void testProvidedInvalidSecondsThrowsIllegalArgumentException(int seconds)
     {
-        final var exception = assertThrows(IllegalArgumentException.class, () -> new Clock(10, 0, seconds, JANUARY, MONDAY, 1, 2022, AM),
-                "Expected IllegalArgumentException for invalid seconds: " + seconds);
+        final var exception = assertThrows(InvalidInputException.class, () -> new Clock(10, 0, seconds, JANUARY, MONDAY, 1, 2022, AM),
+                "Expected InvalidInputException for invalid seconds: " + seconds);
         if (seconds < 0) {
             assertEquals("Seconds must be between 0 and 59", exception.getMessage(), "Expected message for seconds < 0");
         } else {
@@ -160,18 +162,18 @@ class ClockTest
     @ValueSource(ints = {-1, 32})
     void testProvidedInvalidDayOfMonthThrowsIllegalArgumentException(int dayOfMonth)
     {
-        final var exception = assertThrows(IllegalArgumentException.class, () -> new Clock(10, 0, 0, JANUARY, MONDAY, dayOfMonth, 2022, AM),
-                "Expected IllegalArgumentException for invalid dayOfMonth: " + dayOfMonth);
-        assertEquals("The day of month must be between 1 and 31", exception.getMessage(), "Expected message for invalid dayOfMonth");
+        final var exception = assertThrows(InvalidInputException.class, () -> new Clock(10, 0, 0, JANUARY, MONDAY, dayOfMonth, 2022, AM),
+                "Expected InvalidInputException for invalid dayOfMonth: " + dayOfMonth);
+        assertEquals("The day of month for JANUARY must be between 1 and 31", exception.getMessage(), "Expected message for invalid dayOfMonth");
     }
 
     @ParameterizedTest
-    @ValueSource(ints = {-1, 999})
+    @ValueSource(ints = {-1, 1581})
     void testProvidedInvalidYearThrowsIllegalArgumentException(int year)
     {
-        final var exception = assertThrows(IllegalArgumentException.class, () -> new Clock(10, 0, 0, JANUARY, MONDAY, 1, year, AM),
-                "Expected IllegalArgumentException for invalid year: " + year);
-        assertEquals("Year must be greater than 1000", exception.getMessage(), "Expected message for invalid year");
+        final var exception = assertThrows(InvalidInputException.class, () -> new Clock(10, 0, 0, JANUARY, MONDAY, 1, year, AM),
+                "Expected InvalidInputException for invalid year: " + year);
+        assertEquals("Year must be 1582 or later (Gregorian calendar did not exist before this)", exception.getMessage(), "Expected message for invalid year");
     }
 
     @Test
@@ -352,91 +354,6 @@ class ClockTest
             alarm.stopAlarm();
         });
     }
-
-    // TODO: Move to ClockFrameTest
-//    @Test
-//    @DisplayName("Test turn off dst setting")
-//    void testTurnOffDSTSetting()
-//    {
-//        LocalDate endDSTDate = clock.getEndDaylightSavingsTimeDate();
-//        clock.setHours(1);
-//        clock.setMinutes(59);
-//        clock.setSeconds(50);
-//        clock.setMonth(endDSTDate.getMonth());
-//        clock.setDayOfWeek(endDSTDate.getDayOfWeek());
-//        clock.setDayOfMonth(endDSTDate.getDayOfMonth());
-//        clock.setYear(endDSTDate.getYear());
-//        clock.setAMPM(AM);
-//        clock.setTheCurrentTime();
-//        clock.getClockFrame().getClockMenuBar().getToggleDSTSetting().doClick(); // DST turning off; enabled:false
-//        javax.swing.SwingUtilities.invokeLater(() -> {
-//            var expectedValue = Turn+SPACE+on+SPACE+DST_SETTING;
-//            assertEquals(expectedValue, clock.getClockFrame().getClockMenuBar().getToggleDSTSetting().getText(), "Expected setting to be off");
-//            assertFalse(clock.isDaylightSavingsTimeEnabled());
-//            assertEquals(2, clock.getHours(), "Expected hours to be 2");
-//        });
-//
-//        tick(10);
-//    }
-
-    // TODO: Move to ClockFrameTest
-//    @Test
-//    void testDSTSettingWhenSettingIsFalse()
-//    {
-//        clock.setDaylightSavingsTimeEnabled(false);
-//        clock.getClockFrame().getClockMenuBar().getToggleDSTSetting().setText(Turn+SPACE+on+SPACE+DST_SETTING);
-//
-//        LocalDate endDSTDate = clock.getEndDaylightSavingsTimeDate();
-//        clock.setHours(1);
-//        clock.setMinutes(59);
-//        clock.setSeconds(50);
-//        clock.setMonth(endDSTDate.getMonth());
-//        clock.setDayOfWeek(endDSTDate.getDayOfWeek());
-//        clock.setDayOfMonth(endDSTDate.getDayOfMonth());
-//        clock.setYear(endDSTDate.getYear());
-//        clock.setAMPM(AM);
-//        clock.setTheCurrentTime();
-//        var expectedValue = Turn+SPACE+on+SPACE+DST_SETTING;
-//
-//        tick(10);
-//
-//        javax.swing.SwingUtilities.invokeLater(() -> {
-//            assertEquals(expectedValue, clock.getClockFrame().getClockMenuBar().getToggleDSTSetting().getText(), "Expected setting to be off");
-//            assertEquals(1, clock.getHours(), "Expected hours to be 1");
-//        });
-//    }
-
-//    @Test
-//    void testUpdateClockTimeSyncsClockTime()
-//    {
-//        clock.setHours(7);
-//        clock.setMinutes(0);
-//        clock.setSeconds(6);
-//        clock.setMonth(SEPTEMBER);
-//        clock.setDayOfWeek(FRIDAY);
-//        clock.setDayOfMonth(20);
-//        clock.setYear(2024);
-//        clock.setAMPM(PM);
-//        clock.setTheCurrentTime();
-//        LocalDateTime testNow = LocalDateTime.of(LocalDate.of(2024, AUGUST, 20), clock.getTime());
-//        assertTrue(clock.shouldUpdateTime(testNow));
-//    }
-
-//    @Test
-//    void testUpdateClockTimeDoesNotSyncClockTime()
-//    {
-//        clock.setHours(7);
-//        clock.setMinutes(0);
-//        clock.setSeconds(6);
-//        clock.setMonth(SEPTEMBER);
-//        clock.setDayOfWeek(FRIDAY);
-//        clock.setDayOfMonth(20);
-//        clock.setYear(2024);
-//        clock.setAMPM(PM);
-//        clock.setTheCurrentTime();
-//        LocalDateTime testNow = LocalDateTime.of(clock.getDate(), clock.getTime());
-//        assertFalse(clock.shouldUpdateTime(testNow));
-//    }
 
     @Test
     void testTickClockTwiceAsFast()
@@ -635,6 +552,128 @@ class ClockTest
                 Arguments.of(clockWEDJAN12025_103000AM, false),
                 Arguments.of(clockWEDJAN12025_103000PM, false)
         );
+    }
+
+    // -------------------------------------------------------------------------
+    // Day-of-month validation – per month
+    // -------------------------------------------------------------------------
+
+    @ParameterizedTest
+    @DisplayName("Invalid day of month for each non-February month throws InvalidInputException")
+    @MethodSource("provideInvalidDaysPerMonth")
+    void testInvalidDayOfMonthPerMonthThrowsIllegalArgumentException(Month month, int invalidDay, int year, int expectedMaxDay)
+    {
+        final var exception = assertThrows(InvalidInputException.class,
+                () -> new Clock(10, 0, 0, month, MONDAY, invalidDay, year, AM),
+                "Expected exception for " + month + " day " + invalidDay);
+        assertEquals("The day of month for " + month + " must be between 1 and " + expectedMaxDay, exception.getMessage());
+    }
+    public static Stream<Arguments> provideInvalidDaysPerMonth() {
+        return Stream.of(
+                Arguments.of(JANUARY,   32, 2025, 31),
+                Arguments.of(MARCH,     32, 2025, 31),
+                Arguments.of(APRIL,     31, 2025, 30),
+                Arguments.of(MAY,       32, 2025, 31),
+                Arguments.of(JUNE,      31, 2025, 30),
+                Arguments.of(JULY,      32, 2025, 31),
+                Arguments.of(AUGUST,    32, 2025, 31),
+                Arguments.of(SEPTEMBER, 31, 2025, 30),
+                Arguments.of(OCTOBER,   32, 2025, 31),
+                Arguments.of(NOVEMBER,  31, 2025, 30),
+                Arguments.of(DECEMBER,  32, 2025, 31)
+        );
+    }
+
+    @Test
+    @DisplayName("February in a non-leap year rejects day 29")
+    void testFebruaryNonLeapYearRejectsDay29()
+    {
+        final var exception = assertThrows(InvalidInputException.class,
+                () -> new Clock(10, 0, 0, FEBRUARY, MONDAY, 29, 2025, AM));
+        assertEquals("The day of month for FEBRUARY must be between 1 and 28 (non-leap year)", exception.getMessage());
+    }
+
+    @Test
+    @DisplayName("February in a non-leap year accepts day 28")
+    void testFebruaryNonLeapYearAcceptsDay28()
+    {
+        assertDoesNotThrow(() -> new Clock(10, 0, 0, FEBRUARY, FRIDAY, 28, 2025, AM));
+    }
+
+    @Test
+    @DisplayName("February in a leap year accepts day 29")
+    void testFebruaryLeapYearAcceptsDay29()
+    {
+        assertDoesNotThrow(() -> new Clock(10, 0, 0, FEBRUARY, THURSDAY, 29, 2024, AM));
+    }
+
+    @Test
+    @DisplayName("February in a leap year rejects day 30")
+    void testFebruaryLeapYearRejectsDay30()
+    {
+        final var exception = assertThrows(InvalidInputException.class,
+                () -> new Clock(10, 0, 0, FEBRUARY, FRIDAY, 30, 2024, AM));
+        assertEquals("The day of month for FEBRUARY must be between 1 and 29 (leap year)", exception.getMessage());
+    }
+
+    // -------------------------------------------------------------------------
+    // Gregorian calendar minimum date enforcement
+    // -------------------------------------------------------------------------
+
+    @ParameterizedTest
+    @DisplayName("Year before 1582 throws InvalidInputException")
+    @ValueSource(ints = {-1, 0, 1000, 1581})
+    void testYearBeforeGregorianCalendarThrowsIllegalArgumentException(int year)
+    {
+        final var exception = assertThrows(InvalidInputException.class,
+                () -> new Clock(10, 0, 0, JANUARY, MONDAY, 1, year, AM),
+                "Expected exception for year: " + year);
+        assertEquals("Year must be 1582 or later (Gregorian calendar did not exist before this)", exception.getMessage());
+    }
+
+    @Test
+    @DisplayName("October 1-14 of 1582 throws InvalidInputException (Gregorian calendar starts October 15)")
+    void testDatesIn1582BeforeOctober15ThrowsIllegalArgumentException()
+    {
+        final var oct14 = assertThrows(InvalidInputException.class,
+                () -> new Clock(10, 0, 0, OCTOBER, THURSDAY, 14, 1582, AM));
+        assertEquals("Date must be on or after October 15, 1582 (Gregorian calendar start date). Your date: October 14, 1582", oct14.getMessage());
+    }
+
+    @Test
+    @DisplayName("September 30, 1582 is valid — Month enum prevents numeric month input; only OCTOBER is border-checked")
+    void testSeptember1582IsValidBecauseMonthEnumEnforcesType()
+    {
+        // The Clock constructor takes a Month enum, so numeric values (e.g. 9) cannot be
+        // passed directly — the compiler rejects them. Only OCTOBER days 1-14 are
+        // special-cased for 1582; all other months in 1582 are accepted once year >= 1582.
+        assertDoesNotThrow(() -> new Clock(10, 0, 0, SEPTEMBER, MONDAY, 30, 1582, AM));
+    }
+
+    @Test
+    @DisplayName("Month.of() with an out-of-range number throws DateTimeException — numeric month input is always rejected by Java")
+    void testInvalidNumericMonthThrowsDateTimeException()
+    {
+        assertThrows(DateTimeException.class, () -> Month.of(0),
+                "Month.of(0) should throw DateTimeException — months are 1-12");
+        assertThrows(DateTimeException.class, () -> Month.of(13),
+                "Month.of(13) should throw DateTimeException — months are 1-12");
+    }
+
+    @Test
+    @DisplayName("October 15, 1582 is valid as the Gregorian calendar start date")
+    void testOctober15_1582IsValidGregorianStartDate()
+    {
+        assertDoesNotThrow(() -> new Clock(10, 0, 0, OCTOBER, FRIDAY, 15, 1582, AM));
+    }
+
+    @Test
+    @DisplayName("Dates after October 15, 1582 are valid")
+    void testDatesAfterOctober15_1582AreValid()
+    {
+        assertDoesNotThrow(() -> new Clock(10, 0, 0, OCTOBER, SATURDAY, 16, 1582, AM));
+        assertDoesNotThrow(() -> new Clock(10, 0, 0, NOVEMBER, MONDAY, 1, 1582, AM));
+        assertDoesNotThrow(() -> new Clock(10, 0, 0, DECEMBER, WEDNESDAY, 31, 1582, AM));
     }
 
     // Helper methods

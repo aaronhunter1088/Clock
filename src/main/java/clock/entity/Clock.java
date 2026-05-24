@@ -10,6 +10,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Objects;
 
+import clock.exception.InvalidInputException;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -51,8 +52,8 @@ public class Clock implements Serializable, Comparable<Clock>, Runnable
     private List<Alarm> listOfAlarms;
     private List<Timer> listOfTimers;
     private List<Stopwatch> listOfStopwatches;
-    private boolean isLeapYear, todayMatchesDSTDate,
-            dateChanged, isNewYear, testingClock,
+    private boolean leapYear, todayMatchesDSTDate,
+            dateChanged, isNewYear, //testingClock,
             showFullDate, showPartialDate, showMilitaryTime,
             daylightSavingsTimeEnabled;
 
@@ -61,7 +62,9 @@ public class Clock implements Serializable, Comparable<Clock>, Runnable
      */
     public Clock()
     {
-        this(false);
+        //this(false);
+        super();
+        initialize();
     }
 
     /**
@@ -71,7 +74,7 @@ public class Clock implements Serializable, Comparable<Clock>, Runnable
     public Clock(boolean testing)
     {
         super();
-        setTestingClock(testing);
+        //setTestingClock(testing);
         initialize();
     }
 
@@ -92,19 +95,26 @@ public class Clock implements Serializable, Comparable<Clock>, Runnable
     public Clock(int hours, int minutes, int seconds, Month month, DayOfWeek dayOfWeek,
                  int dayOfMonth, int year, String ampm)
     {
-        logger.info("Initializing Specific Test Clock");
-        setTestingClock(true);
+        logger.info("Initializing Specific Clock");
+        //setTestingClock(true);
         // Validate the inputs
         if (hours < 0 || hours > 23) {
-            if (hours > 12) throw new IllegalArgumentException("Hours must be between 0 and 23");
-            else throw new IllegalArgumentException("Hours must be between 0 and 12");
+            if (hours > 12) throw new InvalidInputException("Hours must be between 0 and 23");
+            else throw new InvalidInputException("Hours must be between 0 and 12");
         }
-        if (minutes < 0 || minutes > 59) throw new IllegalArgumentException("Minutes must be between 0 and 59");
-        if (seconds < 0 || seconds > 59) throw new IllegalArgumentException("Seconds must be between 0 and 59");
-        // TODO: Enhance by first checking what month it is. Then determine exactly what values are acceptable for that month and display proper IllegalArgumentException message. Ex: Feb would say between 1 and 28 or even 29 if it is a leap year
-        if (dayOfMonth < 1 || dayOfMonth > 31) throw new IllegalArgumentException("The day of month must be between 1 and 31");
-        // TODO: May want to think about but for now, the year must be 4 digits long and at least 1000 or more
-        if (year < 1000) throw new IllegalArgumentException("Year must be greater than 1000");
+        if (minutes < 0 || minutes > 59) throw new InvalidInputException("Minutes must be between 0 and 59");
+        if (seconds < 0 || seconds > 59) throw new InvalidInputException("Seconds must be between 0 and 59");
+        if (year < 1582) throw new InvalidInputException("Year must be 1582 or later (Gregorian calendar did not exist before this)");
+        final boolean leapYear = Year.isLeap(year);
+        final int maxDay = month.length(leapYear);
+        if (dayOfMonth < 1 || dayOfMonth > maxDay) {
+            final String leapNote = month == FEBRUARY ? (leapYear ? " (leap year)" : " (non-leap year)") : "";
+            throw new InvalidInputException("The day of month for " + month + " must be between 1 and " + maxDay + leapNote);
+        }
+        if (year == 1582 && month == OCTOBER && dayOfMonth < 15) {
+            String chosenDate = month.toString().substring(0, 1).toUpperCase() + month.toString().substring(1).toLowerCase() + SPACE + dayOfMonth + COMMA + SPACE + year;
+            throw new InvalidInputException("Date must be on or after October 15, 1582 (Gregorian calendar start date). Your date: " + chosenDate);
+        }
         if (hours > 12) setShowMilitaryTime(true);
         setSeconds(seconds);
         setMinutes(minutes);
@@ -131,7 +141,7 @@ public class Clock implements Serializable, Comparable<Clock>, Runnable
      */
     private void initialize()
     {
-        logger.info("Initializing {} Clock", testingClock ? "Test" : "Regular");
+        //logger.info("Initializing {} Clock", testingClock ? "Test" : "Regular");
         setTheTime(LocalDateTime.now());
         setDaylightSavingsTimeDates();
         setLeapYear(date.isLeapYear());
@@ -571,12 +581,12 @@ public class Clock implements Serializable, Comparable<Clock>, Runnable
                 }
                 case FEBRUARY ->
                 {
-                    if (!isLeapYear && dayOfMonth == 29 || isLeapYear && dayOfMonth == 30)
+                    if (!leapYear && dayOfMonth == 29 || leapYear && dayOfMonth == 30)
                     {
                         setDayOfMonth(1);
                         setMonth(MARCH);
                     }
-                    else if (isLeapYear && dayOfMonth == 29)
+                    else if (leapYear && dayOfMonth == 29)
                     { logger.info("happy leap day"); }
                 }
                 case MARCH ->
@@ -779,7 +789,7 @@ public class Clock implements Serializable, Comparable<Clock>, Runnable
     /** Returns the partial date: FRI MAY 4, 2000 */
     public String getPartialDateAsStr() { return dayOfWeek.toString().substring(0,3)+SPACE+month.toString().substring(0,3)+SPACE+dayOfMonth+COMMA+SPACE+year; }
     /** Returns isLeapYear */
-    public boolean isLeapYear() { return isLeapYear; }
+    public boolean isLeapYear() { return leapYear; }
     /** Returns todayMatchesDSTDate */
     public boolean isTodayMatchesDSTDate() { return todayMatchesDSTDate; }
     /** Returns dateChanged */
@@ -792,8 +802,8 @@ public class Clock implements Serializable, Comparable<Clock>, Runnable
     public boolean isShowPartialDate() { return showPartialDate; }
     /** Returns showMilitaryTime */
     public boolean isShowMilitaryTime() { return showMilitaryTime; }
-    /** Returns testingClock */
-    public boolean isTestingClock() { return testingClock; }
+    ///** Returns testingClock */
+    //public boolean isTestingClock() { return testingClock; }
     /** Returns daylightSavingsTimeEnabled */
     public boolean isDaylightSavingsTimeEnabled() { return daylightSavingsTimeEnabled; }
     /** Returns the list of alarms */
@@ -937,7 +947,7 @@ public class Clock implements Serializable, Comparable<Clock>, Runnable
      * @param endDaylightSavingsTimeDate the new end dst date value
      */
     protected void setEndDaylightSavingsTimeDate(LocalDate endDaylightSavingsTimeDate) { this.endDaylightSavingsTimeDate = endDaylightSavingsTimeDate; logger.debug("end dst: {} {} {}, {}", endDaylightSavingsTimeDate.getDayOfWeek(), endDaylightSavingsTimeDate.getMonth(), endDaylightSavingsTimeDate.getDayOfMonth(), endDaylightSavingsTimeDate.getYear()); }
-    protected void setLeapYear(boolean leapYear) { this.isLeapYear = leapYear; logger.debug("isLeapYear: {}", isLeapYear); }
+    protected void setLeapYear(boolean leapYear) { this.leapYear = leapYear; logger.debug("isLeapYear: {}", this.leapYear); }
     /**
      * When the clock starts and the date matches a daylight savings
      * date, this value is set. It is also set after the date updates,
@@ -958,7 +968,7 @@ public class Clock implements Serializable, Comparable<Clock>, Runnable
     protected void setShowFullDate(boolean showFullDate) { this.showFullDate = showFullDate; logger.debug("showFullDate: {}", showFullDate); }
     protected void setShowPartialDate(boolean showPartialDate) { this.showPartialDate = showPartialDate; logger.debug("showPartialDate: {}", showPartialDate); }
     public void setShowMilitaryTime(boolean showMilitaryTime) { this.showMilitaryTime = showMilitaryTime; logger.debug("showMilitaryTime: {}", showMilitaryTime); }
-    private void setTestingClock(boolean testingClock) { this.testingClock = testingClock; logger.debug("testingClock: {}", testingClock); }
+    //private void setTestingClock(boolean testingClock) { this.testingClock = testingClock; logger.debug("testingClock: {}", testingClock); }
     protected void setDaylightSavingsTimeEnabled(boolean daylightSavingsTimeEnabled) { this.daylightSavingsTimeEnabled = daylightSavingsTimeEnabled; logger.debug("daylightSavingsTimeEnabled: {}", daylightSavingsTimeEnabled); }
     protected void setListOfAlarms(List<Alarm> listOfAlarms) { this.listOfAlarms = listOfAlarms; logger.debug("listOfAlarms: {}", listOfAlarms); }
     protected void setListOfTimers(List<Timer> listOfTimers) { this.listOfTimers = listOfTimers; logger.debug("listOfTimers: {}", listOfTimers); }
@@ -1003,7 +1013,7 @@ public class Clock implements Serializable, Comparable<Clock>, Runnable
     @Override
     public int hashCode()
     {
-        return Objects.hash(getDate(), getDayOfWeek(), getMonth(), getTime(), getSeconds(), getMinutes(), getHours(), getDayOfMonth(), getYear(), ampm, getTimezone(), getHoursAsStr(), getMinutesAsStr(), getSecondsAsStr(), getBeginDaylightSavingsTimeDate(), getEndDaylightSavingsTimeDate(), getCurrentDateTime(), getListOfAlarms(), getListOfTimers(), isLeapYear(), isTodayMatchesDSTDate(), isDateChanged(), isNewYear(), isTestingClock(), isShowFullDate(), isShowPartialDate(), isShowMilitaryTime(), isDaylightSavingsTimeEnabled());
+        return Objects.hash(getDate(), getDayOfWeek(), getMonth(), getTime(), getSeconds(), getMinutes(), getHours(), getDayOfMonth(), getYear(), ampm, getTimezone(), getHoursAsStr(), getMinutesAsStr(), getSecondsAsStr(), getBeginDaylightSavingsTimeDate(), getEndDaylightSavingsTimeDate(), getCurrentDateTime(), getListOfAlarms(), getListOfTimers(), isLeapYear(), isTodayMatchesDSTDate(), isDateChanged(), isNewYear(), /*isTestingClock(),*/ isShowFullDate(), isShowPartialDate(), isShowMilitaryTime(), isDaylightSavingsTimeEnabled());
     }
 
     /**

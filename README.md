@@ -5,18 +5,17 @@ both digital and analogue modes. It also has the capability to set multiple alar
 timers and stopwatches. You can also start the clock specifying a panel or a specific
 date and time. The following is the default java command to run the clock:
 
-```
-# Both commands achieve the same result:
-java -jar Clock-version-jar-with-dependencies.jar
-or with 0 as the argument:
-java -jar Clock-version-jar-with-dependencies.jar 0
+### Running the JAR
 
-# Start the jar file with a specific panel (alarm panel in this case):
-# Options are: panel_digital, panel_analogue, panel_alarm, panel_timers, panel_stopwatches
-java -jar Clock-version-jar-with-dependencies.jar panel_alarm
+```bash
+# Default start (digital clock panel)
+java -jar dist/{version}/clock-{version}-jar-with-dependencies.jar
 
-# Start the jar file with a specific date and time:
-java -jar Clock-version-jar-with-dependencies.jar august 6 2025 10 30 0 pm
+# Start with specific panel
+java -jar dist/{version}/clock-{version}-jar-with-dependencies.jar panel_alarm
+
+# Start with specific date/time
+java -jar dist/{version}/clock-{version}-jar-with-dependencies.jar august 6 2025 10 30 0 pm
 ```
 
 The clock defaults on the Digital Clock panel, displaying the current date like
