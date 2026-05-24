@@ -42,19 +42,24 @@ Set `logLevel` as an environment variable to control log verbosity. If unset, a 
 ```
 src/main/java/clock/
   contract/        IClockPanel.java (interfaces)
-  entity/          Clock.java, Alarm.java, Timer.java, Stopwatch.java
-  exception/       Custom exceptions (InvalidInputException, etc.)
-  panel/           DigitalPanel, AnaloguePanel, AlarmPanel, TimerPanel, StopwatchPanel
-  util/            Utility classes (CalculatorUtility, LoggingUtility, etc.)
+  entity/          Clock.java, Alarm.java, Timer.java, Stopwatch.java, Lap.java,
+                   ClockMenuBar.java, Panel.java (enum)
+  exception/       Custom exceptions (InvalidInputException.java)
+  panel/           ClockFrame.java, ClockPanel.java (abstract base),
+                   DigitalClockPanel.java, AnalogueClockPanel.java,
+                   AlarmPanel.java, TimerPanel.java, StopwatchPanel.java,
+                   DisplayLapsPanel.java, DisplayTimePanel.java, ButtonColumn.java
+  util/            Constants.java
   examples/        Example code
   Main.java        ← entry point
 
 src/test/java/clock/
-  contract/        Interface tests
-  entity/          Entity tests (ClockTest, AlarmTest, TimerTest, StopwatchTest, etc.)
-  exception/       Exception tests
-  panel/           Panel tests (DigitalPanelTest, AnalogePanelTest, etc.)
-  util/            Utility tests
+  entity/          ClockTest.java, AlarmTest.java, TimerTest.java, StopwatchTest.java,
+                   LapTest.java, ClockMenuBarTest.java
+  exception/       InvalidInputExceptionTest.java
+  panel/           DigitalClockPanelTest.java, AnalogueClockPanelTest.java,
+                   AlarmPanelTest.java, TimerPanelTest.java, StopwatchPanelTest.java,
+                   ClockFrameTest.java, ClockPanelTest.java, PanelTypeTest.java
 ```
 
 All packages use **lowercase names** (e.g., `clock.entity`, `clock.panel`, `clock.contract`).
@@ -69,6 +74,11 @@ All packages use **lowercase names** (e.g., `clock.entity`, `clock.panel`, `cloc
 | `Alarm` | `clock.entity.Alarm` | Alarm entity with scheduling |
 | `Timer` | `clock.entity.Timer` | Countdown timer entity |
 | `Stopwatch` | `clock.entity.Stopwatch` | Stopwatch entity with lap tracking |
+| `Lap` | `clock.entity.Lap` | Single lap record within a Stopwatch; stores duration and lap time |
+| `Panel` | `clock.entity.Panel` | Enum identifying which panel is active (`PANEL_DIGITAL_CLOCK`, etc.) |
+| `ClockMenuBar` | `clock.entity.ClockMenuBar` | `JMenuBar` subclass managing the Settings and Features menus |
+| `ClockFrame` | `clock.panel.ClockFrame` | Main `JFrame`; owns all panels and drives the scheduled repaint loop |
+| `ClockPanel` | `clock.panel.ClockPanel` | Abstract `JPanel` base class implementing `IClockPanel`; all panels extend this |
 | `IClockPanel` | `clock.contract.IClockPanel` | Interface for clock UI panels |
 | `InvalidInputException` | `clock.exception.InvalidInputException` | Custom exception for invalid inputs |
 
@@ -79,7 +89,7 @@ Never hard-code button labels or UI strings — use appropriate constants or met
 
 ## Architecture: Clock Application State
 
-The application uses a modular architecture with separate entities for Clock, Alarms, Timers, and Stopwatches. Each panel (`DigitalPanel`, `AnaloguePanel`, `AlarmPanel`, `TimerPanel`, `StopwatchPanel`) manages its own state and is instantiated once in the main application frame.
+The application uses a modular architecture with separate entities for Clock, Alarms, Timers, and Stopwatches. Each panel (`DigitalClockPanel`, `AnalogueClockPanel`, `AlarmPanel`, `TimerPanel`, `StopwatchPanel`) extends the abstract `ClockPanel` base class and is instantiated once inside `ClockFrame`.
 
 ### Core Entities
 
@@ -87,20 +97,25 @@ The application uses a modular architecture with separate entities for Clock, Al
 - **Alarm**: Manages alarm scheduling with day-specific rules, pause/resume, and snooze (7 minutes)
 - **Timer**: Manages countdown timer state with pause/resume functionality
 - **Stopwatch**: Manages stopwatch with lap tracking and display modes
+- **Lap**: Immutable-ish record of a single stopwatch interval; `getFormattedDuration()` / `getFormattedLapTime()` return `mm:ss.SSS`
+- **Panel** (enum): Identifies the active panel; passed to `ClockFrame` to switch views
+- **ClockMenuBar**: Owns Settings and Features menus; reads `ClockFrame` reference to switch panels
 
-Each panel implements `IClockPanel` interface and is accessed through the main application frame.
+Each concrete panel extends `ClockPanel` (abstract), which provides the shared `displayPopupMessage()` helper.
 
 ---
 
 ## Logging Conventions
 
 ```java
-// Standard logger declaration
-private final Logger LOGGER = LogManager.getLogger(MyClass.class.getSimpleName());
+// Standard logger declaration (instance context)
+private final Logger logger = LogManager.getLogger(MyClass.class.getSimpleName());
 
 // Static context (e.g. in Clock entity or panel classes)
-private static final Logger LOGGER = LogManager.getLogger(MyClass.class.getSimpleName());
+private static final Logger logger = LogManager.getLogger(MyClass.class.getSimpleName());
 ```
+
+> **Note:** Logger field name is lowercase `logger` throughout the codebase — not `LOGGER`.
 
 Use Log4j2 for logging consistently across the codebase.
 

@@ -12,5 +12,4 @@ public interface IClockPanel
 {
     void setClock(Clock clock);
     void setupSettingsMenu();
-    void printStackTrace(Exception e, String message);
 }

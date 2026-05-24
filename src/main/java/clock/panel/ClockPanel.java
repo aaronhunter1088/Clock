@@ -46,13 +46,12 @@ public abstract class ClockPanel extends JPanel implements IClockPanel
      * @param e the exception
      * @param message a custom message to print out
      */
-    @Override
     public void printStackTrace(Exception e, String message)
     {
-        if (message != null)
-            logger.error(message);
         if (e.getMessage() != null)
             logger.error(e.getMessage());
+        else if (message != null)
+            logger.error(message);
         for(StackTraceElement ste : e.getStackTrace())
         { logger.error(ste.toString()); }
     }
