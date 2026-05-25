@@ -200,4 +200,34 @@ class StopwatchPanelTest {
             Arguments.of(PANEL_STOPWATCH)
         );
     }
+
+    @Test
+    @DisplayName("toggleStopwatchClockPanel switches from digital to analogue mode")
+    void testToggleStopwatchClockPanelToAnalogue()
+    {
+        assertFalse(stopwatchPanel.getDisplayTimePanel().isShowAnaloguePanel(),
+                "Digital mode should be active by default");
+        stopwatchPanel.toggleStopwatchClockPanel();
+        assertTrue(stopwatchPanel.getDisplayTimePanel().isShowAnaloguePanel(),
+                "Should switch to analogue mode after toggle");
+    }
+
+    @Test
+    @DisplayName("toggleStopwatchClockPanel toggles back to digital from analogue mode")
+    void testToggleStopwatchClockPanelBackToDigital()
+    {
+        stopwatchPanel.toggleStopwatchClockPanel(); // digital → analogue
+        stopwatchPanel.toggleStopwatchClockPanel(); // analogue → digital
+        assertFalse(stopwatchPanel.getDisplayTimePanel().isShowAnaloguePanel(),
+                "Should return to digital mode after two toggles");
+    }
+
+    @Test
+    @DisplayName("setupSettingsMenu populates the settings menu")
+    void testSetupSettingsMenuPopulatesMenu()
+    {
+        stopwatchPanel.setupSettingsMenu();
+        assertTrue(stopwatchPanel.getClockFrame().getClockMenuBar().getSettingsMenu().getItemCount() > 0,
+                "Settings menu should have items after setupSettingsMenu");
+    }
 }

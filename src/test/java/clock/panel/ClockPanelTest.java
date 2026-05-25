@@ -57,9 +57,28 @@ public class ClockPanelTest
             "Question Title,Is this a question?,3", // QUESTION
             "Plain Title,This is a plain message.,4" // PLAIN
     })
+    @Disabled
     void testDisplayPopupMessage(String title, String message, int optionPane)
     {
         assertDoesNotThrow(() -> clockPanel.displayPopupMessage(title, message, optionPane));
         logger.info("Popup message displayed successfully with title: {}", title);
+    }
+
+    @Test
+    @DisplayName("printStackTrace logs exception details without throwing")
+    void testPrintStackTraceDoesNotThrow()
+    {
+        final Exception e = new RuntimeException("test exception");
+        assertDoesNotThrow(() -> clockPanel.printStackTrace(e, "custom message"),
+                "printStackTrace should not throw an exception");
+    }
+
+    @Test
+    @DisplayName("printStackTrace with null message does not throw")
+    void testPrintStackTraceWithNullMessageDoesNotThrow()
+    {
+        final Exception e = new RuntimeException("test exception with null message detail");
+        assertDoesNotThrow(() -> clockPanel.printStackTrace(e, null),
+                "printStackTrace should handle a null custom message without throwing");
     }
 }

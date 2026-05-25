@@ -12,7 +12,6 @@ import org.junit.jupiter.params.provider.MethodSource;
 
 import javax.swing.*;
 
-import java.time.LocalDate;
 import java.time.ZoneId;
 import java.util.stream.Stream;
 
@@ -194,5 +193,46 @@ public class ClockFrameTest
                 Arguments.of(new JMenuItem(EASTERN), ZoneId.of(AMERICA_NEW_YORK)),
                 Arguments.of(new JMenuItem(MOUNTAIN), ZoneId.of(AMERICA_DENVER))
         );
+    }
+
+    @Test
+    @DisplayName("clearSettingsMenu empties the settings menu")
+    void testClearSettingsMenuEmptiesMenu()
+    {
+        // The digital clock panel adds items to the settings menu
+        clockFrame.changePanels(PANEL_DIGITAL_CLOCK);
+        assertTrue(clockFrame.getClockMenuBar().getSettingsMenu().getItemCount() > 0,
+                "Settings menu should have items before clearing");
+        clockFrame.clearSettingsMenu();
+        assertEquals(0, clockFrame.getClockMenuBar().getSettingsMenu().getItemCount(),
+                "Settings menu should be empty after clearSettingsMenu");
+    }
+
+    @Test
+    @DisplayName("stop() sets clock and scheduler to null")
+    void testStopSetsClockAndSchedulerToNull()
+    {
+        clockFrame.stop();
+        assertNull(clockFrame.getClock(), "Clock should be null after stop()");
+        assertNull(clockFrame.getScheduler(), "Scheduler should be null after stop()");
+    }
+
+    @Test
+    @DisplayName("setPanelType and getPanelType round-trip")
+    void testSetGetPanelType()
+    {
+        clockFrame.setPanelType(Panel.PANEL_ALARM);
+        assertEquals(Panel.PANEL_ALARM, clockFrame.getPanelType(),
+                "getPanelType should return the value set via setPanelType");
+    }
+
+    @Test
+    @DisplayName("setCurrentPanel and getCurrentPanel round-trip")
+    void testSetGetCurrentPanel()
+    {
+        final var panel = clockFrame.getDigitalClockPanel();
+        clockFrame.setCurrentPanel(panel);
+        assertSame(panel, clockFrame.getCurrentPanel(),
+                "getCurrentPanel should return the panel set via setCurrentPanel");
     }
 }

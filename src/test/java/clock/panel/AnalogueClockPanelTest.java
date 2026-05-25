@@ -14,8 +14,7 @@ import static clock.entity.Panel.PANEL_ANALOGUE_CLOCK;
 import static clock.util.Constants.AM;
 import static java.time.DayOfWeek.WEDNESDAY;
 import static java.time.Month.JANUARY;
-import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
-import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doNothing;
 
@@ -98,5 +97,46 @@ public class AnalogueClockPanelTest
     {
         analogueClockPanel.stop();
         assertNull(analogueClockPanel.getThread(), "Thread should be null after stopping");
+    }
+
+    @Test
+    @DisplayName("start() is idempotent — calling it twice reuses the same thread")
+    void testStartIsIdempotent()
+    {
+        analogueClockPanel.stop();
+        analogueClockPanel.start();
+        final Thread first = analogueClockPanel.getThread();
+        analogueClockPanel.start();
+        assertSame(first, analogueClockPanel.getThread(),
+                "Second start() should not replace the existing thread");
+        analogueClockPanel.stop();
+    }
+
+    @Test
+    @DisplayName("getClockText returns the initialised clock time string")
+    void testGetClockTextIsNotNull()
+    {
+        assertNotNull(analogueClockPanel.getClockText(),
+                "getClockText should return a non-null value after initialisation");
+    }
+
+    @Test
+    @DisplayName("setClock updates the clock referenced by getClock")
+    void testSetClockUpdatesClock()
+    {
+        final Clock newClock = new Clock();
+        analogueClockPanel.setClock(newClock);
+        assertSame(newClock, analogueClockPanel.getClock(),
+                "getClock should return the clock set via setClock");
+    }
+
+    @Test
+    @DisplayName("drawStructure does not throw")
+    void testDrawStructureDoesNotThrow()
+    {
+        doNothing().when(g).setFont(any());
+        doNothing().when(g).setColor(any());
+        assertDoesNotThrow(() -> analogueClockPanel.drawStructure(g),
+                "drawStructure should not throw an exception");
     }
 }

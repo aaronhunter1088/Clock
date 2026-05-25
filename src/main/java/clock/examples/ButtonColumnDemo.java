@@ -10,7 +10,7 @@ import javax.swing.table.*;
 
 public class ButtonColumnDemo
 {
-    public static void main(String[] args)
+    static void main(String[] args)
     {
         SwingUtilities.invokeLater(new Runnable() {
             public void run() {
@@ -19,7 +19,7 @@ public class ButtonColumnDemo
         });
     }
 
-    public static void createAndShowGUI()
+    static void createAndShowGUI()
     {
         UIManager.put("Button.defaultButtonFollowsFocus", Boolean.TRUE);
 

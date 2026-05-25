@@ -275,11 +275,10 @@ public class StopwatchTest {
 
     @Test
     @DisplayName("Test stopStopwatch resets all fields")
-    void testStopStopwatchResetsAllFields() throws InterruptedException
+    void testStopStopwatchResetsAllFields()
     {
         final Stopwatch sw = new Stopwatch("My Stopwatch", false, false, clock);
         sw.startStopwatch();
-        sleep(100);
         sw.stopStopwatch();
 
         assertNull(sw.getName(), "Name should be null after stop");

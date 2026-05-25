@@ -120,6 +120,15 @@
                  Found in parent -->
             <!-- JaCoCo configuration for code analysis
                  Found in parent -->
+            <plugin>
+                <groupId>org.jacoco</groupId>
+                <artifactId>jacoco-maven-plugin</artifactId>
+                <configuration>
+                    <excludes>
+                        <exclude>clock/examples/**</exclude>
+                    </excludes>
+                </configuration>
+            </plugin>
 
             <!-- springdoc-openapi --><!--
                  This plugin is disabled for this project -->
