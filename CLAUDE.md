@@ -59,7 +59,8 @@ src/test/java/clock/
   exception/       InvalidInputExceptionTest.java
   panel/           DigitalClockPanelTest.java, AnalogueClockPanelTest.java,
                    AlarmPanelTest.java, TimerPanelTest.java, StopwatchPanelTest.java,
-                   ClockFrameTest.java, ClockPanelTest.java, PanelTypeTest.java
+                   ClockFrameTest.java, ClockPanelTest.java, PanelTypeTest.java,
+                   DisplayLapsPanelTest.java, DisplayTimePanelTest.java, ButtonColumnTest.java
 ```
 
 All packages use **lowercase names** (e.g., `clock.entity`, `clock.panel`, `clock.contract`).
@@ -143,7 +144,7 @@ All test classes:
 2. Use Mockito for mocking dependencies
 3. Test class names should match source class name + "Test" suffix (e.g., `ClockTest`, `AlarmTest`)
 4. Tests should be in the same package structure as source files
-5. Declare a `static Logger LOGGER` in test classes
+5. Declare a `private static final Logger logger` in test classes (lowercase — matches production convention)
 6. Set up mocks properly with `@BeforeAll` / `@BeforeEach` as needed
 
 ```java
