@@ -3,11 +3,13 @@ package clock.entity;
 import java.io.InputStream;
 import java.io.Serial;
 import java.io.Serializable;
-import java.time.DayOfWeek;
-import java.time.Duration;
+import java.time.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.ScheduledFuture;
+import java.util.concurrent.TimeUnit;
 
 import clock.exception.InvalidInputException;
 import javazoom.jl.decoder.JavaLayerException;
@@ -16,7 +18,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import static java.lang.Thread.sleep;
+//import static java.lang.Thread.sleep;
 import static java.time.DayOfWeek.*;
 import static clock.util.Constants.*;
 
@@ -32,7 +34,7 @@ import static clock.util.Constants.*;
  * @author michael ball
  * @version since 2.0
  */
-public class Alarm implements Serializable, Comparable<Alarm>, Runnable
+public class Alarm implements Serializable, Comparable<Alarm> //, Runnable
 {
     @Serial
     private static final long serialVersionUID = 2L;
@@ -52,7 +54,10 @@ public class Alarm implements Serializable, Comparable<Alarm>, Runnable
                     isSnoozing,
                     isPaused;
     private Clock clock;
-    private volatile Thread selfThread;
+    //private volatile Thread selfThread;
+    private ScheduledFuture<?> scheduledFuture;
+    private ScheduledFuture<?> soundFuture;
+    private ScheduledFuture<?> autoSnoozeFuture;
     private AdvancedPlayer musicPlayer;
 
     /**
@@ -66,7 +71,7 @@ public class Alarm implements Serializable, Comparable<Alarm>, Runnable
      */
     public Alarm()
     {
-        this("Alarm"+(Alarm.alarmsCounter+1), 0, 0, AM, new ArrayList<>(), false, null);
+        this("Alarm"+(Alarm.alarmsCounter+1), 12, 0, AM, WEEKDAYS_LIST, false, null);
         logger.debug("Default alarm created");
     }
 
@@ -123,57 +128,103 @@ public class Alarm implements Serializable, Comparable<Alarm>, Runnable
     }
 
     /**
-     * This method begins the thread
-     * that runs the alarm.
+     * This method schedules the alarm.
      */
-    public synchronized void startAlarm()
+    public synchronized void startAlarm(ScheduledExecutorService scheduler)
     {
-        if (selfThread == null)
+        if (scheduledFuture == null || scheduledFuture.isDone() || scheduledFuture.isCancelled())
         {
-            logger.debug("starting alarm");
-            setSelfThread(new Thread(this));
-            selfThread.start();
+            long delayMillis = calculateDelayUntilNextActivation();
+
+            logger.debug("Scheduling alarm {} in {} ms", this, delayMillis);
+
+            scheduledFuture = scheduler.schedule(
+                    this::activateAlarm,
+                    delayMillis,
+                    TimeUnit.MILLISECONDS
+            );
         }
     }
+//    public synchronized void startAlarm()
+//    {
+//        if (selfThread == null)
+//        {
+//            logger.debug("starting alarm");
+//            setSelfThread(new Thread(this));
+//            selfThread.start();
+//        }
+//    }
 
-    /**
-     * This method starts the alarm
-     */
-    @Override
-    public void run()
+    private long calculateDelayUntilNextActivation()
     {
-        while (!selfThread.isInterrupted())
+        LocalDateTime now = clock.getCurrentDateTime();
+
+        LocalTime alarmTime = LocalTime.of(getHours24(), getMinutes());
+
+        LocalDateTime nextActivation = null;
+
+        for (int i = 0; i <= 7; i++)
         {
-            try {
-                if (!alarmGoingOff && !activatedToday && !isPaused && !isSnoozing) {
-                    activateAlarm();
-                    sleep(1000);
-                }
-                else if (isSnoozing) {
-                    sleep(SNOOZE_TIME);
-                    // copilot added
-                    setIsSnoozing(false);
-                    setIsAlarmGoingOff(true);
-                }
-                else if (alarmGoingOff && !isPaused) {
-                    triggerAlarm();
-                    sleep(1000);
-                }
-                else {
-                    // do nothing
-                    sleep(1000);
-                }
-            }
-            catch (InterruptedException e)
+            LocalDate candidateDate = now.toLocalDate().plusDays(i);
+            DayOfWeek candidateDay = candidateDate.getDayOfWeek();
+
+            LocalDateTime candidateDateTime = LocalDateTime.of(candidateDate, alarmTime);
+
+            boolean dayMatches = getDays().contains(candidateDay);
+            boolean timeIsInFuture = candidateDateTime.isAfter(now);
+
+            if (dayMatches && timeIsInFuture)
             {
-                printStackTrace(e, null);
-                Thread.currentThread().interrupt();
+                nextActivation = candidateDateTime;
+                break;
             }
         }
+
+        if (nextActivation == null)
+        {
+            throw new IllegalStateException("No valid activation time found for alarm: " + this);
+        }
+
+        return Duration.between(now, nextActivation).toMillis();
     }
 
+//    /**
+//     * This method starts the alarm
+//     */
+//    @Override
+//    public void run()
+//    {
+//        while (!selfThread.isInterrupted())
+//        {
+//            try {
+//                if (!alarmGoingOff && !activatedToday && !isPaused && !isSnoozing) {
+//                    activateAlarm();
+//                    sleep(1000);
+//                }
+//                else if (isSnoozing) {
+//                    sleep(SNOOZE_TIME);
+//                    // copilot added
+//                    setIsSnoozing(false);
+//                    setIsAlarmGoingOff(true);
+//                }
+//                else if (alarmGoingOff && !isPaused) {
+//                    triggerAlarm();
+//                    sleep(1000);
+//                }
+//                else {
+//                    // do nothing
+//                    sleep(1000);
+//                }
+//            }
+//            catch (InterruptedException e)
+//            {
+//                printStackTrace(e, null);
+//                Thread.currentThread().interrupt();
+//            }
+//        }
+//    }
+
     /**
-     * Scheduled to run once every second.
      * For each alarm, check if the alarm's
      * time and day matches the clocks current
      * time and day. And, if the alarm is not
@@ -181,26 +232,65 @@ public class Alarm implements Serializable, Comparable<Alarm>, Runnable
      */
     private synchronized void activateAlarm()
     {
-        if (getAlarmAsString().equals(clock.getClockTimeAsAlarmString())
-                && this.getDays().contains(clock.getDayOfWeek()))
+        scheduledFuture = null;
+
+        if (!isPaused)
         {
+            logger.info("Alarm {} activating", this);
             setIsAlarmGoingOff(true);
             setActivatedToday(true);
-            logger.info("Alarm {} matches clock's time. Activating alarm", this);
+            triggerAlarm(clock.getScheduledExecutorService());
         }
     }
+//    private synchronized void activateAlarm()
+//    {
+//        if (getAlarmAsString().equals(clock.getClockTimeAsAlarmString())
+//                && this.getDays().contains(clock.getDayOfWeek()))
+//        {
+//            setIsAlarmGoingOff(true);
+//            setActivatedToday(true);
+//            logger.info("Alarm {} matches clock's time. Activating alarm", this);
+//        }
+//    }
 
     /**
      * Stops an actively going off alarm
      */
     public synchronized void stopAlarm()
     {
-        logger.debug("stopping alarm");
-        setMusicPlayer(null);
         setIsAlarmGoingOff(false);
-        setSelfThread(null);
-        logger.info("{} alarm turned off", this);
+        setIsSnoozing(false);
+
+        stopSound();
+
+        if (scheduledFuture != null)
+        {
+            scheduledFuture.cancel(false);
+            scheduledFuture = null;
+        }
+        if (soundFuture != null)
+        {
+            soundFuture.cancel(false);
+            soundFuture = null;
+        }
+        if (autoSnoozeFuture != null)
+        {
+            autoSnoozeFuture.cancel(false);
+            autoSnoozeFuture = null;
+        }
+
+        // schedule next normal alarm occurrence
+        //scheduledFuture = null; // done just above
+        startAlarm(clock.getScheduledExecutorService());
     }
+//    public synchronized void stopAlarm()
+//    {
+//        logger.debug("stopping alarm");
+//        setMusicPlayer(null);
+//        setIsAlarmGoingOff(false);
+//        setSelfThread(null);
+//        logger.info("{} alarm turned off", this);
+//    }
 
     /** Pauses the alarm */
     public synchronized void pauseAlarm()
@@ -225,14 +315,62 @@ public class Alarm implements Serializable, Comparable<Alarm>, Runnable
     /**
      * Sets an alarm to go off
      */
-    public synchronized void triggerAlarm()
+    public synchronized void triggerAlarm(ScheduledExecutorService scheduler)
     {
         logger.debug("trigger {}", this);
+
+        setIsAlarmGoingOff(true);
+        setIsSnoozing(false);
+
+        startRepeatingSound(scheduler);
+
+        autoSnoozeFuture = scheduler.schedule(
+                () -> autoSnoozeAlarm(scheduler),
+                SNOOZE_TIME,
+                TimeUnit.MILLISECONDS
+        );
+    }
+//    public synchronized void triggerAlarm()
+//    {
+//        logger.debug("trigger {}", this);
+//        try
+//        {
+//            logger.debug("playing sound");
+//            setupMusicPlayer();
+//            musicPlayer.play();
+//        }
+//        catch (Exception e)
+//        {
+//            printStackTrace(e, "Error while playing sound");
+//        }
+//    }
+
+    private synchronized void startRepeatingSound(ScheduledExecutorService scheduler)
+    {
+        if (soundFuture != null && !soundFuture.isDone())
+        {
+            return;
+        }
+
+        soundFuture = scheduler.scheduleWithFixedDelay(
+                this::playSoundOnce,
+                0,
+                1,
+                TimeUnit.SECONDS
+        );
+    }
+
+    private void playSoundOnce()
+    {
         try
         {
             logger.debug("playing sound");
             setupMusicPlayer();
-            musicPlayer.play();
+
+            if (musicPlayer != null)
+            {
+                musicPlayer.play(); // plays the mp3 once
+            }
         }
         catch (Exception e)
         {
@@ -240,15 +378,61 @@ public class Alarm implements Serializable, Comparable<Alarm>, Runnable
         }
     }
 
+    private synchronized void stopSound()
+    {
+        if (soundFuture != null)
+        {
+            soundFuture.cancel(true);
+            soundFuture = null;
+        }
+        if (musicPlayer != null)
+        {
+            musicPlayer.close();
+            musicPlayer = null;
+        }
+    }
+
     /**
      * Snoozing this alarm will stop the alarm
      * from playing its sound for 7 minutes.
      */
-    public synchronized void snooze()
+    public synchronized void snooze(ScheduledExecutorService scheduler)
     {
-        logger.info("snoozing for {} minutes", Duration.ofMillis(SNOOZE_TIME).toMinutes());
-        setIsSnoozing(true);
+        logger.debug("snoozing alarm {}", this);
+
         setIsAlarmGoingOff(false);
+        setIsSnoozing(true);
+
+        stopSound();
+
+        if (scheduledFuture != null)
+        {
+            scheduledFuture.cancel(false);
+            scheduledFuture = null;
+        }
+        if (autoSnoozeFuture != null)
+        {
+            autoSnoozeFuture.cancel(false);
+            autoSnoozeFuture = null;
+        }
+
+        scheduledFuture = scheduler.schedule(
+                () -> triggerAlarm(scheduler),
+                SNOOZE_TIME,
+                TimeUnit.MILLISECONDS
+        );
+    }
+//    public synchronized void snooze()
+//    {
+//        logger.info("snoozing for {} minutes", Duration.ofMillis(SNOOZE_TIME).toMinutes());
+//        setIsSnoozing(true);
+//        setIsAlarmGoingOff(false);
+//    }
+
+    private void autoSnoozeAlarm(ScheduledExecutorService scheduler)
+    {
+        logger.debug("auto-snoozing alarm {}", this);
+        snooze(scheduler);
     }
 
     /**
@@ -318,6 +502,20 @@ public class Alarm implements Serializable, Comparable<Alarm>, Runnable
     public boolean isPaused() { return isPaused; }
     /** Returns the days of the alarm */
     public List<DayOfWeek> getDays() { return this.days; }
+    private int getHours24()
+    {
+        int hour = getHours();
+        if (PM.equalsIgnoreCase(getAMPM()) && hour != 12)
+        {
+            return hour + 12;
+        }
+
+        if (AM.equalsIgnoreCase(getAMPM()) && hour == 12)
+        {
+            return 0;
+        }
+        return hour;
+    }
     /** Returns the hours of the alarm */
     public int getHours() { return this.hours; }
     /** Returns the hours as a string with leading zero if needed */
@@ -336,8 +534,20 @@ public class Alarm implements Serializable, Comparable<Alarm>, Runnable
     public String getAlarmAsString() { return hoursAsStr+COLON+minutesAsStr+SPACE+ampm; }
     /** Returns whether the alarm has been activated today */
     public boolean isActivatedToday() { return activatedToday; }
-    /** Returns the thread reference to itself */
-    public Thread getSelfThread() { return selfThread; }
+//    /** Returns the thread reference to itself */
+//    public Thread getSelfThread() { return selfThread; }
+    public ScheduledFuture<?> getScheduledFuture()
+    {
+        return scheduledFuture;
+    }
+    public ScheduledFuture<?> getSoundFuture()
+    {
+        return soundFuture;
+    }
+    public ScheduledFuture<?> getAutoSnoozeFuture()
+    {
+        return autoSnoozeFuture;
+    }
 
     /** Sets the clock reference */
     public void setClock(Clock clock) { this.clock = clock; logger.debug("clock set to: {}", clock); }
@@ -371,8 +581,21 @@ public class Alarm implements Serializable, Comparable<Alarm>, Runnable
     public void setMusicPlayer(AdvancedPlayer musicPlayer) { this.musicPlayer = musicPlayer; logger.debug("musicPlayer set"); }
     /** Sets whether the alarm has been activated today */
     public void setActivatedToday(boolean activatedToday) { this.activatedToday = activatedToday; logger.debug("triggeredToday: {}", activatedToday); }
-    /** Sets the thread reference to itself */
-    public void setSelfThread(Thread selfThread) { this.selfThread = selfThread; logger.debug("selfThread set"); }
+
+    //    /** Sets the thread reference to itself */
+//    public void setSelfThread(Thread selfThread) { this.selfThread = selfThread; logger.debug("selfThread set"); }
+    public void setScheduledFuture(ScheduledFuture<?> scheduledFuture)
+    {
+        this.scheduledFuture = scheduledFuture;
+    }
+    public void setSoundFuture(ScheduledFuture<?> soundFuture)
+    {
+        this.soundFuture = soundFuture;
+    }
+    public void setAutoSnoozeFuture(ScheduledFuture<?> autoSnoozeFuture)
+    {
+        this.autoSnoozeFuture = autoSnoozeFuture;
+    }
 
     /**
      * Compares this alarm to another alarm based

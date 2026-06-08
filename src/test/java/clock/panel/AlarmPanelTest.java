@@ -498,6 +498,7 @@ class AlarmPanelTest
                 .add(new Alarm("A2", 8, 0, AM, List.of(TUESDAY), false, clock));
 
         alarmPanel.resetAlarmPanel();
+        alarmPanel.resetTableAndMenu();
         assertTrue(alarmPanel.getClock().getListOfAlarms().isEmpty(),
                 "All alarms should be cleared after resetAlarmPanel");
     }
@@ -511,6 +512,7 @@ class AlarmPanelTest
         alarmPanel.getMinutesTextField().setText("30");
 
         alarmPanel.resetAlarmPanel();
+        alarmPanel.resetTableAndMenu();
         assertTrue(alarmPanel.getNameTextField().getText().isEmpty(),
                 "Name field should be empty after reset");
         assertTrue(alarmPanel.getHoursTextField().getText().isEmpty(),
@@ -527,6 +529,7 @@ class AlarmPanelTest
         alarmPanel.getWeekendsCheckBox().setSelected(true);
 
         alarmPanel.resetAlarmPanel();
+        alarmPanel.resetTableAndMenu();
         assertFalse(alarmPanel.getMondayCheckBox().isSelected());
         assertFalse(alarmPanel.getWeekendsCheckBox().isSelected());
     }

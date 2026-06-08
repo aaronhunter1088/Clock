@@ -1,5 +1,6 @@
 package clock.entity;
 
+import clock.panel.ClockFrame;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.junit.jupiter.api.*;
@@ -37,6 +38,7 @@ class ClockTest
     private static final LocalTime PM_TIME = LocalTime.of(15, 30, 45); // 3:30:45 PM
     private static Clock clockWEDJAN12025_103000AM, clockWEDJAN12025_103000PM;
     private Clock clock;
+    private ClockFrame clockFrame;
 
     @BeforeAll
     static void beforeClass()
@@ -49,7 +51,10 @@ class ClockTest
     @BeforeEach
     void beforeEach()
     {
-        clock = new Clock();
+        clockFrame = new ClockFrame(new Clock());
+        clock = clockFrame.getClock();
+        clockWEDJAN12025_103000AM.setScheduledExecutorService(clockFrame.getScheduler());
+        clockWEDJAN12025_103000PM.setScheduledExecutorService(clockFrame.getScheduler());
     }
 
     @AfterEach
@@ -343,6 +348,7 @@ class ClockTest
         clock.setYear(2021);
         clock.setAMPM(PM);
         clock.logIsNewYear();
+        clock.setScheduledExecutorService(clockFrame.getScheduler());
         Alarm alarm = new Alarm("Test", 1, 1, PM, new ArrayList<>(){{add(SATURDAY);}}, false, clock);
         clock.getListOfAlarms().add(alarm);
 

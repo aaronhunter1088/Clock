@@ -311,6 +311,7 @@ public class AlarmPanel extends ClockPanel implements Runnable
         setBackground(Color.BLACK);
         setForeground(Color.BLACK);
         resetAlarmPanel();
+        resetTableAndMenu();
         setupSettingsMenu();
         clockFrame.setTitle(ALARM+S.toLowerCase()+SPACE+PANEL);
         start();
@@ -321,7 +322,6 @@ public class AlarmPanel extends ClockPanel implements Runnable
      */
     public void resetAlarmPanel()
     {
-        logger.debug("reset alarm panel");
         nameTextField.setText(EMPTY);
         hoursTextField.setText(EMPTY);
         minutesTextField.setText(EMPTY);
@@ -334,10 +334,14 @@ public class AlarmPanel extends ClockPanel implements Runnable
         saturdayCheckBox.setSelected(false);
         weekdaysCheckBox.setSelected(false);
         weekendsCheckBox.setSelected(false);
+        logger.debug("alarm panel reset");
+    }
+
+    public void resetTableAndMenu()
+    {
         alarmsTable.setModel(new javax.swing.table.DefaultTableModel());
         clock.getListOfAlarms().forEach(Alarm::stopAlarm);
         clock.getListOfAlarms().clear();
-        logger.debug("all alarms cleared");
     }
 
     /**
@@ -432,7 +436,7 @@ public class AlarmPanel extends ClockPanel implements Runnable
                 switch (buttonAction) {
                     case SNOOZE -> {
                         alarmsTable.getModel().setValueAt(SLEEPING, modelRow, 3);
-                        alarm.snooze();
+                        alarm.snooze(clock.getScheduledExecutorService());
                         clock.getListOfAlarms().set(modelRow, alarm);
                     }
                     case SLEEPING -> {
@@ -680,18 +684,7 @@ public class AlarmPanel extends ClockPanel implements Runnable
             if (!clock.getListOfAlarms().contains(alarm))
             {
                 clock.getListOfAlarms().add(alarm);
-                nameTextField.setText(EMPTY);
-                hoursTextField.setText(EMPTY);
-                minutesTextField.setText(EMPTY);
-                sundayCheckBox.setSelected(false);
-                mondayCheckBox.setSelected(false);
-                tuesdayCheckBox.setSelected(false);
-                wednesdayCheckBox.setSelected(false);
-                thursdayCheckBox.setSelected(false);
-                fridayCheckBox.setSelected(false);
-                saturdayCheckBox.setSelected(false);
-                weekdaysCheckBox.setSelected(false);
-                weekendsCheckBox.setSelected(false);
+                resetAlarmPanel();
             }
             else
             {

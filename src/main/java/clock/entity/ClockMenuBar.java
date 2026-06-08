@@ -1,5 +1,6 @@
 package clock.entity;
 
+import clock.panel.AlarmPanel;
 import clock.panel.ClockFrame;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -352,7 +353,9 @@ public class ClockMenuBar extends JMenuBar
     protected void toggleResetAlarmsPanelSetting(ActionEvent action)
     {
         logger.debug("clicked reset alarms panel setting");
-        clockFrame.getAlarmPanel().resetAlarmPanel();
+        AlarmPanel alarmPanel = clockFrame.getAlarmPanel();
+        alarmPanel.resetAlarmPanel();
+        alarmPanel.resetTableAndMenu();
     }
 
     /** Toggles between digital and analogue panels */

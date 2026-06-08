@@ -1,5 +1,10 @@
 package clock.util;
 
+import java.time.DayOfWeek;
+import java.util.List;
+
+import static java.time.DayOfWeek.*;
+
 /**
  * Constants
  * <p>
@@ -144,6 +149,8 @@ public class Constants {
     public static final String WEEKENDS = "Weekends";
     public static final String VIEW_DIGITAL_CLOCK = "View Digital Clock";
     public static final String VIEW_ANALOGUE_CLOCK = "View Analogue Clock";
+    public static final List<DayOfWeek> WEEKDAYS_LIST = List.of(MONDAY, TUESDAY, WEDNESDAY, THURSDAY, FRIDAY);
+    public static final List<DayOfWeek> WEEKEND_DAYS_LIST_AMERICAN = List.of(SATURDAY, SUNDAY);
 
     // Stopwatch
     public static final String ELAPSED = "Elapsed";

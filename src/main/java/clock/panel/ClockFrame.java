@@ -15,7 +15,6 @@ import java.time.ZoneId;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
-import java.util.function.Function;
 
 import static clock.entity.Panel.*;
 import static clock.util.Constants.*;
@@ -105,8 +104,9 @@ public class ClockFrame extends JFrame
         setIconImage(icon.getImage());
         setLocationRelativeTo(null); // loads the GUI in the center of the screen
         setResizable(false);
+        setScheduler(Executors.newScheduledThreadPool(5));
         setClock(clock != null ? clock : new Clock());
-        setScheduler(Executors.newScheduledThreadPool(25));
+        setSchedulerOnClock();
         setupMenuBar(); // daylightSavingsTimeEnabled directly influences menu bar setup
         setDigitalClockPanel(new DigitalClockPanel(this));
         setAnalogueClockPanel(new AnalogueClockPanel(this));
@@ -308,20 +308,6 @@ public class ClockFrame extends JFrame
     }
 
     /**
-     * Creates and shows the GUI for the Clock application.
-     * This method is invoked in Main when testing the
-     * application with a specific clock.
-     * @param clock the clock to use for testing
-     */
-    public static ClockFrame createAndShowGUI(Clock clock)
-    {
-        logger.info("Starting TestClock...");
-        ClockFrame clockFrame = new ClockFrame(clock);
-        clockFrame.start();
-        return clockFrame;
-    }
-
-    /**
      * Creates and shows the GUI for the Clock application
      * with a specific panel type.
      * @param panelType the panel type to display
@@ -335,12 +321,36 @@ public class ClockFrame extends JFrame
     }
 
     /**
+     * Creates and shows the GUI for the Clock application.
+     * This method is invoked in Main when testing the
+     * application with a specific clock.
+     * @param clock the clock to use for testing
+     */
+    public static ClockFrame createAndShowGUI(Clock clock)
+    {
+        logger.info("Starting Specific Clock...");
+        ClockFrame clockFrame = new ClockFrame(clock);
+        clockFrame.start();
+        return clockFrame;
+    }
+
+    /**
      * Starts the clock and schedules the
      * tasks to run at a fixed rate.
      */
+//    void start()
+//    {
+//        scheduler.execute(clock);
+//    }
     void start()
     {
-        scheduler.execute(clock);
+        clock.setScheduledExecutorService(scheduler);
+        scheduler.scheduleAtFixedRate(
+                clock::tick,
+                0,
+                1,
+                TimeUnit.SECONDS
+        );
     }
 
     /**
@@ -348,6 +358,9 @@ public class ClockFrame extends JFrame
      */
     public void stop()
     {
+        if (scheduler != null) {
+            scheduler.shutdown();
+        }
         setClock(null);
         setScheduler(null);
     }
@@ -389,6 +402,16 @@ public class ClockFrame extends JFrame
     public void setStopwatchPanel(StopwatchPanel stopwatchPanel) { this.stopwatchPanel = stopwatchPanel; logger.debug("stopwatchPanel set"); }
     /** Sets the clock */
     public void setClock(Clock clock) { this.clock = clock; logger.debug("clock set to {}", clock); }
+    /** Sets the ScheduledExecutorService on the clock */
+    public void setSchedulerOnClock() {
+        if (clock != null && scheduler != null) {
+            clock.setScheduledExecutorService(scheduler);
+            logger.debug("clock scheduler set");
+        } else {
+            if (clock == null) { logger.error("clock is null"); }
+            if (scheduler == null) { logger.error("scheduler is null"); }
+        }
+    }
     /** Sets the scheduler */
     public void setScheduler(ScheduledExecutorService scheduler) { this.scheduler = scheduler; logger.debug("scheduler set"); }
 }

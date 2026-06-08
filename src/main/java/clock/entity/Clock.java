@@ -9,6 +9,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 import java.util.Objects;
+import java.util.concurrent.ScheduledExecutorService;
 
 import clock.exception.InvalidInputException;
 import org.apache.logging.log4j.LogManager;
@@ -31,7 +32,7 @@ import static clock.util.Constants.*;
  * @author michael ball 
  * @version since 1.0
  */
-public class Clock implements Serializable, Comparable<Clock>, Runnable
+public class Clock implements Serializable, Comparable<Clock> //, Runnable
 {
     @Serial
     private static final long serialVersionUID = 2L;
@@ -56,6 +57,7 @@ public class Clock implements Serializable, Comparable<Clock>, Runnable
             dateChanged, isNewYear, //testingClock,
             showFullDate, showPartialDate, showMilitaryTime,
             daylightSavingsTimeEnabled;
+    private ScheduledExecutorService scheduledExecutorService; // reference to ClockFrame's service
 
     /**
      * Default constructor for the Clock class.
@@ -454,7 +456,7 @@ public class Clock implements Serializable, Comparable<Clock>, Runnable
      */
     private void setActiveAlarms()
     {
-        getListOfAlarms().forEach(Alarm::startAlarm);
+        getListOfAlarms().forEach(alarm -> alarm.startAlarm(scheduledExecutorService));
         resetTriggeredAlarms();
     }
 
@@ -465,7 +467,7 @@ public class Clock implements Serializable, Comparable<Clock>, Runnable
      */
     private void setActiveTimers()
     {
-        getListOfTimers().forEach(Timer::startTimer);
+        listOfTimers.forEach(Timer::startTimer);
     }
 
     /**
@@ -476,42 +478,42 @@ public class Clock implements Serializable, Comparable<Clock>, Runnable
      */
     private void resetTriggeredAlarms()
     {
-        if (dateChanged && !getListOfAlarms().isEmpty()) {
-            getListOfAlarms().forEach(alarm -> {
+        if (dateChanged && !listOfAlarms.isEmpty()) {
+            listOfAlarms.forEach(alarm -> {
                 alarm.setActivatedToday(false);
             });
             logger.info("Setting {} alarms to not triggered today", Alarm.alarmsCounter);
         }
     }
 
-    /**
-     * The run method is the main loop of the clock.
-     * It should run indefinitely, updating the clock
-     * every second, and then sleeping for 1 second.
-     * There are specifics tasks that should also
-     * occur during each tick. We activate alarms,
-     * and timers, if any, and refresh the clock time
-     * if it is midnight.
-     */
-    @Override
-    public void run()
-    {
-        logger.info("Clock is running");
-        while (!Thread.currentThread().isInterrupted())
-        {
-            try
-            {
-                tick();
-                sleep(1000);
-            }
-            catch (InterruptedException e)
-            {
-                printStackTrace(e, "Clock thread interrupted");
-                Thread.currentThread().interrupt(); // Restore the interrupted status
-                break; // Exit the loop if interrupted
-            }
-        }
-    }
+//    /**
+//     * The run method is the main loop of the clock.
+//     * It should run indefinitely, updating the clock
+//     * every second, and then sleeping for 1 second.
+//     * There are specifics tasks that should also
+//     * occur during each tick. We activate alarms,
+//     * and timers, if any, and refresh the clock time
+//     * if it is midnight.
+//     */
+//    @Override
+//    public void run()
+//    {
+//        logger.info("Clock is running");
+//        while (!Thread.currentThread().isInterrupted())
+//        {
+//            try
+//            {
+//                tick();
+//                sleep(1000);
+//            }
+//            catch (InterruptedException e)
+//            {
+//                printStackTrace(e, "Clock thread interrupted");
+//                Thread.currentThread().interrupt(); // Restore the interrupted status
+//                break; // Exit the loop if interrupted
+//            }
+//        }
+//    }
 
     /**
      * A default tick of the clock
@@ -794,6 +796,12 @@ public class Clock implements Serializable, Comparable<Clock>, Runnable
         };
     }
 
+    /** Gets the scheduled executor service */
+    public ScheduledExecutorService getScheduledExecutorService()
+    {
+        return scheduledExecutorService;
+    }
+
     /**
      * Sets and logs the new second value
      * Also sets secondsAsStr
@@ -937,6 +945,11 @@ public class Clock implements Serializable, Comparable<Clock>, Runnable
     protected void setListOfAlarms(List<Alarm> listOfAlarms) { this.listOfAlarms = listOfAlarms; logger.debug("listOfAlarms: {}", listOfAlarms); }
     protected void setListOfTimers(List<Timer> listOfTimers) { this.listOfTimers = listOfTimers; logger.debug("listOfTimers: {}", listOfTimers); }
     protected void setListOfStopwatches(List<Stopwatch> listOfStopwatches) { this.listOfStopwatches = listOfStopwatches; logger.debug("listOfStopwatches: {}", listOfStopwatches); }
+    /** Sets the scheduled executor service */
+    public void setScheduledExecutorService(ScheduledExecutorService scheduledExecutorService)
+    {
+        this.scheduledExecutorService = scheduledExecutorService;
+    }
 
     /**
      * Compares this clock to another clock based
