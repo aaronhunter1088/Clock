@@ -57,7 +57,7 @@ public class Clock implements Serializable, Comparable<Clock> //, Runnable
             dateChanged, isNewYear, //testingClock,
             showFullDate, showPartialDate, showMilitaryTime,
             daylightSavingsTimeEnabled;
-    private ScheduledExecutorService scheduledExecutorService; // reference to ClockFrame's service
+    private transient ScheduledExecutorService scheduledExecutorService; // reference to ClockFrame's service
 
     /**
      * Default constructor for the Clock class.
@@ -467,7 +467,8 @@ public class Clock implements Serializable, Comparable<Clock> //, Runnable
      */
     private void setActiveTimers()
     {
-        listOfTimers.forEach(Timer::startTimer);
+        //listOfTimers.forEach(Timer::startTimer);
+        listOfTimers.forEach(timer -> timer.startTimer(scheduledExecutorService));
     }
 
     /**

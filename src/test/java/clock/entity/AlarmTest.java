@@ -41,7 +41,6 @@ class AlarmTest {
 
     private static final Logger logger = LogManager.getLogger(AlarmTest.class);
 
-    private ClockFrame clockFrame;
     private Clock clock;
     private final List<DayOfWeek> weekDays = List.of(DayOfWeek.MONDAY, TUESDAY, WEDNESDAY, THURSDAY, DayOfWeek.FRIDAY),
                                   weekendDays = List.of(DayOfWeek.SATURDAY, DayOfWeek.SUNDAY);
@@ -57,7 +56,7 @@ class AlarmTest {
     @BeforeEach
     void beforeEach()
     {
-        clockFrame = new ClockFrame(new Clock());
+        ClockFrame clockFrame = new ClockFrame(new Clock());
         clock = clockFrame.getClock();
         weekDays730AmAlarm = new Alarm("Weekdays Alarm", 7, 30, AM, weekDays, false, clock);
         weekend10AmAlarm = new Alarm("Weekends Alarm", 10, 0, AM, weekendDays, false, clock);

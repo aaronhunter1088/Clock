@@ -103,7 +103,7 @@ public class ClockMenuBar extends JMenuBar
         getPauseResumeAllTimersSetting().setForeground(Color.WHITE);
         getPauseResumeAllTimersSetting().addActionListener(this::togglePauseResumeAllTimersSetting);
 
-        setResetTimersPanelSetting(new JMenuItem(RESET+SPACE+TIMER+S.toLowerCase()));
+        setResetTimersPanelSetting(new JMenuItem(RESET+SPACE+PANEL));
         getResetTimersPanelSetting().setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_R, InputEvent.CTRL_DOWN_MASK));
         getResetTimersPanelSetting().setForeground(Color.WHITE);
         getResetTimersPanelSetting().addActionListener(this::toggleResetTimersPanelSetting);
@@ -113,7 +113,7 @@ public class ClockMenuBar extends JMenuBar
         getPauseResumeAllAlarmsSetting().setForeground(Color.WHITE);
         getPauseResumeAllAlarmsSetting().addActionListener(this::togglePauseResumeAllAlarmsSetting);
 
-        setResetAlarmsPanelSetting(new JMenuItem(RESET+SPACE+ALARM+S.toLowerCase()));
+        setResetAlarmsPanelSetting(new JMenuItem(RESET+SPACE+PANEL));
         getResetAlarmsPanelSetting().setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_R, InputEvent.CTRL_DOWN_MASK));
         getResetAlarmsPanelSetting().setForeground(Color.WHITE);
         getResetAlarmsPanelSetting().addActionListener(this::toggleResetAlarmsPanelSetting);
@@ -145,7 +145,7 @@ public class ClockMenuBar extends JMenuBar
         getTimerFeature().setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_T, InputEvent.CTRL_DOWN_MASK));
         getTimerFeature().addActionListener(action -> clockFrame.changePanels(PANEL_TIMER));
 
-        setStopwatchFeature(new JMenuItem(VIEW_STOPWATCH));
+        setStopwatchFeature(new JMenuItem(VIEW_STOPWATCHES));
         getStopwatchFeature().setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_S, InputEvent.CTRL_DOWN_MASK));
         getStopwatchFeature().addActionListener(action -> clockFrame.changePanels(PANEL_STOPWATCH));
 

@@ -71,7 +71,7 @@ public class DisplayLapsPanel extends JPanel
         JButton viewAll = new JButton(VIEW_ALL);
         viewAll.setFont(ClockFrame.font20);
         viewAll.setOpaque(true);
-        viewAll.setName(VIEW_STOPWATCH + "es" + BUTTON);
+        viewAll.setName(VIEW_STOPWATCHES + BUTTON);
         viewAll.setBackground(Color.BLACK);
         viewAll.setForeground(Color.BLUE);
         viewAll.addActionListener(this::viewStopwatchesTable);

@@ -119,7 +119,7 @@ public class Constants {
     public static final String TIMER_SEC_ERROR = "0 <= "+SEC+" > 60";
     public static final String TIMER_ERROR = "Timer Error";
     public static final String VIEW_TIMERS = "View Timers";
-    public static final String VIEW_STOPWATCH = "View Stopwatch";
+    public static final String VIEW_STOPWATCHES = "View Stopwatches";
     public static final String ZERO = "0";
 
     // Alarm

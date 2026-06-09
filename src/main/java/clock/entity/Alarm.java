@@ -30,6 +30,9 @@ import static clock.util.Constants.*;
  * matches the alarm's time and day, the alarm will
  * make a sound. The alarm can be set to snooze,
  * reset, stopped, or removed.
+ * TODO: Feature updates
+ * TODO: 1. When I click snooze (which only happens on an alarm triggering its sound), the
+ * TODO: button should count down the SNOOZE_TIME. It should say Sleeping .zZ when not active.
  *
  * @author michael ball
  * @version since 2.0
@@ -38,9 +41,9 @@ public class Alarm implements Serializable, Comparable<Alarm> //, Runnable
 {
     @Serial
     private static final long serialVersionUID = 2L;
+    private static final long SNOOZE_TIME = Duration.ofMinutes(7).toMillis(); // 7 minutes in milliseconds
     private static final Logger logger = LogManager.getLogger(Alarm.class);
     public static long alarmsCounter = 0L;
-    private static final long SNOOZE_TIME = Duration.ofMinutes(7).toMillis(); // 7 minutes in milliseconds
     private int hours,
                 minutes;
     private String minutesAsStr,
@@ -53,12 +56,12 @@ public class Alarm implements Serializable, Comparable<Alarm> //, Runnable
                     activatedToday,
                     isSnoozing,
                     isPaused;
-    private Clock clock;
+    private transient Clock clock;
     //private volatile Thread selfThread;
-    private ScheduledFuture<?> scheduledFuture;
-    private ScheduledFuture<?> soundFuture;
-    private ScheduledFuture<?> autoSnoozeFuture;
-    private AdvancedPlayer musicPlayer;
+    private transient ScheduledFuture<?> scheduledFuture;
+    private transient ScheduledFuture<?> soundFuture;
+    private transient ScheduledFuture<?> autoSnoozeFuture;
+    private transient AdvancedPlayer musicPlayer;
 
     /**
      * Creates a new Alarm object with default values

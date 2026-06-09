@@ -10,6 +10,9 @@ import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.ScheduledFuture;
+import java.util.concurrent.TimeUnit;
 
 import static clock.util.Constants.STOPWATCH_READING_FORMAT;
 import static java.lang.Thread.sleep;
@@ -27,6 +30,9 @@ import static java.lang.Thread.sleep;
  * lap. The main count up time will continue to be visible will all times
  * shown together.
  * A lap is the time elapsed between one start and stop event.
+ * TODO: Implement 'Reset (Stopwatch) Panel' menu setting: resets the entire panel
+ * TODO: Implement 'Reset Laps' menu setting: resets laps for active stopwatch
+ * TODO: Implement 'Reset All Laps' menu setting: resets all laps for all stopwatches
  *
  * @author michael ball
  * @version since 2.9
@@ -40,8 +46,10 @@ public class Stopwatch implements Serializable, Comparable<Stopwatch>, Runnable
     private String name;
     private boolean paused,
                     started;
-    private Clock clock;
+    private transient Clock clock;
     private volatile Thread selfThread;
+    private transient ScheduledFuture<?> scheduledFuture;
+    private transient ScheduledFuture<?> soundFuture;
     private long startMilli = 0L;        // start time in milliseconds
     private long accumMilli = 0L;        // time accumulated across previous runs
     private long lastLapMarkMilli = 0L;  // elapsed ns at last lap
