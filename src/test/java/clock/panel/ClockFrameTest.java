@@ -12,6 +12,8 @@ import org.junit.jupiter.params.provider.MethodSource;
 
 import javax.swing.*;
 
+import java.awt.*;
+import java.lang.reflect.InvocationTargetException;
 import java.time.ZoneId;
 import java.util.stream.Stream;
 
@@ -32,9 +34,8 @@ public class ClockFrameTest
 {
     private static final Logger logger = LogManager.getLogger(ClockFrameTest.class);
 
-    Clock clock;
-
     ClockFrame clockFrame;
+    Clock clock;
 
     @BeforeAll
     static void beforeClass()
@@ -46,14 +47,17 @@ public class ClockFrameTest
     void beforeEach()
     {
         clock = new Clock(11, 30, 0, JANUARY, WEDNESDAY, 1, 2025, AM); // 11:30 AM
-        clockFrame = new ClockFrame(clock);
     }
 
     @AfterEach
-    void afterEach()
+    void afterEach() throws InterruptedException, InvocationTargetException
     {
-        clockFrame.stop();
-        clockFrame.dispose();
+        logger.info("Test complete. Closing the clock...");
+        EventQueue.invokeAndWait(() -> {
+            clockFrame.stop();
+            clockFrame.dispose();
+        });
+        assertFalse(clockFrame.isVisible());
     }
 
     @AfterAll
@@ -63,23 +67,18 @@ public class ClockFrameTest
     @DisplayName("Test ClockFrame no-args constructor")
     void testClockFrameNoArgsConstructor()
     {
-        clockFrame = new ClockFrame();
-        try {
-            assertNotNull(clockFrame, "ClockFrame should not be null");
-            assertEquals(PANEL_DIGITAL_CLOCK, clockFrame.getPanelType(), "Panel should be set to PANEL_DIGITAL_CLOCK");
-            assertNotNull(clockFrame.getClock(), "Clock should not be null");
-            assertNotNull(clockFrame.getScheduler(), "Scheduler should not be null");
-            assertNotNull(clockFrame.getClockMenuBar(), "ClockMenuBar should not be null");
-            assertNotNull(clockFrame.getDigitalClockPanel(), "DigitalClockPanel should not be null");
-            assertNotNull(clockFrame.getAnalogueClockPanel(), "AnalogueClockPanel should not be null");
-            assertNotNull(clockFrame.getAlarmPanel(), "AlarmPanel should not be null");
-            assertNotNull(clockFrame.getTimerPanel(), "TimerPanel should not be null");
-            assertNotNull(clockFrame.getStopwatchPanel(), "StopwatchPanel should not be null");
-            assertTrue(clockFrame.isVisible(), "ClockFrame should be visible by default");
-        } finally {
-            clockFrame.stop();
-            clockFrame.dispose();
-        }
+        clockFrame = new ClockFrame(clock);
+        assertNotNull(clockFrame, "ClockFrame should not be null");
+        assertEquals(PANEL_DIGITAL_CLOCK, clockFrame.getPanelType(), "Panel should be set to PANEL_DIGITAL_CLOCK");
+        assertNotNull(clockFrame.getClock(), "Clock should not be null");
+        assertNotNull(clockFrame.getScheduler(), "Scheduler should not be null");
+        assertNotNull(clockFrame.getClockMenuBar(), "ClockMenuBar should not be null");
+        assertNotNull(clockFrame.getDigitalClockPanel(), "DigitalClockPanel should not be null");
+        assertNotNull(clockFrame.getAnalogueClockPanel(), "AnalogueClockPanel should not be null");
+        assertNotNull(clockFrame.getAlarmPanel(), "AlarmPanel should not be null");
+        assertNotNull(clockFrame.getTimerPanel(), "TimerPanel should not be null");
+        assertNotNull(clockFrame.getStopwatchPanel(), "StopwatchPanel should not be null");
+        assertTrue(clockFrame.isVisible(), "ClockFrame should be visible by default");
     }
 
     @ParameterizedTest
@@ -107,6 +106,7 @@ public class ClockFrameTest
     @DisplayName("Test ClockFrame with Clock")
     void testClockFrameWithClock()
     {
+        clockFrame = new ClockFrame(clock);
         assertNotNull(clockFrame, "ClockFrame should not be null");
         assertEquals(clock, clockFrame.getClock(), "Clock in ClockFrame should match the provided clock");
         assertEquals(PANEL_DIGITAL_CLOCK, clockFrame.getPanelType(), "Panel type should be PANEL_DIGITAL_CLOCK by default");
@@ -174,6 +174,7 @@ public class ClockFrameTest
     })
     void testChangePanels(String changeType, Panel expectedPanelType)
     {
+        clockFrame = new ClockFrame(clock);
         clockFrame.changePanels(Panel.valueOf(changeType));
         assertEquals(expectedPanelType, clockFrame.getPanelType(), "Panel type should match expected value after change");
         assertTrue(clockFrame.isVisible(), "ClockFrame should now be visible");
@@ -183,6 +184,7 @@ public class ClockFrameTest
     @DisplayName("Test change panels to same panel does not do anything")
     void testChangePanelsToSamePanel()
     {
+        clockFrame = new ClockFrame(clock);
         clockFrame.changePanels(PANEL_DIGITAL_CLOCK);
         assertEquals(clockFrame.getCurrentPanel(), clockFrame.getDigitalClockPanel(), "Panel type should remain the same after changing to the same panel");
         assertTrue(clockFrame.isVisible(), "ClockFrame should still be visible");
@@ -193,6 +195,7 @@ public class ClockFrameTest
     @MethodSource("clockTimeProvider")
     void testUpdatingClockTime(JMenuItem menuItemTimeZone, ZoneId timezone)
     {
+        clockFrame = new ClockFrame(clock);
         clockFrame.updateClockTimezone(menuItemTimeZone); // Update to 12:45:30
         assertEquals(timezone, clockFrame.getClock().getTimezone(), "Timezone should match the provided timezone");
     }
@@ -211,6 +214,7 @@ public class ClockFrameTest
     @DisplayName("clearSettingsMenu empties the settings menu")
     void testClearSettingsMenuEmptiesMenu()
     {
+        clockFrame = new ClockFrame(clock);
         // The digital clock panel adds items to the settings menu
         clockFrame.changePanels(PANEL_DIGITAL_CLOCK);
         assertTrue(clockFrame.getClockMenuBar().getSettingsMenu().getItemCount() > 0,
@@ -224,6 +228,7 @@ public class ClockFrameTest
     @DisplayName("stop() sets clock and scheduler to null")
     void testStopSetsClockAndSchedulerToNull()
     {
+        clockFrame = new ClockFrame(clock);
         clockFrame.stop();
         assertNull(clockFrame.getClock(), "Clock should be null after stop()");
         assertNull(clockFrame.getScheduler(), "Scheduler should be null after stop()");
@@ -233,6 +238,7 @@ public class ClockFrameTest
     @DisplayName("setPanelType and getPanelType round-trip")
     void testSetGetPanelType()
     {
+        clockFrame = new ClockFrame(clock);
         clockFrame.setPanelType(Panel.PANEL_ALARM);
         assertEquals(Panel.PANEL_ALARM, clockFrame.getPanelType(),
                 "getPanelType should return the value set via setPanelType");
@@ -242,6 +248,7 @@ public class ClockFrameTest
     @DisplayName("setCurrentPanel and getCurrentPanel round-trip")
     void testSetGetCurrentPanel()
     {
+        clockFrame = new ClockFrame(clock);
         final var panel = clockFrame.getDigitalClockPanel();
         clockFrame.setCurrentPanel(panel);
         assertSame(panel, clockFrame.getCurrentPanel(),

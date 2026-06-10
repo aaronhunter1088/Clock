@@ -11,6 +11,7 @@ import javax.swing.table.TableModel;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.lang.reflect.InvocationTargetException;
 import java.util.Arrays;
 
 import static clock.entity.Panel.PANEL_STOPWATCH;
@@ -29,6 +30,7 @@ class DisplayLapsPanelTest
 {
     private static final Logger logger = LogManager.getLogger(DisplayLapsPanelTest.class);
 
+    private ClockFrame clockFrame;
     private Clock clock;
     private StopwatchPanel stopwatchPanel;
     private DisplayLapsPanel displayLapsPanel;
@@ -42,18 +44,23 @@ class DisplayLapsPanelTest
     @BeforeEach
     void beforeEach()
     {
-        clock = new Clock();
+        clockFrame = new ClockFrame(new Clock());
+        clock = clockFrame.getClock();
         Stopwatch.stopwatchCounter = 0L;
         stopwatchPanel = new StopwatchPanel(new ClockFrame(clock));
-        stopwatchPanel.getClockFrame().changePanels(PANEL_STOPWATCH);
+        clockFrame.changePanels(PANEL_STOPWATCH);
         displayLapsPanel = stopwatchPanel.getDisplayLapsPanel();
     }
 
     @AfterEach
-    void afterEach()
+    void afterEach() throws InterruptedException, InvocationTargetException
     {
-        stopwatchPanel.getClockFrame().stop();
-        stopwatchPanel.getClockFrame().dispose();
+        logger.info("Test complete. Closing the clock...");
+        EventQueue.invokeAndWait(() -> {
+            clockFrame.stop();
+            clockFrame.dispose();
+        });
+        assertFalse(clockFrame.isVisible());
     }
 
     @AfterAll

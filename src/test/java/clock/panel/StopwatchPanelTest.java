@@ -13,7 +13,9 @@ import org.junit.jupiter.params.provider.MethodSource;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import java.awt.*;
 import java.awt.event.ActionEvent;
+import java.lang.reflect.InvocationTargetException;
 import java.util.stream.Stream;
 
 import static clock.entity.Panel.*;
@@ -33,6 +35,7 @@ class StopwatchPanelTest {
 
     private static final Logger logger = LogManager.getLogger(TimerPanelTest.class);
 
+    ClockFrame clockFrame;
     Clock clock;
 
     StopwatchPanel stopwatchPanel;
@@ -47,17 +50,22 @@ class StopwatchPanelTest {
     @BeforeEach
     void beforeEach()
     {
-        clock = new Clock();
+        clockFrame = new ClockFrame(new Clock());
+        clock = clockFrame.getClock();
         Stopwatch.stopwatchCounter = 0L;
         stopwatchPanel = new StopwatchPanel(new ClockFrame(clock));
-        stopwatchPanel.getClockFrame().changePanels(PANEL_STOPWATCH);
+        clockFrame.changePanels(PANEL_STOPWATCH);
     }
 
     @AfterEach
-    void afterEach()
+    void afterEach() throws InterruptedException, InvocationTargetException
     {
-        stopwatchPanel.getClockFrame().stop();
-        stopwatchPanel.getClockFrame().dispose();
+        logger.info("Test complete. Closing the clock...");
+        EventQueue.invokeAndWait(() -> {
+            clockFrame.stop();
+            clockFrame.dispose();
+        });
+        assertFalse(clockFrame.isVisible());
     }
 
     @AfterAll
@@ -189,8 +197,8 @@ class StopwatchPanelTest {
     @MethodSource("switchPanelProvider")
     void testSwitchingPanelsWorks(Panel panel)
     {
-        stopwatchPanel.getClockFrame().changePanels(panel);
-        assertEquals(panel, stopwatchPanel.getClockFrame().getPanelType());
+        clockFrame.changePanels(panel);
+        assertEquals(panel, clockFrame.getPanelType());
     }
     private static Stream<Arguments> switchPanelProvider() {
         return Stream.of(

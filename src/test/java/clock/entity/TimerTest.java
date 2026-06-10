@@ -10,6 +10,8 @@ import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.junit.jupiter.params.provider.ValueSource;
 
+import java.awt.*;
+import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -27,6 +29,7 @@ class TimerTest
 {
     private static final Logger logger = LogManager.getLogger(TimerTest.class);
 
+    private ClockFrame clockFrame;
     private Clock clock;
     private Timer timer1, timer2;
 
@@ -37,15 +40,21 @@ class TimerTest
     @BeforeEach
     void beforeEach()
     {
-        ClockFrame clockFrame = new ClockFrame(new Clock());
+        clockFrame = new ClockFrame(new Clock());
         clock = clockFrame.getClock();
     }
 
     @AfterEach
-    void afterEach()
+    void afterEach() throws InterruptedException, InvocationTargetException
     {
-        if (timer1 != null) timer1.stopTimer();
-        if (timer2 != null) timer2.stopTimer();
+        logger.info("Test complete. Closing the clock...");
+        EventQueue.invokeAndWait(() -> {
+            if (timer1 != null) timer1.stopTimer();
+            if (timer2 != null) timer2.stopTimer();
+            clockFrame.stop();
+            clockFrame.dispose();
+        });
+        assertFalse(clockFrame.isVisible());
     }
 
     @AfterAll
@@ -399,19 +408,6 @@ class TimerTest
         timer1.setTriggered(false);
         assertFalse(timer1.isTriggered(), "Timer should not be triggered after setTriggered(false)");
     }
-
-//    @Test
-//    @DisplayName("Test startTimer when already started does not create a new thread")
-//    void testStartTimerWhenAlreadyStartedDoesNothing()
-//    {
-//        timer1 = new Timer(0, 5, 0, clock);
-//        timer1.startTimer(clock.getScheduledExecutorService());
-//        final Thread firstThread = timer1.getSelfThread();
-//
-//        timer1.startTimer(clock.getScheduledExecutorService());
-//
-//        assertSame(firstThread, timer1.getSelfThread(), "Starting an already-started timer should not replace the thread");
-//    }
 
     @Test
     @DisplayName("Test resetTimer restores countdown to initial values")

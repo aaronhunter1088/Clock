@@ -10,7 +10,9 @@ import org.junit.jupiter.params.provider.CsvSource;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import java.awt.*;
 import java.awt.event.ActionEvent;
+import java.lang.reflect.InvocationTargetException;
 import java.time.DayOfWeek;
 import java.util.List;
 
@@ -47,8 +49,15 @@ public class ClockMenuBarTest
     }
 
     @AfterEach
-    void afterEach()
-    {}
+    void afterEach() throws InterruptedException, InvocationTargetException
+    {
+        logger.info("Test complete. Closing the clock...");
+        EventQueue.invokeAndWait(() -> {
+            clockFrame.stop();
+            clockFrame.dispose();
+        });
+        assertFalse(clockFrame.isVisible());
+    }
 
     @AfterAll
     static void afterAll() { logger.info("Concluding {}", ClockMenuBarTest.class.getSimpleName()); }

@@ -7,10 +7,14 @@ import org.junit.jupiter.api.*;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
 
+import java.awt.*;
+import java.lang.reflect.InvocationTargetException;
+
 import static clock.util.Constants.AM;
 import static java.time.DayOfWeek.WEDNESDAY;
 import static java.time.Month.JANUARY;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 
 /**
  * Tests for the {@link ClockPanel} class
@@ -22,9 +26,10 @@ public class ClockPanelTest
 {
     private static final Logger logger = LogManager.getLogger(ClockPanelTest.class);
 
+    ClockFrame clockFrame;
     Clock clock;
 
-    AlarmPanel clockPanel;
+    AlarmPanel alarmPanel;
 
     @BeforeAll
     static void beforeClass()
@@ -36,14 +41,19 @@ public class ClockPanelTest
     void beforeEach()
     {
         clock = new Clock(11, 30, 0, JANUARY, WEDNESDAY, 1, 2025, AM); // 11:30 AM
-        clockPanel = new AlarmPanel(new ClockFrame(clock));
+        clockFrame = new ClockFrame(clock);
+        alarmPanel = new AlarmPanel(clockFrame);
     }
 
     @AfterEach
-    void afterEach()
+    void afterEach() throws InterruptedException, InvocationTargetException
     {
-        clockPanel.getClockFrame().stop();
-        clockPanel.getClockFrame().dispose();
+        logger.info("Test complete. Closing the clock...");
+        EventQueue.invokeAndWait(() -> {
+            clockFrame.stop();
+            clockFrame.dispose();
+        });
+        assertFalse(clockFrame.isVisible());
     }
 
     @AfterAll
@@ -61,7 +71,7 @@ public class ClockPanelTest
     @Disabled
     void testDisplayPopupMessage(String title, String message, int optionPane)
     {
-        assertDoesNotThrow(() -> clockPanel.displayPopupMessage(title, message, optionPane));
+        assertDoesNotThrow(() -> alarmPanel.displayPopupMessage(title, message, optionPane));
         logger.info("Popup message displayed successfully with title: {}", title);
     }
 
@@ -70,7 +80,7 @@ public class ClockPanelTest
     void testPrintStackTraceDoesNotThrow()
     {
         final Exception e = new RuntimeException("test exception");
-        assertDoesNotThrow(() -> clockPanel.printStackTrace(e, "custom message"),
+        assertDoesNotThrow(() -> alarmPanel.printStackTrace(e, "custom message"),
                 "printStackTrace should not throw an exception");
     }
 
@@ -79,7 +89,7 @@ public class ClockPanelTest
     void testPrintStackTraceWithNullMessageDoesNotThrow()
     {
         final Exception e = new RuntimeException("test exception with null message detail");
-        assertDoesNotThrow(() -> clockPanel.printStackTrace(e, null),
+        assertDoesNotThrow(() -> alarmPanel.printStackTrace(e, null),
                 "printStackTrace should handle a null custom message without throwing");
     }
 }

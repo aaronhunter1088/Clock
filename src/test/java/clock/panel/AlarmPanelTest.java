@@ -10,7 +10,9 @@ import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.CsvSource;
 import org.junit.jupiter.params.provider.MethodSource;
 
+import java.awt.*;
 import java.awt.event.ActionEvent;
+import java.lang.reflect.InvocationTargetException;
 import java.time.DayOfWeek;
 import java.util.List;
 import java.util.stream.Stream;
@@ -33,6 +35,7 @@ class AlarmPanelTest
 {
     private static final Logger logger = LogManager.getLogger(AlarmPanelTest.class);
 
+    ClockFrame clockFrame;
     Clock clock;
 
     AlarmPanel alarmPanel;
@@ -47,15 +50,20 @@ class AlarmPanelTest
     void beforeEach()
     {
         clock = new Clock(11, 30, 0, JANUARY, WEDNESDAY, 1, 2025, AM); // 11:30 AM
-        alarmPanel = new AlarmPanel(new ClockFrame(clock));
-        alarmPanel.getClockFrame().changePanels(PANEL_ALARM);
+        clockFrame = new ClockFrame(clock);
+        alarmPanel = new AlarmPanel(clockFrame);
+        clockFrame.changePanels(PANEL_ALARM);
     }
 
     @AfterEach
-    void afterEach()
+    void afterEach() throws InterruptedException, InvocationTargetException
     {
-        alarmPanel.getClockFrame().stop();
-        alarmPanel.getClockFrame().dispose();
+        logger.info("Test complete. Closing the clock...");
+        EventQueue.invokeAndWait(() -> {
+            clockFrame.stop();
+            clockFrame.dispose();
+        });
+        assertFalse(clockFrame.isVisible());
     }
 
     @AfterAll

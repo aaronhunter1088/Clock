@@ -11,6 +11,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.awt.*;
+import java.lang.reflect.InvocationTargetException;
 import java.util.List;
 
 import static clock.entity.Panel.PANEL_DIGITAL_CLOCK;
@@ -31,6 +32,7 @@ public class DigitalClockPanelTest
 {
     private static final Logger logger = LogManager.getLogger(DigitalClockPanelTest.class);
 
+    ClockFrame clockFrame;
     Clock clock;
     DigitalClockPanel digitalClockPanel;
 
@@ -49,16 +51,21 @@ public class DigitalClockPanelTest
     @BeforeEach
     void beforeEach()
     {
-        clock = new Clock();
-        digitalClockPanel = new DigitalClockPanel(new ClockFrame(clock));
-        digitalClockPanel.getClockFrame().changePanels(PANEL_DIGITAL_CLOCK);
+        clockFrame = new ClockFrame(new Clock());
+        clock = clockFrame.getClock();
+        digitalClockPanel = new DigitalClockPanel(clockFrame);
+        clockFrame.changePanels(PANEL_DIGITAL_CLOCK);
     }
 
     @AfterEach
-    void afterEach()
+    void afterEach() throws InterruptedException, InvocationTargetException
     {
-        digitalClockPanel.getClockFrame().stop();
-        digitalClockPanel.getClockFrame().dispose();
+        logger.info("Test complete. Closing the clock...");
+        EventQueue.invokeAndWait(() -> {
+            clockFrame.stop();
+            clockFrame.dispose();
+        });
+        assertFalse(clockFrame.isVisible());
     }
 
     @AfterAll

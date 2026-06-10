@@ -1,11 +1,14 @@
 package clock.entity;
 
+import clock.panel.ClockFrame;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 
+import java.awt.*;
+import java.lang.reflect.InvocationTargetException;
 import java.util.stream.Stream;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -20,8 +23,9 @@ class LapTest {
 
     private static final Logger logger = LogManager.getLogger(LapTest.class);
 
-    private static Clock clock;
-    private static Stopwatch stopwatch;
+    private ClockFrame clockFrame;
+    private Clock clock;
+    private Stopwatch stopwatch;
 
     @BeforeAll
     static void beforeClass()
@@ -32,13 +36,21 @@ class LapTest {
     @BeforeEach
     void beforeEach()
     {
-        clock = new Clock();
+        clockFrame = new ClockFrame(new Clock());
+        clock = clockFrame.getClock();
         stopwatch = new Stopwatch("Test Stopwatch", false, false, clock);
     }
 
     @AfterEach
-    void afterEach()
-    {}
+    void afterEach() throws InterruptedException, InvocationTargetException
+    {
+        logger.info("Test complete. Closing the clock...");
+        EventQueue.invokeAndWait(() -> {
+            clockFrame.stop();
+            clockFrame.dispose();
+        });
+        assertFalse(clockFrame.isVisible());
+    }
 
     @AfterAll
     static void afterAll() { logger.info("Concluding {}", LapTest.class.getSimpleName()); }

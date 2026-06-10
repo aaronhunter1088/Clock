@@ -12,6 +12,7 @@ import org.junit.jupiter.params.provider.MethodSource;
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableModel;
+import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.FocusEvent;
 import java.awt.event.MouseEvent;
@@ -39,6 +40,7 @@ class TimerPanelTest
 {
     private static final Logger logger = LogManager.getLogger(TimerPanelTest.class);
 
+    ClockFrame clockFrame;
     Clock clock;
 
     TimerPanel timerPanel;
@@ -50,16 +52,21 @@ class TimerPanelTest
     @BeforeEach
     void beforeEach()
     {
-        clock = new Clock();
-        timerPanel = new TimerPanel(new ClockFrame(clock));
-        timerPanel.getClockFrame().changePanels(PANEL_TIMER);
+        clockFrame = new ClockFrame(new Clock());
+        clock = clockFrame.getClock();
+        timerPanel = new TimerPanel(clockFrame);
+        clockFrame.changePanels(PANEL_TIMER);
     }
 
     @AfterEach
-    void afterEach()
+    void afterEach() throws InterruptedException, InvocationTargetException
     {
-        timerPanel.getClockFrame().stop();
-        timerPanel.getClockFrame().dispose();
+        logger.info("Test complete. Closing the clock...");
+        EventQueue.invokeAndWait(() -> {
+            clockFrame.stop();
+            clockFrame.dispose();
+        });
+        assertFalse(clockFrame.isVisible());
     }
 
     @AfterAll

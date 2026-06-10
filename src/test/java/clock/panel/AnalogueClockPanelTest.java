@@ -9,6 +9,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.awt.*;
+import java.lang.reflect.InvocationTargetException;
 
 import static clock.entity.Panel.PANEL_ANALOGUE_CLOCK;
 import static clock.util.Constants.AM;
@@ -29,6 +30,7 @@ public class AnalogueClockPanelTest
 {
     private static final Logger logger = LogManager.getLogger(AnalogueClockPanelTest.class);
 
+    ClockFrame clockFrame;
     Clock clock;
 
     AnalogueClockPanel analogueClockPanel;
@@ -46,15 +48,20 @@ public class AnalogueClockPanelTest
     void beforeEach()
     {
         clock = new Clock(11, 30, 0, JANUARY, WEDNESDAY, 1, 2025, AM); // 11:30 AM
-        analogueClockPanel = new AnalogueClockPanel(new ClockFrame(clock));
-        analogueClockPanel.getClockFrame().changePanels(PANEL_ANALOGUE_CLOCK);
+        clockFrame = new ClockFrame(clock);
+        analogueClockPanel = new AnalogueClockPanel(clockFrame);
+        clockFrame.changePanels(PANEL_ANALOGUE_CLOCK);
     }
 
     @AfterEach
-    void afterEach()
+    void afterEach() throws InterruptedException, InvocationTargetException
     {
-        analogueClockPanel.getClockFrame().stop();
-        analogueClockPanel.getClockFrame().dispose();
+        logger.info("Test complete. Closing the clock...");
+        EventQueue.invokeAndWait(() -> {
+            clockFrame.stop();
+            clockFrame.dispose();
+        });
+        assertFalse(clockFrame.isVisible());
     }
 
     @AfterAll

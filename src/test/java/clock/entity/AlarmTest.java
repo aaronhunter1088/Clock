@@ -15,6 +15,8 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import java.awt.*;
+import java.lang.reflect.InvocationTargetException;
 import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -41,6 +43,7 @@ class AlarmTest {
 
     private static final Logger logger = LogManager.getLogger(AlarmTest.class);
 
+    private ClockFrame clockFrame;
     private Clock clock;
     private final List<DayOfWeek> weekDays = List.of(DayOfWeek.MONDAY, TUESDAY, WEDNESDAY, THURSDAY, DayOfWeek.FRIDAY),
                                   weekendDays = List.of(DayOfWeek.SATURDAY, DayOfWeek.SUNDAY);
@@ -56,7 +59,7 @@ class AlarmTest {
     @BeforeEach
     void beforeEach()
     {
-        ClockFrame clockFrame = new ClockFrame(new Clock());
+        clockFrame = new ClockFrame(new Clock());
         clock = clockFrame.getClock();
         weekDays730AmAlarm = new Alarm("Weekdays Alarm", 7, 30, AM, weekDays, false, clock);
         weekend10AmAlarm = new Alarm("Weekends Alarm", 10, 0, AM, weekendDays, false, clock);
@@ -69,12 +72,18 @@ class AlarmTest {
     }
 
     @AfterEach
-    void afterEach()
+    void afterEach() throws InterruptedException, InvocationTargetException
     {
-        alarm1.stopAlarm();
-        alarm2.stopAlarm();
-        weekDays730AmAlarm.stopAlarm();
-        weekend10AmAlarm.stopAlarm();
+        logger.info("Test complete. Closing the clock...");
+        EventQueue.invokeAndWait(() -> {
+            alarm1.stopAlarm();
+            alarm2.stopAlarm();
+            weekDays730AmAlarm.stopAlarm();
+            weekend10AmAlarm.stopAlarm();
+            clockFrame.stop();
+            clockFrame.dispose();
+        });
+        assertFalse(clockFrame.isVisible());
     }
 
     @AfterAll

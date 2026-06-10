@@ -10,6 +10,8 @@ import org.junit.jupiter.params.provider.CsvSource;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.junit.jupiter.params.provider.ValueSource;
 
+import java.awt.*;
+import java.lang.reflect.InvocationTargetException;
 import java.time.*;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
@@ -58,8 +60,15 @@ class ClockTest
     }
 
     @AfterEach
-    void afterEach()
-    {}
+    void afterEach() throws InterruptedException, InvocationTargetException
+    {
+        logger.info("Test complete. Closing the clock...");
+        EventQueue.invokeAndWait(() -> {
+            clockFrame.stop();
+            clockFrame.dispose();
+        });
+        assertFalse(clockFrame.isVisible());
+    }
 
     @AfterAll
     static void afterAll() { logger.info("Concluding {}", ClockTest.class.getSimpleName()); }

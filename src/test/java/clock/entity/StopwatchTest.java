@@ -8,6 +8,8 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 
+import java.awt.*;
+import java.lang.reflect.InvocationTargetException;
 import java.time.Duration;
 import java.util.ArrayList;
 import java.util.stream.Stream;
@@ -26,7 +28,8 @@ public class StopwatchTest {
 
     private static final Logger logger = LogManager.getLogger(StopwatchTest.class);
 
-    private static Clock clock;
+    private ClockFrame clockFrame;
+    private Clock clock;
 
     @BeforeAll
     static void beforeClass()
@@ -38,13 +41,20 @@ public class StopwatchTest {
     @BeforeEach
     void beforeEach()
     {
-        ClockFrame frame = new ClockFrame(new Clock());
-        clock = frame.getClock();
+        clockFrame = new ClockFrame(new Clock());
+        clock = clockFrame.getClock();
     }
 
     @AfterEach
-    void afterEach()
-    {}
+    void afterEach() throws InterruptedException, InvocationTargetException
+    {
+        logger.info("Test complete. Closing the clock...");
+        EventQueue.invokeAndWait(() -> {
+            clockFrame.stop();
+            clockFrame.dispose();
+        });
+        assertFalse(clockFrame.isVisible());
+    }
 
     @AfterAll
     static void afterAll() { logger.info("Concluding {}", StopwatchTest.class.getSimpleName()); }
@@ -162,6 +172,8 @@ public class StopwatchTest {
         assertEquals(value, comparison);
     }
     private static Stream<Arguments> stopwatches() {
+        // can't use class field clock, but it is just created like this, so no biggie
+        Clock clock = new Clock();
         return Stream.of(
                 Arguments.of(new Stopwatch("Stopwatch 1", false, false, clock), new Stopwatch("Stopwatch 2", false, false, clock), -1),
                 Arguments.of(new Stopwatch("Stopwatch 2", false, false, clock), new Stopwatch("Stopwatch 2", false, false, clock), 0),
