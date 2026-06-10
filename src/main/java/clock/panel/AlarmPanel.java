@@ -28,19 +28,20 @@ import static java.time.DayOfWeek.*;
  * <p>
  * Used to set and view alarms. The alarms are displayed
  * in a table below where they're created.
- * To set an alarm, you must enter an Hour, minutes,
- * and the time, AM or PM, case insensitive. A name can
- * also be given but it is not required. You must also
- * provide some combination of day or days the alarm will
- * sound off on.
- * Once created, the alarm will be displayed in the table,
- * most likely currently sleeping. You can edit the sleeping
- * alarm by clicking on the Sleeping button. This will remove
- * the alarm from the table.
- * Once the alarm goes off, a sound will play and you can click
+ * To set an alarm, you must enter a name, an hour, minute,
+ * and a time value, AM or PM. If you don't provide a name,
+ * a default value will automatically fill in. You must also
+ * provide a day or days the alarm will trigger on.
+ * Once created, the alarm will be displayed in the table.
+ * You can edit the sleeping alarm by clicking on the Sleeping
+ * button. This will remove the alarm from the table and place
+ * the values into the form to edit. You can then edit the values
+ * and resave the alarm or just discard it altogether.
+ * Once an alarm goes off, a sound will play and you can click
  * snooze or stop. Snoozing will stop the alarm for 7 more
  * minutes and then it will sound off again. Stopping the alarm
- * will stop the sound but the alarm will remain on the table.
+ * will stop the sound and it will be ready to go off again when
+ * it's scheduled to.
  *
  * @author michael ball
  * @version since 2.0

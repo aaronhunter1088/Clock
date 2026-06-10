@@ -18,7 +18,6 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-//import static java.lang.Thread.sleep;
 import static java.time.DayOfWeek.*;
 import static clock.util.Constants.*;
 
@@ -37,7 +36,7 @@ import static clock.util.Constants.*;
  * @author michael ball
  * @version since 2.0
  */
-public class Alarm implements Serializable, Comparable<Alarm> //, Runnable
+public class Alarm implements Serializable, Comparable<Alarm>
 {
     @Serial
     private static final long serialVersionUID = 2L;
@@ -57,7 +56,6 @@ public class Alarm implements Serializable, Comparable<Alarm> //, Runnable
                     isSnoozing,
                     isPaused;
     private transient Clock clock;
-    //private volatile Thread selfThread;
     private transient ScheduledFuture<?> scheduledFuture;
     private transient ScheduledFuture<?> soundFuture;
     private transient ScheduledFuture<?> autoSnoozeFuture;
@@ -148,15 +146,6 @@ public class Alarm implements Serializable, Comparable<Alarm> //, Runnable
             );
         }
     }
-//    public synchronized void startAlarm()
-//    {
-//        if (selfThread == null)
-//        {
-//            logger.debug("starting alarm");
-//            setSelfThread(new Thread(this));
-//            selfThread.start();
-//        }
-//    }
 
     private long calculateDelayUntilNextActivation()
     {
@@ -191,42 +180,6 @@ public class Alarm implements Serializable, Comparable<Alarm> //, Runnable
         return Duration.between(now, nextActivation).toMillis();
     }
 
-//    /**
-//     * This method starts the alarm
-//     */
-//    @Override
-//    public void run()
-//    {
-//        while (!selfThread.isInterrupted())
-//        {
-//            try {
-//                if (!alarmGoingOff && !activatedToday && !isPaused && !isSnoozing) {
-//                    activateAlarm();
-//                    sleep(1000);
-//                }
-//                else if (isSnoozing) {
-//                    sleep(SNOOZE_TIME);
-//                    // copilot added
-//                    setIsSnoozing(false);
-//                    setIsAlarmGoingOff(true);
-//                }
-//                else if (alarmGoingOff && !isPaused) {
-//                    triggerAlarm();
-//                    sleep(1000);
-//                }
-//                else {
-//                    // do nothing
-//                    sleep(1000);
-//                }
-//            }
-//            catch (InterruptedException e)
-//            {
-//                printStackTrace(e, null);
-//                Thread.currentThread().interrupt();
-//            }
-//        }
-//    }
-
     /**
      * For each alarm, check if the alarm's
      * time and day matches the clocks current
@@ -245,16 +198,6 @@ public class Alarm implements Serializable, Comparable<Alarm> //, Runnable
             triggerAlarm(clock.getScheduledExecutorService());
         }
     }
-//    private synchronized void activateAlarm()
-//    {
-//        if (getAlarmAsString().equals(clock.getClockTimeAsAlarmString())
-//                && this.getDays().contains(clock.getDayOfWeek()))
-//        {
-//            setIsAlarmGoingOff(true);
-//            setActivatedToday(true);
-//            logger.info("Alarm {} matches clock's time. Activating alarm", this);
-//        }
-//    }
 
     /**
      * Stops an actively going off alarm
@@ -286,14 +229,6 @@ public class Alarm implements Serializable, Comparable<Alarm> //, Runnable
         //scheduledFuture = null; // done just above
         startAlarm(clock.getScheduledExecutorService());
     }
-//    public synchronized void stopAlarm()
-//    {
-//        logger.debug("stopping alarm");
-//        setMusicPlayer(null);
-//        setIsAlarmGoingOff(false);
-//        setSelfThread(null);
-//        logger.info("{} alarm turned off", this);
-//    }
 
     /** Pauses the alarm */
     public synchronized void pauseAlarm()
@@ -333,20 +268,6 @@ public class Alarm implements Serializable, Comparable<Alarm> //, Runnable
                 TimeUnit.MILLISECONDS
         );
     }
-//    public synchronized void triggerAlarm()
-//    {
-//        logger.debug("trigger {}", this);
-//        try
-//        {
-//            logger.debug("playing sound");
-//            setupMusicPlayer();
-//            musicPlayer.play();
-//        }
-//        catch (Exception e)
-//        {
-//            printStackTrace(e, "Error while playing sound");
-//        }
-//    }
 
     private synchronized void startRepeatingSound(ScheduledExecutorService scheduler)
     {
@@ -425,12 +346,6 @@ public class Alarm implements Serializable, Comparable<Alarm> //, Runnable
                 TimeUnit.MILLISECONDS
         );
     }
-//    public synchronized void snooze()
-//    {
-//        logger.info("snoozing for {} minutes", Duration.ofMillis(SNOOZE_TIME).toMinutes());
-//        setIsSnoozing(true);
-//        setIsAlarmGoingOff(false);
-//    }
 
     private void autoSnoozeAlarm(ScheduledExecutorService scheduler)
     {
@@ -505,8 +420,12 @@ public class Alarm implements Serializable, Comparable<Alarm> //, Runnable
     public boolean isPaused() { return isPaused; }
     /** Returns the days of the alarm */
     public List<DayOfWeek> getDays() { return this.days; }
-    private int getHours24()
-    {
+    /**
+     * Returns the hour + 12 if it is PM, 0 if AM and 12
+     * or just the hour.
+     * @return the hour adjusted for AMPM.
+     */
+    private int getHours24() {
         int hour = getHours();
         if (PM.equalsIgnoreCase(getAMPM()) && hour != 12)
         {
@@ -537,18 +456,16 @@ public class Alarm implements Serializable, Comparable<Alarm> //, Runnable
     public String getAlarmAsString() { return hoursAsStr+COLON+minutesAsStr+SPACE+ampm; }
     /** Returns whether the alarm has been activated today */
     public boolean isActivatedToday() { return activatedToday; }
-//    /** Returns the thread reference to itself */
-//    public Thread getSelfThread() { return selfThread; }
-    public ScheduledFuture<?> getScheduledFuture()
-    {
+    /** Returns the scheduled future */
+    public ScheduledFuture<?> getScheduledFuture() {
         return scheduledFuture;
     }
-    public ScheduledFuture<?> getSoundFuture()
-    {
+    /** Returns the sound future */
+    public ScheduledFuture<?> getSoundFuture() {
         return soundFuture;
     }
-    public ScheduledFuture<?> getAutoSnoozeFuture()
-    {
+    /** Returns the auto snooze future */
+    public ScheduledFuture<?> getAutoSnoozeFuture() {
         return autoSnoozeFuture;
     }
 
@@ -584,19 +501,12 @@ public class Alarm implements Serializable, Comparable<Alarm> //, Runnable
     public void setMusicPlayer(AdvancedPlayer musicPlayer) { this.musicPlayer = musicPlayer; logger.debug("musicPlayer set"); }
     /** Sets whether the alarm has been activated today */
     public void setActivatedToday(boolean activatedToday) { this.activatedToday = activatedToday; logger.debug("triggeredToday: {}", activatedToday); }
-
-    //    /** Sets the thread reference to itself */
-//    public void setSelfThread(Thread selfThread) { this.selfThread = selfThread; logger.debug("selfThread set"); }
-    public void setScheduledFuture(ScheduledFuture<?> scheduledFuture)
-    {
-        this.scheduledFuture = scheduledFuture;
-    }
-    public void setSoundFuture(ScheduledFuture<?> soundFuture)
-    {
-        this.soundFuture = soundFuture;
-    }
-    public void setAutoSnoozeFuture(ScheduledFuture<?> autoSnoozeFuture)
-    {
+    /** Sets the scheduled future */
+    public void setScheduledFuture(ScheduledFuture<?> scheduledFuture) { this.scheduledFuture = scheduledFuture; }
+    /** Sets the sound future */
+    public void setSoundFuture(ScheduledFuture<?> soundFuture) { this.soundFuture = soundFuture; }
+    /** Sets the auto snooze future */
+    public void setAutoSnoozeFuture(ScheduledFuture<?> autoSnoozeFuture) {
         this.autoSnoozeFuture = autoSnoozeFuture;
     }
 
@@ -607,10 +517,7 @@ public class Alarm implements Serializable, Comparable<Alarm> //, Runnable
      * @return a negative integer, zero, or a positive integer
      */
     @Override
-    public int compareTo(Alarm o)
-    {
-        return this.getAlarmAsString().compareTo(o.getAlarmAsString());
-    }
+    public int compareTo(Alarm o) { return this.getAlarmAsString().compareTo(o.getAlarmAsString()); }
 
     /**
      * Checks if two alarms are equals.
@@ -633,7 +540,8 @@ public class Alarm implements Serializable, Comparable<Alarm> //, Runnable
      * @return the hash code
      */
     @Override
-    public int hashCode() {
+    public int hashCode()
+    {
         return Objects.hash(getHours(), getMinutes(),
                 getName(), getMinutesAsStr(),
                 getHoursAsStr(), getAMPM(),

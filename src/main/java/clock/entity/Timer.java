@@ -66,10 +66,7 @@ public class Timer implements Serializable, Comparable<Timer>
      * @param minutes the minutes for the timer
      * @param seconds the seconds for the timer
      */
-    public Timer(int hours, int minutes, int seconds)
-    {
-        this(hours, minutes, seconds, null, false, false, false, null);
-    }
+    public Timer(int hours, int minutes, int seconds) { this(hours, minutes, seconds, null, false, false, false, null); }
 
     /**
      * Creates a new Timer with time values
@@ -78,10 +75,7 @@ public class Timer implements Serializable, Comparable<Timer>
      * @param seconds the seconds for the timer
      * @param clock the clock object associated with this timer
      */
-    public Timer(int hours, int minutes, int seconds, Clock clock)
-    {
-        this(hours, minutes, seconds, null, false, false, false, clock);
-    }
+    public Timer(int hours, int minutes, int seconds, Clock clock) { this(hours, minutes, seconds, null, false, false, false, clock); }
 
     /**
      * Creates a new Timer with time values and name
@@ -91,10 +85,7 @@ public class Timer implements Serializable, Comparable<Timer>
      * @param name the name of the timer
      * @param clock the clock object associated with this timer
      */
-    public Timer(int hours, int minutes, int seconds, String name, Clock clock)
-    {
-        this(hours, minutes, seconds, name, false, false, false, clock);
-    }
+    public Timer(int hours, int minutes, int seconds, String name, Clock clock) { this(hours, minutes, seconds, name, false, false, false, clock); }
 
     /**
      * The main constructor for creating a Timer
@@ -123,7 +114,6 @@ public class Timer implements Serializable, Comparable<Timer>
         setStarted(started);
         setClock(clock);
         setName(StringUtils.isBlank(name) ? TIMER + (timersCounter + 1) : name);
-        //setupMusicPlayer();
         timersCounter++;
         logger.debug("Total timers created: {}", timersCounter);
         if (timersCounter == 100L) {
@@ -132,11 +122,6 @@ public class Timer implements Serializable, Comparable<Timer>
         }
         logger.info("Timer created");
     }
-
-//    public synchronized void startTimer()
-//    {
-//        startTimer(clock.getScheduledExecutorService());
-//    }
 
     /**
      * This method starts the timer.
@@ -173,7 +158,7 @@ public class Timer implements Serializable, Comparable<Timer>
             countDown = countDown.minusSeconds(1);
         }
 
-        logger.debug("CountDown: {}", getCountDownString());
+        //logger.debug("CountDown: {}", getCountDownString());
 
         if (countDown.getHour() == 0 && countDown.getMinute() == 0 && countDown.getSecond() == 0)
         {

@@ -19,7 +19,9 @@ import static clock.util.Constants.*;
 /**
  * Stopwatch Panel
  * <p>
- * The stopwatch panel is used to set a 'timer' that counts up.
+ * The stopwatch panel is used to create stopwatches. This is a
+ * container which then displays the {@link DisplayTimePanel} and
+ * the {@link DisplayLapsPanel} panels inside of it.
  * You can have multiple stopwatches, each with their own name,
  * however a default name of "Sw" + the current count of
  * stopwatches + 1, will be set if no name is provided. This will

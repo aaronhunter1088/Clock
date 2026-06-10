@@ -17,6 +17,8 @@ import static java.lang.Thread.sleep;
  * A DisplayTimePanel is a JPanel that displays the time of a Stopwatch
  * in either digital or analogue format. It implements Runnable to allow
  * for continuous updating of the display while the stopwatch is running.
+ * This is the left panel of the {@link StopwatchPanel}. See {@link DisplayLapsPanel}
+ * for the right side.
  *
  * @author michael ball
  * @version since 2.9

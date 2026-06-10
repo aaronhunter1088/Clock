@@ -35,6 +35,26 @@ import static clock.util.Constants.*;
  * @author michael ball
  * @version since 2.9
  */
+/**
+ * Timer Panel
+ * <p>
+ * Used to set and view timers. The timers are displayed
+ * in a table below where they're created.
+ * To set a timer, you must enter a name, an hour, minute,
+ * and seconds. If you don't provide a name, a default value
+ * will automatically fill in.
+ * Once created, the timer will be displayed in the table.
+ * You can edit the timer by clicking on Pause first, then the
+ * Edit button. This will remove the timer from the table and place
+ * the values into the form to edit. You can then edit the values
+ * and resave the timer or just discard it altogether.
+ * Once an timer goes off, a sound will play. You can pause, edit,
+ * resume, restart, or remove the timer. There is a settings
+ * that allows you to pause or resume all existing timers at once.
+ *
+ * @author michael ball
+ * @version since 2.9
+ */
 public class TimerPanel extends ClockPanel implements Runnable
 {
     private static final Logger logger = LogManager.getLogger(TimerPanel.class);
@@ -232,6 +252,15 @@ public class TimerPanel extends ClockPanel implements Runnable
             Timer timer = clock.getListOfTimers().get(modelRow);
             logger.debug("{} {} at row: {}", buttonAction, timer, modelRow);
             switch (buttonAction) {
+                case EDIT -> {
+                    logger.info("Edit timer");
+                    timer.stopTimer();
+                    nameTextField.setText(timer.getName());
+                    hoursTextField.setText(Integer.toString(timer.getHours()));
+                    minutesTextField.setText(Integer.toString(timer.getMinutes()));
+                    secondsTextField.setText(Integer.toString(timer.getSeconds()));
+                    clock.getListOfTimers().remove(timer);
+                }
                 case RESET -> {
                     timersTable.getModel().setValueAt(PAUSE, modelRow, columnIndex);
                     timer.resetTimer();
@@ -240,6 +269,7 @@ public class TimerPanel extends ClockPanel implements Runnable
                 case PAUSE -> {
                     timer.pauseTimer();
                     timersTable.getModel().setValueAt(RESUME, modelRow, columnIndex);
+                    timersTable.getModel().setValueAt(EDIT, modelRow, columnIndex+1);
                     clock.getListOfTimers().set(modelRow, timer);
                 }
                 case RESUME -> {
@@ -278,7 +308,7 @@ public class TimerPanel extends ClockPanel implements Runnable
      * @return the column names for the timers table
      */
     public String[] getTimersTableColumnNames()
-    { return new String[]{NAME, COUNTDOWN, RESUME+SLASH+PAUSE+SLASH+RESET, REMOVE}; }
+    { return new String[]{NAME, COUNTDOWN, RESUME+SLASH+PAUSE+SLASH+RESET, REMOVE+SLASH+EDIT}; }
 
     /**
      * Sets the default values for the timers table

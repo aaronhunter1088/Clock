@@ -15,7 +15,6 @@ import clock.exception.InvalidInputException;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import static java.lang.Thread.sleep;
 import static java.time.Month.*;
 import static java.time.DayOfWeek.*;
 import static clock.util.Constants.*;
@@ -32,7 +31,7 @@ import static clock.util.Constants.*;
  * @author michael ball 
  * @version since 1.0
  */
-public class Clock implements Serializable, Comparable<Clock> //, Runnable
+public class Clock implements Serializable, Comparable<Clock>
 {
     @Serial
     private static final long serialVersionUID = 2L;
@@ -41,22 +40,31 @@ public class Clock implements Serializable, Comparable<Clock> //, Runnable
     private LocalDate date;
     private DayOfWeek dayOfWeek;
     private Month month;
-
     private LocalTime time;
-    private int seconds,minutes,hours,dayOfMonth,year;
+    private int seconds,
+                minutes,
+                hours,
+                dayOfMonth,
+                year;
     private String ampm;
     private ZoneId timezone;
-    private String hoursAsStr=EMPTY, minutesAsStr=EMPTY, secondsAsStr=EMPTY;
-    private LocalDate beginDaylightSavingsTimeDate, endDaylightSavingsTimeDate;
+    private String hoursAsStr=EMPTY,
+                   minutesAsStr=EMPTY,
+                   secondsAsStr=EMPTY;
+    private LocalDate beginDaylightSavingsTimeDate,
+                      endDaylightSavingsTimeDate;
     private LocalDateTime currentDateTime;
-
     private List<Alarm> listOfAlarms;
     private List<Timer> listOfTimers;
     private List<Stopwatch> listOfStopwatches;
-    private boolean leapYear, todayMatchesDSTDate,
-            dateChanged, isNewYear, //testingClock,
-            showFullDate, showPartialDate, showMilitaryTime,
-            daylightSavingsTimeEnabled;
+    private boolean leapYear,
+                    todayMatchesDSTDate,
+                    dateChanged,
+                    isNewYear,
+                    showFullDate,
+                    showPartialDate,
+                    showMilitaryTime,
+                    daylightSavingsTimeEnabled;
     private transient ScheduledExecutorService scheduledExecutorService; // reference to ClockFrame's service
 
     /**

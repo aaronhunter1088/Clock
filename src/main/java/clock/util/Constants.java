@@ -101,6 +101,7 @@ public class Constants {
     public static final String COMPLETE = "Complete";
     public static final String COUNTDOWN = "Countdown";
     public static final String CURRENT_TIMERS = "Current Timers";
+    public static final String EDIT = "Edit";
     public static final String HOUR = "Hour";
     public static final String MIN = "Min";
     public static final String PAUSE = "Pause";

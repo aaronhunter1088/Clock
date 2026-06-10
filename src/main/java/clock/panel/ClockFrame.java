@@ -23,6 +23,8 @@ import static clock.util.Constants.*;
  * ClockFrame
  * <p>
  * The main panel used to display the clock application.
+ * This displays the menu bar and displays different
+ * panels for Clocks, Alarms, Timers and Stopwatches.
  *
  * @author michael ball
  * @version since 2.9

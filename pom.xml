@@ -10,7 +10,7 @@
     </parent>
 
     <artifactId>clock</artifactId>
-    <version>3.0.4</version>
+    <version>3.1.0</version>
     <name>Clock</name>
     <description>A simple Clock GUI which displays the date and time,
         and can set alarms, timers, and stopwatches.</description>

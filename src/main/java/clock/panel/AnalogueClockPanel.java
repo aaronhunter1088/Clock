@@ -3,13 +3,11 @@ package clock.panel;
 import java.awt.*;
 
 import clock.entity.Clock;
-import clock.entity.Panel;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import static clock.util.Constants.*;
 import static java.lang.Thread.sleep;
-import static clock.entity.Panel.PANEL_ANALOGUE_CLOCK;
 
 /**
  * Analogue Clock Panel
@@ -17,7 +15,8 @@ import static clock.entity.Panel.PANEL_ANALOGUE_CLOCK;
  * Used to view the time in analogue mode.
  * The time will still show up below the center in
  * its digital format. If you wish to hide this,
- * there is a setting to change that.
+ * there is a setting to hide the digital view.
+ * // TODO: Show date as well
  *
  * @author michael ball
  * @version since 2.6

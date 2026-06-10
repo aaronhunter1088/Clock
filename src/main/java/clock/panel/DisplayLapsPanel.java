@@ -16,8 +16,10 @@ import static clock.util.Constants.*;
  * DisplayLapsPanel
  * <p>
  * A DisplayLapsPanel is a JPanel that displays the laps of a Stopwatch
- * in a table format. It allows users to view all stopwatches and their
- * elapsed times, as well as the laps of the currently selected stopwatch.
+ * in a table format. Starting by displaying the laps in the order of
+ * their creation, you can reverse the order of the laps in the settings.
+ * This is the right panel of the {@link StopwatchPanel}. See {@link DisplayTimePanel}
+ * for the left side.
  *
  * @author michael ball
  * @version since 2.9

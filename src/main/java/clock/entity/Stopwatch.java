@@ -47,7 +47,6 @@ public class Stopwatch implements Serializable, Comparable<Stopwatch>
             started;
     private transient Clock clock;
     private transient ScheduledFuture<?> scheduledFuture;
-    private transient ScheduledFuture<?> soundFuture;
     private long startMilli = 0L;        // start time in milliseconds
     private long accumMilli = 0L;        // time accumulated across previous runs
     private long lastLapMarkMilli = 0L;  // elapsed ns at last lap
@@ -83,11 +82,6 @@ public class Stopwatch implements Serializable, Comparable<Stopwatch>
     }
 
     /** This method begins the thread that runs the stopwatch. */
-//    public synchronized void startStopwatch()
-//    {
-//        startStopwatch(clock.getScheduledExecutorService());
-//    }
-
     public synchronized void startStopwatch(ScheduledExecutorService scheduler)
     {
         if (scheduledFuture == null || scheduledFuture.isDone() || scheduledFuture.isCancelled())
