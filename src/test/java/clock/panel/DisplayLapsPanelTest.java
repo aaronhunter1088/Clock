@@ -15,6 +15,7 @@ import java.util.Arrays;
 
 import static clock.entity.Panel.PANEL_STOPWATCH;
 import static clock.util.Constants.*;
+import static java.lang.Thread.sleep;
 import static org.junit.jupiter.api.Assertions.*;
 
 /**
@@ -31,6 +32,8 @@ class DisplayLapsPanelTest
     private Clock clock;
     private StopwatchPanel stopwatchPanel;
     private DisplayLapsPanel displayLapsPanel;
+    private JTable lapsTable,
+                   stopwatchTable;
 
     @BeforeAll
     static void beforeAll()
@@ -46,6 +49,8 @@ class DisplayLapsPanelTest
         stopwatchPanel = new StopwatchPanel(new ClockFrame(clock));
         stopwatchPanel.getClockFrame().changePanels(PANEL_STOPWATCH);
         displayLapsPanel = stopwatchPanel.getDisplayLapsPanel();
+        lapsTable = displayLapsPanel.getLapsTable();
+        stopwatchTable = displayLapsPanel.getStopwatchTable();
     }
 
     @AfterEach
@@ -215,10 +220,12 @@ class DisplayLapsPanelTest
 
     @Test
     @DisplayName("updateLabelsAndStopwatchTable shows correct row count when laps are recorded")
-    void testUpdateLabelsAndStopwatchTableWithLapsShowsCorrectRowCount()
+    void testUpdateLabelsAndStopwatchTableWithLapsShowsCorrectRowCount() throws InterruptedException
     {
         final Stopwatch sw = addStopwatchToPanel("Sw1");
+        sw.startStopwatch(clock.getScheduledExecutorService());
         sw.recordLap();
+        sleep(2000); // elapse time and then record next lap
         sw.recordLap();
         displayLapsPanel.updateLabelsAndStopwatchTable();
         final JTable table = findTableInScrollPane(displayLapsPanel);
@@ -232,6 +239,7 @@ class DisplayLapsPanelTest
     void testLapsDisplayedInNaturalOrderByDefault()
     {
         final Stopwatch sw = addStopwatchToPanel("Sw1");
+        sw.startStopwatch(clock.getScheduledExecutorService());
         sw.recordLap();
         sw.recordLap();
         displayLapsPanel.isLapsReversed = false;
@@ -248,6 +256,7 @@ class DisplayLapsPanelTest
     void testLapsDisplayedInReverseOrderWhenFlagSet()
     {
         final Stopwatch sw = addStopwatchToPanel("Sw1");
+        sw.startStopwatch(clock.getScheduledExecutorService());
         sw.recordLap();
         sw.recordLap();
         displayLapsPanel.isLapsReversed = true;

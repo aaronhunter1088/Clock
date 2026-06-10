@@ -252,10 +252,10 @@ public class DisplayLapsPanel extends JPanel
                 int modelRow = Integer.parseInt(e.getActionCommand());
                 String buttonAction = (String) stopwatchTable.getModel().getValueAt(modelRow, columnIndex);
                 Stopwatch stopwatch = stopwatchPanel.getClock().getListOfStopwatches().get(modelRow);
+                stopwatchPanel.setCurrentStopwatch(stopwatch);
                 logger.debug("{} {} at row: {}", buttonAction, stopwatch, modelRow);
                 if (buttonAction.equals(SELECT))
                 {
-                    stopwatchPanel.setCurrentStopwatch(stopwatch);
                     stopwatchPanel.getStopwatchNameField().setText(stopwatch.getName());
                     stopwatchPanel.getDisplayTimePanel().setClockText(stopwatch.elapsedFormatted(stopwatchPanel.getCurrentStopwatch().getAccumMilli(), STOPWATCH_READING_FORMAT));
                     stopwatchPanel.getDisplayLapsPanel().updateLabelsAndStopwatchTable();
@@ -273,13 +273,60 @@ public class DisplayLapsPanel extends JPanel
                         // set the current stopwatch to the last stopwatch in the list
                         stopwatchPanel.setCurrentStopwatch(stopwatchPanel.getClock().getListOfStopwatches().getLast());
                     }
+                    // refresh the stopwatchTable now that a row has been removed
+                    stopwatchTable.setModel(new javax.swing.table.DefaultTableModel(getStopwatchesData(), stopwatchTableColumnNames));
                 }
             }
         };
+    }
+
+    public StopwatchPanel getStopwatchPanel()
+    {
+        return stopwatchPanel;
+    }
+
+    public JTable getLapsTable()
+    {
+        return lapsTable;
+    }
+
+    public JTable getStopwatchTable()
+    {
+        return stopwatchTable;
+    }
+
+    public String[] getLapTableColumnNames()
+    {
+        return lapTableColumnNames;
+    }
+
+    public String[] getStopwatchTableColumnNames()
+    {
+        return stopwatchTableColumnNames;
+    }
+
+    public boolean isLapsReversed()
+    {
+        return isLapsReversed;
     }
 
     /** Sets the grid bay layout manager */
     private void setGridBagLayout(GridBagLayout layout) { setLayout(layout); this.layout = layout; logger.debug("GridBagLayout set"); }
     /** Sets the grid bag constraints */
     private void setGridBagConstraints(GridBagConstraints constraints) { this.constraints = constraints; logger.debug("constraints set"); }
+
+    public void setLapsTable(JTable lapsTable)
+    {
+        this.lapsTable = lapsTable;
+    }
+
+    public void setStopwatchTable(JTable stopwatchTable)
+    {
+        this.stopwatchTable = stopwatchTable;
+    }
+
+    public void setLapsReversed(boolean lapsReversed)
+    {
+        isLapsReversed = lapsReversed;
+    }
 }

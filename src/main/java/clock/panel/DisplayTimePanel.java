@@ -1,5 +1,7 @@
 package clock.panel;
 
+import clock.entity.Clock;
+import clock.entity.Stopwatch;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -82,9 +84,12 @@ public class DisplayTimePanel extends JPanel implements Runnable
         {
             try
             {
-                if (!stopwatchPanel.getCurrentStopwatch().isStarted())
+                Stopwatch currentStopwatch = stopwatchPanel.getCurrentStopwatch();
+                if (currentStopwatch != null &&
+                        (!currentStopwatch.isStarted() && currentStopwatch.getName() != null))
                 {
-                    stopwatchPanel.getCurrentStopwatch().startStopwatch();
+                    Clock clock = currentStopwatch.getClock();
+                    currentStopwatch.startStopwatch(clock.getScheduledExecutorService());
                 }
                 revalidate();
                 repaint(); // goes to paint
@@ -116,7 +121,7 @@ public class DisplayTimePanel extends JPanel implements Runnable
 
     public void drawDigitalClock(Graphics g)
     {
-        logger.debug("drawing display time panel");
+        //logger.debug("drawing display time panel");
         g.setFont(ClockFrame.font20);
 
         g.setColor(Color.BLACK);
@@ -235,6 +240,6 @@ public class DisplayTimePanel extends JPanel implements Runnable
     /** Sets the showAnaloguePanel flag */
     public void setShowAnaloguePanel(boolean showAnaloguePanel) { this.showAnaloguePanel = showAnaloguePanel; logger.debug("showAnaloguePanel set to {}", showAnaloguePanel); }
     /** Sets the clock text */
-    public void setClockText(String clockText) { this.clockText = clockText; logger.debug("clockText set to {}", clockText); }
+    public void setClockText(String clockText) { this.clockText = clockText; /* logger.debug("clockText set to {}", clockText); */ }
 }
 

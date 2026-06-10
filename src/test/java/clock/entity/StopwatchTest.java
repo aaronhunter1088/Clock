@@ -1,5 +1,6 @@
 package clock.entity;
 
+import clock.panel.ClockFrame;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.junit.jupiter.api.*;
@@ -37,7 +38,8 @@ public class StopwatchTest {
     @BeforeEach
     void beforeEach()
     {
-        clock = new Clock();
+        ClockFrame frame = new ClockFrame(new Clock());
+        clock = frame.getClock();
     }
 
     @AfterEach
@@ -64,10 +66,10 @@ public class StopwatchTest {
     void testStopwatchStarts()
     {
         Stopwatch stopwatch = new Stopwatch("Test Stopwatch", false, false, clock);
-        stopwatch.startStopwatch();
+        stopwatch.startStopwatch(clock.getScheduledExecutorService());
 
         assertTrue(stopwatch.isStarted());
-        assertNotNull(stopwatch.getSelfThread());
+        //assertNotNull(stopwatch.getSelfThread());
 
         assertNotNull(stopwatch.elapsedFormatted(stopwatch.getAccumMilli(), STOPWATCH_READING_FORMAT)); // used for parsing in analogue panel
     }
@@ -77,12 +79,12 @@ public class StopwatchTest {
     void testStartingAStopwatchThatIsAlreadyStarted() throws InterruptedException
     {
         Stopwatch stopwatch = new Stopwatch("Test Stopwatch", false, false, clock);
-        stopwatch.startStopwatch();
+        stopwatch.startStopwatch(clock.getScheduledExecutorService());
         sleep(100); // Ensure some time passes
-        stopwatch.startStopwatch();
+        stopwatch.startStopwatch(clock.getScheduledExecutorService());
 
         assertTrue(stopwatch.isStarted());
-        assertNotNull(stopwatch.getSelfThread());
+        //assertNotNull(stopwatch.getSelfThread());
     }
 
     @Test
@@ -90,9 +92,10 @@ public class StopwatchTest {
     void testStoppingAStopwatch() throws InterruptedException
     {
         Stopwatch stopwatch = new Stopwatch("Test Stopwatch", false, false, clock);
-        stopwatch.startStopwatch();
+        stopwatch.startStopwatch(clock.getScheduledExecutorService());
         sleep(100); // Ensure some time passes
         stopwatch.stopStopwatch();
+        //assertTrue(stopwatch.isStopped());
     }
 
     @Test
@@ -100,7 +103,7 @@ public class StopwatchTest {
     void testPauseAStopwatch() throws InterruptedException
     {
         Stopwatch stopwatch = new Stopwatch("Test Stopwatch", false, false, clock);
-        stopwatch.startStopwatch();
+        stopwatch.startStopwatch(clock.getScheduledExecutorService());
         sleep(100); // Ensure some time passes
         stopwatch.pauseStopwatch();
 
@@ -114,7 +117,7 @@ public class StopwatchTest {
     {
         Stopwatch stopwatch = new Stopwatch("Test Stopwatch", false, false, clock);
 
-        stopwatch.startStopwatch();
+        stopwatch.startStopwatch(clock.getScheduledExecutorService());
 
         long startDeadline = System.currentTimeMillis() + 1000;
         while (!stopwatch.isStarted() && System.currentTimeMillis() < startDeadline) {
@@ -141,7 +144,7 @@ public class StopwatchTest {
     void testRecordingALap() throws InterruptedException
     {
         Stopwatch stopwatch = new Stopwatch("Test Stopwatch", false, false, clock);
-        stopwatch.startStopwatch();
+        stopwatch.startStopwatch(clock.getScheduledExecutorService());
         sleep(100); // Ensure some time passes
 
         stopwatch.recordLap();
@@ -153,7 +156,7 @@ public class StopwatchTest {
     @ParameterizedTest
     @DisplayName("Test Comparing Two Stopwatches")
     @MethodSource("stopwatches")
-    void testComparingTwoStopwatches(Stopwatch sw1, Stopwatch sw2, int value) throws InterruptedException
+    void testComparingTwoStopwatches(Stopwatch sw1, Stopwatch sw2, int value)
     {
         int comparison = sw1.compareTo(sw2);
         assertEquals(value, comparison);
@@ -262,7 +265,7 @@ public class StopwatchTest {
     void testToStringWhenPaused() throws InterruptedException
     {
         final Stopwatch sw = new Stopwatch("My Stopwatch", false, false, clock);
-        sw.startStopwatch();
+        sw.startStopwatch(clock.getScheduledExecutorService());
         sleep(100);
         sw.pauseStopwatch();
 
@@ -278,14 +281,14 @@ public class StopwatchTest {
     void testStopStopwatchResetsAllFields()
     {
         final Stopwatch sw = new Stopwatch("My Stopwatch", false, false, clock);
-        sw.startStopwatch();
+        sw.startStopwatch(clock.getScheduledExecutorService());
         sw.stopStopwatch();
 
         assertNull(sw.getName(), "Name should be null after stop");
         assertFalse(sw.isPaused(), "isPaused should be false after stop");
         assertFalse(sw.isStarted(), "isStarted should be false after stop");
         assertNull(sw.getClock(), "Clock should be null after stop");
-        assertNull(sw.getSelfThread(), "SelfThread should be null after stop");
+        //assertNull(sw.getSelfThread(), "SelfThread should be null after stop");
         assertNull(sw.getLaps(), "Laps should be null after stop");
         assertEquals(0L, sw.getStartMilli(), "startMilli should be 0 after stop");
         assertEquals(0L, sw.getAccumMilli(), "accumMilli should be 0 after stop");
@@ -311,7 +314,7 @@ public class StopwatchTest {
     void testRecordingMultipleLaps() throws InterruptedException
     {
         final Stopwatch sw = new Stopwatch("Lap Stopwatch", false, false, clock);
-        sw.startStopwatch();
+        sw.startStopwatch(clock.getScheduledExecutorService());
         sleep(50);
         sw.recordLap();
         sleep(50);
@@ -332,7 +335,7 @@ public class StopwatchTest {
     void testResumeWhenNotPausedDoesNothing()
     {
         final Stopwatch sw = new Stopwatch("Test", false, false, clock);
-        sw.startStopwatch();
+        sw.startStopwatch(clock.getScheduledExecutorService());
         assertFalse(sw.isPaused(), "Stopwatch should not be paused initially");
 
         // resuming when not paused should be a no-op
