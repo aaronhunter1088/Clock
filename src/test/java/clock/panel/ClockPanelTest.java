@@ -42,6 +42,7 @@ public class ClockPanelTest
     @AfterEach
     void afterEach()
     {
+        clockPanel.getClockFrame().stop();
         clockPanel.getClockFrame().dispose();
     }
 

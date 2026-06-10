@@ -57,6 +57,7 @@ class StopwatchPanelTest {
     void afterEach()
     {
         stopwatchPanel.getClockFrame().stop();
+        stopwatchPanel.getClockFrame().dispose();
     }
 
     @AfterAll

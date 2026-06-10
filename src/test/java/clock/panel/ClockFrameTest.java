@@ -63,18 +63,23 @@ public class ClockFrameTest
     @DisplayName("Test ClockFrame no-args constructor")
     void testClockFrameNoArgsConstructor()
     {
-        ClockFrame clockFrame = new ClockFrame();
-        assertNotNull(clockFrame, "ClockFrame should not be null");
-        assertEquals(PANEL_DIGITAL_CLOCK, clockFrame.getPanelType(), "Panel should be set to PANEL_DIGITAL_CLOCK");
-        assertNotNull(clockFrame.getClock(), "Clock should not be null");
-        assertNotNull(clockFrame.getScheduler(), "Scheduler should not be null");
-        assertNotNull(clockFrame.getClockMenuBar(), "ClockMenuBar should not be null");
-        assertNotNull(clockFrame.getDigitalClockPanel(), "DigitalClockPanel should not be null");
-        assertNotNull(clockFrame.getAnalogueClockPanel(), "AnalogueClockPanel should not be null");
-        assertNotNull(clockFrame.getAlarmPanel(), "AlarmPanel should not be null");
-        assertNotNull(clockFrame.getTimerPanel(), "TimerPanel should not be null");
-        assertNotNull(clockFrame.getStopwatchPanel(), "StopwatchPanel should not be null");
-        assertTrue(clockFrame.isVisible(), "ClockFrame should be visible by default");
+        clockFrame = new ClockFrame();
+        try {
+            assertNotNull(clockFrame, "ClockFrame should not be null");
+            assertEquals(PANEL_DIGITAL_CLOCK, clockFrame.getPanelType(), "Panel should be set to PANEL_DIGITAL_CLOCK");
+            assertNotNull(clockFrame.getClock(), "Clock should not be null");
+            assertNotNull(clockFrame.getScheduler(), "Scheduler should not be null");
+            assertNotNull(clockFrame.getClockMenuBar(), "ClockMenuBar should not be null");
+            assertNotNull(clockFrame.getDigitalClockPanel(), "DigitalClockPanel should not be null");
+            assertNotNull(clockFrame.getAnalogueClockPanel(), "AnalogueClockPanel should not be null");
+            assertNotNull(clockFrame.getAlarmPanel(), "AlarmPanel should not be null");
+            assertNotNull(clockFrame.getTimerPanel(), "TimerPanel should not be null");
+            assertNotNull(clockFrame.getStopwatchPanel(), "StopwatchPanel should not be null");
+            assertTrue(clockFrame.isVisible(), "ClockFrame should be visible by default");
+        } finally {
+            clockFrame.stop();
+            clockFrame.dispose();
+        }
     }
 
     @ParameterizedTest
@@ -88,9 +93,14 @@ public class ClockFrameTest
     })
     void testClockFrameConstructorWithSpecificPanel(String panelType, Panel expectedPanelType)
     {
-        ClockFrame clockFrame = new ClockFrame(Panel.valueOf(panelType));
-        assertNotNull(clockFrame, "ClockFrame should not be null");
-        assertSame(expectedPanelType, clockFrame.getPanelType(), "Panel type should match expected value");
+        clockFrame = new ClockFrame(Panel.valueOf(panelType));
+        try {
+            assertNotNull(clockFrame, "ClockFrame should not be null");
+            assertSame(expectedPanelType, clockFrame.getPanelType(), "Panel type should match expected value");
+        } finally {
+            clockFrame.stop();
+            clockFrame.dispose();
+        }
     }
 
     @Test
@@ -106,49 +116,51 @@ public class ClockFrameTest
     @DisplayName("Test createAndShowGUI")
     void testCreateAndShowGUI()
     {
-        ClockFrame.createAndShowGUI();
+        clockFrame = ClockFrame.createAndShowGUI();
+//        clockFrame.stop();
+//        clockFrame.dispose();
     }
 
     @Test
     @DisplayName("Test createAndShowGUI with a clock")
     void testCreateAndShowGUIWithAClock()
     {
-        ClockFrame.createAndShowGUI(clock);
+        clockFrame = ClockFrame.createAndShowGUI(clock);
     }
 
     @Test
     @DisplayName("Test createAndShowGUI with PANEL_DIGITAL_CLOCK")
     void testCreateAndShowGUIWithPanelDigitalClock()
     {
-        ClockFrame.createAndShowGUI(PANEL_DIGITAL_CLOCK);
+        clockFrame = ClockFrame.createAndShowGUI(PANEL_DIGITAL_CLOCK);
     }
 
     @Test
     @DisplayName("Test createAndShowGUI with PANEL_ANALOGUE_CLOCK")
     void testCreateAndShowGUIWithPanelAnalogueClock()
     {
-        ClockFrame.createAndShowGUI(Panel.PANEL_ANALOGUE_CLOCK);
+        clockFrame = ClockFrame.createAndShowGUI(Panel.PANEL_ANALOGUE_CLOCK);
     }
 
     @Test
     @DisplayName("Test createAndShowGUI with PANEL_ALARM")
     void testCreateAndShowGUIWithPanelAlarm()
     {
-        ClockFrame.createAndShowGUI(PANEL_ALARM);
+        clockFrame = ClockFrame.createAndShowGUI(PANEL_ALARM);
     }
 
     @Test
     @DisplayName("Test createAndShowGUI with PANEL_TIMER")
     void testCreateAndShowGUIWithPanelTimer()
     {
-        ClockFrame.createAndShowGUI(Panel.PANEL_TIMER);
+        clockFrame = ClockFrame.createAndShowGUI(Panel.PANEL_TIMER);
     }
 
     @Test
     @DisplayName("Test createAndShowGUI with PANEL_STOPWATCH")
     void testCreateAndShowGUIWithPanelStopwatch()
     {
-        ClockFrame.createAndShowGUI(Panel.PANEL_STOPWATCH);
+        clockFrame = ClockFrame.createAndShowGUI(Panel.PANEL_STOPWATCH);
     }
 
     @ParameterizedTest
@@ -158,7 +170,7 @@ public class ClockFrameTest
         "PANEL_ANALOGUE_CLOCK, PANEL_ANALOGUE_CLOCK",
         "PANEL_ALARM, PANEL_ALARM",
         "PANEL_TIMER, PANEL_TIMER",
-        //"PANEL_STOPWATCH, PANEL_STOPWATCH",
+        "PANEL_STOPWATCH, PANEL_STOPWATCH",
     })
     void testChangePanels(String changeType, Panel expectedPanelType)
     {

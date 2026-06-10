@@ -67,7 +67,7 @@ class AlarmPanelTest
     {
         clock = new Clock(12, 0, 0, JANUARY, WEDNESDAY, 1, 2025, PM); // 12:00 PM
         alarmPanel = new AlarmPanel(new ClockFrame(clock));
-        assertEquals(PM ,alarmPanel.getAmpmDropDown().getSelectedItem(), "AlarmPanel should start with PM selected when clock is in PM");
+        assertEquals(PM, alarmPanel.getAmpmDropDown().getSelectedItem(), "AlarmPanel should start with PM selected when clock is in PM");
     }
 
     @ParameterizedTest

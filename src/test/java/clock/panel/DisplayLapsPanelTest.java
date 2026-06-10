@@ -32,8 +32,6 @@ class DisplayLapsPanelTest
     private Clock clock;
     private StopwatchPanel stopwatchPanel;
     private DisplayLapsPanel displayLapsPanel;
-    private JTable lapsTable,
-                   stopwatchTable;
 
     @BeforeAll
     static void beforeAll()
@@ -49,14 +47,13 @@ class DisplayLapsPanelTest
         stopwatchPanel = new StopwatchPanel(new ClockFrame(clock));
         stopwatchPanel.getClockFrame().changePanels(PANEL_STOPWATCH);
         displayLapsPanel = stopwatchPanel.getDisplayLapsPanel();
-        lapsTable = displayLapsPanel.getLapsTable();
-        stopwatchTable = displayLapsPanel.getStopwatchTable();
     }
 
     @AfterEach
     void afterEach()
     {
         stopwatchPanel.getClockFrame().stop();
+        stopwatchPanel.getClockFrame().dispose();
     }
 
     @AfterAll
