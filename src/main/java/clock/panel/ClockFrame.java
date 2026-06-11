@@ -18,6 +18,7 @@ import java.util.concurrent.TimeUnit;
 
 import static clock.entity.Panel.*;
 import static clock.util.Constants.*;
+import static java.util.Arrays.stream;
 
 /**
  * ClockFrame
@@ -116,6 +117,7 @@ public class ClockFrame extends JFrame
         setTimerPanel(new TimerPanel(this));
         setStopwatchPanel(new StopwatchPanel(this));
         changePanels(panelType != null ? panelType : PANEL_DIGITAL_CLOCK);
+        updateHelpText();
     }
 
     /**
@@ -169,6 +171,7 @@ public class ClockFrame extends JFrame
             else if (currentPanel instanceof StopwatchPanel sp)
                 sp.stop();
             showPanel(changePanelType);
+            updateHelpText();
             repaint();
             setVisible(true);
         }
@@ -297,6 +300,17 @@ public class ClockFrame extends JFrame
     void clearSettingsMenu()
     { getClockMenuBar().getSettingsMenu().removeAll(); }
 
+    private void updateHelpText()
+    {
+        switch (panelType) {
+            case PANEL_DIGITAL_CLOCK: menuBar.setHelpText(((DigitalClockPanel)digitalClockPanel).getHelpText()); break;
+            case PANEL_ANALOGUE_CLOCK: menuBar.setHelpText(((AnalogueClockPanel)analogueClockPanel).getHelpText()); break;
+            case PANEL_ALARM: menuBar.setHelpText(((AlarmPanel)alarmPanel).getHelpText()); break;
+            case PANEL_TIMER: menuBar.setHelpText(((TimerPanel)timerPanel).getHelpText()); break;
+            case PANEL_STOPWATCH: menuBar.setHelpText(((StopwatchPanel)stopwatchPanel).getHelpText()); break;
+        };
+    }
+
     /**
      * Creates and shows the GUI for the Clock application.
      * This method is invoked in Main.
@@ -340,10 +354,6 @@ public class ClockFrame extends JFrame
      * Starts the clock and schedules the
      * tasks to run at a fixed rate.
      */
-//    void start()
-//    {
-//        scheduler.execute(clock);
-//    }
     void start()
     {
         clock.setScheduledExecutorService(scheduler);

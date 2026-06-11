@@ -75,9 +75,11 @@ public class Constants {
     public static final String TWELVE = "12";
     public static final String TWO = "2";
 
-    // Time zones
+    // Menu options
     public static final String FEATURES = "Features";
     public static final String SETTINGS = "Settings";
+    public static final String HELP = "Help";
+    // Inner menu options
     public static final String TIME_ZONES = "time zones";
 
     public static final String ALASKA = "Alaska";
@@ -121,6 +123,7 @@ public class Constants {
     public static final String TIMER_ERROR = "Timer Error";
     public static final String VIEW_TIMERS = "View Timers";
     public static final String VIEW_STOPWATCHES = "View Stopwatches";
+    public static final String VIEW_HELP = "View Help";
     public static final String ZERO = "0";
 
     // Alarm

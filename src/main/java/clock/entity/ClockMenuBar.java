@@ -29,6 +29,7 @@ public class ClockMenuBar extends JMenuBar
     // Two main menu options
     private JMenu settingsMenu,
                   featuresMenu,
+                  helpMenu,
                   changeTimeZoneMenuSetting; // an option under Settings
     // Options for Settings
     private JMenuItem militaryTimeSetting,
@@ -48,6 +49,9 @@ public class ClockMenuBar extends JMenuBar
                       alarmsFeature,
                       timerFeature,
                       stopwatchFeature;
+    // Options for Help
+    private JMenuItem helpFeature; // shows about and help for that panel
+    private String helpText;
     private List<JMenuItem> timezones;
 
     /**
@@ -65,6 +69,7 @@ public class ClockMenuBar extends JMenuBar
         // Menu options
         setSettingsMenu(new JMenu(SETTINGS));
         setFeaturesMenu(new JMenu(FEATURES));
+        setupHelpMenu(new JMenu(HELP));
         // Settings menu choices
         setMilitaryTimeSetting(new JMenuItem(clock.isShowMilitaryTime()?HIDE+SPACE+MILITARY_TIME_SETTING:SHOW+SPACE+MILITARY_TIME_SETTING));
         getMilitaryTimeSetting().setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_M, InputEvent.CTRL_DOWN_MASK));
@@ -149,6 +154,10 @@ public class ClockMenuBar extends JMenuBar
         getStopwatchFeature().setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_S, InputEvent.CTRL_DOWN_MASK));
         getStopwatchFeature().addActionListener(action -> clockFrame.changePanels(PANEL_STOPWATCH));
 
+        // Help Menu
+        setTheHelpFeature(new JMenuItem(VIEW_HELP));
+        getTheHelpFeature().setForeground(Color.WHITE);
+        getTheHelpFeature().addActionListener(this::performTheHelpMenuAction);
         // Add options to Features Menu, consistent for each panel
         getFeaturesMenu().add(getDigitalClockFeature());
         getFeaturesMenu().add(getAnalogueClockFeature());
@@ -166,6 +175,11 @@ public class ClockMenuBar extends JMenuBar
         getFeaturesMenu().setOpaque(false);
         getFeaturesMenu().setForeground(Color.WHITE);
         getFeaturesMenu().setBackground(Color.BLACK);
+        // Setup Help Menu
+        getTheHelpMenu().setOpaque(false);
+        getTheHelpMenu().setForeground(Color.WHITE);
+        getTheHelpMenu().setBackground(Color.BLACK);
+        getTheHelpMenu().add(helpFeature);
         // Menu Items for Settings and Features
         getDigitalClockFeature().setForeground(Color.WHITE);
         getAnalogueClockFeature().setForeground(Color.WHITE);
@@ -174,7 +188,28 @@ public class ClockMenuBar extends JMenuBar
         // Add both menus to main menu
         add(getSettingsMenu());
         add(getFeaturesMenu());
+        add(getTheHelpMenu());
         logger.info("Finished creating Clock menubar");
+    }
+
+    /**
+     * Display the text for About Calculator menu item
+     *
+     * @param action the click action
+     */
+    private void performTheHelpMenuAction(ActionEvent action)
+    {
+        JPanel iconPanel = new JPanel(new GridBagLayout());
+        JLabel iconLabel = new JLabel();
+        iconPanel.add(iconLabel);
+        ImageIcon imageIcon = null;
+        JLabel textLabel = new JLabel(helpText, imageIcon, SwingConstants.LEFT);
+        textLabel.setHorizontalTextPosition(SwingConstants.CENTER);
+        textLabel.setVerticalTextPosition(SwingConstants.BOTTOM);
+        JPanel mainPanel = new JPanel();
+        mainPanel.add(iconLabel);
+        mainPanel.add(textLabel);
+        JOptionPane.showMessageDialog(this, mainPanel, "About Clock", JOptionPane.PLAIN_MESSAGE);
     }
 
     /**
@@ -392,6 +427,8 @@ public class ClockMenuBar extends JMenuBar
     public JMenu getSettingsMenu() { return this.settingsMenu; }
     /** Returns the features menu */
     public JMenu getFeaturesMenu() { return this.featuresMenu; }
+    /** Returns the help menu */
+    public JMenu getTheHelpMenu() { return this.helpMenu; }
     /** Returns the alarms feature menu item */
     public JMenuItem getAlarmsFeature() { return this.alarmsFeature; }
     /** Returns the military time setting menu item */
@@ -428,6 +465,10 @@ public class ClockMenuBar extends JMenuBar
     public JMenuItem getTimerFeature() { return this.timerFeature; }
     /** Returns the stopwatch feature menu item */
     public JMenuItem getStopwatchFeature() { return this.stopwatchFeature; }
+    /** Returns the help feature menu item */
+    public JMenuItem getTheHelpFeature() { return this.helpFeature; }
+    /** Returns the help text */
+    public String getHelpText() { return this.helpText; }
     /** Returns the clock frame */
     public ClockFrame getClockFrame() { return this.clockFrame; }
     /** Returns the clock */
@@ -437,6 +478,8 @@ public class ClockMenuBar extends JMenuBar
     protected void setSettingsMenu(JMenu settingsMenu) { this.settingsMenu = settingsMenu; logger.debug("settings menu"); }
     /** Sets the features menu */
     protected void setFeaturesMenu(JMenu featuresMenu) { this.featuresMenu = featuresMenu; logger.debug("features menu"); }
+    /** Sets the help menu item */
+    protected void setupHelpMenu(JMenu helpMenu) { this.helpMenu = helpMenu; logger.debug("help menu"); }
     /** Sets the alarms feature menu item */
     protected void setAlarmsFeature(JMenuItem alarmsFeature) { this.alarmsFeature = alarmsFeature; logger.debug("alarms feature"); }
     /** Sets the military time setting menu item */
@@ -472,7 +515,11 @@ public class ClockMenuBar extends JMenuBar
     /** Sets the timer feature menu item */
     protected void setTimerFeature(JMenuItem timerFeature) { this.timerFeature = timerFeature; logger.debug("timer feature"); }
     /** Sets the stopwatch feature menu item */
-    protected void setStopwatchFeature(JMenuItem stopwatchFeature) { this.stopwatchFeature = stopwatchFeature; logger.debug("stopwatch feature");}
+    protected void setStopwatchFeature(JMenuItem stopwatchFeature) { this.stopwatchFeature = stopwatchFeature; logger.debug("stopwatch feature"); }
+    /** Sets the help feature menu item */
+    protected void setTheHelpFeature(JMenuItem helpFeature) { this.helpFeature = helpFeature; logger.debug("help feature"); }
+    /** Sets the help text */
+    public void setHelpText(String helpText) { this.helpText = helpText; logger.debug("help text"); }
     /** Sets the clock frame */
     protected void setClockFrame(ClockFrame clockFrame) { this.clockFrame = clockFrame; logger.debug("clock frame"); }
     /** Sets the clock */

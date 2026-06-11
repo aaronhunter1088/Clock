@@ -787,6 +787,18 @@ public class AlarmPanel extends ClockPanel implements Runnable
         }
     }
 
+    /**
+     * Returns the help text for the alarm panel.
+     * @return the alarm help text
+     */
+    public String getHelpText()
+    {
+        return
+                """
+                The help text for the alarm panel.
+                """;
+    }
+
     /** Starts the alarm panel thread and internally calls the run method. */
     public void start()
     {

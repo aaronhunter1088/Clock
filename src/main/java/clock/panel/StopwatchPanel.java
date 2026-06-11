@@ -242,6 +242,18 @@ public class StopwatchPanel extends ClockPanel
         clockFrame.getClockMenuBar().getSettingsMenu().add(clockFrame.getClockMenuBar().getReverseLaps());
     }
 
+    /**
+     * Returns the help text for the stopwatch panel.
+     * @return the stopwatch help text
+     */
+    public String getHelpText()
+    {
+        return
+                """
+                The help text for the stopwatch panel.
+                """;
+    }
+
     /** Switches the display time panel between analogue and digital mode */
     public void toggleStopwatchClockPanel()
     {
