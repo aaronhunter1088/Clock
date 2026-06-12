@@ -217,11 +217,11 @@ public class ClockMenuBar extends JMenuBar
     }
 
     /**
-     * Returns the help text for the digital clock panel.
-     * This method builds the help text manually for each
-     * setting and feature in the menu bar and any new
-     * option that comes later.
-     * @return the digital clock help text
+     * Returns the help text for the current panel.
+     * This method builds the help text for each
+     * setting and feature in the menu bar and any
+     * new option that comes later.
+     * @return the help text for the current panel
      */
     public String getHelpText()
     {
