@@ -74,18 +74,6 @@ public class AnalogueClockPanel extends ClockPanel implements Runnable
     }
 
     /**
-     * Returns the help text for the analogue clock panel.
-     * @return the analogue clock help text
-     */
-    public String getHelpText()
-    {
-        return
-                """
-                The help text for the analogue clock panel.
-                """;
-    }
-
-    /**
      * Sets up the default values for the analogue clock panel
      */
     public void setupDefaultValues()

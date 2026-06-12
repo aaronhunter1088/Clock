@@ -176,7 +176,7 @@ public class StopwatchPanel extends ClockPanel
         logger.debug("Setting up default values for StopwatchPanel");
         setupSettingsMenu();
         setBackground(Color.BLACK);
-        clockFrame.setTitle(STOPWATCH+SPACE+PANEL);
+        clockFrame.setTitle(STOPWATCH);
         startButton.setText(START);
         lapButton.setText(LAP);
         displayTimePanel.setClockText(currentStopwatch != null ? currentStopwatch.elapsedFormatted(currentStopwatch.getAccumMilli(), STOPWATCH_READING_FORMAT) : startText);
@@ -240,18 +240,6 @@ public class StopwatchPanel extends ClockPanel
         clockFrame.clearSettingsMenu();
         clockFrame.getClockMenuBar().getSettingsMenu().add(clockFrame.getClockMenuBar().getShowAnalogueTimePanel());
         clockFrame.getClockMenuBar().getSettingsMenu().add(clockFrame.getClockMenuBar().getReverseLaps());
-    }
-
-    /**
-     * Returns the help text for the stopwatch panel.
-     * @return the stopwatch help text
-     */
-    public String getHelpText()
-    {
-        return
-                """
-                The help text for the stopwatch panel.
-                """;
     }
 
     /** Switches the display time panel between analogue and digital mode */

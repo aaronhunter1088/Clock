@@ -314,7 +314,7 @@ public class AlarmPanel extends ClockPanel implements Runnable
         resetAlarmPanel();
         resetTableAndMenu();
         setupSettingsMenu();
-        clockFrame.setTitle(ALARM+S.toLowerCase()+SPACE+PANEL);
+        clockFrame.setTitle(ALARM+S.toLowerCase());
         start();
     }
 
@@ -785,18 +785,6 @@ public class AlarmPanel extends ClockPanel implements Runnable
             sundayCheckBox.setSelected(true);
             weekendsCheckBox.setSelected(true);
         }
-    }
-
-    /**
-     * Returns the help text for the alarm panel.
-     * @return the alarm help text
-     */
-    public String getHelpText()
-    {
-        return
-                """
-                The help text for the alarm panel.
-                """;
     }
 
     /** Starts the alarm panel thread and internally calls the run method. */

@@ -85,18 +85,6 @@ public class DigitalClockPanel extends ClockPanel implements Runnable
     }
 
     /**
-     * Returns the help text for the digital clock panel.
-     * @return the digital clock help text
-     */
-    public String getHelpText()
-    {
-        return
-                """
-                The help text for the digital clock panel.
-                """;
-    }
-
-    /**
      * Starts the digital clock panel thread
      * and internally calls the run method.
      */

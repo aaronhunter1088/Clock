@@ -10,6 +10,7 @@ import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
+import java.util.Arrays;
 import java.util.List;
 
 import static clock.util.Constants.*;
@@ -51,7 +52,6 @@ public class ClockMenuBar extends JMenuBar
                       stopwatchFeature;
     // Options for Help
     private JMenuItem helpFeature; // shows about and help for that panel
-    private String helpText;
     private List<JMenuItem> timezones;
 
     /**
@@ -68,8 +68,11 @@ public class ClockMenuBar extends JMenuBar
         setBackground(Color.BLACK);
         // Menu options
         setSettingsMenu(new JMenu(SETTINGS));
+        getSettingsMenu().setName(SETTINGS);
         setFeaturesMenu(new JMenu(FEATURES));
+        getFeaturesMenu().setName(FEATURES);
         setupHelpMenu(new JMenu(HELP));
+        getTheHelpMenu().setName(HELP);
         // Settings menu choices
         setMilitaryTimeSetting(new JMenuItem(clock.isShowMilitaryTime()?HIDE+SPACE+MILITARY_TIME_SETTING:SHOW+SPACE+MILITARY_TIME_SETTING));
         getMilitaryTimeSetting().setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_M, InputEvent.CTRL_DOWN_MASK));
@@ -199,17 +202,53 @@ public class ClockMenuBar extends JMenuBar
      */
     private void performTheHelpMenuAction(ActionEvent action)
     {
-        JPanel iconPanel = new JPanel(new GridBagLayout());
-        JLabel iconLabel = new JLabel();
-        iconPanel.add(iconLabel);
-        ImageIcon imageIcon = null;
-        JLabel textLabel = new JLabel(helpText, imageIcon, SwingConstants.LEFT);
-        textLabel.setHorizontalTextPosition(SwingConstants.CENTER);
-        textLabel.setVerticalTextPosition(SwingConstants.BOTTOM);
-        JPanel mainPanel = new JPanel();
-        mainPanel.add(iconLabel);
-        mainPanel.add(textLabel);
-        JOptionPane.showMessageDialog(this, mainPanel, "About Clock", JOptionPane.PLAIN_MESSAGE);
+        JTextArea message = new JTextArea(getHelpText(), 20, 40);
+        message.setWrapStyleWord(true);
+        message.setEditable(false);
+        message.setOpaque(false);
+        message.setLineWrap(true);
+        message.setFont(UIManager.getFont("Label.font"));
+
+        JScrollPane scrollPane = new JScrollPane(message, ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED, ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
+        scrollPane.setSize(new Dimension(600, 500));
+        SwingUtilities.updateComponentTreeUI(this);
+        String headerText = "Viewing " + clockFrame.getPanelType().getText() + SPACE + HELP;
+        JOptionPane.showMessageDialog(this, scrollPane, headerText, JOptionPane.PLAIN_MESSAGE);
+    }
+
+    /**
+     * Returns the help text for the digital clock panel.
+     * This method builds the help text manually for each
+     * setting and feature in the menu bar and any new
+     * option that comes later.
+     * @return the digital clock help text
+     */
+    public String getHelpText()
+    {
+        JMenuBar menuBar = clockFrame.getClockMenuBar();
+        List<JMenu> menus = Arrays.stream(menuBar.getComponents()).filter(c -> c instanceof JMenu).map(c -> (JMenu) c).toList();
+        // build a 'string' and append it to the main text for each menu option
+        StringBuilder menuAndItemsText = new StringBuilder();
+        for (JMenu menu : menus)
+        {
+            String nameOfMenu = menu.getName();
+            menuAndItemsText.append(NEWLINE).append(nameOfMenu).append(COLON).append(NEWLINE);
+            // get each 'setting' and 'feature', and the rest, and print out each menu item
+            List<JMenuItem> allMenuItems = Arrays.stream(menu.getMenuComponents()).filter(c -> c instanceof JMenuItem).map(c -> (JMenuItem) c).toList();
+            for (JMenuItem menuItem : allMenuItems) {
+                String menuText = menuItem.getText();
+                menuAndItemsText.append(menuText).append(COLON).append(NEWLINE);
+            }
+
+        }
+        return
+                """
+                Panel: %s
+                %s
+                """.formatted(
+                        clockFrame.getPanelType().getText(),
+                        menuAndItemsText.toString()
+                );
     }
 
     /**
@@ -467,8 +506,6 @@ public class ClockMenuBar extends JMenuBar
     public JMenuItem getStopwatchFeature() { return this.stopwatchFeature; }
     /** Returns the help feature menu item */
     public JMenuItem getTheHelpFeature() { return this.helpFeature; }
-    /** Returns the help text */
-    public String getHelpText() { return this.helpText; }
     /** Returns the clock frame */
     public ClockFrame getClockFrame() { return this.clockFrame; }
     /** Returns the clock */
@@ -518,8 +555,6 @@ public class ClockMenuBar extends JMenuBar
     protected void setStopwatchFeature(JMenuItem stopwatchFeature) { this.stopwatchFeature = stopwatchFeature; logger.debug("stopwatch feature"); }
     /** Sets the help feature menu item */
     protected void setTheHelpFeature(JMenuItem helpFeature) { this.helpFeature = helpFeature; logger.debug("help feature"); }
-    /** Sets the help text */
-    public void setHelpText(String helpText) { this.helpText = helpText; logger.debug("help text"); }
     /** Sets the clock frame */
     protected void setClockFrame(ClockFrame clockFrame) { this.clockFrame = clockFrame; logger.debug("clock frame"); }
     /** Sets the clock */

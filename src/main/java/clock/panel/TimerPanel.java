@@ -231,7 +231,7 @@ public class TimerPanel extends ClockPanel implements Runnable
         setForeground(Color.BLACK);
         setupSettingsMenu();
         clearTextFields();
-        clockFrame.setTitle(TIMER+S.toLowerCase()+SPACE+PANEL);
+        clockFrame.setTitle(TIMER+S.toLowerCase());
         start();
     }
 
@@ -642,18 +642,6 @@ public class TimerPanel extends ClockPanel implements Runnable
         boolean validInputs = validHours && validMinutes && validSeconds && areAllNotZeroes;
         logger.info("inputs are valid: {}", validInputs);
         return validInputs;
-    }
-
-    /**
-     * Returns the help text for the timer panel.
-     * @return the timer help text
-     */
-    public String getHelpText()
-    {
-        return
-                """
-                The help text for the timer panel.
-                """;
     }
 
     /** Starts the timer clock panel thread and internally calls the run method. */

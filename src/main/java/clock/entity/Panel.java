@@ -8,9 +8,21 @@ package clock.entity;
  */
 public enum Panel
 {
-	PANEL_DIGITAL_CLOCK,
-	PANEL_ANALOGUE_CLOCK,
-	PANEL_ALARM,
-	PANEL_TIMER,
-	PANEL_STOPWATCH;
+	PANEL_DIGITAL_CLOCK("Digital Clock"),
+	PANEL_ANALOGUE_CLOCK("Analogue Clock"),
+	PANEL_ALARM("Alarm"),
+	PANEL_TIMER("Timer"),
+	PANEL_STOPWATCH("Stopwatch");
+
+    final String text;
+
+    Panel(String text)
+    {
+        this.text = text;
+    }
+
+    public String getText()
+    {
+        return text;
+    }
 }
