@@ -10,6 +10,7 @@ import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
+import java.time.LocalDate;
 import java.util.Arrays;
 import java.util.List;
 
@@ -77,26 +78,31 @@ public class ClockMenuBar extends JMenuBar
         setMilitaryTimeSetting(new JMenuItem(clock.isShowMilitaryTime()?HIDE+SPACE+MILITARY_TIME_SETTING:SHOW+SPACE+MILITARY_TIME_SETTING));
         getMilitaryTimeSetting().setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_M, InputEvent.CTRL_DOWN_MASK));
         getMilitaryTimeSetting().setForeground(Color.WHITE);
+        getMilitaryTimeSetting().setName("Displays the Time in Military Time. Ex: 0850 hours 30");
         getMilitaryTimeSetting().addActionListener(this::toggleMilitaryTimeSetting);
 
         setFullTimeSetting(new JMenuItem(SHOW+SPACE+FULL_TIME_SETTING));
         getFullTimeSetting().setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_F, InputEvent.CTRL_DOWN_MASK));
         getFullTimeSetting().setForeground(Color.WHITE);
+        getFullTimeSetting().setName("Display the Time in Full Time. Updates Partial Time Setting. Ex: FRIDAY, JUNE 12, 2026");
         getFullTimeSetting().addActionListener(this::toggleShowFullTimeSetting);
 
         setPartialTimeSetting(new JMenuItem(SHOW+SPACE+PARTIAL_TIME_SETTING));
         getPartialTimeSetting().setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_P, InputEvent.CTRL_DOWN_MASK));
         getPartialTimeSetting().setForeground(Color.WHITE);
+        getPartialTimeSetting().setName("Display Time in Partial Time. Updates Full Time Setting. Ex: FRI JUN 12, 2026");
         getPartialTimeSetting().addActionListener(this::togglePartialTimeSetting);
 
         setToggleDSTSetting(new JMenuItem(Turn+SPACE+off+SPACE+DST_SETTING));
         getToggleDSTSetting().setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_T, InputEvent.SHIFT_DOWN_MASK));
         getToggleDSTSetting().setForeground(Color.WHITE);
+        getToggleDSTSetting().setName("Turn off/on Daylight Savings Time.");
         getToggleDSTSetting().addActionListener(this::toggleDSTSetting);
 
         setShowDigitalTimeOnAnalogueClockSetting(new JMenuItem(HIDE+SPACE+DIGITAL_TIME));
         getShowDigitalTimeOnAnalogueClockSetting().setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_E, InputEvent.CTRL_DOWN_MASK));
         getShowDigitalTimeOnAnalogueClockSetting().setForeground(Color.WHITE);
+        getShowDigitalTimeOnAnalogueClockSetting().setName("Show or hide the digital time on the analogue clock panel.");
         getShowDigitalTimeOnAnalogueClockSetting().addActionListener(this::toggleDigitalTimeOnAnalogueClockSetting);
 
         setChangeTimeZoneMenu(new JMenu(CHANGE+SPACE+TIME_ZONES));
@@ -104,62 +110,76 @@ public class ClockMenuBar extends JMenuBar
                              new JMenuItem(PACIFIC), new JMenuItem(CENTRAL),
                              new JMenuItem(EASTERN), new JMenuItem(MOUNTAIN) ));
         getTimezones().forEach(this::setupTimezone);
+        getChangeTimeZoneMenu().setName("Change the timezone to the selected choice and adjusts the clock.");
         setCurrentTimeZone();
 
         setPauseResumeAllTimersSetting(new JMenuItem(PAUSE+SPACE+ALL+SPACE+TIMER+S.toLowerCase()));
         getPauseResumeAllTimersSetting().setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_P, InputEvent.CTRL_DOWN_MASK));
         getPauseResumeAllTimersSetting().setForeground(Color.WHITE);
+        getPauseResumeAllTimersSetting().setName("Pause/Resume All Timers.");
         getPauseResumeAllTimersSetting().addActionListener(this::togglePauseResumeAllTimersSetting);
 
         setResetTimersPanelSetting(new JMenuItem(RESET+SPACE+PANEL));
         getResetTimersPanelSetting().setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_R, InputEvent.CTRL_DOWN_MASK));
         getResetTimersPanelSetting().setForeground(Color.WHITE);
+        getResetTimersPanelSetting().setName("Clears the Timer Panel completely.");
         getResetTimersPanelSetting().addActionListener(this::toggleResetTimersPanelSetting);
 
         setPauseResumeAllAlarmsSetting(new JMenuItem(PAUSE+SPACE+ALL+SPACE+ALARM+S.toLowerCase()));
         getPauseResumeAllAlarmsSetting().setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_P, InputEvent.CTRL_DOWN_MASK));
         getPauseResumeAllAlarmsSetting().setForeground(Color.WHITE);
+        getPauseResumeAllAlarmsSetting().setName("Pause/Resume All Alarms.");
         getPauseResumeAllAlarmsSetting().addActionListener(this::togglePauseResumeAllAlarmsSetting);
 
         setResetAlarmsPanelSetting(new JMenuItem(RESET+SPACE+PANEL));
         getResetAlarmsPanelSetting().setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_R, InputEvent.CTRL_DOWN_MASK));
         getResetAlarmsPanelSetting().setForeground(Color.WHITE);
+        getResetAlarmsPanelSetting().setName("Clears the Alarms Panel completely.");
         getResetAlarmsPanelSetting().addActionListener(this::toggleResetAlarmsPanelSetting);
 
         setShowAnalogueTimePanel(new JMenuItem(SHOW+SPACE+ANALOGUE+SPACE+TIME));
         getShowAnalogueTimePanel().setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_T, InputEvent.CTRL_DOWN_MASK));
         getShowAnalogueTimePanel().setForeground(Color.WHITE);
+        getShowAnalogueTimePanel().setName("Show or hide the analogue clock panel.");
         getShowAnalogueTimePanel().addActionListener(this::toggleTimePanels);
 
         setReverseLaps(new JMenuItem(REVERSE+SPACE+LAPS));
         getReverseLaps().setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_R, InputEvent.CTRL_DOWN_MASK));
         getReverseLaps().setForeground(Color.WHITE);
+        getReverseLaps().setName("Toggles the order of the laps displayed from ascending to descending or back the other way.");
         getReverseLaps().addActionListener(this::toggleReverseLapsSetting);
 
         // Features menu choices
         setDigitalClockFeature(new JMenuItem(VIEW_DIGITAL_CLOCK));
         getDigitalClockFeature().setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_D, InputEvent.CTRL_DOWN_MASK));
+        getDigitalClockFeature().setName("View the digital clock panel.");
         getDigitalClockFeature().addActionListener(action -> clockFrame.changePanels(PANEL_DIGITAL_CLOCK));
 
         setAnalogueClockFeature(new JMenuItem(VIEW_ANALOGUE_CLOCK));
         getAnalogueClockFeature().setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_C, InputEvent.CTRL_DOWN_MASK));
+        getAnalogueClockFeature().setName("View the analogue clock panel.");
         getAnalogueClockFeature().addActionListener(action -> clockFrame.changePanels(PANEL_ANALOGUE_CLOCK));
 
         setAlarmsFeature(new JMenuItem(VIEW_ALARMS));
         getAlarmsFeature().setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_A, InputEvent.CTRL_DOWN_MASK));
+        getAlarmsFeature().setName("View the alarms panel.");
         getAlarmsFeature().addActionListener(action -> clockFrame.changePanels(PANEL_ALARM));
 
         setTimerFeature(new JMenuItem(VIEW_TIMERS));
         getTimerFeature().setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_T, InputEvent.CTRL_DOWN_MASK));
+        getTimerFeature().setName("View the timers panel.");
         getTimerFeature().addActionListener(action -> clockFrame.changePanels(PANEL_TIMER));
 
         setStopwatchFeature(new JMenuItem(VIEW_STOPWATCHES));
         getStopwatchFeature().setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_S, InputEvent.CTRL_DOWN_MASK));
+        getStopwatchFeature().setName("View the stopwatch panel.");
         getStopwatchFeature().addActionListener(action -> clockFrame.changePanels(PANEL_STOPWATCH));
 
         // Help Menu
         setTheHelpFeature(new JMenuItem(VIEW_HELP));
         getTheHelpFeature().setForeground(Color.WHITE);
+        getTheHelpFeature().setName("This is the help panel. It provides information about the current panel and how to " +
+                "use the features and settings in the menu.");
         getTheHelpFeature().addActionListener(this::performTheHelpMenuAction);
         // Add options to Features Menu, consistent for each panel
         getFeaturesMenu().add(getDigitalClockFeature());
@@ -237,7 +257,9 @@ public class ClockMenuBar extends JMenuBar
             List<JMenuItem> allMenuItems = Arrays.stream(menu.getMenuComponents()).filter(c -> c instanceof JMenuItem).map(c -> (JMenuItem) c).toList();
             for (JMenuItem menuItem : allMenuItems) {
                 String menuText = menuItem.getText();
-                menuAndItemsText.append(menuText).append(COLON).append(NEWLINE);
+                menuAndItemsText.append(menuText).append(COLON)
+                                .append(menuItem.getName()); // name is where we store the menu help text
+                menuAndItemsText.append(NEWLINE);
             }
 
         }
@@ -261,6 +283,7 @@ public class ClockMenuBar extends JMenuBar
         timezone.addActionListener(l -> clockFrame.updateClockTimezone(timezone));
         timezone.setForeground(Color.WHITE);
         timezone.setBackground(Color.BLACK);
+        timezone.setName(timezone.getText());
         getChangeTimeZoneMenu().add(timezone);
     }
 
