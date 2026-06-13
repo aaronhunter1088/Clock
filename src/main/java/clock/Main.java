@@ -61,8 +61,8 @@ public class Main
         else if (startValue == 1) {
             specificPanelStart(args);
         }
-        else if (startValue == 7) {
-            specificClockStart(args);
+        else if (startValue == 7 || startValue == 8) {
+            specificClockStart(args); // can pass in true for showMilitaryTime
         }
         else {
             throw new InvalidInputException("Invalid number of arguments provided.");
@@ -110,7 +110,7 @@ public class Main
         int seconds = Integer.parseInt(values.get(5));
 
         String ampm = hours < 12 ? values.get(6).toUpperCase() : PM;
-        Clock testClock = new Clock(hours, minutes, seconds, month, localDate.getDayOfWeek(), dayOfMonth, year, ampm);
-        SwingUtilities.invokeLater(() -> clockFrame = ClockFrame.createAndShowGUI(testClock));
+        boolean showMilitaryTime = values.size() > 7 && Boolean.parseBoolean(values.get(7));
+        SwingUtilities.invokeLater(() -> clockFrame = ClockFrame.createAndShowGUI(new Clock(hours, minutes, seconds, month, localDate.getDayOfWeek(), dayOfMonth, year, ampm, showMilitaryTime)));
     }
 }

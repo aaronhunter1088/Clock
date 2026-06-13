@@ -95,6 +95,28 @@ public class Clock implements Serializable, Comparable<Clock>
     public Clock(int hours, int minutes, int seconds, Month month, DayOfWeek dayOfWeek,
                  int dayOfMonth, int year, String ampm)
     {
+        this(hours, minutes, seconds, month, dayOfWeek, dayOfMonth, year, ampm, false);
+    }
+
+    /**
+     * Custom constructor which takes in values for all Clock
+     * parameters and sets them based on those inputs.
+     * If the hours provided is greater than 12, the clock
+     * will assume military time. All values are validated
+     * before being forwarded to {@link #initialize}.
+     * @param hours      the hours to set, 0-12/23, depending
+     * @param minutes    the minutes to set
+     * @param seconds    the seconds to set
+     * @param month      the month to set
+     * @param dayOfWeek  the day of the week to set
+     * @param dayOfMonth the date of the month to set
+     * @param year       the year to set
+     * @param ampm       the AM or PM to set
+     * @param showMilitaryTime determines if the clocks should show the time in military time
+     */
+    public Clock(int hours, int minutes, int seconds, Month month, DayOfWeek dayOfWeek,
+                 int dayOfMonth, int year, String ampm, boolean showMilitaryTime)
+    {
         super();
         if (hours < 0 || hours > 23) {
             if (hours > 12) throw new InvalidInputException("Hours must be between 0 and 23");
@@ -113,7 +135,7 @@ public class Clock implements Serializable, Comparable<Clock>
         if (LocalDate.of(year, month, dayOfMonth).isBefore(gregorianStart)) {
             throw new InvalidInputException("Date must be on or after October 15, 1582 (Gregorian calendar start date). Your date: " + formatMonthDay(month, dayOfMonth, year));
         }
-        initialize(List.of(hours, minutes, seconds, month, dayOfWeek, dayOfMonth, year, ampm));
+        initialize(List.of(hours, minutes, seconds, month, dayOfWeek, dayOfMonth, year, ampm, showMilitaryTime));
     }
 
     /**
@@ -173,11 +195,12 @@ public class Clock implements Serializable, Comparable<Clock>
         final int dayOfMonth = (Integer)   arguments.get(5);
         final int year       = (Integer)   arguments.get(6);
         final String ampm    = (String)    arguments.get(7);
-        if (hours > 12) setShowMilitaryTime(true);
+        final boolean isMilitaryTimeEnabled = (Boolean)   arguments.get(8);
         setSeconds(seconds);
         setMinutes(minutes);
         setHours(hours);
         setAMPM(ampm);
+        setShowMilitaryTime(isMilitaryTimeEnabled);
         setMonth(month);
         setDayOfWeek(dow);
         setDayOfMonth(dayOfMonth);

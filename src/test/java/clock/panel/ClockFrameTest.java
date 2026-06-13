@@ -113,6 +113,18 @@ public class ClockFrameTest
     }
 
     @Test
+    @DisplayName("Test ClockFrame with Clock in Military Time")
+    void testClockFrameWithMilitaryTimeClock()
+    {
+        clock = new Clock(8,30,0,JANUARY, WEDNESDAY, 1, 2025, PM, true);
+        clockFrame = new ClockFrame(clock);
+        assertNotNull(clockFrame, "ClockFrame should not be null");
+        assertEquals(clock, clockFrame.getClock(), "Clock in ClockFrame should match the provided clock");
+        assertTrue(clock.isShowMilitaryTime(), "Clock should be set to show military time");
+        assertEquals(PANEL_DIGITAL_CLOCK, clockFrame.getPanelType(), "Panel type should be PANEL_DIGITAL_CLOCK by default");
+    }
+
+    @Test
     @DisplayName("Test createAndShowGUI")
     void testCreateAndShowGUI()
     {

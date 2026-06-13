@@ -6,7 +6,7 @@ import org.apache.logging.log4j.Logger;
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.CsvSource;
+import org.junit.jupiter.params.provider.*;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
@@ -14,8 +14,10 @@ import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.lang.reflect.InvocationTargetException;
 import java.time.DayOfWeek;
+import java.util.Arrays;
 import java.util.List;
 
+import static clock.entity.Panel.*;
 import static clock.util.Constants.*;
 import static java.time.DayOfWeek.*;
 import static org.junit.jupiter.api.Assertions.*;
@@ -376,5 +378,19 @@ public class ClockMenuBarTest
         assertNotNull(clockFrame.getClockMenuBar().getAlarmsFeature());
         assertNotNull(clockFrame.getClockMenuBar().getTimerFeature());
         assertNotNull(clockFrame.getClockMenuBar().getStopwatchFeature());
+    }
+
+    @ParameterizedTest
+    @DisplayName("Test Show Help For Each Panel")
+    @EnumSource(Panel.class)
+    @Disabled // just because it requires manual clicking to close the window
+    void testShowHelpMenu(Panel panel)
+    {
+        clockFrame.setPanelType(panel);
+        Arrays.stream(clockFrame.getClockMenuBar().getTheHelpFeature().getActionListeners())
+                .toList()
+                .forEach(listener -> listener.actionPerformed(new ActionEvent(this, 0, "")));
+
+        assertTrue(true, "Should be true");
     }
 }
