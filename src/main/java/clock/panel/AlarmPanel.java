@@ -473,14 +473,14 @@ public class AlarmPanel extends ClockPanel implements Runnable
     {
         return clock.getListOfAlarms().stream()
                 .map(alarm -> new Object[] {
-                        alarm.getName() != null ? alarm.getName() : alarm.toString(),
-                        alarm.getAlarmAsString(),
-                        String.join(COMMA+SPACE, alarm.getDaysShortened()),
-                        alarm.isAlarmGoingOff() && !alarm.isSnoozing() ? SNOOZE
-                            : alarm.isSnoozing() ? alarm.getSnoozeTimeRemainingFormatted()
-                                    : SLEEPING,
-                        alarm.isAlarmGoingOff() && !alarm.isSnoozing() ? STOP
-                            : REMOVE
+                /* Name */ alarm.getName() != null ? alarm.getName() : alarm.toString(),
+                /* Time */ alarm.getAlarmAsString(),
+                /* Days */ String.join(COMMA+SPACE, alarm.getDaysShortened()),
+                /* Sleep */alarm.isAlarmGoingOff() && !alarm.isSnoozing() ? SNOOZE
+                /* Snooze */  : alarm.isSnoozing() ? alarm.getSnoozeTimeRemainingFormatted()
+                              : SLEEPING,
+                /* Remove */ alarm.isAlarmGoingOff() && !alarm.isSnoozing() ? STOP
+                /* Stop */    : REMOVE
                 })
                 .toArray(Object[][]::new);
     }
