@@ -9,3 +9,5 @@ Clock.iml
 dist/**
 logs/**
 misc.xml
+
+src/main/java/clock/examples/**/*.java
