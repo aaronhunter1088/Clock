@@ -195,12 +195,12 @@ public class Clock implements Serializable, Comparable<Clock>
         final int dayOfMonth = (Integer)   arguments.get(5);
         final int year       = (Integer)   arguments.get(6);
         final String ampm    = (String)    arguments.get(7);
-        final boolean isMilitaryTimeEnabled = (Boolean)   arguments.get(8);
+        final boolean isMilitaryTimeEnabled = (Boolean) arguments.get(8);
+        setShowMilitaryTime(isMilitaryTimeEnabled);
         setSeconds(seconds);
         setMinutes(minutes);
         setHours(hours);
         setAMPM(ampm);
-        setShowMilitaryTime(isMilitaryTimeEnabled);
         setMonth(month);
         setDayOfWeek(dow);
         setDayOfMonth(dayOfMonth);

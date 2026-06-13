@@ -118,7 +118,7 @@ class ClockTest
         int dayOfMonth = 15;
         int year = 2023;
         String ampm = PM;
-        clock = new Clock(hours, minutes, seconds, month, dayOfWeek, dayOfMonth, year, ampm);
+        clock = new Clock(hours, minutes, seconds, month, dayOfWeek, dayOfMonth, year, ampm, true);
 
         assertNotNull(clock.getCurrentDateTime(), "The current time should not be null");
         assertEquals(hours, clock.getHours(), "Hours should match");
@@ -735,7 +735,7 @@ class ClockTest
     @DisplayName("getMilitaryTimeAsStr returns HHMMhrs SS format")
     void testGetMilitaryTimeAsStr()
     {
-        clock = new Clock(13, 30, 45, AUGUST, SATURDAY, 15, 2023, PM); // 13 → military
+        clock = new Clock(13, 30, 45, AUGUST, SATURDAY, 15, 2023, PM, true); // 13 → military
         assertEquals("1330 hours 45", clock.getMilitaryTimeAsStr());
     }
 
@@ -834,7 +834,7 @@ class ClockTest
     @DisplayName("defaultText label 2 returns military time string when showMilitaryTime is true")
     void testDefaultTextLabel2MilitaryTime()
     {
-        clock = new Clock(13, 30, 45, AUGUST, SATURDAY, 15, 2023, PM);
+        clock = new Clock(13, 30, 45, AUGUST, SATURDAY, 15, 2023, PM, true);
         assertTrue(clock.isShowMilitaryTime());
         assertEquals("1330 hours 45", clock.defaultText(2));
     }
