@@ -10,9 +10,9 @@ public enum Panel
 {
 	PANEL_DIGITAL_CLOCK("Digital Clock"),
 	PANEL_ANALOGUE_CLOCK("Analogue Clock"),
-	PANEL_ALARM("Alarm"),
-	PANEL_TIMER("Timer"),
-	PANEL_STOPWATCH("Stopwatch");
+	PANEL_ALARM("Alarms"),
+	PANEL_TIMER("Timers"),
+	PANEL_STOPWATCH("Stopwatches");
 
     final String text;
 

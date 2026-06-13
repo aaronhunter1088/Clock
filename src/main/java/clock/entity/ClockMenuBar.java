@@ -6,11 +6,11 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import javax.swing.*;
+import javax.swing.border.LineBorder;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
-import java.time.LocalDate;
 import java.util.Arrays;
 import java.util.List;
 
@@ -28,7 +28,7 @@ public class ClockMenuBar extends JMenuBar
     private static final Logger logger = LogManager.getLogger(ClockMenuBar.class);
     private ClockFrame clockFrame;
     private Clock clock;
-    // Two main menu options
+    // menu options
     private JMenu settingsMenu,
                   featuresMenu,
                   helpMenu,
@@ -57,6 +57,8 @@ public class ClockMenuBar extends JMenuBar
     // Options for Help
     private JMenuItem helpFeature; // shows about and help for that panel
     private List<JMenuItem> timezones;
+    public static final Color
+            MOTIF_GRAY = new Color(174, 178, 195); // Motif look
 
     /**
      * The main constructor for the clock menu bar.
@@ -251,7 +253,7 @@ public class ClockMenuBar extends JMenuBar
      */
     private void performTheHelpMenuAction(ActionEvent action)
     {
-        JTextArea message = new JTextArea(getHelpText(), 20, 40);
+        JTextArea message = new JTextArea(getHelpText(), 10, 30);
         message.setWrapStyleWord(true);
         message.setEditable(false);
         message.setOpaque(false);
@@ -259,7 +261,7 @@ public class ClockMenuBar extends JMenuBar
         message.setFont(UIManager.getFont("Label.font"));
 
         JScrollPane scrollPane = new JScrollPane(message, ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED, ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
-        scrollPane.setSize(new Dimension(600, 500));
+        scrollPane.setSize(new Dimension(400, 300));
         SwingUtilities.updateComponentTreeUI(this);
         String headerText = "Viewing " + clockFrame.getPanelType().getText() + SPACE + HELP;
         JOptionPane.showMessageDialog(this, scrollPane, headerText, JOptionPane.PLAIN_MESSAGE);
@@ -276,28 +278,71 @@ public class ClockMenuBar extends JMenuBar
     {
         JMenuBar menuBar = clockFrame.getClockMenuBar();
         List<JMenu> menus = Arrays.stream(menuBar.getComponents()).filter(c -> c instanceof JMenu).map(c -> (JMenu) c).toList();
-        // build a 'string' and append it to the main text for each menu option
+
+        // Determine the panel-specific description once, based on the active panel.
+        String panelSpecificText = switch (clockFrame.getPanelType()) {
+            case PANEL_DIGITAL_CLOCK -> """
+                    The digital clock displays the date and time. There are two different ways to view the date.
+                    You can turn off or on daylight savings time. When off, when daylight savings would take
+                    effect, this clock will not and the regular time will proceed. When on by default, daylight
+                    savings time will take place.
+                    You can also adjust the timezone to any other USA recognized timezone for the United States.
+                    """;
+            case PANEL_ANALOGUE_CLOCK -> """
+                    The analogue clock displays the time with hour, minute, and second hands. You can choose to show
+                    or hide the digital date and time on the analogue clock panel. You can also turn on or off
+                    daylight savings time and change the timezone.
+                    """;
+            case PANEL_ALARM -> """
+                    Use the alarms panel to set multiple alarms. You can choose to pause and resume all
+                    alarms, or reset the entire panel. When an alarm goes off, you can choose to snooze or dismiss
+                    the alarm. Snoozing will snooze the alarm for 7 minutes. If you do not hit snooze, and a
+                    minute has gone by, the alarm will automatically begin snoozing for you. Edit an alarm
+                    by clicking on the Sleeping .zZ button.
+                    """;
+            case PANEL_TIMER -> """
+                    Use the timers panel to set multiple timers. You can choose to pause and resume all
+                    timers, or reset the entire panel. When a timer goes off, you can choose to restart or dismiss
+                    the timer. Restarting will restart the timer for you with the same time that you originally
+                    set it for. If you do not hit restart, and a minute has gone by, the timer will automatically
+                    begin restarting for you.
+                    """;
+            case PANEL_STOPWATCH -> """
+                    Use the stopwatches panel to set multiple stopwatches. You can choose to show or hide the
+                    analogue clock panel, which will show the time with hour, minute, and second hands. You can
+                    also reverse the order of the laps displayed in the laps panel from ascending to descending
+                    or back the other way. You can reset the laps for a single stopwatch or for all stopwatches.
+                    You can also reset the entire stopwatches panel.
+                    """;
+        };
+
+        // Build the menu listing — one line per item showing its label and its help name.
         StringBuilder menuAndItemsText = new StringBuilder();
         for (JMenu menu : menus)
         {
-            String nameOfMenu = menu.getName();
+            String nameOfMenu = menu.getName(); // Settings, Features, Help
             menuAndItemsText.append(NEWLINE).append(nameOfMenu).append(COLON).append(NEWLINE);
-            // get each 'setting' and 'feature', and the rest, and print out each menu item
-            List<JMenuItem> allMenuItems = Arrays.stream(menu.getMenuComponents()).filter(c -> c instanceof JMenuItem).map(c -> (JMenuItem) c).toList();
-            for (JMenuItem menuItem : allMenuItems) {
-                String menuText = menuItem.getText();
-                menuAndItemsText.append(menuText).append(COLON)
-                                .append(menuItem.getName()); // name is where we store the menu help text
-                menuAndItemsText.append(NEWLINE);
-            }
 
+            List<JMenuItem> allMenuItems = Arrays.stream(menu.getMenuComponents())
+                    .filter(c -> c instanceof JMenuItem)
+                    .map(c -> (JMenuItem) c)
+                    .toList();
+            for (JMenuItem menuItem : allMenuItems)
+            {
+                menuAndItemsText.append(menuItem.getText())
+                                .append(COLON).append(SPACE)
+                                .append(menuItem.getName())
+                                .append(NEWLINE);
+            }
         }
-        return
-                """
+
+        return """
                 Panel: %s
+                %s
                 %s
                 """.formatted(
                         clockFrame.getPanelType().getText(),
+                        panelSpecificText,
                         menuAndItemsText.toString()
                 );
     }
