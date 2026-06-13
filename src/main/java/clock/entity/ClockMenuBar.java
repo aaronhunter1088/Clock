@@ -78,10 +78,18 @@ public class ClockMenuBar extends JMenuBar
         setupHelpMenu(new JMenu(HELP));
         getTheHelpMenu().setName(HELP);
         // Settings menu choices
-        setMilitaryTimeSetting(new JMenuItem(clock.isShowMilitaryTime()?HIDE+SPACE+MILITARY_TIME_SETTING:SHOW+SPACE+MILITARY_TIME_SETTING));
-        getMilitaryTimeSetting().setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_M, InputEvent.CTRL_DOWN_MASK));
+        if (clock.isShowMilitaryTime())
+        {
+            setMilitaryTimeSetting(new JMenuItem(SHOW+SPACE+STANDARD_TIME_SETTING));
+            getMilitaryTimeSetting().setName("Displays the Time in Standard Time. Ex: 08:50:00 AM");
+        }
+        else
+        {
+            setMilitaryTimeSetting(new JMenuItem(SHOW+SPACE+MILITARY_TIME_SETTING));
+            getMilitaryTimeSetting().setName("Displays the Time in Military Time. Ex: 0850 hours 30");
+        }
         getMilitaryTimeSetting().setForeground(Color.WHITE);
-        getMilitaryTimeSetting().setName("Displays the Time in Military Time. Ex: 0850 hours 30");
+        getMilitaryTimeSetting().setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_M, InputEvent.CTRL_DOWN_MASK));
         getMilitaryTimeSetting().addActionListener(this::toggleMilitaryTimeSetting);
 
         setFullTimeSetting(new JMenuItem(SHOW+SPACE+FULL_TIME_SETTING));
@@ -347,16 +355,19 @@ public class ClockMenuBar extends JMenuBar
     protected void toggleMilitaryTimeSetting(ActionEvent action)
     {
         logger.debug("clicked show military time setting");
+        clock.setShowMilitaryTime(!clock.isShowMilitaryTime());
         if (clock.isShowMilitaryTime())
         {
-            clock.setShowMilitaryTime(false);
-            getMilitaryTimeSetting().setText(SHOW+SPACE+MILITARY_TIME_SETTING);
+            getMilitaryTimeSetting().setText(SHOW+SPACE+STANDARD_TIME_SETTING);
+            getMilitaryTimeSetting().setName("Displays the Time in Standard Time. Ex: 08:50:00 AM");
         }
         else
         {
-            clock.setShowMilitaryTime(true);
-            getMilitaryTimeSetting().setText(SHOW+SPACE+STANDARD_TIME_SETTING);
+            getMilitaryTimeSetting().setText(SHOW+SPACE+MILITARY_TIME_SETTING);
+            getMilitaryTimeSetting().setName("Displays the Time in Military Time. Ex: 0850 hours 30");
+
         }
+        SwingUtilities.updateComponentTreeUI(this);
     }
 
     /** Toggles the full time setting. */
