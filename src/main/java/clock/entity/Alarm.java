@@ -29,9 +29,6 @@ import static clock.util.Constants.*;
  * matches the alarm's time and day, the alarm will
  * make a sound. The alarm can be set to snooze,
  * reset, stopped, or removed.
- * TODO: Feature updates
- * TODO: 1. When I click snooze (which only happens on an alarm triggering its sound), the
- * TODO: button should count down the SNOOZE_TIME. It should say Sleeping .zZ when not active.
  *
  * @author michael ball
  * @version since 2.0
