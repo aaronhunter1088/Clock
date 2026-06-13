@@ -11,6 +11,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
 import java.io.Serial;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -119,11 +120,35 @@ public class ClockMenuBar extends JMenuBar
         getShowDigitalTimeOnAnalogueClockSetting().addActionListener(this::toggleDigitalTimeOnAnalogueClockSetting);
 
         setChangeTimeZoneMenu(new JMenu(CHANGE+SPACE+TIME_ZONES));
-        setTimeZones(List.of(new JMenuItem(HAWAII), new JMenuItem(ALASKA),
-                             new JMenuItem(PACIFIC), new JMenuItem(CENTRAL),
-                             new JMenuItem(EASTERN), new JMenuItem(MOUNTAIN) ));
+        setTimeZones(new ArrayList<>()
+        {{
+            add(new JMenuItem(HAWAII));
+            add(new JMenuItem(ALASKA));
+            add(new JMenuItem(PACIFIC));
+            add(new JMenuItem(CENTRAL));
+            add(new JMenuItem(EASTERN));
+            add(new JMenuItem(MOUNTAIN));
+        }});
         getTimezones().forEach(this::setupTimezone);
-        getChangeTimeZoneMenu().setName("Change the timezone to the selected choice and adjusts the clock.");
+        JMenuItem userTimezone = new JMenuItem(ENTER_ZONE_ID);
+        userTimezone.setName("User Time Zone");
+        userTimezone.setForeground(Color.WHITE);
+        userTimezone.setBackground(Color.BLACK);
+        userTimezone.addActionListener(_ -> {
+            String zoneId = JOptionPane.showInputDialog(this, ENTER_ZONE_ID,
+                    CHANGE+SPACE+TIME_ZONES, JOptionPane.PLAIN_MESSAGE);
+            if (zoneId != null && !zoneId.isBlank())
+            { clockFrame.updateClockTimezone(new JMenuItem(zoneId.trim())); }
+        });
+        getChangeTimeZoneMenu().add(userTimezone);
+        getChangeTimeZoneMenu().setName(
+                """
+                Change the timezone to the selected choice and adjusts the clock.
+                The last option is a text field that allows you to enter a timezone.
+                If the value is valid, similar to the default values, the time will
+                update, otherwise no change will occur.
+                """
+        );
         setCurrentTimeZone();
 
         setPauseResumeAllTimersSetting(new JMenuItem(PAUSE+SPACE+ALL+SPACE+TIMER+S.toLowerCase()));
@@ -368,7 +393,7 @@ public class ClockMenuBar extends JMenuBar
     public void setCurrentTimeZone()
     {
         timezones.forEach(menuItem -> {
-            if (clock.getPlainTimezoneFromZoneId(clock.getTimezone()).equals(menuItem.getText().replace(STAR,EMPTY).trim())) {
+            if (clock.getPlainTimezoneFromZoneId(clock.getTimezone()).equalsIgnoreCase(menuItem.getText().replace(STAR,EMPTY).trim())) {
                 if (!menuItem.getText().contains(STAR)) {
                     menuItem.setText(menuItem.getText()+SPACE+STAR);
                 } else {

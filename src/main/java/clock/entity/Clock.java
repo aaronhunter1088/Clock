@@ -5,10 +5,7 @@ import java.io.Serializable;
 import java.time.*;
 import java.time.format.DateTimeFormatter;
 import java.time.format.TextStyle;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Locale;
-import java.util.Objects;
+import java.util.*;
 import java.util.concurrent.ScheduledExecutorService;
 
 import clock.exception.InvalidInputException;
@@ -205,7 +202,7 @@ public class Clock implements Serializable, Comparable<Clock>
         setDayOfWeek(dow);
         setDayOfMonth(dayOfMonth);
         setYear(year);
-        setTimeZone(getZoneIdFromTimezoneButtonText(EMPTY));
+        setTimezone(getZoneIdFromTimezoneButtonText(EMPTY));
         setTheDateAndTime();
         setDateChanged(false);
     }
@@ -229,7 +226,7 @@ public class Clock implements Serializable, Comparable<Clock>
         setDayOfWeek(dateTime.getDayOfWeek());
         setDayOfMonth(dateTime.getDayOfMonth());
         setYear(dateTime.getYear());
-        setTimeZone(getZoneIdFromTimezoneButtonText(EMPTY));
+        setTimezone(getZoneIdFromTimezoneButtonText(EMPTY));
         setDateChanged(false);
         setTheDateAndTime();
     }
@@ -311,15 +308,23 @@ public class Clock implements Serializable, Comparable<Clock>
     protected String getPlainTimezoneFromZoneId(ZoneId timezone)
     {
         logger.debug("timezone: {} or {}", timezone, timezone.getDisplayName(TextStyle.FULL, Locale.ENGLISH));
-        return switch (timezone.getId()) {
-            case PACIFIC_HONOLULU -> HAWAII;
-            case AMERICA_ANCHORAGE -> ALASKA;
-            case AMERICA_LOS_ANGELES -> PACIFIC;
-            case AMERICA_CHICAGO -> CENTRAL;
-            case AMERICA_NEW_YORK -> EASTERN;
-            case AMERICA_DENVER -> MOUNTAIN;
-            default -> ZoneId.systemDefault().getId();
-        };
+        try {
+            return ZoneId.SHORT_IDS.values().stream()
+                    .filter(id -> timezone.getDisplayName(TextStyle.FULL, Locale.ENGLISH).equals(id))
+                    .toList()
+                    .getFirst();
+        }
+        catch (Exception e) {
+            return switch (timezone.getId()) {
+                case PACIFIC_HONOLULU -> HAWAII;
+                case AMERICA_ANCHORAGE -> ALASKA;
+                case AMERICA_LOS_ANGELES -> PACIFIC;
+                case AMERICA_CHICAGO -> CENTRAL;
+                case AMERICA_NEW_YORK -> EASTERN;
+                case AMERICA_DENVER -> MOUNTAIN;
+                default -> ZoneId.systemDefault().getId();
+            };
+        }
     }
 
     /**
@@ -789,15 +794,29 @@ public class Clock implements Serializable, Comparable<Clock>
      */
     public ZoneId getZoneIdFromTimezoneButtonText(String btnText) {
         logger.debug("btnText: {}", btnText);
-        return switch (btnText) {
-            case HAWAII -> ZoneId.of(PACIFIC_HONOLULU);
-            case ALASKA -> ZoneId.of(AMERICA_ANCHORAGE);
-            case PACIFIC -> ZoneId.of(AMERICA_LOS_ANGELES);
-            case CENTRAL -> ZoneId.of(AMERICA_CHICAGO);
-            case EASTERN -> ZoneId.of(AMERICA_NEW_YORK);
-            case MOUNTAIN -> ZoneId.of(AMERICA_DENVER);
-            default -> ZoneId.systemDefault();
-        };
+        try {
+            String longId = ZoneId.SHORT_IDS.get(btnText.toUpperCase());
+            if (longId == null) {
+                return switch (btnText) {
+                    case HAWAII -> ZoneId.of(PACIFIC_HONOLULU);
+                    case ALASKA -> ZoneId.of(AMERICA_ANCHORAGE);
+                    case PACIFIC -> ZoneId.of(AMERICA_LOS_ANGELES);
+                    case CENTRAL -> ZoneId.of(AMERICA_CHICAGO);
+                    case EASTERN -> ZoneId.of(AMERICA_NEW_YORK);
+                    case MOUNTAIN -> ZoneId.of(AMERICA_DENVER);
+                    default -> {
+                        logger.warn("Unknown button text: '{}'. Using ZoneId.systemDefault: {}", btnText, ZoneId.systemDefault());
+                        yield ZoneId.systemDefault();
+                    }
+                };
+            }
+            return ZoneId.of(longId);
+        }
+        catch (DateTimeException e) {
+            logger.error("Cannot determine the zone id from the selected btn text:  {}", btnText);
+            logger.error("Defaulting to system default");
+            return ZoneId.systemDefault();
+        }
     }
 
     /** Gets the scheduled executor service */
@@ -850,7 +869,7 @@ public class Clock implements Serializable, Comparable<Clock>
      * Sets and logs the new timezone value
      * @param timezone the new timezone value
      */
-    public void setTimeZone(ZoneId timezone) { this.timezone = timezone; logger.debug("timezone: {}", getPlainTimezoneFromZoneId(timezone)); }
+    public void setTimezone(ZoneId timezone) { this.timezone = timezone; logger.debug("timezone: {}", getPlainTimezoneFromZoneId(this.timezone)); }
     /** Sets and logs the new time value
      * @param time the new time value
      */

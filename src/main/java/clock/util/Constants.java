@@ -32,6 +32,7 @@ public class Constants {
     public static final String EIGHT = "8";
     public static final String ELEVEN = "11";
     public static final String EMPTY = "";
+    public static final String ENTER_ZONE_ID = "Enter Zone ID";
     public static final String TEXT_FIELD = "TextField";
     public static final String FIVE = "5";
     public static final String FOUR = "4";
