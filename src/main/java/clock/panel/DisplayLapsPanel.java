@@ -312,21 +312,39 @@ public class DisplayLapsPanel extends JPanel
         return isLapsReversed;
     }
 
-    /** Sets the grid bay layout manager */
+    /**
+     * Sets the grid bay layout manager
+     * @param layout the GridBagLayout to use
+     */
     private void setGridBagLayout(GridBagLayout layout) { setLayout(layout); this.layout = layout; logger.debug("GridBagLayout set"); }
-    /** Sets the grid bag constraints */
+    /**
+     * Sets the grid bag constraints
+     * @param constraints the GridBagConstraints to use
+     */
     private void setGridBagConstraints(GridBagConstraints constraints) { this.constraints = constraints; logger.debug("constraints set"); }
 
+    /**
+     * Sets the laps table
+     * @param lapsTable the JTable used to display lap data
+     */
     public void setLapsTable(JTable lapsTable)
     {
         this.lapsTable = lapsTable;
     }
 
+    /**
+     * Sets the stopwatch table
+     * @param stopwatchTable the JTable used to display stopwatch data
+     */
     public void setStopwatchTable(JTable stopwatchTable)
     {
         this.stopwatchTable = stopwatchTable;
     }
 
+    /**
+     * Sets whether laps are displayed in reverse order
+     * @param lapsReversed true to show laps in descending order
+     */
     public void setLapsReversed(boolean lapsReversed)
     {
         isLapsReversed = lapsReversed;

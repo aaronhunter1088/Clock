@@ -385,15 +385,30 @@ public class StopwatchPanel extends ClockPanel
     /** Returns the current stopwatch */
     public Stopwatch getCurrentStopwatch() { return currentStopwatch; }
 
-    /** Sets the clock */
+    /**
+     * Sets the clock
+     * @param clock the clock reference
+     */
     public void setClock(Clock clock) { this.clock = clock; logger.debug("clock set"); }
-    /** Sets the clockFrame */
+    /**
+     * Sets the clockFrame
+     * @param clockFrame the clock frame reference
+     */
     public void setClockFrame(ClockFrame clockFrame) { this.clockFrame = clockFrame; logger.debug("clockFrame set"); }
-    /** Sets the layout manager */
+    /**
+     * Sets the layout manager
+     * @param layout the GridBagLayout to use
+     */
     private void setGridBagLayout(GridBagLayout layout) { setLayout(layout); this.layout = layout; logger.debug("GridBagLayout set"); }
-    /** Sets the grid bag constraints */
+    /**
+     * Sets the grid bag constraints
+     * @param constraints the GridBagConstraints to use
+     */
     public void setGridBagConstraints(GridBagConstraints constraints) { this.constraints = constraints; logger.debug("constraints set"); }
-    /** Sets the current stopwatch */
+    /**
+     * Sets the current stopwatch
+     * @param currentStopwatch the stopwatch currently displayed
+     */
     public void setCurrentStopwatch(Stopwatch currentStopwatch) { this.currentStopwatch = currentStopwatch; logger.debug("currentStopwatch set"); }
 }
 

@@ -16,7 +16,6 @@ import static java.lang.Thread.sleep;
  * The time will still show up below the center in
  * its digital format. If you wish to hide this,
  * there is a setting to hide the digital view.
- * // TODO: Show date as well
  *
  * @author michael ball
  * @version since 2.6
@@ -30,7 +29,8 @@ public class AnalogueClockPanel extends ClockPanel implements Runnable
     private int xcenter = 175, ycenter = 175, lastxs = 0, lastys = 0, lastxm = 0, lastym = 0, lastxh = 0, lastyh = 0;
     private ClockFrame clockFrame;
     private Clock clock;
-    private String clockText = EMPTY;
+    private String dateText = EMPTY,
+                   timeText = EMPTY;
     private boolean showDigitalTimeOnAnalogueClock;
 
     /**
@@ -53,7 +53,7 @@ public class AnalogueClockPanel extends ClockPanel implements Runnable
         logger.debug("initialize analogue clock panel");
         setClockFrame(clockFrame);
         setClock(clockFrame.getClock());
-        setClockText(clock.getTimeAsStr());
+        setTimeText(clock.getTimeAsStr());
         setGridBagLayout(new GridBagLayout()); // sets layout
         setLayout(layout);
         setGridBagConstraints(new GridBagConstraints());
@@ -140,7 +140,10 @@ public class AnalogueClockPanel extends ClockPanel implements Runnable
         int xhour, yhour, xminute, yminute, xsecond, ysecond, second, minute, hour;
 
         if (isShowDigitalTimeOnAnalogueClock())
-        { setClockText(clock.getTimeAsStr()); }
+        {
+            setDateText(clock.getDateAsStr());
+            setTimeText(clock.getTimeAsStr());
+        }
         drawStructure(g);
         second = clock.getTime().getSecond();
         minute = clock.getTime().getMinute();
@@ -199,7 +202,9 @@ public class AnalogueClockPanel extends ClockPanel implements Runnable
         if (isShowDigitalTimeOnAnalogueClock())
         {
             g.setColor(Color.WHITE);
-            g.drawString(clockText, xcenter - 50, ycenter + 90); // 170
+            final FontMetrics fm = g.getFontMetrics();
+            g.drawString(dateText, xcenter - fm.stringWidth(dateText) / 2, ycenter + 70);
+            g.drawString(timeText, xcenter - fm.stringWidth(timeText) / 2, ycenter + 90);
         }
 
         g.setColor(Color.WHITE);
@@ -226,25 +231,53 @@ public class AnalogueClockPanel extends ClockPanel implements Runnable
     public GridBagLayout getGridBagLayout() { return this.layout; }
     /** Returns the grid bag constraints */
     public GridBagConstraints getGridBagConstraints() { return this.constraints; }
-    /** Returns the clock text */
-    public String getClockText() { return this.clockText; }
+    /** Returns the clock date text */
+    public String getDateText() { return this.dateText; }
+    /** Returns the clock time text */
+    public String getTimeText() { return this.timeText; }
     /** Returns isShowDigitalTimeOnAnalogueClock */
     public boolean isShowDigitalTimeOnAnalogueClock() { return showDigitalTimeOnAnalogueClock; }
     /** Returns the self thread */
     public Thread getThread() { return this.thread; }
 
-    /** Sets the clock frame */
+    /**
+     * Sets the clock frame
+     * @param clockFrame the clock frame reference
+     */
     private void setClockFrame(ClockFrame clockFrame) { this.clockFrame = clockFrame; logger.debug("clockFrame set"); }
-    /** Sets the layout manager */
+    /**
+     * Sets the layout manager
+     * @param layout the GridBagLayout to use
+     */
     private void setGridBagLayout(GridBagLayout layout) { this.layout = layout; logger.debug("GridBagLayout set"); }
-    /** Sets the grid bag constraints */
+    /**
+     * Sets the grid bag constraints
+     * @param constraints the GridBagConstraints to use
+     */
     private void setGridBagConstraints(GridBagConstraints constraints) { this.constraints = constraints; logger.debug("GridBagConstraints set"); }
-    /** Sets the clock text */
-    private void setClockText(String clockText) { this.clockText = clockText; logger.debug("clockText set"); }
-    /** Sets the clock */
+    /**
+     * Sets the clock date text
+     * @param dateText the date string to display
+     */
+    private void setDateText(String dateText) { this.dateText = dateText; logger.debug("dateTime set"); }
+    /**
+     * Sets the clock time text
+     * @param timeText the time string to display
+     */
+    private void setTimeText(String timeText) { this.timeText = timeText; logger.debug("clockTime set"); }
+    /**
+     * Sets the clock
+     * @param clock the clock reference
+     */
     public void setClock(Clock clock) { this.clock = clock; logger.debug("clock set"); }
-    /** Sets isShowDigitalTimeOnAnalogueClock */
+    /**
+     * Sets isShowDigitalTimeOnAnalogueClock
+     * @param showDigitalTimeOnAnalogueClock true to show digital time overlay
+     */
     public void setShowDigitalTimeOnAnalogueClock(boolean showDigitalTimeOnAnalogueClock)  { this.showDigitalTimeOnAnalogueClock = showDigitalTimeOnAnalogueClock; logger.debug("showDigitalTimeOnAnalogueClock set to " + showDigitalTimeOnAnalogueClock); }
-    /** Sets the self thread */
+    /**
+     * Sets the self thread
+     * @param thread the thread to assign
+     */
     private void setThread(Thread thread) { this.thread = thread; logger.debug("thread set");  }
 }

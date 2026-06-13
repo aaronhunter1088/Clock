@@ -239,9 +239,15 @@ public class DisplayTimePanel extends JPanel implements Runnable
     /** Returns if the thread is running */
     public boolean isRunning() { return thread != null; }
 
-    /** Sets the showAnaloguePanel flag */
+    /**
+     * Sets the showAnaloguePanel flag
+     * @param showAnaloguePanel true to display analogue clock view
+     */
     public void setShowAnaloguePanel(boolean showAnaloguePanel) { this.showAnaloguePanel = showAnaloguePanel; logger.debug("showAnaloguePanel set to {}", showAnaloguePanel); }
-    /** Sets the clock text */
+    /**
+     * Sets the clock text
+     * @param clockText the time string to display
+     */
     public void setClockText(String clockText) { this.clockText = clockText; /* logger.debug("clockText set to {}", clockText); */ }
 }
 

@@ -21,6 +21,10 @@ public enum Panel
         this.text = text;
     }
 
+    /**
+     * Gets the plain panel text to use for this panel choice.
+     * @return the panel plain text
+     */
     public String getText()
     {
         return text;

@@ -143,13 +143,25 @@ public class Lap implements Serializable, Comparable<Lap>, Cloneable
     /** Get the stopwatch */
     public Stopwatch getStopwatch() { return stopwatch; }
 
-    /** Set the lap number */
+    /**
+     * Set the lap number
+     * @param lapNumber the lap number to set
+     */
     public void setLapNumber(int lapNumber) { this.lapNumber = lapNumber; logger.debug("lapNumber set to {}", lapNumber); }
-    /** Set the duration */
+    /**
+     * Set the duration
+     * @param duration the duration to set in milliseconds
+     */
     public void setDuration(long duration) { this.duration = duration; logger.debug("duration set to {} seconds", duration); }
-    /** Set the lap time */
+    /**
+     * Set the lap time
+     * @param lapTime the lap time to set in milliseconds
+     */
     public void setLapTime(long lapTime) { this.lapTime = lapTime; logger.debug("lapTime set to {}", lapTime); }
-    /** Set the stopwatch */
+    /**
+     * Set the stopwatch
+     * @param stopwatch the stopwatch this lap belongs to
+     */
     public void setStopwatch(Stopwatch stopwatch) { this.stopwatch = stopwatch; logger.debug("stopwatch set to {}", stopwatch); }
 
     /**

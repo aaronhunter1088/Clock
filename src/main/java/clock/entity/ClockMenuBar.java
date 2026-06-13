@@ -534,52 +534,124 @@ public class ClockMenuBar extends JMenuBar
     /** Returns the clock */
     public Clock getClock() { return this.clock; }
 
-    /** Sets the settings menu */
+    /**
+     * Sets the settings menu
+     * @param settingsMenu the settings menu to set
+     */
     protected void setSettingsMenu(JMenu settingsMenu) { this.settingsMenu = settingsMenu; logger.debug("settings menu"); }
-    /** Sets the features menu */
+    /**
+     * Sets the features menu
+     * @param featuresMenu the features menu to set
+     */
     protected void setFeaturesMenu(JMenu featuresMenu) { this.featuresMenu = featuresMenu; logger.debug("features menu"); }
-    /** Sets the help menu item */
+    /**
+     * Sets the help menu item
+     * @param helpMenu the help menu to set
+     */
     protected void setupHelpMenu(JMenu helpMenu) { this.helpMenu = helpMenu; logger.debug("help menu"); }
-    /** Sets the alarms feature menu item */
+    /**
+     * Sets the alarms feature menu item
+     * @param alarmsFeature the alarm menu item to set
+     */
     protected void setAlarmsFeature(JMenuItem alarmsFeature) { this.alarmsFeature = alarmsFeature; logger.debug("alarms feature"); }
-    /** Sets the military time setting menu item */
+    /**
+     * Sets the military time setting menu item
+     * @param militaryTimeSetting the military time setting menu item to set
+     */
     protected void setMilitaryTimeSetting(JMenuItem militaryTimeSetting) { this.militaryTimeSetting = militaryTimeSetting; logger.debug("military time setting"); }
-    /** Sets the full time setting menu item */
+    /**
+     * Sets the full time setting menu item
+     * @param fullTimeSetting the full time setting menu item to set
+     */
     protected void setFullTimeSetting(JMenuItem fullTimeSetting) { this.fullTimeSetting = fullTimeSetting; logger.debug("full time setting"); }
-    /** Sets the partial time setting menu item */
+    /**
+     * Sets the partial time setting menu item
+     * @param partialTimeSetting the partial time setting menu item to set
+     */
     protected void setPartialTimeSetting(JMenuItem partialTimeSetting) { this.partialTimeSetting = partialTimeSetting; logger.debug("partial time setting"); }
-    /** Sets the toggle DST setting menu item */
+    /**
+     * Sets the toggle DST setting menu item
+     * @param toggleDSTSetting the toggle DST setting menu item to set
+     */
     protected void setToggleDSTSetting(JMenuItem toggleDSTSetting) { this.toggleDSTSetting = toggleDSTSetting; logger.debug("toggle dst setting"); }
-    /** Sets the pause/resume all timers setting menu item */
+    /**
+     * Sets the pause/resume all timers setting menu item
+     * @param pauseResumeAllTimersSetting the pause/resume all timers setting menu item to set
+     */
     protected void setPauseResumeAllTimersSetting(JMenuItem pauseResumeAllTimersSetting) { this.pauseResumeAllTimersSetting = pauseResumeAllTimersSetting; logger.debug("pause/resume all timers setting"); }
-    /** Sets the reset timers panel setting menu item */
+    /**
+     * Sets the reset timers panel setting menu item
+     * @param resetTimersPanelSetting the reset timers panel setting menu item to set
+     */
     protected void setResetTimersPanelSetting(JMenuItem resetTimersPanelSetting) { this.resetTimersPanelSetting = resetTimersPanelSetting; logger.debug("reset timers panel setting"); }
-    /** Sets the pause/resume all alarms setting menu item */
+    /**
+     * Sets the pause/resume all alarms setting menu item
+     * @param pauseResumeAllAlarmsSetting the pause/resume all alarms setting menu item to set
+     */
     protected void setPauseResumeAllAlarmsSetting(JMenuItem pauseResumeAllAlarmsSetting) { this.pauseResumeAllAlarmsSetting = pauseResumeAllAlarmsSetting; logger.debug("pause/resume all alarms setting"); }
-    /** Sets the reset alarms panel setting menu item */
+    /**
+     * Sets the reset alarms panel setting menu item
+     * @param resetAlarmsPanelSetting the reset alarms panel setting menu item to set
+     */
     protected void setResetAlarmsPanelSetting(JMenuItem resetAlarmsPanelSetting) { this.resetAlarmsPanelSetting = resetAlarmsPanelSetting; logger.debug("reset alarms panel setting"); }
-    /** Sets the show digital time on analogue clock setting menu item */
+    /**
+     * Sets the show digital time on analogue clock setting menu item
+     * @param showDigitalTimeSettingOnAnalogueClockSetting the show digital time on analogue clock setting menu item to set
+     */
     protected void setShowDigitalTimeOnAnalogueClockSetting(JMenuItem showDigitalTimeSettingOnAnalogueClockSetting) { this.showDigitalTimeSettingOnAnalogueClockSetting = showDigitalTimeSettingOnAnalogueClockSetting; logger.debug("show digital time on analogue clock setting"); }
-    /** Sets the show analogue time panel menu item */
+    /**
+     * Sets the show analogue time panel menu item
+     * @param showAnalogueTimePanel the show analogue time panel menu item to set
+     */
     protected void setShowAnalogueTimePanel(JMenuItem showAnalogueTimePanel) { this.showAnalogueTimePanel = showAnalogueTimePanel; logger.debug("show analogue time panel"); }
-    /** Sets the change time zone menu */
+    /**
+     * Sets the change time zone menu
+     * @param changeTimeZone the change time zone menu to set
+     */
     protected void setChangeTimeZoneMenu(JMenu changeTimeZone) { this.changeTimeZoneMenuSetting = changeTimeZone; logger.debug("change time zone menu"); }
-    /** Sets the digital clock feature menu item */
+    /**
+     * Sets the digital clock feature menu item
+     * @param digitalClockFeature the digital clock feature menu item to set
+     */
     protected void setDigitalClockFeature(JMenuItem digitalClockFeature) { this.digitalClockFeature = digitalClockFeature; logger.debug("digital clock feature"); }
-    /** Sets the analogue clock feature menu item */
+    /**
+     * Sets the analogue clock feature menu item
+     * @param analogueClockFeature the analogue clock feature menu item to set
+     */
     protected void setAnalogueClockFeature(JMenuItem analogueClockFeature) { this.analogueClockFeature = analogueClockFeature; logger.debug("analogue clock feature"); }
-    /** Sets the reverse laps setting menu item */
+    /**
+     * Sets the reverse laps setting menu item
+     * @param reverseLapsSetting the reverse laps setting menu item to set
+     */
     protected void setReverseLaps(JMenuItem reverseLapsSetting) { this.reverseLapsSetting = reverseLapsSetting; logger.debug("reverse laps setting"); }
-    /** Sets the list of timezone menu items */
+    /**
+     * Sets the list of timezone menu items
+     * @param timezones the list of timezone menu items to set
+     */
     protected void setTimeZones(java.util.List<JMenuItem> timezones) { this.timezones = timezones; logger.debug("timezones list"); }
-    /** Sets the timer feature menu item */
+    /**
+     * Sets the timer feature menu item
+     * @param timerFeature the timer feature menu item to set
+     */
     protected void setTimerFeature(JMenuItem timerFeature) { this.timerFeature = timerFeature; logger.debug("timer feature"); }
-    /** Sets the stopwatch feature menu item */
+    /**
+     * Sets the stopwatch feature menu item
+     * @param stopwatchFeature the stopwatch feature menu item to set
+     */
     protected void setStopwatchFeature(JMenuItem stopwatchFeature) { this.stopwatchFeature = stopwatchFeature; logger.debug("stopwatch feature"); }
-    /** Sets the help feature menu item */
+    /**
+     * Sets the help feature menu item
+     * @param helpFeature the help feature menu item to set
+     */
     protected void setTheHelpFeature(JMenuItem helpFeature) { this.helpFeature = helpFeature; logger.debug("help feature"); }
-    /** Sets the clock frame */
+    /**
+     * Sets the clock frame
+     * @param clockFrame the clock frame to set
+     */
     protected void setClockFrame(ClockFrame clockFrame) { this.clockFrame = clockFrame; logger.debug("clock frame"); }
-    /** Sets the clock */
+    /**
+     * Sets the clock
+     * @param clock the clock to set
+     */
     protected void setClock(Clock clock) { this.clock = clock; logger.debug("clock"); }
 }

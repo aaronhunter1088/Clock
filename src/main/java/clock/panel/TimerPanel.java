@@ -703,24 +703,54 @@ public class TimerPanel extends ClockPanel implements Runnable
     /** Returns the timers table */
     public JTable getTimersTable() { return timersTable; }
 
-    /** Sets the clock frame */
+    /**
+     * Sets the clock frame
+     * @param clockFrame the clock frame reference
+     */
     private void setClockFrame(ClockFrame clockFrame) { this.clockFrame = clockFrame; logger.debug("clockFrame set"); }
-    /** Sets the layout manager */
+    /**
+     * Sets the layout manager
+     * @param layout the GridBagLayout to use
+     */
     protected void setGridBagLayout(GridBagLayout layout) { this.layout = layout; logger.debug("layout set"); }
-    /** Sets the layout constraints */
+    /**
+     * Sets the layout constraints
+     * @param constraints the GridBagConstraints to use
+     */
     protected void setGridBagConstraints(GridBagConstraints constraints) { this.constraints = constraints; logger.debug("constraints set"); }
-    /** Sets the clock */
+    /**
+     * Sets the clock
+     * @param clock the clock reference
+     */
     public void setClock(Clock clock) { this.clock = clock; logger.debug("Clock set in TimerPanel"); }
-    /** Sets the name text field */
+    /**
+     * Sets the name text field
+     * @param nameTextField the name text field
+     */
     public void setNameTextField(JTextField nameTextField) { this.nameTextField = nameTextField; logger.debug("nameTextField set in TimerPanel"); }
-    /** Sets the hours text field */
+    /**
+     * Sets the hours text field
+     * @param hoursTextField the hours text field
+     */
     public void setHoursTextField(JTextField hoursTextField) { this.hoursTextField = hoursTextField; logger.debug("hoursTextField set in TimerPanel"); }
-    /** Sets the minutes text field */
+    /**
+     * Sets the minutes text field
+     * @param minutesTextField the minutes text field
+     */
     public void setMinutesTextField(JTextField minutesTextField) { this.minutesTextField = minutesTextField; logger.debug("minutesTextField set in TimerPanel"); }
-    /** Sets the seconds text field */
+    /**
+     * Sets the seconds text field
+     * @param secondsTextField the seconds text field
+     */
     public void setSecondsTextField(JTextField secondsTextField) { this.secondsTextField = secondsTextField; logger.debug("secondsTextField set in TimerPanel"); }
-    /** Sets the set timer button */
+    /**
+     * Sets the set timer button
+     * @param setTimerButton the set timer button
+     */
     public void setSetTimerButton(JButton setTimerButton) { this.setTimerButton = setTimerButton; logger.debug("setTimerButton set in TimerPanel");}
-    /** Sets the timers table */
+    /**
+     * Sets the timers table
+     * @param timersTable the JTable used to display timers
+     */
     public void setTimersTable(JTable timersTable) { this.timersTable = timersTable; logger.debug("timersTable set in TimerPanel");  }
 }

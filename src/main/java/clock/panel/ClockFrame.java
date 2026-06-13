@@ -385,21 +385,45 @@ public class ClockFrame extends JFrame
     /** Returns the scheduler */
     public ScheduledExecutorService getScheduler() { return scheduler; }
 
-    /** Sets the panel type */
+    /**
+     * Sets the panel type
+     * @param panelType the panel type to display
+     */
     public void setPanelType(Panel panelType) { this.panelType = panelType; logger.debug("set panel type to {}", panelType); }
-    /** Sets the current panel */
+    /**
+     * Sets the current panel
+     * @param currentPanel the panel to set as current
+     */
     public void setCurrentPanel(ClockPanel currentPanel) { this.currentPanel = currentPanel; logger.debug("currentPanel set"); }
-    /** Sets the digital clock panel */
+    /**
+     * Sets the digital clock panel
+     * @param digitalClockPanel the digital clock panel
+     */
     public void setDigitalClockPanel(DigitalClockPanel digitalClockPanel) { this.digitalClockPanel = digitalClockPanel; logger.debug("digitalClockPanel set"); }
-    /** Sets the analogue clock panel */
+    /**
+     * Sets the analogue clock panel
+     * @param analogueClockPanel the analogue clock panel
+     */
     public void setAnalogueClockPanel(AnalogueClockPanel analogueClockPanel) { this.analogueClockPanel = analogueClockPanel; logger.debug("analogueClockPanel set"); }
-    /** Sets the alarm panel */
+    /**
+     * Sets the alarm panel
+     * @param alarmPanel the alarm panel
+     */
     public void setAlarmPanel(AlarmPanel alarmPanel) { this.alarmPanel = alarmPanel; logger.debug("alarmPanel set"); }
-    /** Sets the timer panel */
+    /**
+     * Sets the timer panel
+     * @param timerPanel the timer panel
+     */
     public void setTimerPanel(TimerPanel timerPanel) { this.timerPanel = timerPanel; logger.debug("timerPanel set"); }
-    /** Sets the stopwatch panel */
+    /**
+     * Sets the stopwatch panel
+     * @param stopwatchPanel the stopwatch panel
+     */
     public void setStopwatchPanel(StopwatchPanel stopwatchPanel) { this.stopwatchPanel = stopwatchPanel; logger.debug("stopwatchPanel set"); }
-    /** Sets the clock */
+    /**
+     * Sets the clock
+     * @param clock the clock reference
+     */
     public void setClock(Clock clock) { this.clock = clock; logger.debug("clock set to {}", clock); }
     /** Sets the ScheduledExecutorService on the clock */
     public void setSchedulerOnClock() {
@@ -411,7 +435,10 @@ public class ClockFrame extends JFrame
             if (scheduler == null) { logger.error("scheduler is null"); }
         }
     }
-    /** Sets the scheduler */
+    /**
+     * Sets the scheduler
+     * @param scheduler the ScheduledExecutorService to use
+     */
     public void setScheduler(ScheduledExecutorService scheduler) { this.scheduler = scheduler; logger.debug("scheduler set"); }
 }
 

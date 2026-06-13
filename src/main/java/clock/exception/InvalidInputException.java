@@ -62,8 +62,14 @@ public class InvalidInputException extends RuntimeException implements Serializa
 	/** Get the cause */
 	public Throwable getCause() { return cause; }
 
-	/** Set the message */
+	/**
+     * Set the message
+     * @param message the message to set
+     */
 	public void setMessage(String message) { this.message = message; }
-	/** Set the cause */
+	/**
+     * Set the cause
+     * @param cause the cause to set
+     */
 	public void setCause(Throwable cause) { this.cause = cause; }
 }

@@ -232,12 +232,24 @@ public class DigitalClockPanel extends ClockPanel implements Runnable
     /** Returns the clock */
     public Clock getClock() { return this.clock; }
 
-    /** Sets the clock frame */
+    /**
+     * Sets the clock frame
+     * @param clockFrame the clock frame reference
+     */
     private void setClockFrame(ClockFrame clockFrame) { this.clockFrame = clockFrame; logger.debug("clockFrame set"); }
-    /** Sets the layout manager */
+    /**
+     * Sets the layout manager
+     * @param layout the GridBagLayout to use
+     */
     protected void setGridBagLayout(GridBagLayout layout) { this.layout = layout; }
-    /** Sets the grid bag constraints */
+    /**
+     * Sets the grid bag constraints
+     * @param constraints the GridBagConstraints to use
+     */
     protected void setGridBagConstraints(GridBagConstraints constraints) { this.constraints = constraints; }
-    /** Sets the clock */
+    /**
+     * Sets the clock
+     * @param clock the clock reference
+     */
     public void setClock(Clock clock) { this.clock = clock; logger.debug("clock set in DigitalClockPanel"); }
 }

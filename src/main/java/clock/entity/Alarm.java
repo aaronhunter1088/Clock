@@ -135,49 +135,19 @@ public class Alarm implements Serializable, Comparable<Alarm>
     {
         if (scheduledFuture == null || scheduledFuture.isDone() || scheduledFuture.isCancelled())
         {
-            long delayMillis = calculateDelayUntilNextActivation();
-
-            logger.debug("Scheduling alarm {} in {} ms", this, delayMillis);
-
-            scheduledFuture = scheduler.schedule(
-                    this::activateAlarm,
-                    delayMillis,
-                    TimeUnit.MILLISECONDS
-            );
-        }
-    }
-
-    private long calculateDelayUntilNextActivation()
-    {
-        LocalDateTime now = clock.getCurrentDateTime();
-
-        LocalTime alarmTime = LocalTime.of(getHours24(), getMinutes());
-
-        LocalDateTime nextActivation = null;
-
-        for (int i = 0; i <= 7; i++)
-        {
-            LocalDate candidateDate = now.toLocalDate().plusDays(i);
-            DayOfWeek candidateDay = candidateDate.getDayOfWeek();
-
-            LocalDateTime candidateDateTime = LocalDateTime.of(candidateDate, alarmTime);
-
-            boolean dayMatches = getDays().contains(candidateDay);
-            boolean timeIsInFuture = candidateDateTime.isAfter(now);
-
-            if (dayMatches && timeIsInFuture)
+            if (getAlarmAsString().equals(clock.getClockTimeAsAlarmString())
+                    && this.getDays().contains(clock.getDayOfWeek()))
             {
-                nextActivation = candidateDateTime;
-                break;
+                long delayMillis = 1L;
+                logger.debug("Scheduling alarm {} in {} ms", this, delayMillis);
+
+                scheduledFuture = scheduler.schedule(
+                        this::activateAlarm,
+                        delayMillis,
+                        TimeUnit.MILLISECONDS
+                );
             }
         }
-
-        if (nextActivation == null)
-        {
-            throw new IllegalStateException("No valid activation time found for alarm: " + this);
-        }
-
-        return Duration.between(now, nextActivation).toMillis();
     }
 
     /**
@@ -375,7 +345,6 @@ public class Alarm implements Serializable, Comparable<Alarm>
      */
     public List<String> getDaysShortened()
     {
-        logger.info("getDaysShortened");
         List<String> shortenedDays = new ArrayList<>();
         if (days.contains(MONDAY) && days.contains(TUESDAY) &&
             days.contains(WEDNESDAY) && days.contains(THURSDAY) && days.contains(FRIDAY)
@@ -405,6 +374,7 @@ public class Alarm implements Serializable, Comparable<Alarm>
                 }
             }
         }
+        logger.debug("getDaysShortened: {}", shortenedDays);
         return shortenedDays;
     }
 
@@ -467,6 +437,33 @@ public class Alarm implements Serializable, Comparable<Alarm>
     /** Returns the auto snooze future */
     public ScheduledFuture<?> getAutoSnoozeFuture() {
         return autoSnoozeFuture;
+    }
+
+    /**
+     * Returns the number of whole seconds remaining in the current snooze countdown.
+     * Returns 0 if the alarm is not snoozing or the future is absent.
+     *
+     * @return seconds remaining in snooze, or 0
+     */
+    public long getSnoozeTimeRemainingSeconds()
+    {
+        if (!isSnoozing || scheduledFuture == null) { return 0L; }
+        return Math.max(0L, scheduledFuture.getDelay(TimeUnit.SECONDS));
+    }
+
+    /**
+     * Returns the snooze countdown formatted as {@code M:SS} (e.g. {@code "6:59"}).
+     * Returns an empty string if the alarm is not currently snoozing.
+     *
+     * @return formatted countdown string, or empty string
+     */
+    public String getSnoozeTimeRemainingFormatted()
+    {
+        if (!isSnoozing || scheduledFuture == null) { return EMPTY; }
+        final long totalSeconds = Math.max(0L, scheduledFuture.getDelay(TimeUnit.SECONDS));
+        final long minutes = totalSeconds / 60;
+        final long seconds = totalSeconds % 60;
+        return String.format("%d:%02d", minutes, seconds);
     }
 
     /** Sets the clock reference */

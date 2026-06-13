@@ -17,7 +17,9 @@ import static java.time.DayOfWeek.WEDNESDAY;
 import static java.time.Month.JANUARY;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.doNothing;
+import static org.mockito.Mockito.when;
 
 /**
  * Tests for the {@link AnalogueClockPanel} class
@@ -37,6 +39,9 @@ public class AnalogueClockPanelTest
 
     @Mock
     Graphics g;
+
+    @Mock
+    FontMetrics mockFontMetrics;
 
     @BeforeAll
     static void beforeClass()
@@ -78,6 +83,8 @@ public class AnalogueClockPanelTest
 
         doNothing().when(g).setFont(any());
         doNothing().doNothing().doNothing().when(g).setColor(any());
+        when(g.getFontMetrics()).thenReturn(mockFontMetrics);
+        when(mockFontMetrics.stringWidth(anyString())).thenReturn(0);
 
         assertDoesNotThrow(() -> analogueClockPanel.paint(g), "Painting the AnalogueClockPanel should not throw an exception");
     }
@@ -123,7 +130,7 @@ public class AnalogueClockPanelTest
     @DisplayName("getClockText returns the initialised clock time string")
     void testGetClockTextIsNotNull()
     {
-        assertNotNull(analogueClockPanel.getClockText(),
+        assertNotNull(analogueClockPanel.getTimeText(),
                 "getClockText should return a non-null value after initialisation");
     }
 
@@ -143,6 +150,8 @@ public class AnalogueClockPanelTest
     {
         doNothing().when(g).setFont(any());
         doNothing().when(g).setColor(any());
+        when(g.getFontMetrics()).thenReturn(mockFontMetrics);
+        when(mockFontMetrics.stringWidth(anyString())).thenReturn(0);
         assertDoesNotThrow(() -> analogueClockPanel.drawStructure(g),
                 "drawStructure should not throw an exception");
     }

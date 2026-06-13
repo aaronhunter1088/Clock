@@ -464,7 +464,7 @@ public class Clock implements Serializable, Comparable<Clock>
      */
     private void setActiveAlarms()
     {
-        getListOfAlarms().forEach(alarm -> alarm.startAlarm(scheduledExecutorService));
+        listOfAlarms.forEach(alarm -> alarm.startAlarm(scheduledExecutorService));
         resetTriggeredAlarms();
     }
 
@@ -494,35 +494,6 @@ public class Clock implements Serializable, Comparable<Clock>
             logger.info("Setting {} alarms to not triggered today", Alarm.alarmsCounter);
         }
     }
-
-//    /**
-//     * The run method is the main loop of the clock.
-//     * It should run indefinitely, updating the clock
-//     * every second, and then sleeping for 1 second.
-//     * There are specifics tasks that should also
-//     * occur during each tick. We activate alarms,
-//     * and timers, if any, and refresh the clock time
-//     * if it is midnight.
-//     */
-//    @Override
-//    public void run()
-//    {
-//        logger.info("Clock is running");
-//        while (!Thread.currentThread().isInterrupted())
-//        {
-//            try
-//            {
-//                tick();
-//                sleep(1000);
-//            }
-//            catch (InterruptedException e)
-//            {
-//                printStackTrace(e, "Clock thread interrupted");
-//                Thread.currentThread().interrupt(); // Restore the interrupted status
-//                break; // Exit the loop if interrupted
-//            }
-//        }
-//    }
 
     /**
      * A default tick of the clock
@@ -777,8 +748,6 @@ public class Clock implements Serializable, Comparable<Clock>
     public boolean isShowPartialDate() { return showPartialDate; }
     /** Returns showMilitaryTime */
     public boolean isShowMilitaryTime() { return showMilitaryTime; }
-    ///** Returns testingClock */
-    //public boolean isTestingClock() { return testingClock; }
     /** Returns daylightSavingsTimeEnabled */
     public boolean isDaylightSavingsTimeEnabled() { return daylightSavingsTimeEnabled; }
     /** Returns the list of alarms */
@@ -859,22 +828,7 @@ public class Clock implements Serializable, Comparable<Clock>
     /** Sets and logs the new time value
      * @param time the new time value
      */
-    private void setTime(LocalTime time) { this.time = time; printTime(); }
-    private void printTime()
-    {
-        if (logger.isInfoEnabled())
-        {
-            logger.info("time: {} (isMilitary:{})",
-                    !isShowMilitaryTime() ? getTimeAsStr() : getMilitaryTimeAsStr(),
-                    isShowMilitaryTime());
-        }
-        else
-        {
-            logger.debug("time: {} (isMilitary:{})",
-                    !isShowMilitaryTime() ? getTimeAsStr() : getMilitaryTimeAsStr(),
-                    isShowMilitaryTime());
-        }
-    }
+    private void setTime(LocalTime time) { this.time = time; logger.debug("(isMilitary:{}) time: {} ", isShowMilitaryTime(), isShowMilitaryTime() ? getMilitaryTimeAsStr() : getTimeAsStr()); }
     /**
      * Sets and logs the new dayOfWeek value
      * @param dayOfWeek the new dayOfWeek value
@@ -900,24 +854,12 @@ public class Clock implements Serializable, Comparable<Clock>
      * Example log: FRIDAY MAY 4, 2000
      * @param date the new date value
      */
-    protected void setDate(LocalDate date) { this.date = date; printDate(); }
-    private void printDate()
-    {
-        if (logger.isInfoEnabled())
-        {
-            logger.info("date: {} {}", dayOfWeek!=null?dayOfWeek.toString():"DayOfWeekUnset", getDateAsStr());
-        }
-        else
-        {
-            logger.debug("date: {} {}", dayOfWeek!=null?dayOfWeek.toString():"DayOfWeekUnset", getDateAsStr());
-        }
-    }
+    protected void setDate(LocalDate date) { this.date = date; logger.debug("date: {} {}", dayOfWeek.toString(), getDateAsStr()); }
     /**
      * Sets and logs the new current time
      * @param currentDateTime the new current time
      */
-    protected void setCurrentDateTime(LocalDateTime currentDateTime) { this.currentDateTime = currentDateTime; printDateTime(); }
-    private void printDateTime() { logger.debug("{}", DateTimeFormatter.ofPattern("MMM dd, yyyy hh:mm:ss a").format(currentDateTime)); }
+    protected void setCurrentDateTime(LocalDateTime currentDateTime) { this.currentDateTime = currentDateTime; logger.debug("currentDateTime: {}", currentDateTime); }
     /**
      * Sets and logs the new begin dst date value
      * @param beginDaylightSavingsTimeDate the new begin dst date value
@@ -928,6 +870,10 @@ public class Clock implements Serializable, Comparable<Clock>
      * @param endDaylightSavingsTimeDate the new end dst date value
      */
     protected void setEndDaylightSavingsTimeDate(LocalDate endDaylightSavingsTimeDate) { this.endDaylightSavingsTimeDate = endDaylightSavingsTimeDate; logger.debug("end dst: {} {} {}, {}", endDaylightSavingsTimeDate.getDayOfWeek(), endDaylightSavingsTimeDate.getMonth(), endDaylightSavingsTimeDate.getDayOfMonth(), endDaylightSavingsTimeDate.getYear()); }
+    /**
+     * Sets the value for if it's a leap year or not
+     * @param leapYear the leap year value to set
+     */
     protected void setLeapYear(boolean leapYear) { this.leapYear = leapYear; logger.debug("isLeapYear: {}", this.leapYear); }
     /**
      * When the clock starts and the date matches a daylight savings
@@ -938,27 +884,54 @@ public class Clock implements Serializable, Comparable<Clock>
     protected void setTodayMatchesDSTDate(boolean todayMatchesDSTDate) { this.todayMatchesDSTDate = todayMatchesDSTDate; logger.debug("today is dst? {}", todayMatchesDSTDate); }
     /**
      * Sets and logs the new dateChanged value
-     * @param isDateChanged the dateChanged value to set
+     * @param isDateChanged the date changed value to set
      */
     protected void setDateChanged(boolean isDateChanged) { this.dateChanged = isDateChanged; logger.debug("dateChanged: {}", dateChanged); }
     /**
      * Sets and logs the new isNewYear value
-     * @param isNewYear the isNewYear value to set
+     * @param isNewYear the is new year value to set
      */
     protected void setIsNewYear(boolean isNewYear) { this.isNewYear = isNewYear; logger.debug("isNewYear: {}", isNewYear); }
+    /**
+     * Sets the value for showing the full date
+     * @param showFullDate the show full date value to set
+     */
     protected void setShowFullDate(boolean showFullDate) { this.showFullDate = showFullDate; logger.debug("showFullDate: {}", showFullDate); }
+    /**
+     * Sets the value for showing partial date
+     * @param showPartialDate the show partial date value to set
+     */
     protected void setShowPartialDate(boolean showPartialDate) { this.showPartialDate = showPartialDate; logger.debug("showPartialDate: {}", showPartialDate); }
+    /**
+     * Sets the value for showing military time or not
+     * @param showMilitaryTime the show military time value to set
+     */
     public void setShowMilitaryTime(boolean showMilitaryTime) { this.showMilitaryTime = showMilitaryTime; logger.debug("showMilitaryTime: {}", showMilitaryTime); }
-    //private void setTestingClock(boolean testingClock) { this.testingClock = testingClock; logger.debug("testingClock: {}", testingClock); }
+    /**
+     * Sets the value for if daylight savings time is enabled or not
+     * @param daylightSavingsTimeEnabled the dst value to set
+     */
     protected void setDaylightSavingsTimeEnabled(boolean daylightSavingsTimeEnabled) { this.daylightSavingsTimeEnabled = daylightSavingsTimeEnabled; logger.debug("daylightSavingsTimeEnabled: {}", daylightSavingsTimeEnabled); }
+    /**
+     * Sets the list of alarms
+     * @param listOfAlarms the list of alarms to set
+     */
     protected void setListOfAlarms(List<Alarm> listOfAlarms) { this.listOfAlarms = listOfAlarms; logger.debug("listOfAlarms: {}", listOfAlarms); }
+    /**
+     * Sets the list of timers
+     * @param listOfTimers the list of timers to set
+     */
     protected void setListOfTimers(List<Timer> listOfTimers) { this.listOfTimers = listOfTimers; logger.debug("listOfTimers: {}", listOfTimers); }
+    /**
+     * Sets the list of watches
+     * @param listOfStopwatches the list of stopwatches to set
+     */
     protected void setListOfStopwatches(List<Stopwatch> listOfStopwatches) { this.listOfStopwatches = listOfStopwatches; logger.debug("listOfStopwatches: {}", listOfStopwatches); }
-    /** Sets the scheduled executor service */
-    public void setScheduledExecutorService(ScheduledExecutorService scheduledExecutorService)
-    {
-        this.scheduledExecutorService = scheduledExecutorService;
-    }
+    /**
+     * Sets the scheduled executor service
+     * @param scheduledExecutorService the scheduled executor service to set
+     */
+    public void setScheduledExecutorService(ScheduledExecutorService scheduledExecutorService)  { this.scheduledExecutorService = scheduledExecutorService; logger.debug("scheduledExecutorService set"); }
 
     /**
      * Compares this clock to another clock based

@@ -197,12 +197,6 @@ class TimerPanelTest
         assertTrue(timerPanel.getClock().getListOfTimers().isEmpty(), "Expected clock list to be empty");
     }
 
-//    @Test
-//    void pauseCountDown() throws InterruptedException
-//    {
-//
-//    }
-
     // TODO: Update to parameterized test, create multiple timers
     @Test
     void testHittingSetButtonCreates5SecondTimer()

@@ -370,50 +370,95 @@ public class Timer implements Serializable, Comparable<Timer>
     /** Returns the sound future */
     public ScheduledFuture<?> getSoundFuture() { return soundFuture; }
 
-    /** Sets the clock */
+    /**
+     * Sets the clock
+     * @param clock the clock to set
+     */
     public void setClock(Clock clock) { this.clock = clock; logger.debug("clock set"); }
-    /** Sets the hours, also updates the hoursAsStr */
+    /**
+     * Sets the hours, also updates the hoursAsStr
+     * @param hour the hours to set
+     */
     public void setHours(int hour)
     {
         this.hours = hour;
         setHoursAsStr(hour < 10 ? ZERO + hour : EMPTY + hour);
         logger.debug("hours set to {}", hour);
     }
-    /** Sets the hours as a string */
+    /**
+     * Sets the hours as a string
+     * @param hoursAsStr the hours as a string to set
+     */
     public void setHoursAsStr(String hoursAsStr) { this.hoursAsStr = hoursAsStr; }
-    /** Sets the minutes, also updates the minutesAsStr */
+    /**
+     * Sets the minutes, also updates the minutesAsStr
+     * @param minutes the minutes to set
+     */
     public void setMinutes(int minutes)
     {
         this.minutes = minutes;
         setMinutesAsStr(minutes < 10 ? ZERO + minutes : EMPTY + minutes);
         logger.debug("minutes set to {}", minutes);
     }
-    /** Sets the minutes as a string */
+    /**
+     * Sets the minutes as a string
+     * @param minutesAsStr the minutes as a string to set
+     */
     public void setMinutesAsStr(String minutesAsStr) { this.minutesAsStr = minutesAsStr; }
-    /** Sets the seconds, also updates the secondsAsStr */
+    /**
+     * Sets the seconds, also updates the secondsAsStr
+     * @param seconds the seconds to set
+     */
     public void setSeconds(int seconds)
     {
         this.seconds = seconds;
         setSecondsAsStr(seconds < 10 ? ZERO + seconds : EMPTY + seconds);
         logger.debug("seconds set to {}", seconds);
     }
-    /** Sets the seconds as a string */
+    /**
+     * Sets the seconds as a string
+     * @param secondsAsStr the seconds as a string to set
+     */
     public void setSecondsAsStr(String secondsAsStr) { this.secondsAsStr = secondsAsStr; }
-    /** Sets the countdown */
+    /**
+     * Sets the countdown
+     * @param countDown the countdown to set
+     */
     public void setCountDown(LocalTime countDown) { this.countDown = countDown; }
-    /** Sets the paused flag */
+    /**
+     * Sets the paused flag
+     * @param paused the paused flag to set
+     */
     public void setPaused(boolean paused) { this.paused = paused; }
-    /** Sets the name of the timer */
+    /**
+     * Sets the name of the timer
+     * @param name the name of the timer to set
+     */
     public void setName(String name) { this.name = name; }
-    /** Sets the timerGoingOff flag */
+    /**
+     * Sets the timerGoingOff flag
+     * @param timerGoingOff the timerGoingOff flag to set
+     */
     public void setTimerGoingOff(boolean timerGoingOff) { this.timerGoingOff = timerGoingOff; }
-    /** Sets the started flag */
+    /**
+     * Sets the started flag
+     * @param started the started flag to set
+     */
     public void setStarted(boolean started) { this.started = started; }
-    /** Sets the triggered flag */
+    /**
+     * Sets the triggered flag
+     * @param triggered the triggered flag to set
+     */
     public void setTriggered(boolean triggered) { this.triggered = triggered; }
-    /** Sets the music player */
+    /**
+     * Sets the music player
+     * @param musicPlayer the music player to set
+     */
     public void setMusicPlayer(AdvancedPlayer musicPlayer) { this.musicPlayer = musicPlayer; }
-    /** Sets the countdown future */
+    /**
+     * Sets the countdown future
+     * @param countdownFuture the countdown future to set
+     */
     public void setCountdownFuture(ScheduledFuture<?> countdownFuture) { this.countdownFuture = countdownFuture; }
     /** Sets the sound future */
     public void setSoundFuture(ScheduledFuture<?> soundFuture) { this.soundFuture = soundFuture; }

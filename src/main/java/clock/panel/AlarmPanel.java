@@ -312,7 +312,7 @@ public class AlarmPanel extends ClockPanel implements Runnable
         setBackground(Color.BLACK);
         setForeground(Color.BLACK);
         resetAlarmPanel();
-        resetTableAndMenu();
+        setupAlarmsTableDefaults(false);
         setupSettingsMenu();
         clockFrame.setTitle(ALARM+S.toLowerCase());
         start();
@@ -476,8 +476,11 @@ public class AlarmPanel extends ClockPanel implements Runnable
                         alarm.getName() != null ? alarm.getName() : alarm.toString(),
                         alarm.getAlarmAsString(),
                         String.join(COMMA+SPACE, alarm.getDaysShortened()),
-                        SLEEPING,
-                        REMOVE
+                        alarm.isAlarmGoingOff() && !alarm.isSnoozing() ? SNOOZE
+                            : alarm.isSnoozing() ? alarm.getSnoozeTimeRemainingFormatted()
+                                    : SLEEPING,
+                        alarm.isAlarmGoingOff() && !alarm.isSnoozing() ? STOP
+                            : REMOVE
                 })
                 .toArray(Object[][]::new);
     }
@@ -526,19 +529,21 @@ public class AlarmPanel extends ClockPanel implements Runnable
                     if (currentAlarm.equals(alarm.getName())) {
                         alarmsTable.setValueAt(alarm.getAlarmAsString(), rowIndex.get(), 1);
                     }
-                    // update buttons to show restart or remove
+                    // update buttons to show stop or remove
                     if (alarm.isAlarmGoingOff() && !alarm.isSnoozing()) {
                         alarmsTable.getModel().setValueAt(SNOOZE, rowIndex.get(), 3);
                         alarmsTable.getModel().setValueAt(STOP, rowIndex.get(), 4);
-                        new ButtonColumn(alarmsTable, buttonAction(3), 3);
-                        new ButtonColumn(alarmsTable, buttonAction(4), 4);
+                    }
+                    else if (alarm.isSnoozing()) {
+                        alarmsTable.getModel().setValueAt(alarm.getSnoozeTimeRemainingFormatted(), rowIndex.get(), 3);
+                        alarmsTable.getModel().setValueAt(REMOVE, rowIndex.get(), 4);
                     }
                     else {
                         alarmsTable.getModel().setValueAt(SLEEPING, rowIndex.get(), 3);
                         alarmsTable.getModel().setValueAt(REMOVE, rowIndex.get(), 4);
-                        new ButtonColumn(alarmsTable, buttonAction(3), 3);
-                        new ButtonColumn(alarmsTable, buttonAction(4), 4);
                     }
+                    new ButtonColumn(alarmsTable, buttonAction(3), 3);
+                    new ButtonColumn(alarmsTable, buttonAction(4), 4);
                     rowIndex.getAndIncrement();
                 });
             }
@@ -678,7 +683,7 @@ public class AlarmPanel extends ClockPanel implements Runnable
      */
     public void setAlarm(ActionEvent action)
     {
-        logger.info("set alarm");
+        logger.debug("set alarm");
         try {
             Alarm alarm = createAlarm();
             // checks equality
@@ -872,48 +877,113 @@ public class AlarmPanel extends ClockPanel implements Runnable
     /** Returns the alarms table */
     public JTable getAlarmsTable() { return this.alarmsTable; }
 
-    /** Sets the clock */
+    /**
+     * Sets the clock
+     * @param clock the clock reference
+     */
     public void setClock(Clock clock) { this.clock = clock; logger.info("clock set"); }
-    /** Sets the clock frame */
+    /**
+     * Sets the clock frame
+     * @param clockFrame the clock frame reference
+     */
     protected void setClockFrame(ClockFrame clockFrame) { this.clockFrame = clockFrame; logger.debug("clockFrame set"); }
-    /** Sets the layout manager */
+    /**
+     * Sets the layout manage
+     * @param layout the GridBagLayout to use
+     */
     protected void setGridBagLayout(GridBagLayout layout) { this.layout = layout; logger.debug("layout set"); }
-    /** Sets the constraints */
+    /**
+     * Sets the constraints
+     * @param constraints the GridBagConstraints to use
+     */
     protected void setGridBagConstraints(GridBagConstraints constraints) { this.constraints = constraints; logger.debug("constraints set"); }
-    /** Sets the name label */
+    /**
+     * Sets the name label
+     * @param nameLabel the name label
+     */
     protected void setNameLabel(JLabel nameLabel) { this.nameLabel = nameLabel; logger.debug("nameLabel set"); }
-    /** Sets the hours label */
+    /**
+     * Sets the hours label
+     * @param alarmLabel1 the hours label
+     */
     protected void setHoursLabel(JLabel alarmLabel1) { this.hoursLabel = alarmLabel1; logger.debug("hoursLabel set"); }
-    /** Sets the minutes label */
+    /**
+     * Sets the minutes label
+     * @param alarmLabel2 the minutes label
+     */
     protected void setMinutesLabel(JLabel alarmLabel2) { this.minutesLabel = alarmLabel2; logger.debug("minutesLabel set"); }
-    /** Sets the ampm label */
+    /**
+     * Sets the ampm label
+     * @param alarmLabel3 the AM/PM label
+     */
     protected void setAmpmLabel(JLabel alarmLabel3) { this.ampmLabel = alarmLabel3; logger.debug("ampmLabel set"); }
-    /** Sets the ampm drop down */
+    /**
+     * Sets the ampm drop down
+     * @param ampmDropDown the AM/PM combo box
+     */
     protected void setAmpmDropDown(JComboBox<String> ampmDropDown) { this.ampmDropDown = ampmDropDown; logger.debug("ampmDropDown set"); }
-    /** Sets the name text field */
+    /**
+     * Sets the name text field
+     * @param nameTextField the name text field
+     */
     protected void setNameTextField(JTextField nameTextField) { this.nameTextField = nameTextField; logger.debug("nameTextField set"); }
-    /** Sets the hours text field */
+    /**
+     * Sets the hours text field
+     * @param textField1 the hours text field
+     */
     protected void setHoursTextField(JTextField textField1) { this.hoursTextField = textField1; logger.debug("hoursTextField set"); }
-    /** Sets the minutes text field */
+    /**
+     * Sets the minutes text field
+     * @param textField2 the minutes text field
+     */
     protected void setMinutesTextField(JTextField textField2) { this.minutesTextField = textField2; logger.debug("minutesTextField set"); }
-    /** Sets the set alarm button */
+    /**
+     * Sets the set alarm button
+     * @param setAlarmButton the set alarm button
+     */
     protected void setSetAlarmButton(JButton setAlarmButton) { this.setAlarmButton = setAlarmButton; logger.debug("setAlarmButton set"); }
-    /** Sets the Monday checkbox */
+    /**
+     * Sets the Monday checkbox
+     * @param mondayCheckBox the Monday checkbox
+     */
     protected void setMondayCheckBox(JCheckBox mondayCheckBox) { this.mondayCheckBox = mondayCheckBox; logger.debug("mondayCheckBox set"); }
-    /** Sets the Tuesday checkbox */
+    /** Sets the Tuesday checkbox
+     * @param tuesdayCheckBox the Tuesday checkbox
+     */
     protected void setTuesdayCheckBox(JCheckBox tuesdayCheckBox) { this.tuesdayCheckBox = tuesdayCheckBox; logger.debug("tuesdayCheckBox set"); }
-    /** Sets the Wednesday checkbox */
+    /**
+     * Sets the Wednesday checkbox
+     * @param wednesdayCheckBox the Wednesday checkbox
+     */
     protected void setWednesdayCheckBox(JCheckBox wednesdayCheckBox) { this.wednesdayCheckBox = wednesdayCheckBox; logger.debug("wednesdayCheckBox set"); }
-    /** Sets the Thursday checkbox */
+    /**
+     * Sets the Thursday checkbox
+     * @param thursdayCheckBox the Thursday checkbox
+     */
     protected void setThursdayCheckBox(JCheckBox thursdayCheckBox) { this.thursdayCheckBox = thursdayCheckBox; logger.debug("thursdayCheckBox set"); }
-    /** Sets the Friday checkbox */
+    /**
+     * Sets the Friday checkbox
+     * @param fridayCheckBox the Friday checkbox
+     */
     protected void setFridayCheckBox(JCheckBox fridayCheckBox) { this.fridayCheckBox = fridayCheckBox; logger.debug("fridayCheckBox set"); }
-    /** Sets the Saturday checkbox */
+    /**
+     * Sets the Saturday checkbox
+     * @param saturdayCheckBox the Saturday checkbox
+     */
     protected void setSaturdayCheckBox(JCheckBox saturdayCheckBox) { this.saturdayCheckBox = saturdayCheckBox; logger.debug("saturdayCheckBox set"); }
-    /** Sets the Sunday checkbox */
+    /**
+     * Sets the Sunday checkbox
+     * @param sundayCheckBox the Sunday checkbox
+     */
     protected void setSundayCheckBox(JCheckBox sundayCheckBox) { this.sundayCheckBox = sundayCheckBox; logger.debug("sundayCheckBox set"); }
-    /** Sets the Weekdays checkbox */
+    /**
+     * Sets the Weekdays checkbox
+     * @param weekdaysCheckBox the Weekdays checkbox
+     */
     protected void setWeekdaysCheckBox(JCheckBox weekdaysCheckBox) { this.weekdaysCheckBox = weekdaysCheckBox; logger.debug("weekCheckBox set"); }
-    /** Sets the Weekends checkbox */
+    /**
+     * Sets the Weekends checkbox
+     * @param weekendsCheckBox the Weekends checkbox
+     */
     protected void setWeekendsCheckBox(JCheckBox weekendsCheckBox) { this.weekendsCheckBox = weekendsCheckBox; logger.debug("weekendCheckBox set"); }
 }

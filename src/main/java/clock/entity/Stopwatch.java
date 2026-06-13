@@ -351,20 +351,44 @@ public class Stopwatch implements Serializable, Comparable<Stopwatch>
     /** Returns the scheduled future */
     public ScheduledFuture<?> getScheduledFuture() { return scheduledFuture; }
 
-    /** Set the clock */
+    /**
+     * Set the clock
+     * @param clock the clock to set
+     */
     public void setClock(Clock clock) { this.clock = clock; logger.debug("clock set"); }
-    /** Set paused */
+    /**
+     * Set paused
+     * @param paused the paused state to set
+     */
     public void setPaused(boolean paused) { this.paused = paused; logger.debug("paused set to {}", paused); }
-    /** Set the name */
+    /**
+     * Set the name
+     * @param name the name to set
+     */
     public void setName(String name) { this.name = name; logger.debug("name set to {}", name); }
-    /** Set started */
+    /**
+     * Set started
+     * @param started the started state to set
+     */
     public void setStarted(boolean started) { this.started = started; logger.debug("started set to {}", started); }
-    /** Set the laps */
+    /**
+     * Set the laps
+     * @param laps the list of laps to set
+     */
     public void setLaps(List<Lap> laps) { this.laps = laps; if (laps != null) logger.debug("laps set"); else logger.debug("laps set to null"); }
-    /** Set the duration */
+    /**
+     * Set the duration
+     * @param duration the duration to set
+     */
     public void setDuration(Duration duration) { this.duration = duration; /* logger.debug("duration set to {}", duration); */ }
-    /** Set the accumulated paused milliseconds */
+    /**
+     * Set the accumulated paused milliseconds
+     * @param pausedAccumMilli the accumulated paused milliseconds to set
+     */
     public void setPausedAccumMilli(long pausedAccumMilli) { this.pausedAccumMilli = pausedAccumMilli; /* logger.debug("pausedAccumMilli set to {}", pausedAccumMilli); */ }
-    /** Set the scheduled future */
+    /**
+     * Set the scheduled future
+     * @param scheduledFuture the scheduled future to set
+     */
     public void setScheduledFuture(ScheduledFuture<?> scheduledFuture) { this.scheduledFuture = scheduledFuture; logger.debug("scheduledFuture set"); }
 }
