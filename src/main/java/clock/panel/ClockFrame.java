@@ -18,7 +18,6 @@ import java.util.concurrent.TimeUnit;
 
 import static clock.entity.Panel.*;
 import static clock.util.Constants.*;
-import static java.util.Arrays.stream;
 
 /**
  * ClockFrame
@@ -133,7 +132,7 @@ public class ClockFrame extends JFrame
         else {
             resource = classLoader.getResource(path.substring(19));
             if (resource != null) { retImageIcon = new ImageIcon(resource); }
-            else { logger.error("The path '" + path + "' you provided cannot find a resource. Returning null"); }
+            else { logger.error("The path '{}' you provided cannot find a resource. Returning null", path); }
         }
         return retImageIcon;
     }

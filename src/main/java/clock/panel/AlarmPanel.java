@@ -235,35 +235,35 @@ public class AlarmPanel extends ClockPanel implements Runnable
                     checkBox.setBackground(Color.BLACK);
                     checkBox.setForeground(Color.WHITE);
         });
-        sundayCheckBox.addActionListener(action -> {
+        sundayCheckBox.addActionListener(_ -> {
             sundayCheckBox.setSelected(sundayCheckBox.isSelected());
             logger.info("sundayCheckBox: {}", sundayCheckBox.isSelected());
         });
-        mondayCheckBox.addActionListener(action -> {
+        mondayCheckBox.addActionListener(_ -> {
             mondayCheckBox.setSelected(mondayCheckBox.isSelected());
             logger.info("mondayCheckBox: {}", mondayCheckBox.isSelected());
         });
-        tuesdayCheckBox.addActionListener(action -> {
+        tuesdayCheckBox.addActionListener(_ -> {
             tuesdayCheckBox.setSelected(tuesdayCheckBox.isSelected());
             logger.info("tuesdayCheckBox: {}", tuesdayCheckBox.isSelected());
         });
-        wednesdayCheckBox.addActionListener(action -> {
+        wednesdayCheckBox.addActionListener(_ -> {
             wednesdayCheckBox.setSelected(wednesdayCheckBox.isSelected());
             logger.info("wednesdayCheckBox: {}", wednesdayCheckBox.isSelected());
         });
-        thursdayCheckBox.addActionListener(action -> {
+        thursdayCheckBox.addActionListener(_ -> {
             thursdayCheckBox.setSelected(thursdayCheckBox.isSelected());
             logger.info("thursdayCheckBox: {}", thursdayCheckBox.isSelected());
         });
-        fridayCheckBox.addActionListener(action -> {
+        fridayCheckBox.addActionListener(_ -> {
             fridayCheckBox.setSelected(fridayCheckBox.isSelected());
             logger.info("fridayCheckBox: {}", fridayCheckBox.isSelected());
         });
-        saturdayCheckBox.addActionListener(action -> {
+        saturdayCheckBox.addActionListener(_ -> {
             saturdayCheckBox.setSelected(saturdayCheckBox.isSelected());
             logger.info("saturdayCheckBox: {}", saturdayCheckBox.isSelected());
         });
-        weekdaysCheckBox.addActionListener(action -> {
+        weekdaysCheckBox.addActionListener(_ -> {
             if (!weekdaysCheckBox.isSelected())
             {
                 logger.info("Week checkbox not selected!");
@@ -285,7 +285,7 @@ public class AlarmPanel extends ClockPanel implements Runnable
                 fridayCheckBox.setSelected(true);
             }
         });
-        weekendsCheckBox.addActionListener(action -> {
+        weekendsCheckBox.addActionListener(_ -> {
             if (!weekendsCheckBox.isSelected())
             {
                 logger.info("Weekend checkbox not selected!");

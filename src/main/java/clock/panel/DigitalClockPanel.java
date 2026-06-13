@@ -184,7 +184,7 @@ public class DigitalClockPanel extends ClockPanel implements Runnable
             timeStr = clock.defaultText(9);
         }
         // If we have only Timers going off
-        else if (timersGoingOff && !alarmsGoingOff)
+        else if (!alarmsGoingOff) //if (timersGoingOff && !alarmsGoingOff)
         {
             var activeTimers = clock.getListOfTimers().stream().filter(Timer::isTimerGoingOff).toList();
             // Display Timer Name or "Many Timers" if more than one

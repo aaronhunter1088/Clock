@@ -6,11 +6,11 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import javax.swing.*;
-import javax.swing.border.LineBorder;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
+import java.io.Serial;
 import java.util.Arrays;
 import java.util.List;
 
@@ -25,16 +25,18 @@ import static clock.entity.Panel.*;
  */
 public class ClockMenuBar extends JMenuBar
 {
+    @Serial
+    private static final long serialVersionUID = 1L;
     private static final Logger logger = LogManager.getLogger(ClockMenuBar.class);
     private ClockFrame clockFrame;
     private Clock clock;
     // menu options
-    private JMenu settingsMenu,
+    private transient JMenu settingsMenu,
                   featuresMenu,
                   helpMenu,
                   changeTimeZoneMenuSetting; // an option under Settings
     // Options for Settings
-    private JMenuItem militaryTimeSetting,
+    private transient JMenuItem militaryTimeSetting,
                       fullTimeSetting,
                       partialTimeSetting,
                       toggleDSTSetting,
@@ -53,12 +55,10 @@ public class ClockMenuBar extends JMenuBar
                       analogueClockFeature,
                       alarmsFeature,
                       timerFeature,
-                      stopwatchFeature;
+                      stopwatchFeature,
     // Options for Help
-    private JMenuItem helpFeature; // shows about and help for that panel
-    private List<JMenuItem> timezones;
-    public static final Color
-            MOTIF_GRAY = new Color(174, 178, 195); // Motif look
+                      helpFeature; // shows about and help for that panel
+    private transient List<JMenuItem> timezones;
 
     /**
      * The main constructor for the clock menu bar.
@@ -166,45 +166,45 @@ public class ClockMenuBar extends JMenuBar
         getResetLapsSetting().setAccelerator(null);
         getResetLapsSetting().setForeground(Color.WHITE);
         getResetLapsSetting().setName("Clears the Laps Panel for the current stopwatch completely.");
-        getResetLapsSetting().addActionListener(action -> clockFrame.getStopwatchPanel().resetLapsPanel());
+        getResetLapsSetting().addActionListener(_ -> clockFrame.getStopwatchPanel().resetLapsPanel());
 
         setResetAllLapsSetting(new JMenuItem(RESET+SPACE+ALL+SPACE+LAPS));
         getResetAllLapsSetting().setAccelerator(null);
         getResetAllLapsSetting().setForeground(Color.WHITE);
         getResetAllLapsSetting().setName("Clears the Laps Panel for all stopwatches completely.");
-        getResetAllLapsSetting().addActionListener(action -> clockFrame.getStopwatchPanel().resetAllLapsPanel());
+        getResetAllLapsSetting().addActionListener(_ -> clockFrame.getStopwatchPanel().resetAllLapsPanel());
 
         setResetStopwatchesPanelSetting(new JMenuItem(RESET+SPACE+PANEL));
         getResetStopwatchesPanelSetting().setAccelerator(null); // not implemented
         getResetStopwatchesPanelSetting().setForeground(Color.WHITE);
         getResetStopwatchesPanelSetting().setName("Clears the Stopwatches Panel completely.");
-        getResetStopwatchesPanelSetting().addActionListener(action -> clockFrame.getStopwatchPanel().resetStopwatchPanel());
+        getResetStopwatchesPanelSetting().addActionListener(_ -> clockFrame.getStopwatchPanel().resetStopwatchPanel());
 
         // Features menu choices
         setDigitalClockFeature(new JMenuItem(VIEW_DIGITAL_CLOCK));
         getDigitalClockFeature().setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_D, InputEvent.CTRL_DOWN_MASK));
         getDigitalClockFeature().setName("View the digital clock panel.");
-        getDigitalClockFeature().addActionListener(action -> clockFrame.changePanels(PANEL_DIGITAL_CLOCK));
+        getDigitalClockFeature().addActionListener(_ -> clockFrame.changePanels(PANEL_DIGITAL_CLOCK));
 
         setAnalogueClockFeature(new JMenuItem(VIEW_ANALOGUE_CLOCK));
         getAnalogueClockFeature().setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_C, InputEvent.CTRL_DOWN_MASK));
         getAnalogueClockFeature().setName("View the analogue clock panel.");
-        getAnalogueClockFeature().addActionListener(action -> clockFrame.changePanels(PANEL_ANALOGUE_CLOCK));
+        getAnalogueClockFeature().addActionListener(_ -> clockFrame.changePanels(PANEL_ANALOGUE_CLOCK));
 
         setAlarmsFeature(new JMenuItem(VIEW_ALARMS));
         getAlarmsFeature().setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_A, InputEvent.CTRL_DOWN_MASK));
         getAlarmsFeature().setName("View the alarms panel.");
-        getAlarmsFeature().addActionListener(action -> clockFrame.changePanels(PANEL_ALARM));
+        getAlarmsFeature().addActionListener(_ -> clockFrame.changePanels(PANEL_ALARM));
 
         setTimerFeature(new JMenuItem(VIEW_TIMERS));
         getTimerFeature().setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_T, InputEvent.CTRL_DOWN_MASK));
         getTimerFeature().setName("View the timers panel.");
-        getTimerFeature().addActionListener(action -> clockFrame.changePanels(PANEL_TIMER));
+        getTimerFeature().addActionListener(_ -> clockFrame.changePanels(PANEL_TIMER));
 
         setStopwatchFeature(new JMenuItem(VIEW_STOPWATCHES));
         getStopwatchFeature().setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_S, InputEvent.CTRL_DOWN_MASK));
         getStopwatchFeature().setName("View the stopwatch panel.");
-        getStopwatchFeature().addActionListener(action -> clockFrame.changePanels(PANEL_STOPWATCH));
+        getStopwatchFeature().addActionListener(_ -> clockFrame.changePanels(PANEL_STOPWATCH));
 
         // Help Menu
         setTheHelpFeature(new JMenuItem(VIEW_HELP));
@@ -354,7 +354,7 @@ public class ClockMenuBar extends JMenuBar
     public void setupTimezone(JMenuItem timezone)
     {
         logger.debug("setup timezone for {}", timezone.getText());
-        timezone.addActionListener(l -> clockFrame.updateClockTimezone(timezone));
+        timezone.addActionListener(_ -> clockFrame.updateClockTimezone(timezone));
         timezone.setForeground(Color.WHITE);
         timezone.setBackground(Color.BLACK);
         timezone.setName(timezone.getText());
