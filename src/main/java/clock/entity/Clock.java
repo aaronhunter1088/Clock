@@ -241,11 +241,14 @@ public class Clock implements Serializable, Comparable<Clock>
      */
     public void setTheDateAndTime()
     {
-        setDateChanged(false);
-        setDate(LocalDate.of(year, month, dayOfMonth));
+        // configured such that we only set and log the date if the date has changed, if it was never set, or if we are in debug mode
+        if (dateChanged || date == null || logger.isDebugEnabled()) {
+            setDate(LocalDate.of(year, month, dayOfMonth));
+        }
         setTime(LocalTime.of(this.hours, this.minutes, this.seconds));
         setLeapYear(date.isLeapYear());
         setCurrentDateTime(LocalDateTime.of(date, time));
+        setDateChanged(false);
     }
 
     /**
@@ -851,7 +854,7 @@ public class Clock implements Serializable, Comparable<Clock>
     /** Sets and logs the new time value
      * @param time the new time value
      */
-    private void setTime(LocalTime time) { this.time = time; logger.debug("(isMilitary:{}) time: {} ", isShowMilitaryTime(), isShowMilitaryTime() ? getMilitaryTimeAsStr() : getTimeAsStr()); }
+    private void setTime(LocalTime time) { this.time = time; logger.info("(isMilitary:{}) time: {} ", isShowMilitaryTime(), isShowMilitaryTime() ? getMilitaryTimeAsStr() : getTimeAsStr()); }
     /**
      * Sets and logs the new dayOfWeek value
      * @param dayOfWeek the new dayOfWeek value
@@ -877,7 +880,7 @@ public class Clock implements Serializable, Comparable<Clock>
      * Example log: FRIDAY MAY 4, 2000
      * @param date the new date value
      */
-    protected void setDate(LocalDate date) { this.date = date; logger.debug("date: {} {}", dayOfWeek.toString(), getDateAsStr()); }
+    protected void setDate(LocalDate date) { this.date = date; logger.info("date: {} {}", dayOfWeek.toString(), getDateAsStr()); }
     /**
      * Sets and logs the new current time
      * @param currentDateTime the new current time
