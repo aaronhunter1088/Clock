@@ -100,26 +100,18 @@ public class Constants {
     //String
 
     // Timer
-    public static final String COMPLETE = "Complete";
     public static final String COUNTDOWN = "Countdown";
-    public static final String CURRENT_TIMERS = "Current Timers";
     public static final String EDIT = "Edit";
     public static final String HOUR = "Hour";
     public static final String MIN = "Min";
     public static final String PAUSE = "Pause";
-    public static final String PAUSE_TIMER = "Pause Timer";
     public static final String REMOVE = "Remove";
     public static final String RESET = "Reset";
     public static final String RESUME = "Resume";
-    public static final String RESUME_TIMER = "Resume Timer";
     public static final String SEC = "Sec";
     public static final String SET = "Set";
     public static final String TIME = "Time";
     public static final String TIMER = "Timer";
-    public static final String TIMER_HOUR_ERROR_12 = "0 <= "+HOUR+" > 12";
-    public static final String TIMER_HOUR_ERROR_24 = "0 <= "+HOUR+" > 24";
-    public static final String TIMER_MIN_ERROR = "0 <= "+MIN+" > 60";
-    public static final String TIMER_SEC_ERROR = "0 <= "+SEC+" > 60";
     public static final String TIMER_ERROR = "Timer Error";
     public static final String VIEW_TIMERS = "View Timers";
     public static final String VIEW_STOPWATCHES = "View Stopwatches";
@@ -127,11 +119,9 @@ public class Constants {
     public static final String ZERO = "0";
 
     // Alarm
-    public static final String ADDED = "Added";
     public static final String ALARM = "Alarm";
     public static final String ALARM_ERROR = "Alarm Error";
     public static final String AMPM = "AM/PM";
-    public static final String CURRENT_ALARMS = "Current Alarms";
     public static final String DAYS = "Days";
     public static final String M = "M";
     public static final String T = "T";
@@ -144,24 +134,20 @@ public class Constants {
     public static final String SLEEPING = "Sleeping .zZ";
     public static final String SNOOZE = "Snooze";
     public static final String STOP = "Stop";
-    public static final String SET_ALARMS = "Set Alarms";
     public static final String VIEW_ALARMS = "View Alarms";
     public static final String WEEK = "WK";
-    public static final String WEEK_FULL = "Week";
     public static final String WEEKDAYS = "Weekdays";
     public static final String WEEKEND = "WKD";
     public static final String WEEKENDS = "Weekends";
     public static final String VIEW_DIGITAL_CLOCK = "View Digital Clock";
     public static final String VIEW_ANALOGUE_CLOCK = "View Analogue Clock";
     public static final List<DayOfWeek> WEEKDAYS_LIST = List.of(MONDAY, TUESDAY, WEDNESDAY, THURSDAY, FRIDAY);
-    public static final List<DayOfWeek> WEEKEND_DAYS_LIST_AMERICAN = List.of(SATURDAY, SUNDAY);
 
     // Stopwatch
     public static final String ELAPSED = "Elapsed";
     public static final String LAP = "Lap";
     public static final String LAP_SYM = "Lap #";
     public static final String LAPS = "Laps";
-    public static final String LAP_TIME = "Lap Time";
     public static final String RECORDED = "Recorded";
     public static final String RESTORE = "Restore";
     public static final String REVERSE = "Reverse";

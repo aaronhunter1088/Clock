@@ -209,7 +209,7 @@ class AlarmTest {
 
     @Test
     @DisplayName("Test Alarm Is Triggered")
-    void testTriggerAnAlarm()
+    void testTriggerAnAlarm() throws InterruptedException, InvocationTargetException
     {
         alarm1 = weekDays730AmAlarm;
 
@@ -222,7 +222,7 @@ class AlarmTest {
         alarm1.startAlarm(clock.getScheduledExecutorService());
         sleep(1000); // Allow time for the alarm to trigger
 
-        javax.swing.SwingUtilities.invokeLater(() -> {
+        EventQueue.invokeAndWait(() -> {
             assertTrue(alarm1.isAlarmGoingOff(), "Alarm should be going off");
             assertTrue(alarm1.isActivatedToday(), "Alarm should be triggered today");
             assertNotNull(alarm1.getMusicPlayer(), "Music player should be set");
@@ -231,7 +231,7 @@ class AlarmTest {
 
     @Test
     @DisplayName("Test Pausing An Alarm")
-    void testPausingAnAlarm()
+    void testPausingAnAlarm() throws InterruptedException, InvocationTargetException
     {
         alarm1 = weekDays730AmAlarm;
 
@@ -244,7 +244,7 @@ class AlarmTest {
         alarm1.startAlarm(clock.getScheduledExecutorService());
         sleep(1000); // Allow time for the alarm to trigger
 
-        javax.swing.SwingUtilities.invokeLater(() -> {
+        EventQueue.invokeAndWait(() -> {
             assertTrue(alarm1.isAlarmGoingOff(), "Alarm should be going off");
             assertTrue(alarm1.isActivatedToday(), "Alarm should be triggered today");
             alarm1.pauseAlarm();
@@ -254,7 +254,7 @@ class AlarmTest {
 
     @Test
     @DisplayName("Test Resuming A Paused Alarm")
-    void testResumingAPausedAlarm()
+    void testResumingAPausedAlarm() throws InterruptedException, InvocationTargetException
     {
         alarm1 = weekDays730AmAlarm;
 
@@ -267,7 +267,7 @@ class AlarmTest {
         alarm1.startAlarm(clock.getScheduledExecutorService());
         sleep(1000); // Allow time for the alarm to trigger
 
-        javax.swing.SwingUtilities.invokeLater(() -> {
+        EventQueue.invokeAndWait(() -> {
             assertTrue(alarm1.isAlarmGoingOff(), "Alarm should be going off");
             assertTrue(alarm1.isActivatedToday(), "Alarm should be triggered today");
             alarm1.pauseAlarm();
@@ -280,10 +280,8 @@ class AlarmTest {
 
     @Test
     @DisplayName("Checking An Alarm when not equal to current time does nothing")
-    void testCheckingAnAlarmWhenNotEqualToCurrentTimeDoesNothing()
+    void testCheckingAnAlarmWhenNotEqualToCurrentTimeDoesNothing() throws InterruptedException, InvocationTargetException
     {
-        alarm1 = weekDays730AmAlarm;
-
         // Simulate the clock not reaching the alarm time
         LocalDate date = LocalDateTime.now().toLocalDate().with(ChronoField.DAY_OF_WEEK, DayOfWeek.MONDAY.getValue());
         LocalTime time = LocalDateTime.now().toLocalTime().withHour(6).withMinute(30);
@@ -293,7 +291,7 @@ class AlarmTest {
         alarm1.startAlarm(clock.getScheduledExecutorService());
         sleep(1000);
 
-        javax.swing.SwingUtilities.invokeLater(() -> assertNull(alarm1.getMusicPlayer(), "Music player should not be set yet"));
+        EventQueue.invokeAndWait(() -> assertNull(alarm1.getMusicPlayer(), "Music player should not be set yet"));
     }
 
     @Test

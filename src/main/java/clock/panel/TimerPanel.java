@@ -166,7 +166,7 @@ public class TimerPanel extends ClockPanel implements Runnable
                             {
                                 displayPopupMessage(TIMER_ERROR, "Hours must be between 0 and "+upperLimit, 0);
                                 hoursTextField.setBorder(new LineBorder(Color.RED));
-                                hoursTextField.requestFocusInWindow();
+                                hoursTextField.grabFocus();
                             }
                         }
                         case MIN+TEXT_FIELD -> {
@@ -179,7 +179,7 @@ public class TimerPanel extends ClockPanel implements Runnable
                             {
                                 displayPopupMessage(TIMER_ERROR, "Minutes must be between 0 and 59", 0);
                                 minutesTextField.setBorder(new LineBorder(Color.RED));
-                                minutesTextField.requestFocusInWindow();
+                                minutesTextField.grabFocus();
                             }
                         }
                         case SEC+TEXT_FIELD -> {

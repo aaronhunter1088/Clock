@@ -340,7 +340,7 @@ public class ClockFrame extends JFrame
      * Starts the clock and schedules the
      * tasks to run at a fixed rate.
      */
-    void start()
+    public void start()
     {
         clock.setScheduledExecutorService(scheduler);
         scheduler.scheduleAtFixedRate(

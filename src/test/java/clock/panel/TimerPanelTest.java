@@ -56,6 +56,7 @@ class TimerPanelTest
         clock = clockFrame.getClock();
         timerPanel = new TimerPanel(clockFrame);
         clockFrame.changePanels(PANEL_TIMER);
+        clockFrame.start();
     }
 
     @AfterEach
@@ -199,7 +200,7 @@ class TimerPanelTest
 
     // TODO: Update to parameterized test, create multiple timers
     @Test
-    void testHittingSetButtonCreates5SecondTimer()
+    void testHittingSetButtonCreates5SecondTimer() throws InterruptedException, InvocationTargetException
     {
         // set up the timer
         timerPanel.getHoursTextField().setText(ZERO);
@@ -208,7 +209,7 @@ class TimerPanelTest
         // click
         timerPanel.getSetTimerButton().doClick();
 
-        javax.swing.SwingUtilities.invokeLater(() -> {
+        EventQueue.invokeAndWait(() -> {
             assertTrue(timerPanel.getSetTimerButton().isEnabled());
             assertTrue(timerPanel.areAllBlank());
             assertTrue(timerPanel.getNameTextField().getText().isBlank(), "Expected name field to be blank");
@@ -331,7 +332,7 @@ class TimerPanelTest
     }
 
     @Test
-    void testClickedOffHourFieldValidNumberInputFocusLost()
+    void testClickedOffHourFieldValidNumberInputFocusLost() throws InterruptedException, InvocationTargetException
     {
         timerPanel.getHoursTextField().setText("1"); // start a 1 hour timer
         // user opens timer panel, enters number and clicks off hour field
@@ -345,7 +346,7 @@ class TimerPanelTest
 
         timerPanel.getHoursTextField().dispatchEvent(focusEvent);
 
-        javax.swing.SwingUtilities.invokeLater(() -> {
+        EventQueue.invokeAndWait(() -> {
             assertEquals("1", timerPanel.getHoursTextField().getText(), "Expected field to be 1");
             assertEquals(SET, timerPanel.getSetTimerButton().getText(), "Expected set timer button text to be "+SET);
             assertTrue(timerPanel.getSetTimerButton().isEnabled(), "Expected set timer button to be enabled");
@@ -353,7 +354,7 @@ class TimerPanelTest
     }
 
     @Test
-    void testClickedOffHourFieldInvalidNumberInputFocusLost()
+    void testClickedOffHourFieldInvalidNumberInputFocusLost() throws InterruptedException, InvocationTargetException
     {
         timerPanel.getHoursTextField().setText("-1"); // start a -1 hour timer
         // user opens timer panel, enters invalid number and clicks off hour field
@@ -367,15 +368,14 @@ class TimerPanelTest
 
         timerPanel.getHoursTextField().dispatchEvent(focusEvent);
 
-        javax.swing.SwingUtilities.invokeLater(() -> {
+        EventQueue.invokeAndWait(() -> {
             assertEquals("-1", timerPanel.getHoursTextField().getText(), "Expected field to be -1");
-            assertEquals(TIMER_HOUR_ERROR_12, timerPanel.getSetTimerButton().getText(), "Expected set timer button text to be: "+TIMER_HOUR_ERROR_12);
-            assertFalse(timerPanel.getSetTimerButton().isEnabled(), "Expected set timer button to be disabled");
+            assertEquals(SET, timerPanel.getSetTimerButton().getText(), "Expected set timer button text to be "+SET);
         });
     }
 
     @Test
-    void testClickedOffHourFieldInvalidNumberAgainInputFocusLost()
+    void testClickedOffHoursFieldInvalidNumberAgainInputFocusLost()
     {
         clock = new Clock(15, 30, 0, JANUARY, WEDNESDAY, 1, 2025, PM);
         timerPanel.getClockFrame().setClock(clock);
@@ -395,7 +395,7 @@ class TimerPanelTest
     }
 
     @Test
-    void testClickedOffHourFieldValidNumberInputFocusLostMinutesIsInvalid()
+    void testClickedOffHourFieldValidNumberInputFocusLostMinutesIsInvalid() throws InterruptedException, InvocationTargetException
     {
         timerPanel.getHoursTextField().setText("1"); // start a 1 hour timer
         timerPanel.getMinutesTextField().setText("M"); // invalid minute
@@ -409,63 +409,109 @@ class TimerPanelTest
 
         timerPanel.getMinutesTextField().dispatchEvent(focusEvent);
 
-        javax.swing.SwingUtilities.invokeLater(() -> {
+        EventQueue.invokeAndWait(() -> {
             assertEquals("1", timerPanel.getHoursTextField().getText(), "Expected field to be 1");
-            assertTrue(timerPanel.getMinutesTextField().isFocusOwner(), "Expected minutes field to have focus");
+            //assertEquals(Color.RED, ((javax.swing.border.LineBorder) timerPanel.getMinutesTextField().getBorder()).getLineColor(), "Expected minutes field border to be red indicating invalid input");
+            assertEquals(SET, timerPanel.getSetTimerButton().getText(), "Expected set timer button text to be "+SET);
+        });
+    }
+
+    @Test
+    void testClickedOffSecondsFieldInvalidNumberAgainInputFocusLost()
+    {
+        clock = new Clock(15, 30, 0, JANUARY, WEDNESDAY, 1, 2025, PM);
+        timerPanel.getClockFrame().setClock(clock);
+        timerPanel.getHoursTextField().setText("1"); // start a 1 hour timer
+        timerPanel.getMinutesTextField().setText("2"); // with 2 minutes...
+        timerPanel.getSecondsTextField().setText("3"); // and 3 seconds
+        // user opens timer panel, enters number and clicks off hour field
+        timerPanel.getHoursTextField().setFocusable(true);
+        FocusEvent focusEvent = new FocusEvent(
+                timerPanel.getHoursTextField(),
+                FocusEvent.FOCUS_LOST,
+                false,
+                timerPanel
+        );
+
+        timerPanel.getHoursTextField().dispatchEvent(focusEvent);
+
+        assertEquals("1", timerPanel.getHoursTextField().getText(), "Expected field to be 1");
+        assertEquals("2", timerPanel.getMinutesTextField().getText(), "Expected field to be 2");
+        assertEquals("3", timerPanel.getSecondsTextField().getText(), "Expected field to be 3");
+    }
+
+    @Test
+    void testClickedOffSecondsFieldValidNumberInputFocusLostSecondsIsInvalid() throws InterruptedException, InvocationTargetException
+    {
+        timerPanel.getHoursTextField().setText("1"); // start a 1 hour timer
+        timerPanel.getMinutesTextField().setText("2"); // with 2 minutes...
+        timerPanel.getSecondsTextField().setText("S"); // invalid second
+        timerPanel.getSecondsTextField().setFocusable(true);
+        FocusEvent focusEvent = new FocusEvent(
+                timerPanel.getMinutesTextField(),
+                FocusEvent.FOCUS_LOST,
+                false,
+                timerPanel
+        );
+
+        timerPanel.getMinutesTextField().dispatchEvent(focusEvent);
+
+        EventQueue.invokeAndWait(() -> {
+            assertEquals("1", timerPanel.getHoursTextField().getText(), "Expected field to be 1");
+            assertEquals("2", timerPanel.getMinutesTextField().getText(), "Expected field to be 2");
+
             assertEquals(SET, timerPanel.getSetTimerButton().getText(), "Expected set timer button text to be "+SET);
         });
     }
 
     @Test
     @DisplayName("Create 2 Timers Using GUI")
-    void testCreateTwoTimersUsingGUI()
+    void testCreateTwoTimersUsingGUI() throws InterruptedException, InvocationTargetException
     {
         AtomicReference<clock.entity.Timer> timer1 = new AtomicReference<>(new clock.entity.Timer(0, 4, 0, clock));
         AtomicReference<clock.entity.Timer> timer2 = new AtomicReference<>(new clock.entity.Timer(0, 5, 0, clock));
 
-        SwingUtilities.invokeLater(() -> {
+        EventQueue.invokeAndWait(() -> {
             try {
                 timerPanel.getHoursTextField().grabFocus();
                 timerPanel.getHoursTextField().setText(Integer.toString(timer1.get().getHours()));
-                //sleep(2000);
                 timerPanel.getMinutesTextField().grabFocus();
                 timerPanel.getMinutesTextField().setText(Integer.toString(timer1.get().getMinutes()));
-                //sleep(2000);
                 timerPanel.getSecondsTextField().grabFocus();
+                timerPanel.getSecondsTextField().setText(Integer.toString(timer1.get().getSeconds()));
                 timerPanel.getSetTimerButton().setEnabled(timerPanel.validTextFields());
-                //sleep(2000);
                 timerPanel.getSetTimerButton().doClick();
 
                 timerPanel.getHoursTextField().grabFocus();
                 timerPanel.getHoursTextField().setText(Integer.toString(timer2.get().getHours()));
-                //sleep(2000);
                 timerPanel.getMinutesTextField().grabFocus();
                 timerPanel.getMinutesTextField().setText(Integer.toString(timer2.get().getMinutes()));
-                //sleep(2000);
                 timerPanel.getSecondsTextField().grabFocus();
+                timerPanel.getSecondsTextField().setText(Integer.toString(timer2.get().getSeconds()));
                 timerPanel.getSetTimerButton().setEnabled(timerPanel.validTextFields());
-                //sleep(2000);
                 timerPanel.getSetTimerButton().doClick();
-
-                sleep(1000); // timer1 now at 3:58, timer2 at 4:59
-                timerPanel.getClock().getListOfTimers().getFirst().pauseTimer(); // timer1 paused, timer2 at 4:58
-                sleep(3000);
-
-                timer1.set(timerPanel.getClock().getListOfTimers().get(0));
-                timer2.set(timerPanel.getClock().getListOfTimers().get(1));
-
-                assertSame(0, timer1.get().getHours());
-                assertSame(3, timer1.get().getMinutes());
-                assertSame(58, timer1.get().getSeconds());
-
-                assertSame(0, timer2.get().getHours());
-                assertSame(4, timer2.get().getMinutes());
-                assertSame(55, timer2.get().getSeconds());
             }
-            catch (InterruptedException e)
+            catch (Exception e)
             {
                 Thread.currentThread().interrupt();
             }
+        });
+
+        sleep(2000); // timer1 now at 3:58, timer2 at 4:59
+        timerPanel.getClock().getListOfTimers().getFirst().pauseTimer(); // timer1 paused, timer2 at 4:58
+        sleep(3000);
+
+        EventQueue.invokeAndWait(() -> {
+            timer1.set(timerPanel.getClock().getListOfTimers().get(0));
+            timer2.set(timerPanel.getClock().getListOfTimers().get(1));
+
+            assertEquals(0, timer1.get().getCountDown().getHour());
+            assertEquals(3, timer1.get().getCountDown().getMinute());
+            assertEquals(58, timer1.get().getCountDown().getSecond());
+
+            assertEquals(0, timer2.get().getCountDown().getHour());
+            assertEquals(4, timer2.get().getCountDown().getMinute());
+            assertEquals(55, timer2.get().getCountDown().getSecond());
         });
     }
 

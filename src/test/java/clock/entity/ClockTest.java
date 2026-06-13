@@ -345,7 +345,7 @@ class ClockTest
     }
 
     @Test
-    void testWhenClockInMilitaryTimeAlarmStillTriggers()
+    void testWhenClockInMilitaryTimeAlarmStillTriggers() throws InterruptedException, InvocationTargetException
     {
         clock.setShowMilitaryTime(true);
         clock.setHours(13);
@@ -364,7 +364,7 @@ class ClockTest
         assertEquals(1, clock.getListOfAlarms().size());
 
         tick(4);
-        javax.swing.SwingUtilities.invokeLater(() -> {
+        EventQueue.invokeAndWait(() -> {
             assertTrue(clock.getListOfAlarms().getFirst().isAlarmGoingOff());
             alarm.stopAlarm();
         });
