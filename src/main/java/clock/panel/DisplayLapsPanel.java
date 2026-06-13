@@ -54,7 +54,9 @@ public class DisplayLapsPanel extends JPanel
     /** The default layout of the panel */
     public void setDefaultLayout()
     {
-        JLabel label = new JLabel("Sw" + (Stopwatch.stopwatchCounter + 1));
+        String labelText = stopwatchPanel.getCurrentStopwatch() != null ?
+                stopwatchPanel.getCurrentStopwatch().getName() : "Sw" + (Stopwatch.stopwatchCounter + 1);
+        JLabel label = new JLabel(labelText);
         label.setForeground(Color.WHITE);
         label.setFont(ClockFrame.font20);
         // add a space or some gap, if needed

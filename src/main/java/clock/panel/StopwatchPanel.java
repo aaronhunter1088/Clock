@@ -238,8 +238,12 @@ public class StopwatchPanel extends ClockPanel
     public void setupSettingsMenu()
     {
         clockFrame.clearSettingsMenu();
-        clockFrame.getClockMenuBar().getSettingsMenu().add(clockFrame.getClockMenuBar().getShowAnalogueTimePanel());
-        clockFrame.getClockMenuBar().getSettingsMenu().add(clockFrame.getClockMenuBar().getReverseLaps());
+        JMenu settingsMenu = clockFrame.getClockMenuBar().getSettingsMenu();
+        settingsMenu.add(clockFrame.getClockMenuBar().getShowAnalogueTimePanel());
+        settingsMenu.add(clockFrame.getClockMenuBar().getReverseLaps());
+        settingsMenu.add(clockFrame.getClockMenuBar().getResetLapsSetting());
+        settingsMenu.add(clockFrame.getClockMenuBar().getResetAllLapsSetting());
+        settingsMenu.add(clockFrame.getClockMenuBar().getResetStopwatchesPanelSetting());
     }
 
     /** Switches the display time panel between analogue and digital mode */
@@ -268,7 +272,7 @@ public class StopwatchPanel extends ClockPanel
      * @param e the action event
      *          Package private
      */
-    void executeButtonAction(ActionEvent e)
+    public void executeButtonAction(ActionEvent e)
     {
         String buttonText = ((JButton)e.getSource()).getText();
         switch (buttonText)
@@ -287,7 +291,7 @@ public class StopwatchPanel extends ClockPanel
      * Starts a new stopwatch and changes
      * the start button to a stop button
      */
-    void startStopwatch()
+    public void startStopwatch()
     {
         String name = stopwatchNameField.getText();
         if (currentStopwatch != null && currentStopwatch.getName().equals(name))
@@ -309,7 +313,7 @@ public class StopwatchPanel extends ClockPanel
     }
 
     /** Pauses the current stopwatch */
-    void pauseStopwatchPanel()
+    public void pauseStopwatchPanel()
     {
         displayTimePanel.stop(); // also pauses the stopwatch
         startButton.setText(RESUME);
@@ -318,7 +322,7 @@ public class StopwatchPanel extends ClockPanel
     }
 
     /** Resumes the current stopwatch */
-    void resumeStopwatch()
+    public void resumeStopwatch()
     {
         String chosenName = stopwatchNameField.getText();
         // sets the current stopwatch to the chosen name if it exists otherwise currentStopwatch remains the same
@@ -336,7 +340,7 @@ public class StopwatchPanel extends ClockPanel
     }
 
     /** Records a lap for the current stopwatch */
-    void recordLap()
+    public void recordLap()
     {
         if (currentStopwatch != null)
         {
@@ -351,7 +355,7 @@ public class StopwatchPanel extends ClockPanel
     }
 
     /** Resets the stopwatch panel to its default state */
-    void resetStopwatchPanel()
+    public void resetStopwatchPanel()
     {
         logger.debug("resetting stopwatch panel");
         getClock().getListOfStopwatches().forEach(Stopwatch::stopStopwatch);
@@ -366,6 +370,28 @@ public class StopwatchPanel extends ClockPanel
         displayLapsPanel.setDefaultLayout();
         startButton.setText(START);
         lapButton.setText(LAP);
+    }
+
+    /**
+     * Removes the laps from the current stopwatch
+     * and updates the table.
+     */
+    public void resetLapsPanel()
+    {
+        currentStopwatch.getLaps().clear();
+        displayLapsPanel.resetPanel();
+        displayLapsPanel.setDefaultLayout();
+    }
+
+    /**
+     * Removes the laps from all stopwatches
+     * and updates the table.
+     */
+    public void resetAllLapsPanel()
+    {
+        clock.getListOfStopwatches().forEach(stopwatch -> stopwatch.getLaps().clear());
+        displayLapsPanel.resetPanel();
+        displayLapsPanel.setDefaultLayout();
     }
 
     /** Returns the clock */

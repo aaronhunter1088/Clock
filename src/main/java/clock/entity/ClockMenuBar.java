@@ -45,6 +45,9 @@ public class ClockMenuBar extends JMenuBar
                       resetAlarmsPanelSetting,
                       showAnalogueTimePanel,
                       reverseLapsSetting,
+                      resetStopwatchesPanelSetting,
+                      resetLapsSetting,
+                      resetAllLapsSetting,
     // Options for Features
                       digitalClockFeature,
                       analogueClockFeature,
@@ -148,6 +151,24 @@ public class ClockMenuBar extends JMenuBar
         getReverseLaps().setForeground(Color.WHITE);
         getReverseLaps().setName("Toggles the order of the laps displayed from ascending to descending or back the other way.");
         getReverseLaps().addActionListener(this::toggleReverseLapsSetting);
+
+        setResetLapsSetting(new JMenuItem(RESET+SPACE+LAPS));
+        getResetLapsSetting().setAccelerator(null);
+        getResetLapsSetting().setForeground(Color.WHITE);
+        getResetLapsSetting().setName("Clears the Laps Panel for the current stopwatch completely.");
+        getResetLapsSetting().addActionListener(action -> clockFrame.getStopwatchPanel().resetLapsPanel());
+
+        setResetAllLapsSetting(new JMenuItem(RESET+SPACE+ALL+SPACE+LAPS));
+        getResetAllLapsSetting().setAccelerator(null);
+        getResetAllLapsSetting().setForeground(Color.WHITE);
+        getResetAllLapsSetting().setName("Clears the Laps Panel for all stopwatches completely.");
+        getResetAllLapsSetting().addActionListener(action -> clockFrame.getStopwatchPanel().resetAllLapsPanel());
+
+        setResetStopwatchesPanelSetting(new JMenuItem(RESET+SPACE+PANEL));
+        getResetStopwatchesPanelSetting().setAccelerator(null); // not implemented
+        getResetStopwatchesPanelSetting().setForeground(Color.WHITE);
+        getResetStopwatchesPanelSetting().setName("Clears the Stopwatches Panel completely.");
+        getResetStopwatchesPanelSetting().addActionListener(action -> clockFrame.getStopwatchPanel().resetStopwatchPanel());
 
         // Features menu choices
         setDigitalClockFeature(new JMenuItem(VIEW_DIGITAL_CLOCK));
@@ -533,6 +554,22 @@ public class ClockMenuBar extends JMenuBar
     public ClockFrame getClockFrame() { return this.clockFrame; }
     /** Returns the clock */
     public Clock getClock() { return this.clock; }
+    /**
+     * Returns the reset all laps setting
+     * @return resetAllLapsSeting
+     */
+    public JMenuItem getResetAllLapsSetting() {  return resetAllLapsSetting; }
+    /**
+     * Return the reset stopwatches panel setting
+     * @return resetStopwatchesPanelSetting
+     */
+    public JMenuItem getResetStopwatchesPanelSetting()
+    { return resetStopwatchesPanelSetting; }
+    /**
+     * Return the reset laps setting
+     * @return resetLapsSetting
+     */
+    public JMenuItem getResetLapsSetting() { return resetLapsSetting; }
 
     /**
      * Sets the settings menu
@@ -654,4 +691,19 @@ public class ClockMenuBar extends JMenuBar
      * @param clock the clock to set
      */
     protected void setClock(Clock clock) { this.clock = clock; logger.debug("clock"); }
+    /**
+     * Sets the reset all laps setting
+     * @param resetAllLapsSetting the reset all laps menu item to set
+     */
+    public void setResetAllLapsSetting(JMenuItem resetAllLapsSetting) { this.resetAllLapsSetting = resetAllLapsSetting; }
+    /**
+     * Sets the reset laps setting
+     * @param resetLapsSetting the reset laps menu item to set
+     */
+    public void setResetLapsSetting(JMenuItem resetLapsSetting) { this.resetLapsSetting = resetLapsSetting; }
+    /**
+     * Sets the reset stopwatches panel setting
+     * @param resetStopwatchesPanelSetting the reset stopwatches menu item to set
+     */
+    public void setResetStopwatchesPanelSetting(JMenuItem resetStopwatchesPanelSetting) { this.resetStopwatchesPanelSetting = resetStopwatchesPanelSetting; }
 }
