@@ -42,12 +42,12 @@ public class ButtonColumn extends AbstractCellEditor implements TableCellRendere
     private int mnemonic;
     /** The border to use */
     private final Border originalBorder;
-    /** The border focus to use */
-    private final Border focusBorder;
     /** The button to render */
     private final JButton renderButton;
     /** The edit button to render */
     private final JButton editButton;
+    /** The border focus to use */
+    private Border focusBorder;
     /** The editor value */
     private Object editorValue;
 
@@ -90,16 +90,16 @@ public class ButtonColumn extends AbstractCellEditor implements TableCellRendere
         return focusBorder;
     }
 
-//    /**
-//     *  The foreground color of the button when
-//     *  the cell has focus.
-//     *  @param focusBorder the foreground color
-//     */
-//    public void setFocusBorder(Border focusBorder)
-//    {
-//        this.focusBorder = focusBorder;
-//        editButton.setBorder(focusBorder);
-//    }
+    /**
+     *  The foreground color of the button when
+     *  the cell has focus.
+     *  @param focusBorder the foreground color
+     */
+    public void setFocusBorder(Border focusBorder)
+    {
+        this.focusBorder = focusBorder;
+        editButton.setBorder(focusBorder);
+    }
 
     /**
      * Get the mnemonic to activate the button
