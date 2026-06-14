@@ -182,20 +182,11 @@ public class Alarm implements Serializable, Comparable<Alarm>
             scheduledFuture.cancel(false);
             scheduledFuture = null;
         }
-        if (soundFuture != null)
-        {
-            soundFuture.cancel(false);
-            soundFuture = null;
-        }
         if (autoSnoozeFuture != null)
         {
             autoSnoozeFuture.cancel(false);
             autoSnoozeFuture = null;
         }
-
-        // schedule next normal alarm occurrence
-        //scheduledFuture = null; // done just above
-        startAlarm(clock.getScheduledExecutorService());
     }
 
     /** Pauses the alarm */
