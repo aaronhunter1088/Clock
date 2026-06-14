@@ -22,7 +22,7 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
  * @author michael ball
  * @version since 2.9
  */
-public class ClockPanelTest
+class ClockPanelTest
 {
     private static final Logger logger = LogManager.getLogger(ClockPanelTest.class);
 

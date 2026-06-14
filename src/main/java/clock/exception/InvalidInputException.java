@@ -21,8 +21,9 @@ public class InvalidInputException extends RuntimeException implements Serializa
 {
 	@Serial
 	private static final long serialVersionUID = 2L;
-
+    /** The message text or, explanation, for the exception occurring */
 	private String message;
+    /** The cause or, reason, for the exception occurring */
 	private Throwable cause;
 
 	/**

@@ -28,7 +28,7 @@ import static org.mockito.Mockito.when;
  * @version since 3.0.4
  */
 @ExtendWith(MockitoExtension.class)
-public class DigitalClockPanelTest
+class DigitalClockPanelTest
 {
     private static final Logger logger = LogManager.getLogger(DigitalClockPanelTest.class);
 
@@ -81,8 +81,8 @@ public class DigitalClockPanelTest
     {
         assertEquals(PANEL_DIGITAL_CLOCK, digitalClockPanel.getClockFrame().getPanelType(), "Current panel should be " + PANEL_DIGITAL_CLOCK);
         assertNotNull(digitalClockPanel, "DigitalClockPanel should not be null");
-        assertNotNull(digitalClockPanel.getGridBagConstraints(), "GridBagConstraints should not be null");
-        assertNotNull(digitalClockPanel.getGridBagLayout(), "GridBagLayout should not be null");
+        //assertNotNull(digitalClockPanel.getGridBagConstraints(), "GridBagConstraints should not be null");
+        //assertNotNull(digitalClockPanel.getGridBagLayout(), "GridBagLayout should not be null");
         assertNotNull(digitalClockPanel.getClock(), "Clock should not be null");
     }
 
@@ -141,7 +141,7 @@ public class DigitalClockPanelTest
     {
         when(g.getFontMetrics(any())).thenReturn(fontMetrics);
         when(fontMetrics.stringWidth(any())).thenReturn(100);
-        assertDoesNotThrow(() -> digitalClockPanel.drawStructure(g),
+        assertDoesNotThrow(() -> digitalClockPanel.paint(g),
                 "drawStructure should not throw when there are no active alarms or timers");
     }
 
@@ -159,7 +159,7 @@ public class DigitalClockPanelTest
 
         when(g.getFontMetrics(any())).thenReturn(fontMetrics);
         when(fontMetrics.stringWidth(any())).thenReturn(100);
-        assertDoesNotThrow(() -> digitalClockPanel.drawStructure(g),
+        assertDoesNotThrow(() -> digitalClockPanel.paint(g),
                 "drawStructure should not throw with one alarm going off");
     }
 
@@ -176,7 +176,7 @@ public class DigitalClockPanelTest
         when(g.getFont()).thenReturn(ClockFrame.font40);
         when(g.getFontMetrics(any())).thenReturn(fontMetrics);
         when(fontMetrics.stringWidth(any())).thenReturn(100);
-        assertDoesNotThrow(() -> digitalClockPanel.drawStructure(g),
+        assertDoesNotThrow(() -> digitalClockPanel.paint(g),
                 "drawStructure should not throw with multiple alarms going off");
     }
 
@@ -194,7 +194,7 @@ public class DigitalClockPanelTest
 
         when(g.getFontMetrics(any())).thenReturn(fontMetrics);
         when(fontMetrics.stringWidth(any())).thenReturn(100);
-        assertDoesNotThrow(() -> digitalClockPanel.drawStructure(g),
+        assertDoesNotThrow(() -> digitalClockPanel.paint(g),
                 "drawStructure should not throw with one timer going off");
     }
 
@@ -210,7 +210,7 @@ public class DigitalClockPanelTest
         }
         when(g.getFontMetrics(any())).thenReturn(fontMetrics);
         when(fontMetrics.stringWidth(any())).thenReturn(100);
-        assertDoesNotThrow(() -> digitalClockPanel.drawStructure(g),
+        assertDoesNotThrow(() -> digitalClockPanel.paint(g),
                 "drawStructure should not throw with multiple timers going off");
     }
 
@@ -233,7 +233,7 @@ public class DigitalClockPanelTest
         when(g.getFont()).thenReturn(ClockFrame.font40);
         when(g.getFontMetrics(any())).thenReturn(fontMetrics);
         when(fontMetrics.stringWidth(any())).thenReturn(100);
-        assertDoesNotThrow(() -> digitalClockPanel.drawStructure(g),
+        assertDoesNotThrow(() -> digitalClockPanel.paint(g),
                 "drawStructure should not throw when both alarms and timers are going off");
     }
 

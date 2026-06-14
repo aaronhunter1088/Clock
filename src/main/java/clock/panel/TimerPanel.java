@@ -41,22 +41,39 @@ import static clock.util.Constants.*;
  */
 public class TimerPanel extends ClockPanel implements Runnable
 {
+    /** The logger */
     private static final Logger logger = LogManager.getLogger(TimerPanel.class);
+    /** The panel thread */
     private Thread thread;
+    /** The timer layout */
     private GridBagLayout layout;
+    /** The timer layout constraints */
     private GridBagConstraints constraints;
-    private JLabel nameLabel,
-                   hoursLabel,
-                   minutesLabel,
-                   secondsLabel;
-    private JTextField nameTextField,
-                       hoursTextField,
-                       minutesTextField,
-                       secondsTextField;
+    /** The label for the name field */
+    private JLabel nameLabel;
+    /** The label for the hours field */
+    private JLabel hoursLabel;
+    /** The label for the minutes field */
+    private JLabel minutesLabel;
+    /** The label for the seconds field */
+    private JLabel secondsLabel;
+    /** The text field for the name */
+    private JTextField nameTextField;
+    /** The text field for the hours */
+    private JTextField hoursTextField;
+    /** The text field for the minutes */
+    private JTextField minutesTextField;
+    /** The text field for the seconds */
+    private JTextField secondsTextField;
+    /** Set timer button */
     private JButton setTimerButton;
+    /** Timers table */
     private JTable timersTable;
+    /** Scrollable table */
     private JScrollPane scrollTable;
+    /** Reference to the clock frame */
     private ClockFrame clockFrame;
+    /** Reference to the clock */
     private Clock clock;
 
     /**

@@ -62,10 +62,10 @@ class LapTest {
         Lap lap = new Lap(1, 123456, 123456, stopwatch);
         assertNotNull(lap);
         assertEquals(1, lap.getLapNumber());
-        assertNotNull(lap.getFormattedDuration());
+        assertNotNull(lap.getFormattedRecordedAt());
         assertNotNull(lap.getFormattedLapTime());
         assertEquals(stopwatch, lap.getStopwatch());
-        assertEquals("02:03.456", lap.getFormattedDuration());
+        assertEquals("02:03.456", lap.getFormattedRecordedAt());
         assertEquals("02:03.456", lap.getFormattedLapTime());
         assertNotNull(lap.toString());
 
@@ -156,12 +156,12 @@ class LapTest {
         final Stopwatch newStopwatch = new Stopwatch("New Stopwatch", false, false, clock);
 
         lap.setLapNumber(5);
-        lap.setDuration(99999L);
+        lap.setRecordedAt(99999L);
         lap.setLapTime(88888L);
         lap.setStopwatch(newStopwatch);
 
         assertEquals(5, lap.getLapNumber());
-        assertEquals(99999L, lap.getDuration());
+        assertEquals(99999L, lap.getRecordedAt());
         assertEquals(88888L, lap.getLapTime());
         assertEquals(newStopwatch, lap.getStopwatch());
     }
@@ -187,22 +187,22 @@ class LapTest {
         assertEquals(original, clone);
 
         clone.setLapNumber(99);
-        clone.setDuration(999L);
+        clone.setRecordedAt(999L);
 
         assertEquals(1, original.getLapNumber());
-        assertEquals(123456L, original.getDuration());
+        assertEquals(123456L, original.getRecordedAt());
     }
 
     @ParameterizedTest
-    @DisplayName("Test Lap formatted duration for various millisecond values")
-    @MethodSource("durationFormatScenarios")
-    void testGetFormattedDuration(long millis, String expected)
+    @DisplayName("Test Lap formatted recordedAt for various millisecond values")
+    @MethodSource("recordedAtFormatScenarios")
+    void testGetFormattedRecordedAt(long millis, String expected)
     {
         final Lap lap = new Lap(1, millis, millis, stopwatch);
-        assertEquals(expected, lap.getFormattedDuration());
+        assertEquals(expected, lap.getFormattedRecordedAt());
     }
 
-    static Stream<org.junit.jupiter.params.provider.Arguments> durationFormatScenarios()
+    static Stream<org.junit.jupiter.params.provider.Arguments> recordedAtFormatScenarios()
     {
         return Stream.of(
             org.junit.jupiter.params.provider.Arguments.of(0L,      "00:00.000"),

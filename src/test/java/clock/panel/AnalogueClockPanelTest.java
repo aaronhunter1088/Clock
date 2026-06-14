@@ -28,7 +28,7 @@ import static org.mockito.Mockito.when;
  * @version since 2.9
  */
 @ExtendWith(MockitoExtension.class)
-public class AnalogueClockPanelTest
+class AnalogueClockPanelTest
 {
     private static final Logger logger = LogManager.getLogger(AnalogueClockPanelTest.class);
 
@@ -79,7 +79,7 @@ public class AnalogueClockPanelTest
         Assertions.assertNotNull(analogueClockPanel, "AnalogueClockPanel should not be null");
         Assertions.assertEquals(PANEL_ANALOGUE_CLOCK, analogueClockPanel.getClockFrame().getPanelType(), "Current panel should be ANALOGUE_CLOCK");
         Assertions.assertEquals(clock, analogueClockPanel.getClock(), "Clock should match the initialized clock");
-        Assertions.assertTrue(analogueClockPanel.isShowDigitalTimeOnAnalogueClock(), "Digital time should be shown on analogue clock by default");
+        Assertions.assertTrue(analogueClockPanel.isShowDateAndTimeOnAnalogueClock(), "Digital time should be shown on analogue clock by default");
 
         doNothing().when(g).setFont(any());
         doNothing().doNothing().doNothing().when(g).setColor(any());
@@ -93,11 +93,11 @@ public class AnalogueClockPanelTest
     @DisplayName("Test AnalogueClockPanel Initialization with Show Digital Time Off")
     void testAnalogueClockPanelInitializationShowDigitalTimeOff()
     {
-        analogueClockPanel.setShowDigitalTimeOnAnalogueClock(false);
+        analogueClockPanel.setShowDateAndTimeOnAnalogueClock(false);
         Assertions.assertNotNull(analogueClockPanel, "AnalogueClockPanel should not be null");
         Assertions.assertEquals(PANEL_ANALOGUE_CLOCK, analogueClockPanel.getClockFrame().getPanelType(), "Current panel should be ANALOGUE_CLOCK");
         Assertions.assertEquals(clock, analogueClockPanel.getClock(), "Clock should match the initialized clock");
-        Assertions.assertFalse(analogueClockPanel.isShowDigitalTimeOnAnalogueClock(), "Digital time should not be shown on analogue clock");
+        Assertions.assertFalse(analogueClockPanel.isShowDateAndTimeOnAnalogueClock(), "Digital time should not be shown on analogue clock");
 
         doNothing().when(g).setFont(any());
         doNothing().doNothing().doNothing().when(g).setColor(any());

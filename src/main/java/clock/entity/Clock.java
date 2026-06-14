@@ -497,6 +497,7 @@ public class Clock implements Serializable, Comparable<Clock>
         else if (labelVersion == 6) { defaultText = No_Alarms; }
         else if (labelVersion == 7) { defaultText = S; }
         //else if (labelVersion == 8) { defaultText = alarmPanel.getActiveAlarm().toString(); }
+        // retire 9
         else if (labelVersion == 9) { defaultText = is+SPACE+going_off; }
         else if (labelVersion == 10) { defaultText = No_Timers; }
         return defaultText;
@@ -955,7 +956,6 @@ public class Clock implements Serializable, Comparable<Clock>
             return ZoneId.systemDefault();
         }
     }
-
     /**
      * Returns the scheduled executor service
      * @return the scheduled executor service.

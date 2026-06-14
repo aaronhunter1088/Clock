@@ -17,7 +17,6 @@ import java.time.DayOfWeek;
 import java.util.Arrays;
 import java.util.List;
 
-import static clock.entity.Panel.*;
 import static clock.util.Constants.*;
 import static java.time.DayOfWeek.*;
 import static org.junit.jupiter.api.Assertions.*;
@@ -134,10 +133,10 @@ public class ClockMenuBarTest
     })
     void testToggleShowDigitalTimeOnAnalogueClockSetting(boolean showDigitalTime, String settingText)
     {
-        clockFrame.getAnalogueClockPanel().setShowDigitalTimeOnAnalogueClock(showDigitalTime);
-        clockFrame.getClockMenuBar().toggleDigitalTimeOnAnalogueClockSetting(actionEvent);
-        assertEquals(!showDigitalTime, clockFrame.getAnalogueClockPanel().isShowDigitalTimeOnAnalogueClock(), "Expecting " + showDigitalTime);
-        assertEquals(settingText, clockFrame.getClockMenuBar().getShowDigitalTimeOnAnalogueClockSetting().getText());
+        clockFrame.getAnalogueClockPanel().setShowDateAndTimeOnAnalogueClock(showDigitalTime);
+        clockFrame.getClockMenuBar().toggleDateAndTimeOnAnalogueClockSetting(actionEvent);
+        assertEquals(!showDigitalTime, clockFrame.getAnalogueClockPanel().isShowDateAndTimeOnAnalogueClock(), "Expecting " + showDigitalTime);
+        assertEquals(settingText, clockFrame.getClockMenuBar().getShowDateAndTimeOnAnalogueClockSetting().getText());
     }
 
     @ParameterizedTest
@@ -401,7 +400,7 @@ public class ClockMenuBarTest
         assertEquals(SHOW+SPACE+FULL_TIME_SETTING, clockFrame.getClockMenuBar().getFullTimeSetting().getText());
         assertEquals(SHOW+SPACE+PARTIAL_TIME_SETTING, clockFrame.getClockMenuBar().getPartialTimeSetting().getText());
         assertEquals(Turn+SPACE+off+SPACE+DST_SETTING, clockFrame.getClockMenuBar().getToggleDSTSetting().getText());
-        assertEquals(HIDE+SPACE+DATE.toLowerCase()+SPACE+AND.toLowerCase()+SPACE+TIME.toLowerCase(), clockFrame.getClockMenuBar().getShowDigitalTimeOnAnalogueClockSetting().getText());
+        assertEquals(HIDE+SPACE+DATE.toLowerCase()+SPACE+AND.toLowerCase()+SPACE+TIME.toLowerCase(), clockFrame.getClockMenuBar().getShowDateAndTimeOnAnalogueClockSetting().getText());
         assertEquals(PAUSE+SPACE+ALL+SPACE+TIMER+S.toLowerCase(), clockFrame.getClockMenuBar().getPauseResumeAllTimersSetting().getText());
         assertEquals(PAUSE+SPACE+ALL+SPACE+ALARM+S.toLowerCase(), clockFrame.getClockMenuBar().getPauseResumeAllAlarmsSetting().getText());
         assertEquals(SHOW+SPACE+ANALOGUE+SPACE+TIME, clockFrame.getClockMenuBar().getShowAnalogueTimePanel().getText());
@@ -428,7 +427,7 @@ public class ClockMenuBarTest
         assertNotNull(clockFrame.getClockMenuBar().getFullTimeSetting());
         assertNotNull(clockFrame.getClockMenuBar().getPartialTimeSetting());
         assertNotNull(clockFrame.getClockMenuBar().getToggleDSTSetting());
-        assertNotNull(clockFrame.getClockMenuBar().getShowDigitalTimeOnAnalogueClockSetting());
+        assertNotNull(clockFrame.getClockMenuBar().getShowDateAndTimeOnAnalogueClockSetting());
         assertNotNull(clockFrame.getClockMenuBar().getPauseResumeAllTimersSetting());
         assertNotNull(clockFrame.getClockMenuBar().getResetTimersPanelSetting());
         assertNotNull(clockFrame.getClockMenuBar().getPauseResumeAllAlarmsSetting());

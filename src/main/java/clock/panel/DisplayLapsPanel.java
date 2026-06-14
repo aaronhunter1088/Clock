@@ -30,11 +30,15 @@ public class DisplayLapsPanel extends JPanel
     private GridBagLayout layout;
     private GridBagConstraints constraints;
     private final StopwatchPanel stopwatchPanel;
-    /** The background repaint thread for this panel. */
+    /** The panel thread */
     public Thread thread;
-    private JTable lapsTable,
-                   stopwatchTable;
+    /** The stopwatches' laps table */
+    private JTable lapsTable;
+    /** The stopwatches table */
+    private JTable stopwatchTable;
+    /** The stopwatch laps table column names */
     private final String[] lapTableColumnNames = {LAP_SYM, TIME, RECORDED};
+    /** The stopwatches table column names */
     private final String[] stopwatchTableColumnNames = {NAME, ELAPSED, SELECT, REMOVE};
     /** Whether laps are displayed in reverse order. */
     public boolean isLapsReversed = false;
@@ -104,7 +108,7 @@ public class DisplayLapsPanel extends JPanel
             for (int i = stopwatchPanel.getCurrentStopwatch().getLaps().size()-1, j=0; i >= 0; i--) {
                 data[j][0] = stopwatchPanel.getCurrentStopwatch().getLaps().get(i).getLapNumber();
                 data[j][1] = stopwatchPanel.getCurrentStopwatch().getLaps().get(i).getFormattedLapTime();
-                data[j][2] = stopwatchPanel.getCurrentStopwatch().getLaps().get(i).getFormattedDuration();
+                data[j][2] = stopwatchPanel.getCurrentStopwatch().getLaps().get(i).getFormattedRecordedAt();
                 j++;
             }
         }
@@ -113,7 +117,7 @@ public class DisplayLapsPanel extends JPanel
             for (int i = 0; i < stopwatchPanel.getCurrentStopwatch().getLaps().size(); i++) {
                 data[i][0] = stopwatchPanel.getCurrentStopwatch().getLaps().get(i).getLapNumber();
                 data[i][1] = stopwatchPanel.getCurrentStopwatch().getLaps().get(i).getFormattedLapTime();
-                data[i][2] = stopwatchPanel.getCurrentStopwatch().getLaps().get(i).getFormattedDuration();
+                data[i][2] = stopwatchPanel.getCurrentStopwatch().getLaps().get(i).getFormattedRecordedAt();
             }
         }
 

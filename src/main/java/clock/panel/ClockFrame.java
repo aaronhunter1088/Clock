@@ -52,15 +52,25 @@ public class ClockFrame extends JFrame
     public final static Font font10 = new Font("Courier New", Font.BOLD, 10);
     /** Bold 20-point TimesRoman font used on the analogue clock face. */
     public final static Font analogueFont = new Font("TimesRoman", Font.BOLD, 20);
+    /** The type of the current panel */
     private Panel panelType;
+    /** Reference to the clock menu bar */
     private ClockMenuBar menuBar;
-    private ClockPanel currentPanel,
-                       digitalClockPanel,
-                       analogueClockPanel,
-                       alarmPanel,
-                       timerPanel,
-                       stopwatchPanel;
+    /** Reference to the current panel */
+    private ClockPanel currentPanel;
+    /** Reference to the digital clock panel */
+    private ClockPanel digitalClockPanel;
+    /** Reference to the analogue clock panel */
+    private ClockPanel analogueClockPanel;
+    /** Reference to the alarms panel */
+    private ClockPanel alarmPanel;
+    /** Reference to the timers panel */
+    private ClockPanel timerPanel;
+    /** Reference to the stopwatches panel */
+    private ClockPanel stopwatchPanel;
+    /** Reference to the clock */
     private Clock clock;
+    /** Reference to the scheduled executor service, or scheduler */
     private ScheduledExecutorService scheduler;
 
     /**
@@ -158,7 +168,7 @@ public class ClockFrame extends JFrame
      * Changes the panel based on the provided value
      * @param changePanelType the panel to change to
      */
-    public void changePanels(clock.entity.Panel changePanelType)
+    public void changePanels(Panel changePanelType)
     {
         if (changePanelType != panelType || !isVisible())
         {
@@ -343,7 +353,7 @@ public class ClockFrame extends JFrame
      * settings menu.
      */
     void clearSettingsMenu()
-    { getClockMenuBar().getSettingsMenu().removeAll(); }
+    { menuBar.getSettingsMenu().removeAll(); }
 
     /**
      * Creates and shows the GUI for the Clock application.

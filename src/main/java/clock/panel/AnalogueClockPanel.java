@@ -23,15 +23,30 @@ import static java.lang.Thread.sleep;
 public class AnalogueClockPanel extends ClockPanel implements Runnable
 {
     private static final Logger logger = LogManager.getLogger(AnalogueClockPanel.class);
+    /** The layout of the analogue clock panel */
     private GridBagLayout layout;
-    private GridBagConstraints constraints;
+    //private GridBagConstraints constraints;
+    /** The panel thread */
     private Thread thread = null;
-    private int xcenter = 175, ycenter = 175, lastxs = 0, lastys = 0, lastxm = 0, lastym = 0, lastxh = 0, lastyh = 0;
+    /** Drawing variables */
+    private int xcenter = 175;
+    private int ycenter = 175;
+    private int lastxs = 0;
+    private int lastys = 0;
+    private int lastxm = 0;
+    private int lastym = 0;
+    private int lastxh = 0;
+    private int lastyh = 0;
+    /** Reference to the clock frame */
     private ClockFrame clockFrame;
+    /** Reference to the clock */
     private Clock clock;
-    private String dateText = EMPTY,
-                   timeText = EMPTY;
-    private boolean showDigitalTimeOnAnalogueClock;
+    /** The clock's current date as a string */
+    private String dateText = EMPTY;
+    /** The clock's current time as a string */
+    private String timeText = EMPTY;
+    /** Indicator to display date and time on analogue clock or not */
+    private boolean showDateAndTimeOnAnalogueClock;
 
     /**
      * Default constructor
@@ -56,7 +71,7 @@ public class AnalogueClockPanel extends ClockPanel implements Runnable
         setTimeText(clock.getTimeAsStr());
         setGridBagLayout(new GridBagLayout()); // sets layout
         setLayout(layout);
-        setGridBagConstraints(new GridBagConstraints());
+        //setGridBagConstraints(new GridBagConstraints());
         setupDefaultValues();
     }
 
@@ -66,10 +81,10 @@ public class AnalogueClockPanel extends ClockPanel implements Runnable
     public void setupSettingsMenu()
     {
         clockFrame.clearSettingsMenu();
-        clockFrame.getClockMenuBar().getSettingsMenu().add(clockFrame.getClockMenuBar().getShowDigitalTimeOnAnalogueClockSetting());
+        clockFrame.getClockMenuBar().getSettingsMenu().add(clockFrame.getClockMenuBar().getShowDateAndTimeOnAnalogueClockSetting());
         clockFrame.getClockMenuBar().getSettingsMenu().add(clockFrame.getClockMenuBar().getToggleDSTSetting());
         clockFrame.getClockMenuBar().getSettingsMenu().add(clockFrame.getClockMenuBar().getChangeTimeZoneMenu());
-        setShowDigitalTimeOnAnalogueClock(true);
+        setShowDateAndTimeOnAnalogueClock(true);
     }
 
     /**
@@ -138,7 +153,7 @@ public class AnalogueClockPanel extends ClockPanel implements Runnable
         logger.info("painting analogue clock panel");
         int xhour, yhour, xminute, yminute, xsecond, ysecond, second, minute, hour;
 
-        if (isShowDigitalTimeOnAnalogueClock())
+        if (isShowDateAndTimeOnAnalogueClock())
         {
             setDateText(clock.getDateAsStr());
             setTimeText(clock.getTimeAsStr());
@@ -198,7 +213,7 @@ public class AnalogueClockPanel extends ClockPanel implements Runnable
         g.setColor(Color.BLACK);
         g.fillOval(xcenter - 150, ycenter - 150, 300, 300);
 
-        if (isShowDigitalTimeOnAnalogueClock())
+        if (isShowDateAndTimeOnAnalogueClock())
         {
             g.setColor(Color.WHITE);
             final FontMetrics fm = g.getFontMetrics();
@@ -246,7 +261,7 @@ public class AnalogueClockPanel extends ClockPanel implements Runnable
      * Returns isShowDigitalTimeOnAnalogueClock
      * @return show digital time on analogue clock.
      */
-    public boolean isShowDigitalTimeOnAnalogueClock() { return showDigitalTimeOnAnalogueClock; }
+    public boolean isShowDateAndTimeOnAnalogueClock() { return showDateAndTimeOnAnalogueClock; }
     /**
      * Returns the self thread
      * @return the self thread.
@@ -267,7 +282,7 @@ public class AnalogueClockPanel extends ClockPanel implements Runnable
      * Sets the grid bag constraints
      * @param constraints the GridBagConstraints to use
      */
-    private void setGridBagConstraints(GridBagConstraints constraints) { this.constraints = constraints; logger.debug("GridBagConstraints set"); }
+    //private void setGridBagConstraints(GridBagConstraints constraints) { this.constraints = constraints; logger.debug("GridBagConstraints set"); }
     /**
      * Sets the clock date text
      * @param dateText the date string to display
@@ -285,9 +300,9 @@ public class AnalogueClockPanel extends ClockPanel implements Runnable
     public void setClock(Clock clock) { this.clock = clock; logger.debug("clock set"); }
     /**
      * Sets isShowDigitalTimeOnAnalogueClock
-     * @param showDigitalTimeOnAnalogueClock true to show digital time overlay
+     * @param showDateAndTimeOnAnalogueClock true to show digital time overlay
      */
-    public void setShowDigitalTimeOnAnalogueClock(boolean showDigitalTimeOnAnalogueClock)  { this.showDigitalTimeOnAnalogueClock = showDigitalTimeOnAnalogueClock; logger.debug("showDigitalTimeOnAnalogueClock set to " + showDigitalTimeOnAnalogueClock); }
+    public void setShowDateAndTimeOnAnalogueClock(boolean showDateAndTimeOnAnalogueClock)  { this.showDateAndTimeOnAnalogueClock = showDateAndTimeOnAnalogueClock; logger.debug("showDigitalTimeOnAnalogueClock set to " + showDateAndTimeOnAnalogueClock); }
     /**
      * Sets the self thread
      * @param thread the thread to assign

@@ -34,15 +34,21 @@ public class ButtonColumn extends AbstractCellEditor
     @Serial
     private static final long serialVersionUID = 1L;
     private static final Logger logger = LogManager.getLogger(ButtonColumn.class);
-
+    /** The reference to the table */
     private final JTable table;
+    /** The action to take on the button click */
     private final Action action;
+    /** The mnemonic to use */
     private int mnemonic;
+    /** The border to use */
     private final Border originalBorder;
-    private Border focusBorder;
-
+    /** The border focus to use */
+    private final Border focusBorder;
+    /** The button to render */
     private final JButton renderButton;
+    /** The edit button to render */
     private final JButton editButton;
+    /** The editor value */
     private Object editorValue;
 
     /**
@@ -66,7 +72,8 @@ public class ButtonColumn extends AbstractCellEditor
         editButton.setFocusPainted(false);
         editButton.addActionListener(this);
         originalBorder = editButton.getBorder();
-        setFocusBorder(new LineBorder(Color.BLUE));
+        focusBorder = new LineBorder(Color.BLUE);
+        editButton.setBorder(focusBorder);
 
         TableColumnModel columnModel = table.getColumnModel();
         columnModel.getColumn(column).setCellRenderer(this);
@@ -83,16 +90,16 @@ public class ButtonColumn extends AbstractCellEditor
         return focusBorder;
     }
 
-    /**
-     *  The foreground color of the button when
-     *  the cell has focus.
-     *  @param focusBorder the foreground color
-     */
-    public void setFocusBorder(Border focusBorder)
-    {
-        this.focusBorder = focusBorder;
-        editButton.setBorder(focusBorder);
-    }
+//    /**
+//     *  The foreground color of the button when
+//     *  the cell has focus.
+//     *  @param focusBorder the foreground color
+//     */
+//    public void setFocusBorder(Border focusBorder)
+//    {
+//        this.focusBorder = focusBorder;
+//        editButton.setBorder(focusBorder);
+//    }
 
     /**
      * Get the mnemonic to activate the button

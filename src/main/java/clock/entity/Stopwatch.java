@@ -40,19 +40,32 @@ public class Stopwatch implements Serializable, Comparable<Stopwatch>
     private static final Logger logger = LogManager.getLogger(Stopwatch.class);
     /** Running count of total Stopwatch instances created; resets at 100. */
     public static long stopwatchCounter = 0L;
+    /** The name of the stopwatch */
     private String name;
-    private boolean paused,
-            started;
-    private transient Clock clock;
-    private transient ScheduledFuture<?> scheduledFuture;
-    private long startMilli = 0L;        // start time in milliseconds
-    private long accumMilli = 0L;        // time accumulated across previous runs
-    private long lastLapMarkMilli = 0L;  // elapsed ns at last lap
-    private long pausedAccumMilli = 0L;  // total paused duration accumulated
-    private long totalPausedMilli = 0L;  // total paused duration with previous pauses
-    private long pausedMilli = 0L;        // when Pause was pressed in milliseconds
-    private Duration duration;
+    /** Indicates if the stopwatch is paused or not */
+    private boolean paused;
+    /** Indicates if the stopwatch is started or not */
+    private boolean started;
+    /** The start time in milliseconds */
+    private long startMilli = 0L;
+    /** The time accumulated across previous runs */
+    private long accumMilli = 0L;
+    /** The elapsed time since the last lap */
+    private long lastLapMarkMilli = 0L;
+    /** The total paused time accumulated */
+    private long pausedAccumMilli = 0L;
+    /** The total paused time with previous pauses */
+    private long totalPausedMilli = 0L;
+    /** The total currently paused time */
+    private long pausedMilli = 0L;
+    /** The laps belonging to this stopwatch */
     private List<Lap> laps;
+    /** The time expressed as a duration */
+    private transient Duration duration;
+    /** Reference to the clock */
+    private transient Clock clock;
+    /** The scheduled future */
+    private transient ScheduledFuture<?> scheduledFuture;
 
     /**
      * The main constructor for creating a Stopwatch
@@ -216,7 +229,7 @@ public class Stopwatch implements Serializable, Comparable<Stopwatch>
         long lastRecordedDuration = 0L;
         if (!laps.isEmpty())
         {
-            lastRecordedDuration = laps.getLast().getDuration();
+            lastRecordedDuration = laps.getLast().getRecordedAt();
         }
         long thisDuration = now - startMilli - totalPausedMilli;
 
@@ -230,7 +243,7 @@ public class Stopwatch implements Serializable, Comparable<Stopwatch>
 
         logger.info("Recording lap #{}, time: {} for stopwatch:{}",
                 lap.getLapNumber(),
-                lap.getFormattedDuration(),
+                lap.getFormattedRecordedAt(),
                 this.getName());
         laps.add(lap);
     }

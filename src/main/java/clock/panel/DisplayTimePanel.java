@@ -26,7 +26,7 @@ import static java.lang.Thread.sleep;
 public class DisplayTimePanel extends JPanel implements Runnable
 {
     private static final Logger logger = LogManager.getLogger(DisplayTimePanel.class);
-    /** The background repaint thread for this panel. */
+    /** The panel thread */
     public Thread thread;
     /** Whether the analogue clock view is active (false = digital). */
     private boolean showAnaloguePanel = false;
@@ -34,6 +34,7 @@ public class DisplayTimePanel extends JPanel implements Runnable
     public String clockText = "00:00.000";
     /** The default/reset stopwatch display text. */
     public static String startText = "00:00.000"; // default text
+    /** Reference to the stopwatch panel */
     private final StopwatchPanel stopwatchPanel;
 
     /**

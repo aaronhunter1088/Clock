@@ -66,10 +66,15 @@ public class Alarm implements Serializable, Comparable<Alarm>
     private boolean isSnoozing;
     /** Whether this alarm is paused. */
     private boolean isPaused;
+    /** Reference to the clock */
     private transient Clock clock;
+    /** The scheduled future */
     private transient ScheduledFuture<?> scheduledFuture;
+    /** The sound future */
     private transient ScheduledFuture<?> soundFuture;
+    /** The auto-snooze future */
     private transient ScheduledFuture<?> autoSnoozeFuture;
+    /** The music player */
     private transient AdvancedPlayer musicPlayer;
 
     /**

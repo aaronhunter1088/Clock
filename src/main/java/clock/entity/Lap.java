@@ -24,9 +24,13 @@ public class Lap implements Serializable, Comparable<Lap>, Cloneable
     @Serial
     private static final long serialVersionUID = 1L;
     private static final Logger logger = LogManager.getLogger(Lap.class);
+    /** The lap number */
     private int lapNumber;
-    private long duration;
+    /** The time the lap was recorded at */
+    private long recordedAt;
+    /** The lap duration */
     private long lapTime;
+    /** Reference to the laps stopwatch */
     private Stopwatch stopwatch;
 
     /**
@@ -39,7 +43,7 @@ public class Lap implements Serializable, Comparable<Lap>, Cloneable
     public Lap(int lapNumber, long recordedAt, long lapTime, Stopwatch stopwatch)
     {
         setLapNumber(lapNumber);
-        setDuration(recordedAt);
+        setRecordedAt(recordedAt);
         setLapTime(lapTime);
         setStopwatch(stopwatch);
     }
@@ -48,9 +52,9 @@ public class Lap implements Serializable, Comparable<Lap>, Cloneable
      * Formats the duration of the lap into a string representation
      * @return the formatted duration as mm:ss.SSS
      */
-    public String getFormattedDuration()
+    public String getFormattedRecordedAt()
     {
-        long msTotal = duration;
+        long msTotal = recordedAt;
         long minutes = msTotal / 60_000;
         long seconds = (msTotal % 60_000) / 1000;
         long hundredths = msTotal % 1000;
@@ -105,7 +109,7 @@ public class Lap implements Serializable, Comparable<Lap>, Cloneable
     {
         if (!(o instanceof Lap lap)) return false;
         return getLapNumber() == lap.getLapNumber() &&
-                getDuration() == lap.getDuration() &&
+                getRecordedAt() == lap.getRecordedAt() &&
                 getLapTime() == lap.getLapTime();
     }
 
@@ -115,7 +119,7 @@ public class Lap implements Serializable, Comparable<Lap>, Cloneable
      */
     @Override
     public int hashCode()
-    { return Objects.hash(getLapNumber(), getDuration(), getLapTime()); }
+    { return Objects.hash(getLapNumber(), getRecordedAt(), getLapTime()); }
 
     /**
      * Provides a string representation of a Lap, including
@@ -143,7 +147,7 @@ public class Lap implements Serializable, Comparable<Lap>, Cloneable
      * Returns the duration
      * @return the duration in milliseconds
      */
-    public long getDuration() { return duration; }
+    public long getRecordedAt() { return recordedAt; }
     /**
      * Returns the lap time
      * @return the lap time in milliseconds
@@ -162,9 +166,9 @@ public class Lap implements Serializable, Comparable<Lap>, Cloneable
     public void setLapNumber(int lapNumber) { this.lapNumber = lapNumber; logger.debug("lapNumber set to {}", lapNumber); }
     /**
      * Set the duration
-     * @param duration the duration to set in milliseconds
+     * @param recordedAt the duration to set in milliseconds
      */
-    public void setDuration(long duration) { this.duration = duration; logger.debug("duration set to {} seconds", duration); }
+    public void setRecordedAt(long recordedAt) { this.recordedAt = recordedAt; logger.debug("duration set to {} seconds", recordedAt); }
     /**
      * Set the lap time
      * @param lapTime the lap time to set in milliseconds

@@ -30,7 +30,7 @@ import static org.junit.jupiter.api.Assertions.*;
  * @author michael ball
  * @version since 2.9
  */
-public class ClockFrameTest
+class ClockFrameTest
 {
     private static final Logger logger = LogManager.getLogger(ClockFrameTest.class);
 

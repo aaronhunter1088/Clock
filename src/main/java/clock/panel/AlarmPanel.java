@@ -49,28 +49,58 @@ import static java.time.DayOfWeek.*;
 public class AlarmPanel extends ClockPanel implements Runnable
 {
     private static final Logger logger = LogManager.getLogger(AlarmPanel.class);
+    /** The panel thread */
     private Thread thread;
+    /** The alarm panel layout */
     private GridBagLayout layout;
+    /** The alarm panel layout constraints */
     private GridBagConstraints constraints;
-    private JLabel nameLabel,
-                   hoursLabel,
-                   minutesLabel,
-                   ampmLabel;
-    private JTextField nameTextField,
-                       hoursTextField,
-                       minutesTextField;
+    /** The label for the name field */
+    private JLabel nameLabel;
+    /** The label for the hours field */
+    private JLabel hoursLabel;
+    /** The label for the minutes field */
+    private JLabel minutesLabel;
+    /** The label for the ampm field */
+    private JLabel ampmLabel;
+    /** The text field for the name */
+    private JTextField nameTextField;
+    /** The text field for the hours */
+    private JTextField hoursTextField;
+    /** The text field for the minutes */
+    private JTextField minutesTextField;
+    /** The dropdown for ampm */
     private JComboBox<String> ampmDropDown;
-    private JCheckBox mondayCheckBox,tuesdayCheckBox,
-                      wednesdayCheckBox,thursdayCheckBox,
-                      fridayCheckBox,saturdayCheckBox,
-                      sundayCheckBox, weekdaysCheckBox,
-                      weekendsCheckBox;
+    /** Monday checkbox */
+    private JCheckBox mondayCheckBox;
+    /** Tuesday checkbox */
+    private JCheckBox tuesdayCheckBox;
+    /** Wednesday checkbox */
+    private JCheckBox wednesdayCheckBox;
+    /** Thursday checkbox */
+    private JCheckBox thursdayCheckBox;
+    /** Friday checkbox */
+    private JCheckBox fridayCheckBox;
+    /** Saturday checkbox */
+    private JCheckBox saturdayCheckBox;
+    /** Sunday checkbox */
+    private JCheckBox sundayCheckBox;
+    /** Weekdays checkbox */
+    private JCheckBox weekdaysCheckBox;
+    /** Weekends checkbox */
+    private JCheckBox weekendsCheckBox;
+    /** Set alarm button */
     private JButton setAlarmButton;
+    /** Alarms table */
     private JTable alarmsTable;
+    /** Scrollable table */
     private JScrollPane scrollTable;
+    /** Reference to the clock frame */
     private ClockFrame clockFrame;
+    /** Reference to the clock */
     private Clock clock;
-    private final int NAME_LENGTH_MAX = 20;
+    /** Name length requirement */
+    private static final int NAME_LENGTH_MAX = 20;
 
     /**
      * Main constructor for creating the AlarmPanel

@@ -40,15 +40,25 @@ import static clock.util.Constants.*;
 public class StopwatchPanel extends ClockPanel
 {
     private static final Logger logger = LogManager.getLogger(StopwatchPanel.class);
+    /** The stopwatch layout */
     private GridBagLayout layout;
+    /** The stopwatch layout constraints */
     private GridBagConstraints constraints;
+    /** Reference to the clock frame */
     private ClockFrame clockFrame;
+    /** Reference to the clock */
     private Clock clock;
-    private DisplayTimePanel displayTimePanel; // Used to display the stopwatch time in two modes
-    private DisplayLapsPanel displayLapsPanel; // Used to display the laps recorded for all stopwatches
-    private JButton lapButton,   // toggles to reset when stopwatch is stopped
-                    startButton; // toggles to stop when stopwatch is started
+    /** Reference to the display time panel */
+    private DisplayTimePanel displayTimePanel;
+    /** Reference to the stopwatch panel */
+    private DisplayLapsPanel displayLapsPanel;
+    /** The laps button */
+    private JButton lapButton;   // toggles to reset when stopwatch is stopped
+    /** The start stopwatch button */
+    private JButton startButton; // toggles to stop when stopwatch is started
+    /** The stopwatch name text field */
     private JTextField stopwatchNameField;
+    /** Reference to the currently running stopwatch */
     private Stopwatch currentStopwatch;
 
     /**

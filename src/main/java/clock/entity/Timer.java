@@ -35,22 +35,37 @@ public class Timer implements Serializable, Comparable<Timer>
     private static final Logger logger = LogManager.getLogger(Timer.class);
     /** Running count of total Timer instances created; resets at 100. */
     public static long timersCounter = 0L;
-    private int hours,
-                minutes,
-                seconds;
-    private String name,
-                   hoursAsStr,
-                   minutesAsStr,
-                   secondsAsStr;
-    private boolean timerGoingOff,
-                    paused,
-                    started,
-                    triggered;
+    /** The hours of the timer */
+    private int hours;
+    /** The minutes of the timer */
+    private int minutes;
+    /** The seconds of the timer */
+    private int seconds;
+    /** The hours of the timer as a string */
+    private String hoursAsStr;
+    /** The minutes of the timer as a string */
+    private String minutesAsStr;
+    /** The seconds of the timer as a string */
+    private String secondsAsStr;
+    /** The name of the timer */
+    private String name;
+    /** Indicates if this timer is actively playing its sound, or going off */
+    private boolean timerGoingOff;
+    /** Indicates if the timer is paused or not */
+    private boolean paused;
+    /** Indicates if the timer has been started or not */
+    private boolean started;
+    /** Indicates if the timer has been triggered to begin playing its sound */
+    private boolean triggered;
+    /** Reference to the clock */
     private transient Clock clock;
-    private LocalTime countDown;
-
+    /** The time to count down for this timer expressed as a LocalTime */
+    private transient LocalTime countDown;
+    /** The countdown future */
     private transient ScheduledFuture<?> countdownFuture;
+    /** The sound future */
     private transient ScheduledFuture<?> soundFuture;
+    /** The music player */
     private transient AdvancedPlayer musicPlayer;
 
     /**
@@ -196,23 +211,9 @@ public class Timer implements Serializable, Comparable<Timer>
         );
     }
 
-    private void playSoundOnce()
-    {
-        try
-        {
-            setupMusicPlayer();
-
-            if (musicPlayer != null)
-            {
-                musicPlayer.play();
-            }
-        }
-        catch (Exception e)
-        {
-            printStackTrace(e, "Error while playing timer sound");
-        }
-    }
-
+    /**
+     * Sets up a music player for the timer.
+     */
     private void setupMusicPlayer()
     {
         logger.info("setup music player");
@@ -247,6 +248,29 @@ public class Timer implements Serializable, Comparable<Timer>
         }
     }
 
+    /**
+     * Plays a sound using the music player.
+     */
+    private void playSoundOnce()
+    {
+        try
+        {
+            setupMusicPlayer();
+
+            if (musicPlayer != null)
+            {
+                musicPlayer.play();
+            }
+        }
+        catch (Exception e)
+        {
+            printStackTrace(e, "Error while playing timer sound");
+        }
+    }
+
+    /**
+     * Stops the soundFuture and the music player.
+     */
     private synchronized void stopSound()
     {
         if (soundFuture != null)
