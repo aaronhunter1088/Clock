@@ -307,14 +307,32 @@ public class ClockMenuBarTest
     @DisplayName("Test setCurrentTimeZone marks the active timezone with a star")
     void testSetCurrentTimeZoneMarksActiveWithStar()
     {
+        clockFrame.getClock().setTimezone(java.time.ZoneId.of(AMERICA_NEW_YORK));
         clockFrame.getClockMenuBar().setCurrentTimeZone();
-        final String currentTz = clockFrame.getClock().getPlainTimezoneFromZoneId(clockFrame.getClock().getTimezone());
 
-        final boolean activeTimezoneHasStar = clockFrame.getClockMenuBar().getTimezones().stream()
-                .filter(item -> item.getText().replace(STAR, EMPTY).trim().equals(currentTz))
+        final boolean easternHasStar = clockFrame.getClockMenuBar().getTimezones().stream()
+                .filter(item -> item.getText().replace(STAR, EMPTY).trim().equalsIgnoreCase(EASTERN))
                 .anyMatch(item -> item.getText().contains(STAR));
 
-        assertTrue(activeTimezoneHasStar, "The active timezone should be marked with a star");
+        assertTrue(easternHasStar, "Eastern timezone should be marked with a star when clock is set to America/New_York");
+    }
+
+    @Test
+    @DisplayName("Test updateClockTimezone with a SHORT_IDS key adds item and marks it with a star")
+    void testUpdateClockTimezoneWithShortIdKeyMarksWithStar()
+    {
+        final String shortId = "JST"; // resolves to Asia/Tokyo
+        final int countBefore = clockFrame.getClockMenuBar().getTimezones().size();
+
+        clockFrame.updateClockTimezone(new javax.swing.JMenuItem(shortId));
+
+        final int countAfter = clockFrame.getClockMenuBar().getTimezones().size();
+        assertEquals(countBefore + 1, countAfter, "A new timezone entry should be added to the list");
+
+        final boolean hasStar = clockFrame.getClockMenuBar().getTimezones().stream()
+                .filter(item -> item.getText().replace(STAR, EMPTY).trim().equalsIgnoreCase(shortId))
+                .anyMatch(item -> item.getText().contains(STAR));
+        assertTrue(hasStar, "The newly selected JST timezone should be marked with a star");
     }
 
     @Test

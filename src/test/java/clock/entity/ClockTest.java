@@ -1136,11 +1136,39 @@ class ClockTest
     }
 
     @Test
-    @DisplayName("getPlainTimezoneFromZoneId returns system default id for unknown zone")
+    @DisplayName("getPlainTimezoneFromZoneId returns the zone ID itself for an unknown zone")
     void testGetPlainTimezoneFromZoneIdUnknown()
     {
         final String result = clock.getPlainTimezoneFromZoneId(ZoneId.of("Europe/London"));
-        assertEquals(ZoneId.systemDefault().getId(), result);
+        assertEquals("Europe/London", result);
+    }
+
+    @Test
+    @DisplayName("getZoneIdFromTimezoneButtonText resolves a raw ZoneId string like Europe/London")
+    void testGetZoneIdFromTimezoneButtonTextRawZoneId()
+    {
+        assertEquals(ZoneId.of("Europe/London"), clock.getZoneIdFromTimezoneButtonText("Europe/London"));
+    }
+
+    @Test
+    @DisplayName("getZoneIdFromTimezoneButtonText resolves a SHORT_IDS key like PST")
+    void testGetZoneIdFromTimezoneButtonTextShortId()
+    {
+        assertEquals(ZoneId.of(ZoneId.SHORT_IDS.get("PST")), clock.getZoneIdFromTimezoneButtonText("PST"));
+    }
+
+    @ParameterizedTest
+    @DisplayName("getZoneIdFromTimezoneButtonText resolves SHORT_IDS keys to their canonical ZoneIds")
+    @MethodSource("shortIdsProvider")
+    void testGetZoneIdFromTimezoneButtonTextAllShortIds(String shortId, String longId)
+    {
+        assertEquals(ZoneId.of(longId), clock.getZoneIdFromTimezoneButtonText(shortId));
+    }
+
+    static Stream<Arguments> shortIdsProvider()
+    {
+        return ZoneId.SHORT_IDS.entrySet().stream()
+                .map(entry -> Arguments.of(entry.getKey(), entry.getValue()));
     }
 
 }

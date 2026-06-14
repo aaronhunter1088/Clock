@@ -16,7 +16,6 @@ import java.time.ZoneId;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
-import java.util.stream.Collectors;
 
 import static clock.entity.Panel.*;
 import static clock.util.Constants.*;
@@ -267,36 +266,24 @@ public class ClockFrame extends JFrame
      */
     public void updateClockTimezone(JMenuItem timezone)
     {
-        logger.info("clicked on {} timezone. updating the time", timezone.getText());
-        LocalDateTime ldt = determineNewTimeFromSelectedTimeZone(timezone.getText().replace(STAR,EMPTY).trim());
-        clock.setTheTime(ldt);
-        // Update the timezone correctly
-        java.util.List<JMenuItem> menuBarTimezones = menuBar.getTimezones();
-        java.util.Set<String> timezoneTexts = menuBarTimezones.stream().map(button -> button.getText().replace(STAR,EMPTY).trim()).collect(Collectors.toSet());
-        timezoneTexts = timezoneTexts.stream().filter(text -> text.equalsIgnoreCase(timezone.getText().trim())).collect(Collectors.toSet());
-        if (timezoneTexts.isEmpty()) {
-            String longId = ZoneId.SHORT_IDS.get(timezone.getText().toUpperCase());
-            if (longId != null) {
-                clock.setTimezone(ZoneId.of(longId));
-            }
-        } else {
-            clock.setTimezone(clock.getZoneIdFromTimezoneButtonText(timezone.getText().replace(STAR, EMPTY).trim()));
-        }
+        final String cleanText = timezone.getText().replace(STAR, EMPTY).trim();
+        logger.info("clicked on {} timezone. updating the time", cleanText);
+        clock.setTheTime(determineNewTimeFromSelectedTimeZone(cleanText));
+        clock.setTimezone(clock.getZoneIdFromTimezoneButtonText(cleanText));
+        logger.debug("Time zone changed to {}", clock.getTimezone());
 
-        // Clear all stars from timezones
-        //menuBarTimezones.forEach(button -> button.setText(button.getText().replace(STAR,EMPTY).trim()));
-
-        timezoneTexts = menuBarTimezones.stream().map(button -> button.getText().replace(STAR,EMPTY).trim()).collect(Collectors.toSet());
-        final boolean alreadyPresent = timezoneTexts.stream()
-                .anyMatch(tz -> tz.contains(timezone.getText()));
+        final java.util.List<JMenuItem> menuBarTimezones = menuBar.getTimezones();
+        final boolean alreadyPresent = menuBarTimezones.stream()
+                .map(btn -> btn.getText().replace(STAR, EMPTY).trim())
+                .anyMatch(text -> text.equalsIgnoreCase(cleanText));
         if (!alreadyPresent) {
-            timezone.setText(timezone.getText());
+            timezone.setText(cleanText);
             timezone.addActionListener(_ -> updateClockTimezone(timezone));
             timezone.setForeground(Color.WHITE);
             timezone.setBackground(Color.BLACK);
-            timezone.setName(timezone.getText());
-            logger.info("adding timezone: {}", timezone.getText());
-            int secondToLast = menuBar.getChangeTimeZoneMenu().getItemCount() - 1;
+            timezone.setName(cleanText);
+            logger.info("adding timezone: {}", cleanText);
+            final int secondToLast = menuBar.getChangeTimeZoneMenu().getItemCount() - 1;
             menuBar.getChangeTimeZoneMenu().add(timezone, secondToLast);
             menuBarTimezones.add(timezone);
         }
@@ -320,9 +307,15 @@ public class ClockFrame extends JFrame
                     case CENTRAL -> LocalDateTime.now(ZoneId.of(AMERICA_CHICAGO));
                     case EASTERN -> LocalDateTime.now(ZoneId.of(AMERICA_NEW_YORK));
                     case MOUNTAIN -> LocalDateTime.now(ZoneId.of(AMERICA_DENVER));
-                    default -> clock.getTimezone() != null
-                            ? LocalDateTime.now(clock.getTimezone())
-                            : LocalDateTime.now(ZoneId.systemDefault());
+                    default -> {
+                        try {
+                            yield LocalDateTime.now(ZoneId.of(timezone));
+                        } catch (DateTimeException dte) {
+                            yield clock.getTimezone() != null
+                                    ? LocalDateTime.now(clock.getTimezone())
+                                    : LocalDateTime.now(ZoneId.systemDefault());
+                        }
+                    }
                 };
             }
             return LocalDateTime.now(ZoneId.of(longId));

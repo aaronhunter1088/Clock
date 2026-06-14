@@ -322,7 +322,7 @@ public class Clock implements Serializable, Comparable<Clock>
                 case AMERICA_CHICAGO -> CENTRAL;
                 case AMERICA_NEW_YORK -> EASTERN;
                 case AMERICA_DENVER -> MOUNTAIN;
-                default -> ZoneId.systemDefault().getId();
+                default -> timezone.getId();
             };
         }
     }
@@ -805,8 +805,14 @@ public class Clock implements Serializable, Comparable<Clock>
                     case EASTERN -> ZoneId.of(AMERICA_NEW_YORK);
                     case MOUNTAIN -> ZoneId.of(AMERICA_DENVER);
                     default -> {
-                        logger.warn("Unknown button text: '{}'. Using ZoneId.systemDefault: {}", btnText, ZoneId.systemDefault());
-                        yield ZoneId.systemDefault();
+                        try {
+                            final ZoneId parsed = ZoneId.of(btnText);
+                            logger.debug("Parsed zone ID directly from button text: {}", parsed);
+                            yield parsed;
+                        } catch (DateTimeException dte) {
+                            logger.warn("Unknown button text: '{}'. Using ZoneId.systemDefault: {}", btnText, ZoneId.systemDefault());
+                            yield ZoneId.systemDefault();
+                        }
                     }
                 };
             }
