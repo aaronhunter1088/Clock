@@ -445,7 +445,7 @@ public class ClockMenuBarTest
     @ParameterizedTest
     @DisplayName("Test Show Help For Each Panel")
     @EnumSource(Panel.class)
-    @Disabled // just because it requires manual clicking to close the window
+    //@Disabled // just because it requires manual clicking to close the window
     void testShowHelpMenu(Panel panel)
     {
         clockFrame.setPanelType(panel);

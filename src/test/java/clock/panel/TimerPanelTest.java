@@ -348,6 +348,7 @@ class TimerPanelTest
                     false,
                     timerPanel
             );
+            timerPanel.setClock(clock);
             timerPanel.getHoursTextField().dispatchEvent(focusEvent);
         });
 
