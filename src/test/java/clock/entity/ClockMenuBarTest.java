@@ -129,8 +129,8 @@ public class ClockMenuBarTest
     @ParameterizedTest
     @DisplayName("Test Toggle Show Digital Time on Analogue Clock Setting")
     @CsvSource({
-        "true, 'Show digital time'",
-        "false, 'Hide digital time'"
+        "true, 'Show date and time'",
+        "false, 'Hide date and time'"
     })
     void testToggleShowDigitalTimeOnAnalogueClockSetting(boolean showDigitalTime, String settingText)
     {
@@ -401,7 +401,7 @@ public class ClockMenuBarTest
         assertEquals(SHOW+SPACE+FULL_TIME_SETTING, clockFrame.getClockMenuBar().getFullTimeSetting().getText());
         assertEquals(SHOW+SPACE+PARTIAL_TIME_SETTING, clockFrame.getClockMenuBar().getPartialTimeSetting().getText());
         assertEquals(Turn+SPACE+off+SPACE+DST_SETTING, clockFrame.getClockMenuBar().getToggleDSTSetting().getText());
-        assertEquals(HIDE+SPACE+DIGITAL_TIME, clockFrame.getClockMenuBar().getShowDigitalTimeOnAnalogueClockSetting().getText());
+        assertEquals(HIDE+SPACE+DATE.toLowerCase()+SPACE+AND.toLowerCase()+SPACE+TIME.toLowerCase(), clockFrame.getClockMenuBar().getShowDigitalTimeOnAnalogueClockSetting().getText());
         assertEquals(PAUSE+SPACE+ALL+SPACE+TIMER+S.toLowerCase(), clockFrame.getClockMenuBar().getPauseResumeAllTimersSetting().getText());
         assertEquals(PAUSE+SPACE+ALL+SPACE+ALARM+S.toLowerCase(), clockFrame.getClockMenuBar().getPauseResumeAllAlarmsSetting().getText());
         assertEquals(SHOW+SPACE+ANALOGUE+SPACE+TIME, clockFrame.getClockMenuBar().getShowAnalogueTimePanel().getText());

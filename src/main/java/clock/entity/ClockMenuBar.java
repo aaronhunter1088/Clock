@@ -149,7 +149,8 @@ public class ClockMenuBar extends JMenuBar
                     .toArray(ZoneOption[]::new);
 
             final JComboBox<ZoneOption> comboBox = new JComboBox<>(zoneOptions);
-            final JTextField rawInput = new JTextField("Ex: Africa/Cairo", 20);
+            final JTextField rawInput = new JTextField("Ex: Africa/Cairo, Europe/London, UTC", 20);
+            rawInput.setToolTipText("Ex: Africa/Cairo, Europe/London, UTC");
 
             final JPanel panel = new JPanel(new GridLayout(0, 2, 5, 8));
             panel.add(new JLabel("Select from list:"));
@@ -163,7 +164,8 @@ public class ClockMenuBar extends JMenuBar
             );
             if (result != JOptionPane.OK_OPTION) { return; }
 
-            final String raw = rawInput.getText().trim();
+            String raw = rawInput.getText().trim();
+            if (raw.contains("Ex:")) raw = EMPTY;
             if (!raw.isBlank()) {
                 try {
                     ZoneId.of(raw); // validate before doing anything
@@ -173,12 +175,14 @@ public class ClockMenuBar extends JMenuBar
                 } catch (DateTimeException e) {
                     logger.warn("Invalid zone ID entered: '{}'. No change made.", raw);
                 }
-            } else {
+            }
+            else {
                 final ZoneOption selected = (ZoneOption) comboBox.getSelectedItem();
                 if (selected != null) {
-                    final JMenuItem tzItem = new JMenuItem(selected.displayName());
+                    final JMenuItem tzItem = new JMenuItem(selected.key());
                     tzItem.setName(ZoneId.SHORT_IDS.get(selected.key()));
                     clockFrame.updateClockTimezone(tzItem);
+                    tzItem.setText(selected.displayName()+SPACE+STAR);
                 }
             }
         });
