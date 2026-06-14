@@ -61,7 +61,7 @@ public class DisplayTimePanel extends JPanel implements Runnable
     /** Stops the digital stopwatch panel thread. */
     public void stop()
     {
-        logger.debug("stopping digital stopwatch panel");
+        logger.debug("stopping digital time stopwatch panel");
         // TODO: Is this right? Is there a better way to do this?
         thread = null;
         setClockText(startText);
