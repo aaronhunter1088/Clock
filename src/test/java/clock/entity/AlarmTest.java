@@ -609,6 +609,41 @@ class AlarmTest {
                 "Shortened days should map Tuesday=T, Thursday=TH, Saturday=S");
     }
 
+    @Test
+    @DisplayName("Test user snooze before auto-snooze leaves alarm snoozing, not going off")
+    void testUserSnoozePreventsAutoSnooze()
+    {
+        alarm1 = weekDays730AmAlarm;
+        alarm1.triggerAlarm(clock.getScheduledExecutorService());
+
+        assertTrue(alarm1.isAlarmGoingOff(), "Alarm should be going off after triggerAlarm");
+        assertNotNull(alarm1.getAutoSnoozeFuture(), "Auto-snooze future should be scheduled");
+
+        // User clicks snooze before auto-snooze fires
+        alarm1.snooze(clock.getScheduledExecutorService());
+
+        assertFalse(alarm1.isAlarmGoingOff(), "Alarm should not be going off after user snooze");
+        assertTrue(alarm1.isSnoozing(), "Alarm should be in snoozing state after user snooze");
+        assertNull(alarm1.getAutoSnoozeFuture(), "Auto-snooze future should be cancelled after user snooze");
+        assertNotNull(alarm1.getScheduledFuture(), "A snooze re-trigger should be scheduled");
+    }
+
+    @Test
+    @DisplayName("Test auto-snooze future is cancelled when user snoozes")
+    void testAutoSnoozeFutureCancelledOnUserSnooze()
+    {
+        alarm1 = weekDays730AmAlarm;
+        alarm1.triggerAlarm(clock.getScheduledExecutorService());
+
+        final var futureBefore = alarm1.getAutoSnoozeFuture();
+        assertNotNull(futureBefore, "Auto-snooze future should exist after trigger");
+
+        alarm1.snooze(clock.getScheduledExecutorService());
+
+        assertTrue(futureBefore.isCancelled() || futureBefore.isDone(),
+                "Auto-snooze future should be cancelled or done after user manually snoozes");
+    }
+
     // Helper methods
     @SuppressWarnings("SameParameterValue")
     private void sleep(int time)

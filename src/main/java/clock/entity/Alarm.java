@@ -306,8 +306,12 @@ public class Alarm implements Serializable, Comparable<Alarm>
         );
     }
 
-    private void autoSnoozeAlarm(ScheduledExecutorService scheduler)
+    private synchronized void autoSnoozeAlarm(ScheduledExecutorService scheduler)
     {
+        if (!isAlarmGoingOff()) {
+            logger.debug("auto-snooze skipped — alarm already handled by user for {}", this);
+            return;
+        }
         logger.debug("auto-snoozing alarm {}", this);
         snooze(scheduler);
     }

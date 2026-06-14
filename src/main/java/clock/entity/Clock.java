@@ -495,6 +495,7 @@ public class Clock implements Serializable, Comparable<Clock>
      */
     private void setActiveAlarms()
     {
+        logger.debug("setActiveAlarms for {}", listOfAlarms.size() == 1 ? 1+SPACE+ALARM : listOfAlarms.size()+SPACE+ALARM+S.toLowerCase());
         listOfAlarms.forEach(alarm -> alarm.startAlarm(scheduledExecutorService));
         resetTriggeredAlarms();
     }
@@ -506,7 +507,7 @@ public class Clock implements Serializable, Comparable<Clock>
      */
     private void setActiveTimers()
     {
-        //listOfTimers.forEach(Timer::startTimer);
+        logger.debug("setActiveTimers for {}", listOfTimers.size() == 1 ? 1+SPACE+TIMER : listOfTimers.size()+SPACE+TIMER+S.toLowerCase());
         listOfTimers.forEach(timer -> timer.startTimer(scheduledExecutorService));
     }
 
