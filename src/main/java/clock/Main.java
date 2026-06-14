@@ -42,7 +42,6 @@ public class Main
         startMain(args);
         Runtime.getRuntime().addShutdownHook(new Thread(() -> {
             clockFrame.stop();
-            clockFrame.dispose();
             logger.info("Closing Clock application");
         }));
     }
