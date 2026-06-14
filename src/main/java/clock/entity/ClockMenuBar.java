@@ -11,6 +11,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
 import java.io.Serial;
+import java.time.DateTimeException;
 import java.time.ZoneId;
 import java.time.format.TextStyle;
 import java.util.ArrayList;
@@ -146,20 +147,39 @@ public class ClockMenuBar extends JMenuBar
                     ))
                     .sorted(Comparator.comparing(ZoneOption::displayName))
                     .toArray(ZoneOption[]::new);
-            final ZoneOption selected = (ZoneOption) JOptionPane.showInputDialog(
-                    this,
-                    SELECT_ZONE_ID,
-                    CHANGE + SPACE + TIME_ZONES,
-                    JOptionPane.PLAIN_MESSAGE,
-                    null,
-                    zoneOptions,
-                    zoneOptions[0]
+
+            final JComboBox<ZoneOption> comboBox = new JComboBox<>(zoneOptions);
+            final JTextField rawInput = new JTextField("Ex: Africa/Cairo", 20);
+
+            final JPanel panel = new JPanel(new GridLayout(0, 2, 5, 8));
+            panel.add(new JLabel("Select from list:"));
+            panel.add(comboBox);
+            panel.add(new JLabel("Or enter a zone ID:"));
+            panel.add(rawInput);
+
+            final int result = JOptionPane.showConfirmDialog(
+                    this, panel, CHANGE + SPACE + TIME_ZONES,
+                    JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE
             );
-            if (selected != null)
-            {
-                final JMenuItem tzItem = new JMenuItem(selected.displayName());
-                tzItem.setName(ZoneId.SHORT_IDS.get(selected.key())); // long ID used for resolution
-                clockFrame.updateClockTimezone(tzItem);
+            if (result != JOptionPane.OK_OPTION) { return; }
+
+            final String raw = rawInput.getText().trim();
+            if (!raw.isBlank()) {
+                try {
+                    ZoneId.of(raw); // validate before doing anything
+                    final JMenuItem tzItem = new JMenuItem(ZoneId.of(raw).getDisplayName(TextStyle.FULL, Locale.ENGLISH));
+                    tzItem.setName(raw);
+                    clockFrame.updateClockTimezone(tzItem);
+                } catch (DateTimeException e) {
+                    logger.warn("Invalid zone ID entered: '{}'. No change made.", raw);
+                }
+            } else {
+                final ZoneOption selected = (ZoneOption) comboBox.getSelectedItem();
+                if (selected != null) {
+                    final JMenuItem tzItem = new JMenuItem(selected.displayName());
+                    tzItem.setName(ZoneId.SHORT_IDS.get(selected.key()));
+                    clockFrame.updateClockTimezone(tzItem);
+                }
             }
         });
         getChangeTimeZoneMenu().add(userTimezone);
