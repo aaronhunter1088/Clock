@@ -205,7 +205,7 @@ public class DisplayTimePanel extends JPanel implements Runnable
         String time = stopwatchPanel.getCurrentStopwatch() == null ? "00:00:000" : clockText;
         String[] parts = time.split(COLON);
 
-        double milliseconds = Double.parseDouble(parts[2] != null ? parts[2] : String.valueOf(Double.parseDouble("0")));
+        double milliseconds = Double.parseDouble(parts[2]);
         long minutes = Long.parseLong(parts[0]);
         int seconds = Integer.parseInt(parts[1]);
 
