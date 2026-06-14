@@ -185,18 +185,18 @@ public class DisplayTimePanel extends JPanel implements Runnable
         g.drawString(clockText, xcenter - g.getFontMetrics().stringWidth(clockText) / 2, ycenter + (int)(radius * 0.5));  // adjust radius number as needed
 
         // Draw numbers (adjust positions for new radius)
-        g.drawString(ZERO+FIVE,    xcenter + (int)(radius * 0.3),  ycenter - (int)(radius * 0.7));
-        g.drawString(TEN,    xcenter + (int)(radius * 0.6), ycenter - (int)(radius * 0.4));
+        g.drawString(ZERO+FIVE, xcenter + (int)(radius * 0.3),  ycenter - (int)(radius * 0.7));
+        g.drawString(TEN+EMPTY, xcenter + (int)(radius * 0.6), ycenter - (int)(radius * 0.4));
         g.drawString(ONE+FIVE,  xcenter + (int)(radius * 0.8),          ycenter);
-        g.drawString(TWO+ZERO,   xcenter + (int)(radius * 0.6), ycenter + (int)(radius * 0.4));
-        g.drawString(TWO+FIVE,   xcenter + (int)(radius * 0.3),  ycenter + (int)(radius * 0.7));
-        g.drawString(THREE+ZERO,    xcenter - 10,                   ycenter + radius - 5);
-        g.drawString(THREE+FIVE,  xcenter - (int)(radius * 0.5),  ycenter + (int)(radius * 0.7));
-        g.drawString(FOUR+ZERO,  xcenter - (int)(radius * 0.8),  ycenter + (int)(radius * 0.4));
-        g.drawString(FOUR+FIVE,   xcenter - radius + 5,           ycenter);
-        g.drawString(FIVE+ZERO,    xcenter - (int)(radius * 0.8),  ycenter - (int)(radius * 0.4));
+        g.drawString(TWO+ZERO,  xcenter + (int)(radius * 0.6), ycenter + (int)(radius * 0.4));
+        g.drawString(TWO+FIVE,  xcenter + (int)(radius * 0.3),  ycenter + (int)(radius * 0.7));
+        g.drawString(THREE+ZERO,xcenter - 10,                   ycenter + radius - 5);
+        g.drawString(THREE+FIVE,xcenter - (int)(radius * 0.5),  ycenter + (int)(radius * 0.7));
+        g.drawString(FOUR+ZERO, xcenter - (int)(radius * 0.8),  ycenter + (int)(radius * 0.4));
+        g.drawString(FOUR+FIVE, xcenter - radius + 5,           ycenter);
+        g.drawString(FIVE+ZERO, xcenter - (int)(radius * 0.8),  ycenter - (int)(radius * 0.4));
         g.drawString(FIVE+FIVE, xcenter - (int)(radius * 0.5),  ycenter - (int)(radius * 0.7));
-        g.drawString(SIX+ZERO, xcenter - 10,                   ycenter - radius + 20);
+        g.drawString(SIX+ZERO,  xcenter - 10,                   ycenter - radius + 20);
 
         g.setColor(Color.BLACK);
 
