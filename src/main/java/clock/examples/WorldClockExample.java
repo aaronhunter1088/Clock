@@ -16,12 +16,30 @@ import java.util.stream.Stream;
 
 import static clock.util.Constants.AMERICA_CHICAGO;
 
-public class WorldClockExample 
+/**
+ * WorldClockExample
+ * <p>
+ * Demonstrates fetching world timezone data from the WorldTime API
+ * and logging the results using Gson for pretty-printing.
+ *
+ * @author michael ball
+ * @version since 2.0
+ */
+public class WorldClockExample
 {
-    private static Logger logger = LogManager.getLogger(WorldClockExample.class);
+    private static final Logger logger = LogManager.getLogger(WorldClockExample.class);
 
+    /** The default timezone used when making API requests. */
     private String timeZone = AMERICA_CHICAGO;
 
+    /** Private constructor — example class, not instantiable. */
+    private WorldClockExample() {}
+
+    /**
+     * Entry point. Fetches all available timezones from the WorldTime API
+     * and logs each one's time data.
+     * @param args optional: the first argument limits the number of timezones queried
+     */
     public static void main(String[] args) {
         try
         {
@@ -59,7 +77,7 @@ public class WorldClockExample
                     logger.info("body -> {}", json);
                 }
                 catch (Exception e)
-                { logger.error("Something happened when retrieving timezone info for {}" + timezone, e); }
+                { logger.error("Something happened when retrieving timezone info for " + timezone, e); }
             });
 
 

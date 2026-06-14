@@ -26,12 +26,20 @@ import static java.lang.Thread.sleep;
 public class DisplayTimePanel extends JPanel implements Runnable
 {
     private static final Logger logger = LogManager.getLogger(DisplayTimePanel.class);
+    /** The background repaint thread for this panel. */
     public Thread thread;
+    /** Whether the analogue clock view is active (false = digital). */
     private boolean showAnaloguePanel = false;
+    /** The current stopwatch time text displayed on the panel. */
     public String clockText = "00:00.000";
+    /** The default/reset stopwatch display text. */
     public static String startText = "00:00.000"; // default text
     private final StopwatchPanel stopwatchPanel;
 
+    /**
+     * Constructs a DisplayTimePanel attached to the given stopwatch panel.
+     * @param stopwatchPanel the parent StopwatchPanel
+     */
     public DisplayTimePanel(StopwatchPanel stopwatchPanel)
     {
         super();
@@ -121,6 +129,10 @@ public class DisplayTimePanel extends JPanel implements Runnable
         }
     }
 
+    /**
+     * Draws the digital stopwatch time and label strings onto the panel.
+     * @param g the Graphics context to draw on
+     */
     public void drawDigitalClock(Graphics g)
     {
         //logger.debug("drawing display time panel");
@@ -237,11 +249,20 @@ public class DisplayTimePanel extends JPanel implements Runnable
         g.drawLine(xcenter, ycenter, xminute, yminute);
     }
 
-    /** Returns isShowAnaloguePanel */
+    /**
+     * Returns isShowAnaloguePanel
+     * @return true if the analogue panel is displayed
+     */
     public boolean isShowAnaloguePanel() { return showAnaloguePanel; }
-    /** Returns the clock text */
+    /**
+     * Returns the clock text
+     * @return the current clock display text
+     */
     public String getClockText() { return clockText; }
-    /** Returns if the thread is running */
+    /**
+     * Returns if the thread is running
+     * @return true if the display thread is running
+     */
     public boolean isRunning() { return thread != null; }
 
     /**

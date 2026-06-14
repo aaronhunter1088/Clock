@@ -34,35 +34,64 @@ public class Clock implements Serializable, Comparable<Clock>
     private static final long serialVersionUID = 2L;
     private static final Logger logger = LogManager.getLogger(Clock.class);
 
+    /** The current date. */
     private LocalDate date;
+    /** The current day of the week. */
     private DayOfWeek dayOfWeek;
+    /** The current month. */
     private Month month;
+    /** The current local time. */
     private LocalTime time;
-    private int seconds,
-                minutes,
-                hours,
-                dayOfMonth,
-                year;
+    /** The current seconds value (0–59). */
+    private int seconds;
+    /** The current minutes value (0–59). */
+    private int minutes;
+    /** The current hours value. */
+    private int hours;
+    /** The current day of the month (1–31). */
+    private int dayOfMonth;
+    /** The current year. */
+    private int year;
+    /** The AM or PM indicator for standard time display. */
     private String ampm;
+    /** The active timezone for this clock. */
     private ZoneId timezone;
-    private String hoursAsStr=EMPTY,
-                   minutesAsStr=EMPTY,
-                   secondsAsStr=EMPTY;
-    private LocalDate beginDaylightSavingsTimeDate,
-                      endDaylightSavingsTimeDate;
+    /** The hours value formatted as a zero-padded two-digit string. */
+    private String hoursAsStr = EMPTY;
+    /** The minutes value formatted as a zero-padded two-digit string. */
+    private String minutesAsStr = EMPTY;
+    /** The seconds value formatted as a zero-padded two-digit string. */
+    private String secondsAsStr = EMPTY;
+    /** The date on which daylight savings time begins this year (spring forward). */
+    private LocalDate beginDaylightSavingsTimeDate;
+    /** The date on which daylight savings time ends this year (fall back). */
+    private LocalDate endDaylightSavingsTimeDate;
+    /** The combined current date and time. */
     private LocalDateTime currentDateTime;
+    /** The list of alarms managed by this clock. */
     private List<Alarm> listOfAlarms;
+    /** The list of timers managed by this clock. */
     private List<Timer> listOfTimers;
+    /** The list of stopwatches managed by this clock. */
     private List<Stopwatch> listOfStopwatches;
-    private boolean leapYear,
-                    todayMatchesDSTDate,
-                    dateChanged,
-                    isNewYear,
-                    showFullDate,
-                    showPartialDate,
-                    showMilitaryTime,
-                    daylightSavingsTimeEnabled;
-    private transient ScheduledExecutorService scheduledExecutorService; // reference to ClockFrame's service
+    /** Whether the current year is a leap year. */
+    private boolean leapYear;
+    /** Whether today's date matches a DST transition date. */
+    private boolean todayMatchesDSTDate;
+    /** Whether the date has changed since the last tick. */
+    private boolean dateChanged;
+    /** Whether the clock has just rolled over into a new year. */
+    private boolean isNewYear;
+    /** Whether the full date (day of week, month, day, year) is shown. */
+    private boolean showFullDate;
+    /** Whether the partial date (abbreviated day and month) is shown. */
+    private boolean showPartialDate;
+    /** Whether the time is displayed in military (24-hour) format. */
+    private boolean showMilitaryTime;
+    /** Whether daylight savings time adjustments are applied. */
+    private boolean daylightSavingsTimeEnabled;
+    /** Reference to the ClockFrame's scheduled executor service. */
+    private transient ScheduledExecutorService scheduledExecutorService;
 
     /**
      * Default constructor for the Clock class.
@@ -368,6 +397,7 @@ public class Clock implements Serializable, Comparable<Clock>
 
     /**
      * Returns the AMPM from the current time
+     * @param now the local date/time to extract AM/PM from (null uses current timezone instant)
      * @return String the AMPM from the current time
      */
     protected String getAMPMFromTime(LocalDateTime now)
@@ -413,6 +443,7 @@ public class Clock implements Serializable, Comparable<Clock>
      * hours from the result if we are in PM, we want standard
      * time display versus military time, and the hour is greater
      * than 12.
+     * @param now the local date/time to format (null uses current timezone instant)
      * @return LocalDateTime the current time in non-military time
      */
     protected LocalDateTime formatCurrentTimeToNonMilitaryTime(LocalDateTime now)
@@ -701,39 +732,90 @@ public class Clock implements Serializable, Comparable<Clock>
         { logger.error(ste.toString()); }
     }
 
-    /** Returns the date */
+    /**
+     * Returns the date
+     * @return the date
+     */
     public LocalDate getDate() { return date; }
-    /** Returns the time */
+    /**
+     * Returns the time
+     * @return the time
+     */
     public LocalTime getTime() { return time; }
-    /** Returns the beginDaylightSavingsTimeDate */
+    /**
+     * Returns the beginDaylightSavingsTimeDate
+     * @return this years' spring forward date
+     */
     public LocalDate getBeginDaylightSavingsTimeDate() { return this.beginDaylightSavingsTimeDate; }
-    /** Returns the endDaylightSavingsTimeDate */
+    /**
+     * Returns the endDaylightSavingsTimeDate
+     * @return this years' fall back date
+     */
     public LocalDate getEndDaylightSavingsTimeDate() { return this.endDaylightSavingsTimeDate; }
-    /** Returns the seconds */
+    /**
+     * Returns the seconds
+     * @return the seconds.
+     */
     public int getSeconds() { return seconds; }
-    /** Returns the minutes */
+    /**
+     * Returns the minutes
+     * @return the minutes.
+     */
     public int getMinutes() { return minutes; }
-    /** Returns the hours */
+    /**
+     * Returns the hours
+     * @return the hours.
+     */
     public int getHours() { return hours; }
-    /** Returns the AMPM */
+    /**
+     * Returns the AMPM
+     * @return the ampm.
+     */
     public String getAMPM() { return ampm; }
-    /** Returns the timezone */
+    /**
+     * Returns the timezone
+     * @return the timezone
+     */
     public ZoneId getTimezone() { return timezone; }
-    /** Returns the day of the week */
+    /**
+     * Returns the day of the week
+     * @return the day of the week.
+     */
     public DayOfWeek getDayOfWeek() { return dayOfWeek; }
-    /** Returns the day of the month: 1-31 */
+    /**
+     * Returns the day of the month: 1-31
+     * @return the day of the month.
+     */
     public int getDayOfMonth() { return dayOfMonth; }
-    /** Returns the month */
+    /**
+     * Returns the month
+     * @return the month.
+     */
     public Month getMonth() { return month; }
-    /** Returns the year */
+    /**
+     * Returns the year
+     * @return the year.
+     */
     public int getYear() { return year; }
-    /** Returns the hour as a string */
+    /**
+     * Returns the hour as a string
+     * @return the hour as a string
+     */
     public String getHoursAsStr() { return hoursAsStr; }
-    /** Returns the minute as a string */
+    /**
+     * Returns the minute as a string
+     * @return the minute as a string
+     */
     public String getMinutesAsStr() { return minutesAsStr; }
-    /** Returns the second as a string */
+    /**
+     * Returns the second as a string
+     * @return the second as a string
+     */
     public String getSecondsAsStr() { return secondsAsStr; }
-    /** Returns the current time in the selected timezone */
+    /**
+     * Returns the current time in the selected timezone
+     * @return the current datetime
+     */
     public LocalDateTime getCurrentDateTime() { return currentDateTime; }
     /**
      * This method returns the clock's current hour, minute, second, and time.
@@ -741,7 +823,10 @@ public class Clock implements Serializable, Comparable<Clock>
      * @return 'HH:MM:SS AMPM' ex: 05:15:24 PM
      */
     public String getTimeAsStr() { return hoursAsStr+COLON+minutesAsStr+COLON+secondsAsStr+SPACE+ampm; }
-    /** Returns the clock's time as an alarm string */
+    /**
+     * Returns the clock's time as an alarm string
+     * @return the clock's time representing for an alarm.
+     */
     public String getClockTimeAsAlarmString() {
         if (showMilitaryTime) {
             if (hours > 12) {
@@ -758,40 +843,85 @@ public class Clock implements Serializable, Comparable<Clock>
             return hoursAsStr+COLON+minutesAsStr+SPACE+ampm;
         }
     }
-    /** Returns the date like: MAY 4, 2000 */
+    /**
+     * Returns the date like: MAY 4, 2000
+     * @return the date formatted.
+     */
     public String getDateAsStr() { return month+SPACE+dayOfMonth+COMMA+SPACE+year; }
-    /** Returns the full date like: FRIDAY MAY 4, 2000 */
+    /**
+     * Returns the full date like: FRIDAY MAY 4, 2000
+     * @return the full date formatted.
+     */
     public String getFullDateAsStr() { return dayOfWeek+SPACE+month+SPACE+dayOfMonth+COMMA+SPACE+year; }
-    /** Returns the military time like: 17:15:24 */
+    /**
+     * Returns the military time like: 17:15:24
+     * @return the time formatted for military time
+     */
     public String getMilitaryTimeAsStr() { return hoursAsStr+minutesAsStr+SPACE+Hours.toLowerCase()+SPACE+secondsAsStr; }
-    /** Returns the partial date: FRI MAY 4, 2000 */
+    /**
+     * Returns the partial date: FRI MAY 4, 2000
+     * @return the time formatted for partial viewing
+     */
     public String getPartialDateAsStr() { return dayOfWeek.toString().substring(0,3)+SPACE+month.toString().substring(0,3)+SPACE+dayOfMonth+COMMA+SPACE+year; }
-    /** Returns isLeapYear */
+    /**
+     * Returns isLeapYear
+     * @return is leap year
+     */
     public boolean isLeapYear() { return leapYear; }
-    /** Returns todayMatchesDSTDate */
+    /**
+     * Returns todayMatchesDSTDate
+     * @return today matches dst date.
+     */
     public boolean isTodayMatchesDSTDate() { return todayMatchesDSTDate; }
-    /** Returns dateChanged */
+    /**
+     * Returns dateChanged
+     * @return date changed.
+     */
     public boolean isDateChanged() { return dateChanged; }
-    /** Returns isNewYear */
+    /**
+     * Returns isNewYear
+     * @return is new year.
+     */
     public boolean isNewYear() { return isNewYear; }
-    /** Returns showFullDate */
+    /**
+     * Returns showFullDate
+     * @return show full date.
+     */
     public boolean isShowFullDate() { return showFullDate; }
-    /** Returns showPartialDate */
+    /**
+     * Returns showPartialDate
+     * @return show partial date
+     */
     public boolean isShowPartialDate() { return showPartialDate; }
-    /** Returns showMilitaryTime */
+    /**
+     * Returns showMilitaryTime
+     * @return show military time
+     */
     public boolean isShowMilitaryTime() { return showMilitaryTime; }
-    /** Returns daylightSavingsTimeEnabled */
+    /**
+     * Returns daylightSavingsTimeEnabled
+     * @return daylight savings time is enabled
+     */
     public boolean isDaylightSavingsTimeEnabled() { return daylightSavingsTimeEnabled; }
-    /** Returns the list of alarms */
+    /**
+     * Returns the list of alarms
+     * @return the list of alarms.
+     */
     public List<Alarm> getListOfAlarms() { return listOfAlarms; }
-    /** Returns the list of timers */
+    /**
+     * Returns the list of timers
+     * @return the list of timers.
+     */
     public List<Timer> getListOfTimers() { return listOfTimers; }
-    /** Returns the list of stopwatches */
+    /**
+     * Returns the list of stopwatches
+     * @return the list of stopwatches.
+     */
     public List<Stopwatch> getListOfStopwatches() { return listOfStopwatches; }
     /**
      * Returns the timezone from the selected timezone button text
      * @param btnText the text from the timezone button
-     * @return ZoneId the timezone from the selected timezone button text
+     * @return ZoneId the timezone from the selected timezone button text.
      */
     public ZoneId getZoneIdFromTimezoneButtonText(String btnText) {
         logger.debug("btnText: {}", btnText);
@@ -826,7 +956,10 @@ public class Clock implements Serializable, Comparable<Clock>
         }
     }
 
-    /** Gets the scheduled executor service */
+    /**
+     * Returns the scheduled executor service
+     * @return the scheduled executor service.
+     */
     public ScheduledExecutorService getScheduledExecutorService()
     {
         return scheduledExecutorService;

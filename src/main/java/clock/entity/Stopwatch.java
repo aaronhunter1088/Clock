@@ -38,6 +38,7 @@ public class Stopwatch implements Serializable, Comparable<Stopwatch>
     @Serial
     private static final long serialVersionUID = 1L;
     private static final Logger logger = LogManager.getLogger(Stopwatch.class);
+    /** Running count of total Stopwatch instances created; resets at 100. */
     public static long stopwatchCounter = 0L;
     private String name;
     private boolean paused,
@@ -78,7 +79,10 @@ public class Stopwatch implements Serializable, Comparable<Stopwatch>
         }
     }
 
-    /** This method begins the thread that runs the stopwatch. */
+    /**
+     * This method begins the thread that runs the stopwatch.
+     * @param scheduler the executor service used to schedule the count-up task
+     */
     public synchronized void startStopwatch(ScheduledExecutorService scheduler)
     {
         if (scheduledFuture == null || scheduledFuture.isDone() || scheduledFuture.isCancelled())
@@ -321,31 +325,70 @@ public class Stopwatch implements Serializable, Comparable<Stopwatch>
         return sb.toString();
     }
 
-    /** Returns the clock */
+    /**
+     * Returns the clock
+     * @return the clock reference
+     */
     public Clock getClock() { return clock; }
-    /** Returns paused */
+    /**
+     * Returns paused
+     * @return true if the stopwatch is paused
+     */
     public boolean isPaused() { return paused; }
-    /** Returns the name */
+    /**
+     * Returns the name
+     * @return the name of the stopwatch
+     */
     public String getName() { return name; }
-    /** Returns started */
+    /**
+     * Returns started
+     * @return true if the stopwatch has been started
+     */
     public boolean isStarted() { return started; }
-    /** Returns the list of laps */
+    /**
+     * Returns the list of laps
+     * @return the list of laps recorded
+     */
     public List<Lap> getLaps() { return laps; }
-    /** Returns the total paused milliseconds */
+    /**
+     * Returns the total paused milliseconds
+     * @return the total paused duration in milliseconds
+     */
     public long getTotalPausedMilli() { return totalPausedMilli; }
-    /** Returns the last lap mark in milliseconds */
+    /**
+     * Returns the last lap mark in milliseconds
+     * @return the elapsed milliseconds at the last lap
+     */
     public long getLastLapMarkMilli() { return lastLapMarkMilli; }
-    /** Returns the duration */
+    /**
+     * Returns the duration
+     * @return the elapsed duration
+     */
     public Duration getDuration() { return duration; }
-    /** Returns the start time in milliseconds */
+    /**
+     * Returns the start time in milliseconds
+     * @return the start time in milliseconds
+     */
     public long getStartMilli() { return startMilli; }
-    /** Returns when Pause was pressed in milliseconds */
+    /**
+     * Returns when Pause was pressed in milliseconds
+     * @return the timestamp when pause was pressed
+     */
     public long getPausedMilli() { return pausedMilli; }
-    /** Returns the accumulated paused milliseconds */
+    /**
+     * Returns the accumulated paused milliseconds
+     * @return the total accumulated milliseconds
+     */
     public long getAccumMilli() { return accumMilli; }
-    /** Returns the accumulated paused milliseconds */
+    /**
+     * Returns the accumulated paused milliseconds
+     * @return the accumulated paused duration in milliseconds
+     */
     public long getPausedAccumMilli() { return pausedAccumMilli; }
-    /** Returns the scheduled future */
+    /**
+     * Returns the scheduled future
+     * @return the scheduled future
+     */
     public ScheduledFuture<?> getScheduledFuture() { return scheduledFuture; }
 
     /**

@@ -9,13 +9,16 @@ import java.awt.*;
 
 /**
  * Abstract class for clock panels, implementing the IClockPanel interface.
- * <p>
+ *
  * @author michael ball
  * @version since 2.9
  */
 public abstract class ClockPanel extends JPanel implements IClockPanel
 {
     private static final Logger logger = LogManager.getLogger(ClockPanel.class);
+
+    /** Default constructor. */
+    protected ClockPanel() { super(); }
 
     /**
      * Displays a popup message with the given title and message.

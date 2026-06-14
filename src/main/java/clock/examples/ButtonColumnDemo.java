@@ -8,8 +8,20 @@ import java.awt.event.*;
 import javax.swing.*;
 import javax.swing.table.*;
 
+/**
+ * ButtonColumnDemo
+ * <p>
+ * A demonstration of the {@link clock.panel.ButtonColumn} utility showing
+ * how to embed action buttons inside a JTable column.
+ *
+ * @author michael ball
+ * @version since 2.0
+ */
 public class ButtonColumnDemo
 {
+    /** Private constructor — demo utility class, not instantiable. */
+    private ButtonColumnDemo() {}
+
     static void main(String[] args)
     {
         SwingUtilities.invokeLater(new Runnable() {

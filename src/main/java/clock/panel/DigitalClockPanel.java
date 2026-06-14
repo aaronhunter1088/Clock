@@ -58,6 +58,9 @@ public class DigitalClockPanel extends ClockPanel implements Runnable
         setupDefaultValues();
     }
 
+    /**
+     * Sets up the default visual properties and starts the panel thread.
+     */
     public void setupDefaultValues()
     {
         setMaximumSize(ClockFrame.clockDefaultSize);
@@ -222,13 +225,25 @@ public class DigitalClockPanel extends ClockPanel implements Runnable
         g.setColor(Color.BLACK);
     }
 
-    /** Returns the clock frame */
+    /**
+     * Returns the clock frame
+     * @return the clock frame reference
+     */
     public ClockFrame getClockFrame() { return this.clockFrame; }
-    /** Returns the layout manager */
+    /**
+     * Returns the layout manager
+     * @return the GridBagLayout used by this panel
+     */
     public GridBagLayout getGridBagLayout() { return this.layout; }
-    /** Returns the grid bag constraints */
+    /**
+     * Returns the grid bag constraints
+     * @return the GridBagConstraints used by this panel
+     */
     public GridBagConstraints getGridBagConstraints() { return this.constraints; }
-    /** Returns the clock */
+    /**
+     * Returns the clock
+     * @return the clock reference
+     */
     public Clock getClock() { return this.clock; }
 
     /**

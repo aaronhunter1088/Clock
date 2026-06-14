@@ -30,13 +30,19 @@ public class DisplayLapsPanel extends JPanel
     private GridBagLayout layout;
     private GridBagConstraints constraints;
     private final StopwatchPanel stopwatchPanel;
+    /** The background repaint thread for this panel. */
     public Thread thread;
     private JTable lapsTable,
                    stopwatchTable;
     private final String[] lapTableColumnNames = {LAP_SYM, TIME, RECORDED};
     private final String[] stopwatchTableColumnNames = {NAME, ELAPSED, SELECT, REMOVE};
+    /** Whether laps are displayed in reverse order. */
     public boolean isLapsReversed = false;
 
+    /**
+     * Constructs a DisplayLapsPanel attached to the given stopwatch panel.
+     * @param stopwatchPanel the parent StopwatchPanel
+     */
     public DisplayLapsPanel(StopwatchPanel stopwatchPanel)
     {
         super();
@@ -68,6 +74,10 @@ public class DisplayLapsPanel extends JPanel
         addComponent(scrollPane, 1, 0, 1, 1, 5,5,1,1, GridBagConstraints.BOTH, new Insets(5,5,5,5));
     }
 
+    /**
+     * Rebuilds the laps display and the stopwatch selection table
+     * for the currently selected stopwatch.
+     */
     public void updateLabelsAndStopwatchTable()
     {
         resetPanel();
@@ -212,6 +222,8 @@ public class DisplayLapsPanel extends JPanel
      * @param gheight   the height
      * @param ipadx     the x padding
      * @param ipady     the y padding
+     * @param weightx   the horizontal weight for GridBagConstraints
+     * @param weighty   the vertical weight for GridBagConstraints
      * @param fill      the fill
      * @param insets    the insets
      */
@@ -284,17 +296,35 @@ public class DisplayLapsPanel extends JPanel
         };
     }
 
-    /** Return the stopwatch panel */
+    /**
+     * Returns the stopwatch panel
+     * @return the stopwatch panel reference
+     */
     public StopwatchPanel getStopwatchPanel() { return stopwatchPanel; }
-    /** Return the laps table */
+    /**
+     * Returns the laps table
+     * @return the laps table
+     */
     public JTable getLapsTable() { return lapsTable; }
-    /** Return the stopwatch table */
+    /**
+     * Returns the stopwatch table
+     * @return the stopwatch table
+     */
     public JTable getStopwatchTable() { return stopwatchTable; }
-    /** Return the lap table column names */
+    /**
+     * Returns the lap table column names
+     * @return the lap table column names
+     */
     public String[] getLapTableColumnNames() { return lapTableColumnNames; }
-    /** Return the stopwatch table column names */
+    /**
+     * Returns the stopwatch table column names
+     * @return the stopwatch table column names
+     */
     public String[] getStopwatchTableColumnNames() { return stopwatchTableColumnNames; }
-    /** Returns isLapsReverse */
+    /**
+     * Returns isLapsReversed
+     * @return true if laps are displayed in reverse order
+     */
     public boolean isLapsReversed() { return isLapsReversed; }
 
     /**

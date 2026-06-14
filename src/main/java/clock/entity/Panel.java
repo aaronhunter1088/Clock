@@ -8,12 +8,18 @@ package clock.entity;
  */
 public enum Panel
 {
+	/** The digital clock panel. */
 	PANEL_DIGITAL_CLOCK("Digital Clock"),
+	/** The analogue clock panel. */
 	PANEL_ANALOGUE_CLOCK("Analogue Clock"),
+	/** The alarms panel. */
 	PANEL_ALARM("Alarms"),
+	/** The timers panel. */
 	PANEL_TIMER("Timers"),
+	/** The stopwatches panel. */
 	PANEL_STOPWATCH("Stopwatches");
 
+    /** The human-readable panel label text. */
     final String text;
 
     Panel(String text)

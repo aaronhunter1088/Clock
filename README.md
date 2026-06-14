@@ -19,6 +19,9 @@ java -jar dist/{version}/clock-{version}-jar-with-dependencies.jar august 6 2025
 
 # Start with specific date/time in military time
 java -jar dist/{version}/clock-{version}-jar-with-dependencies.jar august 6 2025 10 30 0 pm true
+
+# Generate javadocs
+mvn javadoc:jar
 ```
 
 The clock defaults on the Digital Clock panel, displaying the current date like

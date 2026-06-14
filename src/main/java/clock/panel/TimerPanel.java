@@ -373,6 +373,8 @@ public class TimerPanel extends ClockPanel implements Runnable
      * @param gheight   the height how many rows it takes up
      * @param ipadx     the x padding
      * @param ipady     the y padding
+     * @param weightx   the x weight
+     * @param weighty   the y weight
      * @param fill      the fill
      * @param insets    the insets
      */
@@ -416,6 +418,7 @@ public class TimerPanel extends ClockPanel implements Runnable
 
     /**
      * Creates a new Timer
+     * @return a newly created timer.
      */
     public Timer createTimer()
     {
@@ -666,25 +669,55 @@ public class TimerPanel extends ClockPanel implements Runnable
         }
     }
 
-    /** Returns the clock frame */
+    /**
+     * Returns the clock frame
+     * @return the clock frame reference
+     */
     public ClockFrame getClockFrame() { return this.clockFrame; }
-    /** Returns the layout manager */
+    /**
+     * Returns the layout manager
+     * @return the GridBagLayout used by this panel
+     */
     public GridBagLayout getGridBagLayout() { return this.layout; }
-    /** Returns the layout constraints */
+    /**
+     * Returns the layout constraints
+     * @return the GridBagConstraints used by this panel
+     */
     public GridBagConstraints getGridBagConstraints() { return this.constraints; }
-    /** Returns the clock */
+    /**
+     * Returns the clock
+     * @return the clock reference
+     */
     public Clock getClock() { return clockFrame.getClock(); }
-    /** Returns the name text field */
+    /**
+     * Returns the name text field
+     * @return the name text field
+     */
     public JTextField getNameTextField() { return this.nameTextField; }
-    /** Returns the hours text field */
+    /**
+     * Returns the hours text field
+     * @return the hours text field
+     */
     public JTextField getHoursTextField() { return hoursTextField; }
-    /** Returns the minutes text field */
+    /**
+     * Returns the minutes text field
+     * @return the minutes text field
+     */
     public JTextField getMinutesTextField() { return minutesTextField; }
-    /** Returns the seconds text field */
+    /**
+     * Returns the seconds text field
+     * @return the seconds text field
+     */
     public JTextField getSecondsTextField() { return secondsTextField; }
-    /** Returns the set timer button */
+    /**
+     * Returns the set timer button
+     * @return the set timer button
+     */
     public JButton getSetTimerButton() { return setTimerButton; }
-    /** Returns the timers table */
+    /**
+     * Returns the timers table
+     * @return the timers table
+     */
     public JTable getTimersTable() { return timersTable; }
 
     /**

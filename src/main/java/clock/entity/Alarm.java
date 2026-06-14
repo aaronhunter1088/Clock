@@ -40,19 +40,32 @@ public class Alarm implements Serializable, Comparable<Alarm>
     private static final long SNOOZE_TIME = Duration.ofMinutes(7).toMillis(); // 7 minutes in milliseconds
     private static final long AUTO_SNOOZE_TIME = Duration.ofMinutes(1).toMillis(); // 1 minute in milliseconds
     private static final Logger logger = LogManager.getLogger(Alarm.class);
+    /** Running count of total Alarm instances created; resets at 100. */
     public static long alarmsCounter = 0L;
-    private int hours,
-                minutes;
-    private String minutesAsStr,
-                   hoursAsStr,
-                   ampm,
-                   name; // limited to 20 characters
+    /** The alarm's hour setting (0–12). */
+    private int hours;
+    /** The alarm's minute setting (0–59). */
+    private int minutes;
+    /** The minutes value formatted as a zero-padded string. */
+    private String minutesAsStr;
+    /** The hours value formatted as a zero-padded string. */
+    private String hoursAsStr;
+    /** The AM or PM indicator for this alarm. */
+    private String ampm;
+    /** The name of this alarm (max 20 characters). */
+    private String name;
+    /** The days of the week on which this alarm should trigger. */
     private List<DayOfWeek> days;
-    private boolean alarmGoingOff,
-                    updatingAlarm,
-                    activatedToday,
-                    isSnoozing,
-                    isPaused;
+    /** Whether this alarm is currently going off. */
+    private boolean alarmGoingOff;
+    /** Whether this alarm is being edited/updated. */
+    private boolean updatingAlarm;
+    /** Whether this alarm has already been activated today. */
+    private boolean activatedToday;
+    /** Whether this alarm is currently in a snooze state. */
+    private boolean isSnoozing;
+    /** Whether this alarm is paused. */
+    private boolean isPaused;
     private transient Clock clock;
     private transient ScheduledFuture<?> scheduledFuture;
     private transient ScheduledFuture<?> soundFuture;
@@ -76,11 +89,12 @@ public class Alarm implements Serializable, Comparable<Alarm>
 
     /**
      * Main constructor for creating alarms
+     * @param name          the name of the alarm (max 20 characters)
      * @param hours         the hour of the alarm
      * @param minutes       the minutes of the alarm
      * @param ampm          the AM or PM value
-     * @param updatingAlarm updating an alarm
      * @param days          the days to trigger alarm
+     * @param updatingAlarm updating an alarm
      * @param clock         reference to the clock that created this alarm
      */
     public Alarm(String name, int hours, int minutes, String ampm, List<DayOfWeek> days,
@@ -128,6 +142,7 @@ public class Alarm implements Serializable, Comparable<Alarm>
 
     /**
      * This method schedules the alarm.
+     * @param scheduler the executor service used to schedule the alarm task
      */
     public synchronized void startAlarm(ScheduledExecutorService scheduler)
     {
@@ -211,6 +226,7 @@ public class Alarm implements Serializable, Comparable<Alarm>
 
     /**
      * Sets an alarm to go off
+     * @param scheduler the executor service used to schedule sound and snooze tasks
      */
     public synchronized void triggerAlarm(ScheduledExecutorService scheduler)
     {
@@ -278,6 +294,7 @@ public class Alarm implements Serializable, Comparable<Alarm>
     /**
      * Snoozing this alarm will stop the alarm
      * from playing its sound for 7 minutes.
+     * @param scheduler the executor service used to schedule the snooze delay
      */
     public synchronized void snooze(ScheduledExecutorService scheduler)
     {
@@ -371,17 +388,35 @@ public class Alarm implements Serializable, Comparable<Alarm>
         return shortenedDays;
     }
 
-    /** Returns the clock reference */
+    /**
+     * Returns the clock reference
+     * @return the clock reference
+     */
     public Clock getClock() { return this.clock; }
-    /** Returns whether the alarm is going off */
+    /**
+     * Returns whether the alarm is going off
+     * @return true if the alarm is going off
+     */
     public boolean isAlarmGoingOff() { return alarmGoingOff; }
-    /** Returns whether the alarm is being updated */
+    /**
+     * Returns whether the alarm is being updated
+     * @return true if the alarm is being updated
+     */
     public boolean isUpdatingAlarm() { return updatingAlarm; }
-    /** Returns whether the alarm is snoozing */
+    /**
+     * Returns whether the alarm is snoozing
+     * @return true if the alarm is snoozing
+     */
     public boolean isSnoozing() { return isSnoozing; }
-    /** Returns whether the alarm is paused */
+    /**
+     * Returns whether the alarm is paused
+     * @return true if the alarm is paused
+     */
     public boolean isPaused() { return isPaused; }
-    /** Returns the days of the alarm */
+    /**
+     * Returns the days of the alarm
+     * @return the list of days the alarm triggers on
+     */
     public List<DayOfWeek> getDays() { return this.days; }
     /**
      * Returns the hour + 12 if it is PM, 0 if AM and 12
@@ -401,33 +436,69 @@ public class Alarm implements Serializable, Comparable<Alarm>
         }
         return hour;
     }
-    /** Returns the hours of the alarm */
+    /**
+     * Returns the hours of the alarm
+     * @return the hours of the alarm
+     */
     public int getHours() { return this.hours; }
-    /** Returns the hours as a string with leading zero if needed */
+    /**
+     * Returns the hours as a string with leading zero if needed
+     * @return the hours as a string
+     */
     public String getHoursAsStr() { return this.hoursAsStr; }
-    /** Returns the minutes of the alarm */
+    /**
+     * Returns the minutes of the alarm
+     * @return the minutes of the alarm
+     */
     public int getMinutes() { return this.minutes; }
-    /** Returns the minutes as a string with leading zero if needed */
+    /**
+     * Returns the minutes as a string with leading zero if needed
+     * @return the minutes as a string
+     */
     public String getMinutesAsStr() { return this.minutesAsStr; }
-    /** Returns the AM or PM value */
+    /**
+     * Returns the AM or PM value
+     * @return the AM or PM value
+     */
     public String getAMPM() { return this.ampm; }
-    /** Returns the name of the alarm */
+    /**
+     * Returns the name of the alarm
+     * @return the name of the alarm
+     */
     public String getName() { return this.name; }
-    /** Returns the music player object */
+    /**
+     * Returns the music player object
+     * @return the music player object
+     */
     public AdvancedPlayer getMusicPlayer() { return this.musicPlayer; }
-    /** Returns the alarm as a string in the format HH:MM AM/PM */
+    /**
+     * Returns the alarm as a string in the format HH:MM AM/PM
+     * @return the alarm time as a string
+     */
     public String getAlarmAsString() { return hoursAsStr+COLON+minutesAsStr+SPACE+ampm; }
-    /** Returns whether the alarm has been activated today */
+    /**
+     * Returns whether the alarm has been activated today
+     * @return true if the alarm has been activated today
+     */
     public boolean isActivatedToday() { return activatedToday; }
-    /** Returns the scheduled future */
+    /**
+     * Returns the scheduled future
+     * @return the scheduled future
+     */
     public ScheduledFuture<?> getScheduledFuture() {
         return scheduledFuture;
     }
-    /** Returns the sound future */
+    /**
+     * Returns the sound future
+     * @return the sound future
+     */
     public ScheduledFuture<?> getSoundFuture() {
         return soundFuture;
     }
-    /** Returns the auto snooze future */
+    /**
+     * Returns the auto snooze future
+     * @return the auto snooze future
+     */
     public ScheduledFuture<?> getAutoSnoozeFuture() {
         return autoSnoozeFuture;
     }
@@ -435,7 +506,6 @@ public class Alarm implements Serializable, Comparable<Alarm>
     /**
      * Returns the number of whole seconds remaining in the current snooze countdown.
      * Returns 0 if the alarm is not snoozing or the future is absent.
-     *
      * @return seconds remaining in snooze, or 0
      */
     public long getSnoozeTimeRemainingSeconds()
@@ -447,7 +517,6 @@ public class Alarm implements Serializable, Comparable<Alarm>
     /**
      * Returns the snooze countdown formatted as {@code M:SS} (e.g. {@code "6:59"}).
      * Returns an empty string if the alarm is not currently snoozing.
-     *
      * @return formatted countdown string, or empty string
      */
     public String getSnoozeTimeRemainingFormatted()
@@ -459,43 +528,88 @@ public class Alarm implements Serializable, Comparable<Alarm>
         return String.format("%d:%02d", minutes, seconds);
     }
 
-    /** Sets the clock reference */
+    /**
+     * Sets the clock reference
+     * @param clock the clock reference to set for this alarm
+     */
     public void setClock(Clock clock) { this.clock = clock; logger.debug("clock set to: {}", clock); }
-    /** Sets whether the alarm is going off */
+    /**
+     * Sets whether the alarm is going off
+     * @param alarmGoingOff true if the alarm is going off, false otherwise
+     */
     public void setIsAlarmGoingOff(boolean alarmGoingOff) { this.alarmGoingOff = alarmGoingOff; logger.debug("alarmGoingOff: {}", alarmGoingOff); }
-    /** Sets whether the alarm is being updated */
+    /**
+     * Sets whether the alarm is being updated
+     * @param updatingAlarm updating the alarm or not
+     */
     public void setUpdatingAlarm(boolean updatingAlarm) { this.updatingAlarm = updatingAlarm; logger.debug("updatingAlarm: {}", updatingAlarm); }
-    /** Sets whether the alarm is snoozing */
+    /**
+     * Sets whether the alarm is snoozing
+     * @param isSnoozing the alarm is snoozing or not
+     */
     public void setIsSnoozing(boolean isSnoozing) { this.isSnoozing = isSnoozing; logger.debug("isSnoozing: {}", isSnoozing); }
-    /** Sets whether the alarm is paused */
+    /**
+     * Sets whether the alarm is paused
+     * @param isPaused the alarm is paused or not
+     */
     public void setIsPaused(boolean isPaused) { this.isPaused = isPaused; logger.debug("isPaused: {}", isPaused); }
-    /** Sets the days of the alarm */
+    /**
+     * Sets the days of the alarm
+     * @param days the days to set
+     */
     public void setDays(List<DayOfWeek> days) { this.days = days; logger.debug("days: {}", days); }
-    /** Sets the hours of the alarm */
+    /**
+     * Sets the hours of the alarm
+     * @param hours the hours to set
+     */
     public void setHours(int hours) {
         this.hours = hours;
         this.hoursAsStr = (hours < 10) ? "0"+this.hours : String.valueOf(this.hours);
         logger.debug("hours: {}", hours);
     }
-    /** Sets the minutes of the alarm */
+    /**
+     * Sets the minutes of the alarm
+     * @param minutes the minutes to set
+     */
     public void setMinutes(int minutes) {
         this.minutes = minutes;
         this.minutesAsStr = (minutes < 10) ? "0"+this.minutes : String.valueOf(this.minutes);
         logger.debug("minutes: {}", minutes);
     }
-    /** Sets the AM or PM value */
+    /**
+     * Sets the AM or PM value
+     * @param ampm the AM or PM value to set
+     */
     public void setAMPM(String ampm) { this.ampm = ampm; logger.debug("ampm: {}", ampm); }
-    /** Sets the name of the alarm */
+    /**
+     * Sets the name of the alarm
+     * @param name the name to set
+     */
     public void setName(String name) { this.name = name; logger.debug("name set to {}", name); }
-    /** Sets the music player object */
+    /**
+     * Sets the music player object
+     * @param musicPlayer the music player to set
+     */
     public void setMusicPlayer(AdvancedPlayer musicPlayer) { this.musicPlayer = musicPlayer; logger.debug("musicPlayer set"); }
-    /** Sets whether the alarm has been activated today */
+    /**
+     * Sets whether the alarm has been activated today
+     * @param activatedToday the activated today value to set
+     */
     public void setActivatedToday(boolean activatedToday) { this.activatedToday = activatedToday; logger.debug("triggeredToday: {}", activatedToday); }
-    /** Sets the scheduled future */
+    /**
+     * Sets the scheduled future
+     * @param scheduledFuture the scheduled future to set for this alarm's next scheduled activation
+     */
     public void setScheduledFuture(ScheduledFuture<?> scheduledFuture) { this.scheduledFuture = scheduledFuture; }
-    /** Sets the sound future */
+    /**
+     * Sets the sound future
+     * @param soundFuture the sound future to set for the alarm's sound to repeat while going off
+     */
     public void setSoundFuture(ScheduledFuture<?> soundFuture) { this.soundFuture = soundFuture; }
-    /** Sets the auto snooze future */
+    /**
+     * Sets the auto snooze future
+     * @param autoSnoozeFuture the future to set for auto snoozing the alarm
+     */
     public void setAutoSnoozeFuture(ScheduledFuture<?> autoSnoozeFuture) {
         this.autoSnoozeFuture = autoSnoozeFuture;
     }

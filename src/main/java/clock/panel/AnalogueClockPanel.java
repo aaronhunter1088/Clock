@@ -222,21 +222,35 @@ public class AnalogueClockPanel extends ClockPanel implements Runnable
         g.setColor(Color.BLACK); // needed to avoid second hand delay UI issue
     }
 
-    /** Returns the clock frame */
+    /**
+     * Returns the clock frame
+     * @return the clock frame.
+     */
     public ClockFrame getClockFrame() { return this.clockFrame; }
-    /** Returns the clock */
+    /**
+     * Returns the clock
+     * @return the clock.
+     */
     public Clock getClock() { return this.clock; }
-    /** Returns the layout manager */
-    public GridBagLayout getGridBagLayout() { return this.layout; }
-    /** Returns the grid bag constraints */
-    public GridBagConstraints getGridBagConstraints() { return this.constraints; }
-    /** Returns the clock date text */
+    /**
+     * Returns the clock date text
+     * @return the date text
+     */
     public String getDateText() { return this.dateText; }
-    /** Returns the clock time text */
+    /**
+     * Returns the clock time text
+     * @return the time text
+     */
     public String getTimeText() { return this.timeText; }
-    /** Returns isShowDigitalTimeOnAnalogueClock */
+    /**
+     * Returns isShowDigitalTimeOnAnalogueClock
+     * @return show digital time on analogue clock.
+     */
     public boolean isShowDigitalTimeOnAnalogueClock() { return showDigitalTimeOnAnalogueClock; }
-    /** Returns the self thread */
+    /**
+     * Returns the self thread
+     * @return the self thread.
+     */
     public Thread getThread() { return this.thread; }
 
     /**

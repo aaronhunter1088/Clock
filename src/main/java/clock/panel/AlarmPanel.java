@@ -338,6 +338,7 @@ public class AlarmPanel extends ClockPanel implements Runnable
         logger.debug("alarm panel reset");
     }
 
+    /** Clears the alarms table model and stops and removes all alarms from the clock. */
     public void resetTableAndMenu()
     {
         alarmsTable.setModel(new javax.swing.table.DefaultTableModel());
@@ -398,6 +399,8 @@ public class AlarmPanel extends ClockPanel implements Runnable
      * @param gheight   the height
      * @param ipadx     the x padding
      * @param ipady     the y padding
+     * @param weightx   the horizontal weight for GridBagConstraints
+     * @param weighty   the vertical weight for GridBagConstraints
      * @param fill      the fill
      * @param insets    the insets
      */
@@ -660,7 +663,10 @@ public class AlarmPanel extends ClockPanel implements Runnable
         return allBlank;
     }
 
-    /** Validates all the inputs used to create an alarm */
+    /**
+     * Validates all the inputs used to create an alarm
+     * @return {@code true} if all inputs are valid; {@code false} otherwise
+     */
     public boolean validateAllInputs()
     {
         if (areAllBlank())
@@ -680,6 +686,7 @@ public class AlarmPanel extends ClockPanel implements Runnable
 
     /**
      * Sets the action for the set alarm button
+     * @param action the triggering ActionEvent (unused)
      */
     public void setAlarm(ActionEvent action)
     {
@@ -741,7 +748,7 @@ public class AlarmPanel extends ClockPanel implements Runnable
 
     /**
      * Returns a list of days that were checked
-     * @return List<DayOfWeek> the days selected
+     * @return {@code List<DayOfWeek>} the days selected
      */
     public List<DayOfWeek> getDaysChecked()
     {
@@ -830,51 +837,120 @@ public class AlarmPanel extends ClockPanel implements Runnable
         }
     }
 
-    /** Return the clock frame */
+    /**
+     * Returns the clock frame
+     * @return the clock frame reference
+     */
     public ClockFrame getClockFrame() { return this.clockFrame; }
-    /** Return the layout manager */
+    /**
+     * Returns the layout manager
+     * @return the GridBagLayout used by this panel
+     */
     public GridBagLayout getGridBagLayout() { return this.layout; }
-    /** Return the constraints */
+    /**
+     * Returns the constraints
+     * @return the GridBagConstraints used by this panel
+     */
     public GridBagConstraints getGridBagConstraints() { return this.constraints; }
-    /** Return the clock */
+    /**
+     * Returns the clock
+     * @return the clock reference
+     */
     public Clock getClock() { return this.clockFrame.getClock(); }
-    /** Return the name label */
+    /**
+     * Returns the name label
+     * @return the name label
+     */
     public JLabel getNameLabel() { return this.nameLabel; }
-    /** Return the hours label */
+    /**
+     * Returns the hours label
+     * @return the hours label
+     */
     public JLabel getHoursLabel() { return this.hoursLabel; }
-    /** Return the minutes label */
+    /**
+     * Returns the minutes label
+     * @return the minutes label
+     */
     public JLabel getMinutesLabel() { return this.minutesLabel; }
-    /** Return the ampm label */
+    /**
+     * Returns the ampm label
+     * @return the AM/PM label
+     */
     public JLabel getAmpmLabel() { return this.ampmLabel; }
-    /** Return the name text field */
+    /**
+     * Returns the name text field
+     * @return the name text field
+     */
     public JTextField getNameTextField() { return this.nameTextField; }
-    /** Return the hours text field */
+    /**
+     * Returns the hours text field
+     * @return the hours text field
+     */
     public JTextField getHoursTextField() { return this.hoursTextField; }
-    /** Return the minutes text field */
+    /**
+     * Returns the minutes text field
+     * @return the minutes text field
+     */
     public JTextField getMinutesTextField() { return this.minutesTextField; }
-    /** Return the ampm drop down */
+    /**
+     * Returns the ampm drop down
+     * @return the AM/PM combo box
+     */
     public JComboBox<String> getAmpmDropDown() { return this.ampmDropDown; }
-    /** Return the set alarm button */
+    /**
+     * Returns the set alarm button
+     * @return the set alarm button
+     */
     public JButton getSetAlarmButton() { return this.setAlarmButton; }
-    /** Returns the Monday checkbox */
+    /**
+     * Returns the Monday checkbox
+     * @return the Monday checkbox
+     */
     public JCheckBox getMondayCheckBox() { return mondayCheckBox; }
-    /** Returns the Tuesday checkbox */
+    /**
+     * Returns the Tuesday checkbox
+     * @return the Tuesday checkbox
+     */
     public JCheckBox getTuesdayCheckBox() { return tuesdayCheckBox; }
-    /** Returns the Wednesday checkbox */
+    /**
+     * Returns the Wednesday checkbox
+     * @return the Wednesday checkbox
+     */
     public JCheckBox getWednesdayCheckBox() { return wednesdayCheckBox; }
-    /** Returns the Thursday checkbox */
+    /**
+     * Returns the Thursday checkbox
+     * @return the Thursday checkbox
+     */
     public JCheckBox getThursdayCheckBox() { return thursdayCheckBox; }
-    /** Returns the Friday checkbox */
+    /**
+     * Returns the Friday checkbox
+     * @return the Friday checkbox
+     */
     public JCheckBox getFridayCheckBox() { return fridayCheckBox; }
-    /** Returns the Saturday checkbox */
+    /**
+     * Returns the Saturday checkbox
+     * @return the Saturday checkbox
+     */
     public JCheckBox getSaturdayCheckBox() { return saturdayCheckBox; }
-    /** Returns the Sunday checkbox */
+    /**
+     * Returns the Sunday checkbox
+     * @return the Sunday checkbox
+     */
     public JCheckBox getSundayCheckBox() { return sundayCheckBox; }
-    /** Returns the Weekdays checkbox */
+    /**
+     * Returns the Weekdays checkbox
+     * @return the Weekdays checkbox
+     */
     public JCheckBox getWeekdaysCheckBox() { return weekdaysCheckBox; }
-    /** Returns the Weekends checkbox */
+    /**
+     * Returns the Weekends checkbox
+     * @return the Weekends checkbox
+     */
     public JCheckBox getWeekendsCheckBox() { return weekendsCheckBox; }
-    /** Returns the alarms table */
+    /**
+     * Returns the alarms table
+     * @return the alarms table
+     */
     public JTable getAlarmsTable() { return this.alarmsTable; }
 
     /**

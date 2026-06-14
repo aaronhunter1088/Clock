@@ -33,6 +33,7 @@ public class Timer implements Serializable, Comparable<Timer>
     @Serial
     private static final long serialVersionUID = 2L;
     private static final Logger logger = LogManager.getLogger(Timer.class);
+    /** Running count of total Timer instances created; resets at 100. */
     public static long timersCounter = 0L;
     private int hours,
                 minutes,
@@ -125,6 +126,7 @@ public class Timer implements Serializable, Comparable<Timer>
 
     /**
      * This method starts the timer.
+     * @param scheduler the executor service used to schedule the countdown task
      */
     public synchronized void startTimer(ScheduledExecutorService scheduler)
     {
@@ -329,23 +331,50 @@ public class Timer implements Serializable, Comparable<Timer>
         }
     }
 
-    /** Returns the clock */
+    /**
+     * Returns the clock
+     * @return the clock reference
+     */
     public Clock getClock() { return clock; }
-    /** Returns the hours */
+    /**
+     * Returns the hours
+     * @return the hours
+     */
     public int getHours() { return hours; }
-    /** Returns the hours as a string */
+    /**
+     * Returns the hours as a string
+     * @return the hours as a string
+     */
     public String getHoursAsStr() { return hoursAsStr; }
-    /** Returns the minutes */
+    /**
+     * Returns the minutes
+     * @return the minutes
+     */
     public int getMinutes() { return minutes; }
-    /** Returns the minutes as a string */
+    /**
+     * Returns the minutes as a string
+     * @return the minutes as a string
+     */
     public String getMinutesAsStr() { return minutesAsStr; }
-    /** Returns the seconds */
+    /**
+     * Returns the seconds
+     * @return the seconds
+     */
     public int getSeconds() { return seconds; }
-    /** Returns the seconds as a string */
+    /**
+     * Returns the seconds as a string
+     * @return the seconds as a string
+     */
     public String getSecondsAsStr() { return secondsAsStr; }
-    /** Returns the countdown */
+    /**
+     * Returns the countdown
+     * @return the countdown as a LocalTime
+     */
     public LocalTime getCountDown() { return countDown; }
-    /** Returns the countdown as a formatted string HH:MM:SS */
+    /**
+     * Returns the countdown as a formatted string HH:MM:SS
+     * @return the countdown string
+     */
     public String getCountDownString()
     {
         String countdownHours = countDown.getHour() < 10 ? ZERO + countDown.getHour() : String.valueOf(countDown.getHour());
@@ -353,21 +382,45 @@ public class Timer implements Serializable, Comparable<Timer>
         String countdownSeconds = countDown.getSecond() < 10 ? ZERO + countDown.getSecond() : String.valueOf(countDown.getSecond());
         return String.format("%s:%s:%s", countdownHours, countdownMinutes, countdownSeconds);
     }
-    /** Returns paused */
+    /**
+     * Returns paused
+     * @return true if the timer is paused
+     */
     public boolean isPaused() { return paused; }
-    /** Returns the name of the timer */
+    /**
+     * Returns the name of the timer
+     * @return the name of the timer
+     */
     public String getName() { return name; }
-    /** Returns the timerGoingOff flag */
+    /**
+     * Returns the timerGoingOff flag
+     * @return true if the timer is going off
+     */
     public boolean isTimerGoingOff() { return timerGoingOff; }
-    /** Returns the started flag */
+    /**
+     * Returns the started flag
+     * @return true if the timer has been started
+     */
     public boolean isStarted() { return started; }
-    /** Returns the triggered flag */
+    /**
+     * Returns the triggered flag
+     * @return true if the timer has been triggered
+     */
     public boolean isTriggered() { return triggered; }
-    /** Returns the music player */
+    /**
+     * Returns the music player
+     * @return the music player object
+     */
     public AdvancedPlayer getMusicPlayer() { return musicPlayer; }
-    /** Returns the countdown future */
+    /**
+     * Returns the countdown future
+     * @return the countdown scheduled future
+     */
     public ScheduledFuture<?> getCountdownFuture() { return countdownFuture; }
-    /** Returns the sound future */
+    /**
+     * Returns the sound future
+     * @return the sound scheduled future
+     */
     public ScheduledFuture<?> getSoundFuture() { return soundFuture; }
 
     /**
@@ -460,7 +513,9 @@ public class Timer implements Serializable, Comparable<Timer>
      * @param countdownFuture the countdown future to set
      */
     public void setCountdownFuture(ScheduledFuture<?> countdownFuture) { this.countdownFuture = countdownFuture; }
-    /** Sets the sound future */
+    /** Sets the sound future
+     * @param soundFuture the sound scheduled future to set
+     */
     public void setSoundFuture(ScheduledFuture<?> soundFuture) { this.soundFuture = soundFuture; }
 
     /**

@@ -36,13 +36,21 @@ public class ClockFrame extends JFrame
     private static final long serialVersionUID = 2L;
     private static final Logger logger = LogManager.getLogger(ClockFrame.class);
 
+    /** Default window size for the digital clock panel. */
     public final static Dimension clockDefaultSize = new Dimension(700, 300);
+    /** Window size for the analogue clock panel. */
     public final static Dimension analogueSize = new Dimension(350, 400);
+    /** Window size for the alarm panel. */
     public final static Dimension alarmSize = new Dimension(200,100);
+    /** Bold 60-point Courier New font used for the primary clock display. */
     public final static Font font60 = new Font("Courier New", Font.BOLD, 60);
+    /** Bold 40-point Courier New font used for secondary display elements. */
     public final static Font font40 = new Font("Courier New", Font.BOLD, 40);
+    /** Bold 20-point Courier New font used for panel labels. */
     public final static Font font20 = new Font("Courier New", Font.BOLD, 20);
+    /** Bold 10-point Courier New font used for small table labels. */
     public final static Font font10 = new Font("Courier New", Font.BOLD, 10);
+    /** Bold 20-point TimesRoman font used on the analogue clock face. */
     public final static Font analogueFont = new Font("TimesRoman", Font.BOLD, 20);
     private Panel panelType;
     private ClockMenuBar menuBar;
@@ -340,6 +348,7 @@ public class ClockFrame extends JFrame
     /**
      * Creates and shows the GUI for the Clock application.
      * This method is invoked in Main.
+     * @return the created and started ClockFrame instance
      */
     public static ClockFrame createAndShowGUI()
     {
@@ -353,6 +362,7 @@ public class ClockFrame extends JFrame
      * Creates and shows the GUI for the Clock application
      * with a specific panel type.
      * @param panelType the panel type to display
+     * @return the created and started ClockFrame instance
      */
     public static ClockFrame createAndShowGUI(Panel panelType)
     {
@@ -367,6 +377,7 @@ public class ClockFrame extends JFrame
      * This method is invoked in Main when testing the
      * application with a specific clock.
      * @param clock the clock to use for testing
+     * @return the created and started ClockFrame instance
      */
     public static ClockFrame createAndShowGUI(Clock clock)
     {
@@ -403,25 +414,55 @@ public class ClockFrame extends JFrame
         setScheduler(null);
     }
 
-    /** Returns the panel type */
+    /**
+     * Returns the panel type
+     * @return the active panel type
+     */
     public clock.entity.Panel getPanelType() { return panelType; }
-    /** Returns the current panel */
+    /**
+     * Returns the current panel
+     * @return the currently displayed panel
+     */
     public ClockPanel getCurrentPanel() { return currentPanel; }
-    /** Returns the digital clock panel */
+    /**
+     * Returns the digital clock panel
+     * @return the digital clock panel
+     */
     public DigitalClockPanel getDigitalClockPanel() { return (DigitalClockPanel) digitalClockPanel; }
-    /** Returns the analogue clock panel */
+    /**
+     * Returns the analogue clock panel
+     * @return the analogue clock panel
+     */
     public AnalogueClockPanel getAnalogueClockPanel() { return (AnalogueClockPanel) analogueClockPanel; }
-    /** Returns the alarm panel */
+    /**
+     * Returns the alarm panel
+     * @return the alarm panel
+     */
     public AlarmPanel getAlarmPanel() { return (AlarmPanel) alarmPanel; }
-    /** Returns the timer panel */
+    /**
+     * Returns the timer panel
+     * @return the timer panel
+     */
     public TimerPanel getTimerPanel() { return (TimerPanel) timerPanel; }
-    /** Returns the stopwatch panel */
+    /**
+     * Returns the stopwatch panel
+     * @return the stopwatch panel
+     */
     public StopwatchPanel getStopwatchPanel() { return (StopwatchPanel) stopwatchPanel; }
-    /** Returns the menu bar */
+    /**
+     * Returns the menu bar
+     * @return the clock menu bar
+     */
     public ClockMenuBar getClockMenuBar() { return menuBar; }
-    /** Returns the clock */
+    /**
+     * Returns the clock
+     * @return the clock reference
+     */
     public Clock getClock() { return clock; }
-    /** Returns the scheduler */
+    /**
+     * Returns the scheduler
+     * @return the scheduled executor service
+     */
     public ScheduledExecutorService getScheduler() { return scheduler; }
 
     /**

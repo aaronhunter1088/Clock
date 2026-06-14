@@ -396,21 +396,45 @@ public class StopwatchPanel extends ClockPanel
         displayLapsPanel.setDefaultLayout();
     }
 
-    /** Returns the clock */
+    /**
+     * Returns the clock
+     * @return the clock reference
+     */
     public Clock getClock() { return clock; }
-    /** Returns the clockFrame */
+    /**
+     * Returns the clockFrame
+     * @return the clock frame reference
+     */
     public ClockFrame getClockFrame() { return clockFrame; }
-    /** Returns the displayTimePanel */
+    /**
+     * Returns the displayTimePanel
+     * @return the display time panel
+     */
     public DisplayTimePanel getDisplayTimePanel() { return displayTimePanel; }
-    /** Returns the displayLapsPanel */
+    /**
+     * Returns the displayLapsPanel
+     * @return the display laps panel
+     */
     public DisplayLapsPanel getDisplayLapsPanel() { return displayLapsPanel; }
-    /** Returns the start button */
+    /**
+     * Returns the start button
+     * @return the start button
+     */
     public JButton getStartButton() { return startButton; }
-    /** Returns the lap button */
+    /**
+     * Returns the lap button
+     * @return the lap button
+     */
     public JButton getLapButton() { return lapButton; }
-    /** Returns the stopwatch name text field */
+    /**
+     * Returns the stopwatch name text field
+     * @return the stopwatch name text field
+     */
     public JTextField getStopwatchNameField() { return stopwatchNameField; }
-    /** Returns the current stopwatch */
+    /**
+     * Returns the current stopwatch
+     * @return the currently active stopwatch
+     */
     public Stopwatch getCurrentStopwatch() { return currentStopwatch; }
 
     /**

@@ -70,6 +70,7 @@ public class ClockMenuBar extends JMenuBar
      * The main constructor for the clock menu bar.
      * It creates a Settings and Features menu options,
      * each with several items to choose from.
+     * @param clockFrame the parent ClockFrame this menu bar is attached to
      */
     public ClockMenuBar(ClockFrame clockFrame)
     {
@@ -322,7 +323,6 @@ public class ClockMenuBar extends JMenuBar
 
     /**
      * Display the text for About Calculator menu item
-     *
      * @param action the click action
      */
     private void performTheHelpMenuAction(ActionEvent action)
@@ -473,7 +473,10 @@ public class ClockMenuBar extends JMenuBar
         g2d.fillRect(0, 0, getWidth()-1, getHeight()-1);
     }
 
-    /** Toggles the military time setting. */
+    /**
+     * Toggles the military time setting.
+     * @param action the triggering ActionEvent (unused)
+     */
     protected void toggleMilitaryTimeSetting(ActionEvent action)
     {
         logger.debug("clicked show military time setting");
@@ -492,7 +495,10 @@ public class ClockMenuBar extends JMenuBar
         SwingUtilities.updateComponentTreeUI(this);
     }
 
-    /** Toggles the full time setting. */
+    /**
+     * Toggles the full time setting.
+     * @param action the triggering ActionEvent (unused)
+     */
     protected void toggleShowFullTimeSetting(ActionEvent action)
     {
         logger.debug("clicked show full time setting");
@@ -509,7 +515,10 @@ public class ClockMenuBar extends JMenuBar
         getPartialTimeSetting().setText(SHOW+SPACE+PARTIAL_TIME_SETTING);
     }
 
-    /** Toggles the partial time setting. */
+    /**
+     * Toggles the partial time setting.
+     * @param action the triggering ActionEvent (unused)
+     */
     protected void togglePartialTimeSetting(ActionEvent action)
     {
         logger.debug("clicked show partial time setting");
@@ -526,7 +535,10 @@ public class ClockMenuBar extends JMenuBar
         getFullTimeSetting().setText(SHOW+SPACE+FULL_TIME_SETTING);
     }
 
-    /** Toggles the Daylight Savings Time setting. */
+    /**
+     * Toggles the Daylight Savings Time setting.
+     * @param action the triggering ActionEvent (unused)
+     */
     protected void toggleDSTSetting(ActionEvent action)
     {
         var isEnabled = clock.isDaylightSavingsTimeEnabled();
@@ -536,7 +548,10 @@ public class ClockMenuBar extends JMenuBar
         logger.debug("setting text: '{}'", getToggleDSTSetting().getText());
     }
 
-    /** Toggles the digital time on the analogue clock setting. */
+    /**
+     * Toggles the digital time on the analogue clock setting.
+     * @param action the triggering ActionEvent (unused)
+     */
     protected void toggleDigitalTimeOnAnalogueClockSetting(ActionEvent action)
     {
         logger.debug("clicked toggle digital time on analogue clock setting");
@@ -549,7 +564,10 @@ public class ClockMenuBar extends JMenuBar
         clockFrame.getAnalogueClockPanel().repaint();
     }
 
-    /** Toggles the pause/resume all timers setting. */
+    /**
+     * Toggles the pause/resume all timers setting.
+     * @param action the triggering ActionEvent (unused)
+     */
     protected void togglePauseResumeAllTimersSetting(ActionEvent action)
     {
         if (clock.getListOfTimers().isEmpty())
@@ -571,14 +589,20 @@ public class ClockMenuBar extends JMenuBar
         }
     }
 
-    /** Toggles the reset timers panel setting. */
+    /**
+     * Toggles the reset timers panel setting.
+     * @param action the triggering ActionEvent (unused)
+     */
     protected void toggleResetTimersPanelSetting(ActionEvent action)
     {
         logger.debug("clicked reset timers panel setting");
         clockFrame.getTimerPanel().resetTimerPanel();
     }
 
-    /** Toggles the pause/resume all alarms setting. */
+    /**
+     * Toggles the pause/resume all alarms setting.
+     * @param action the triggering ActionEvent (unused)
+     */
     protected void togglePauseResumeAllAlarmsSetting(ActionEvent action)
     {
         if (clock.getListOfAlarms().isEmpty())
@@ -600,7 +624,10 @@ public class ClockMenuBar extends JMenuBar
         }
     }
 
-    /** Toggles the reset alarms panel setting. */
+    /**
+     * Toggles the reset alarms panel setting.
+     * @param action the triggering ActionEvent (unused)
+     */
     protected void toggleResetAlarmsPanelSetting(ActionEvent action)
     {
         logger.debug("clicked reset alarms panel setting");
@@ -609,7 +636,10 @@ public class ClockMenuBar extends JMenuBar
         alarmPanel.resetTableAndMenu();
     }
 
-    /** Toggles between digital and analogue panels */
+    /**
+     * Toggles between digital and analogue panels.
+     * @param action the triggering ActionEvent (unused)
+     */
     protected void toggleTimePanels(ActionEvent action)
     {
         clockFrame.getStopwatchPanel().toggleStopwatchClockPanel();
@@ -625,7 +655,10 @@ public class ClockMenuBar extends JMenuBar
         }
     }
 
-    /** Toggles the reverse laps setting for the stopwatch panel. */
+    /**
+     * Toggles the reverse laps setting for the stopwatch panel.
+     * @param action the triggering ActionEvent (unused)
+     */
     protected void toggleReverseLapsSetting(ActionEvent action)
     {
         logger.debug("clicked reverse laps setting");
@@ -641,53 +674,125 @@ public class ClockMenuBar extends JMenuBar
         repaint();
     }
 
-    /** Returns the settings menu */
+    /**
+     * Returns the settings menu
+     * @return the settings menu
+     */
     public JMenu getSettingsMenu() { return this.settingsMenu; }
-    /** Returns the features menu */
+    /**
+     * Returns the features menu
+     * @return the features menu
+     */
     public JMenu getFeaturesMenu() { return this.featuresMenu; }
-    /** Returns the help menu */
+    /**
+     * Returns the help menu
+     * @return the help menu
+     */
     public JMenu getTheHelpMenu() { return this.helpMenu; }
-    /** Returns the alarms feature menu item */
+    /**
+     * Returns the alarms feature menu item
+     * @return the alarms feature menu item
+     */
     public JMenuItem getAlarmsFeature() { return this.alarmsFeature; }
-    /** Returns the military time setting menu item */
+    /**
+     * Returns the military time setting menu item
+     * @return the military time setting menu item
+     */
     public JMenuItem getMilitaryTimeSetting() { return this.militaryTimeSetting; }
-    /** Returns the full time setting menu item */
+    /**
+     * Returns the full time setting menu item
+     * @return the full time setting menu item
+     */
     public JMenuItem getFullTimeSetting() { return this.fullTimeSetting; }
-    /** Returns the partial time setting menu item */
+    /**
+     * Returns the partial time setting menu item
+     * @return the partial time setting menu item
+     */
     public JMenuItem getPartialTimeSetting() { return this.partialTimeSetting; }
-    /** Returns the toggle DST setting menu item */
+    /**
+     * Returns the toggle DST setting menu item
+     * @return the toggle DST setting menu item
+     */
     public JMenuItem getToggleDSTSetting() { return toggleDSTSetting; }
-    /** Returns the pause/resume all timers setting menu item */
+    /**
+     * Returns the pause/resume all timers setting menu item
+     * @return the pause/resume all timers setting menu item
+     */
     public JMenuItem getPauseResumeAllTimersSetting() { return pauseResumeAllTimersSetting; }
-    /** Returns the reset timers panel setting menu item */
+    /**
+     * Returns the reset timers panel setting menu item
+     * @return the reset timers panel setting menu item
+     */
     public JMenuItem getResetTimersPanelSetting() { return resetTimersPanelSetting; }
-    /** Returns the pause/resume all alarms setting menu item */
+    /**
+     * Returns the pause/resume all alarms setting menu item
+     * @return the pause/resume all alarms setting menu item
+     */
     public JMenuItem getPauseResumeAllAlarmsSetting() { return pauseResumeAllAlarmsSetting; }
-    /** Returns the reset alarms panel setting menu item */
+    /**
+     * Returns the reset alarms panel setting menu item
+     * @return the reset alarms panel setting menu item
+     */
     public JMenuItem getResetAlarmsPanelSetting() { return resetAlarmsPanelSetting; }
-    /** Returns the show digital time on analogue clock setting menu item */
+    /**
+     * Returns the show digital time on analogue clock setting menu item
+     * @return the show digital time on analogue clock setting menu item
+     */
     public JMenuItem getShowDigitalTimeOnAnalogueClockSetting() { return this.showDigitalTimeSettingOnAnalogueClockSetting; }
-    /** Returns the show analogue time panel menu item */
+    /**
+     * Returns the show analogue time panel menu item
+     * @return the show analogue time panel menu item
+     */
     public JMenuItem getShowAnalogueTimePanel() { return this.showAnalogueTimePanel; }
-    /** Returns the reverse laps setting menu item */
+    /**
+     * Returns the reverse laps setting menu item
+     * @return the reverse laps setting menu item
+     */
     public JMenuItem getReverseLaps() { return this.reverseLapsSetting; }
-    /** Returns the change time zone menu */
+    /**
+     * Returns the change time zone menu
+     * @return the change time zone sub-menu
+     */
     public JMenu getChangeTimeZoneMenu() { return this.changeTimeZoneMenuSetting; }
-    /** Returns the list of timezone menu items */
+    /**
+     * Returns the list of timezone menu items
+     * @return the list of timezone menu items
+     */
     public java.util.List<JMenuItem> getTimezones() { return this.timezones; }
-    /** Returns the digital clock feature menu item */
+    /**
+     * Returns the digital clock feature menu item
+     * @return the digital clock feature menu item
+     */
     public JMenuItem getDigitalClockFeature() { return this.digitalClockFeature; }
-    /** Returns the analogue clock feature menu item */
+    /**
+     * Returns the analogue clock feature menu item
+     * @return the analogue clock feature menu item
+     */
     public JMenuItem getAnalogueClockFeature() { return this.analogueClockFeature; }
-    /** Returns the timer feature menu item */
+    /**
+     * Returns the timer feature menu item
+     * @return the timer feature menu item
+     */
     public JMenuItem getTimerFeature() { return this.timerFeature; }
-    /** Returns the stopwatch feature menu item */
+    /**
+     * Returns the stopwatch feature menu item
+     * @return the stopwatch feature menu item
+     */
     public JMenuItem getStopwatchFeature() { return this.stopwatchFeature; }
-    /** Returns the help feature menu item */
+    /**
+     * Returns the help feature menu item
+     * @return the help feature menu item
+     */
     public JMenuItem getTheHelpFeature() { return this.helpFeature; }
-    /** Returns the clock frame */
+    /**
+     * Returns the clock frame
+     * @return the clock frame reference
+     */
     public ClockFrame getClockFrame() { return this.clockFrame; }
-    /** Returns the clock */
+    /**
+     * Returns the clock
+     * @return the clock reference
+     */
     public Clock getClock() { return this.clock; }
     /**
      * Returns the reset all laps setting

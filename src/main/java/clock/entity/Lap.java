@@ -134,13 +134,25 @@ public class Lap implements Serializable, Comparable<Lap>, Cloneable
         return sb.toString();
     }
 
-    /** Get the lap number */
+    /**
+     * Returns the lap number
+     * @return the lap number
+     */
     public int getLapNumber() { return lapNumber; }
-    /** Get the duration */
+    /**
+     * Returns the duration
+     * @return the duration in milliseconds
+     */
     public long getDuration() { return duration; }
-    /** Get the lap time */
+    /**
+     * Returns the lap time
+     * @return the lap time in milliseconds
+     */
     public long getLapTime() { return lapTime; }
-    /** Get the stopwatch */
+    /**
+     * Returns the stopwatch
+     * @return the stopwatch this lap belongs to
+     */
     public Stopwatch getStopwatch() { return stopwatch; }
 
     /**

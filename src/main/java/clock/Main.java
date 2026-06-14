@@ -26,12 +26,16 @@ public class Main
 {
     private final static Logger logger = LogManager.getLogger(Main.class);
 
+    /** Private constructor — utility class, not instantiable. */
+    private Main() {}
+
     private static ClockFrame clockFrame;
 
     /**
      * Main method to start the Clock
      *
      * @param args command line arguments
+     * @throws Exception if the arguments are invalid or the application cannot start
      */
     public static void main(String[] args) throws Exception
     {
