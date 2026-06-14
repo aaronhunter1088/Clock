@@ -12,9 +12,12 @@ import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
 import java.io.Serial;
 import java.time.ZoneId;
+import java.time.format.TextStyle;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Comparator;
 import java.util.List;
+import java.util.Locale;
 
 import static clock.util.Constants.*;
 import static clock.entity.Panel.*;
@@ -136,10 +139,14 @@ public class ClockMenuBar extends JMenuBar
         userTimezone.setForeground(Color.WHITE);
         userTimezone.setBackground(Color.BLACK);
         userTimezone.addActionListener(_ -> {
-            final String[] zoneOptions = ZoneId.SHORT_IDS.keySet().stream()
-                    .sorted()
-                    .toArray(String[]::new);
-            final String selected = (String) JOptionPane.showInputDialog(
+            final ZoneOption[] zoneOptions = ZoneId.SHORT_IDS.entrySet().stream()
+                    .map(entry -> new ZoneOption(
+                            ZoneId.of(entry.getValue()).getDisplayName(TextStyle.FULL, Locale.ENGLISH),
+                            entry.getKey()
+                    ))
+                    .sorted(Comparator.comparing(ZoneOption::displayName))
+                    .toArray(ZoneOption[]::new);
+            final ZoneOption selected = (ZoneOption) JOptionPane.showInputDialog(
                     this,
                     SELECT_ZONE_ID,
                     CHANGE + SPACE + TIME_ZONES,
@@ -149,7 +156,11 @@ public class ClockMenuBar extends JMenuBar
                     zoneOptions[0]
             );
             if (selected != null)
-            { clockFrame.updateClockTimezone(new JMenuItem(selected)); }
+            {
+                final JMenuItem tzItem = new JMenuItem(selected.displayName());
+                tzItem.setName(ZoneId.SHORT_IDS.get(selected.key())); // long ID used for resolution
+                clockFrame.updateClockTimezone(tzItem);
+            }
         });
         getChangeTimeZoneMenu().add(userTimezone);
         getChangeTimeZoneMenu().setName(
@@ -404,7 +415,9 @@ public class ClockMenuBar extends JMenuBar
     {
         timezones.forEach(menuItem -> {
             final String cleanText = menuItem.getText().replace(STAR, EMPTY).trim();
-            final ZoneId menuZoneId = clock.getZoneIdFromTimezoneButtonText(cleanText);
+            final String resolutionKey = (menuItem.getName() != null && !menuItem.getName().isBlank())
+                    ? menuItem.getName() : cleanText;
+            final ZoneId menuZoneId = clock.getZoneIdFromTimezoneButtonText(resolutionKey);
             if (clock.getTimezone().equals(menuZoneId)) {
                 if (!menuItem.getText().contains(STAR)) {
                     menuItem.setText(cleanText + SPACE + STAR);
@@ -798,4 +811,18 @@ public class ClockMenuBar extends JMenuBar
      * @param resetStopwatchesPanelSetting the reset stopwatches menu item to set
      */
     public void setResetStopwatchesPanelSetting(JMenuItem resetStopwatchesPanelSetting) { this.resetStopwatchesPanelSetting = resetStopwatchesPanelSetting; }
+
+    /**
+     * A display-only wrapper for a SHORT_IDS timezone entry.
+     * {@link JOptionPane} calls {@code toString()} on each entry in the selection list,
+     * so the readable name is shown while the raw key is retained for clock updates.
+     *
+     * @param displayName the human-readable timezone name (e.g. "Central Time")
+     * @param key         the raw SHORT_IDS key (e.g. "CST")
+     */
+    private record ZoneOption(String displayName, String key)
+    {
+        @Override
+        public String toString() { return displayName; }
+    }
 }

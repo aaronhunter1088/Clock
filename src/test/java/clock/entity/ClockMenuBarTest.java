@@ -321,7 +321,7 @@ public class ClockMenuBarTest
     @DisplayName("Test updateClockTimezone with a SHORT_IDS key adds item and marks it with a star")
     void testUpdateClockTimezoneWithShortIdKeyMarksWithStar()
     {
-        final String shortId = "JST"; // resolves to Asia/Tokyo
+        final String shortId = "JST"; // resolves to Asia/Tokyo — not already in the default list
         final int countBefore = clockFrame.getClockMenuBar().getTimezones().size();
 
         clockFrame.updateClockTimezone(new javax.swing.JMenuItem(shortId));
@@ -333,6 +333,50 @@ public class ClockMenuBarTest
                 .filter(item -> item.getText().replace(STAR, EMPTY).trim().equalsIgnoreCase(shortId))
                 .anyMatch(item -> item.getText().contains(STAR));
         assertTrue(hasStar, "The newly selected JST timezone should be marked with a star");
+    }
+
+    @Test
+    @DisplayName("Test updateClockTimezone with a display name and long zone ID shows the display name in the menu")
+    void testUpdateClockTimezoneWithDisplayNameShowsReadableLabel()
+    {
+        // Simulate what the ZoneOption dialog produces: display name as text, long ID as name
+        final String displayName = "Japan Time";
+        final String longId = "Asia/Tokyo"; // ZoneId.SHORT_IDS.get("JST")
+        final javax.swing.JMenuItem tzItem = new javax.swing.JMenuItem(displayName);
+        tzItem.setName(longId);
+        final int countBefore = clockFrame.getClockMenuBar().getTimezones().size();
+
+        clockFrame.updateClockTimezone(tzItem);
+
+        final int countAfter = clockFrame.getClockMenuBar().getTimezones().size();
+        assertEquals(countBefore + 1, countAfter, "A new timezone entry should be added");
+
+        final boolean labelIsReadable = clockFrame.getClockMenuBar().getTimezones().stream()
+                .anyMatch(item -> item.getText().replace(STAR, EMPTY).trim().equals(displayName));
+        assertTrue(labelIsReadable, "Menu item should display the readable name, not the raw key");
+
+        final boolean hasStar = clockFrame.getClockMenuBar().getTimezones().stream()
+                .filter(item -> item.getText().replace(STAR, EMPTY).trim().equals(displayName))
+                .anyMatch(item -> item.getText().contains(STAR));
+        assertTrue(hasStar, "The newly added Japan Time entry should be marked with a star");
+    }
+
+    @Test
+    @DisplayName("Test updateClockTimezone does not add duplicate when SHORT_IDS key resolves to same ZoneId as an existing entry")
+    void testUpdateClockTimezoneSkipsDuplicateByZoneId()
+    {
+        // PST resolves to America/Los_Angeles, which is the same ZoneId as the existing "Pacific" entry
+        final int countBefore = clockFrame.getClockMenuBar().getTimezones().size();
+
+        clockFrame.updateClockTimezone(new javax.swing.JMenuItem("PST"));
+
+        final int countAfter = clockFrame.getClockMenuBar().getTimezones().size();
+        assertEquals(countBefore, countAfter, "PST should not be added because Pacific already covers America/Los_Angeles");
+
+        final long starCount = clockFrame.getClockMenuBar().getTimezones().stream()
+                .filter(item -> item.getText().contains(STAR))
+                .count();
+        assertEquals(1, starCount, "Exactly one timezone entry should have a star");
     }
 
     @Test

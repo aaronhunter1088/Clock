@@ -267,21 +267,27 @@ public class ClockFrame extends JFrame
     public void updateClockTimezone(JMenuItem timezone)
     {
         final String cleanText = timezone.getText().replace(STAR, EMPTY).trim();
+        final String resolutionKey = (timezone.getName() != null && !timezone.getName().isBlank())
+                ? timezone.getName() : cleanText;
         logger.info("clicked on {} timezone. updating the time", cleanText);
-        clock.setTheTime(determineNewTimeFromSelectedTimeZone(cleanText));
-        clock.setTimezone(clock.getZoneIdFromTimezoneButtonText(cleanText));
+        clock.setTheTime(determineNewTimeFromSelectedTimeZone(resolutionKey));
+        clock.setTimezone(clock.getZoneIdFromTimezoneButtonText(resolutionKey));
         logger.debug("Time zone changed to {}", clock.getTimezone());
 
         final java.util.List<JMenuItem> menuBarTimezones = menuBar.getTimezones();
         final boolean alreadyPresent = menuBarTimezones.stream()
-                .map(btn -> btn.getText().replace(STAR, EMPTY).trim())
-                .anyMatch(text -> text.equalsIgnoreCase(cleanText));
+                .map(btn -> {
+                    final String name = btn.getName();
+                    final String key = (name != null && !name.isBlank()) ? name : btn.getText().replace(STAR, EMPTY).trim();
+                    return clock.getZoneIdFromTimezoneButtonText(key);
+                })
+                .anyMatch(existingZoneId -> existingZoneId.equals(clock.getTimezone()));
         if (!alreadyPresent) {
             timezone.setText(cleanText);
             timezone.addActionListener(_ -> updateClockTimezone(timezone));
             timezone.setForeground(Color.WHITE);
             timezone.setBackground(Color.BLACK);
-            timezone.setName(cleanText);
+            timezone.setName(resolutionKey); // preserve the resolution key for future clicks
             logger.info("adding timezone: {}", cleanText);
             final int secondToLast = menuBar.getChangeTimeZoneMenu().getItemCount() - 1;
             menuBar.getChangeTimeZoneMenu().add(timezone, secondToLast);
