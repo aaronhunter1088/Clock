@@ -226,7 +226,7 @@ public class ClockMenuBar extends JMenuBar
         getShowAnalogueTimePanel().setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_C, InputEvent.SHIFT_DOWN_MASK));
         //getShowAnalogueTimePanel().setAccelerator(null); // T is used for View Timers
         getShowAnalogueTimePanel().setForeground(Color.WHITE);
-        getShowAnalogueTimePanel().setName("Show or hide the analogue clock panel. Shift + C.");
+        getShowAnalogueTimePanel().setName("Show the analogue clock panel. Shift + C.");
         getShowAnalogueTimePanel().addActionListener(this::toggleTimePanels);
 
         setReverseLaps(new JMenuItem(REVERSE+SPACE+LAPS));
@@ -616,10 +616,12 @@ public class ClockMenuBar extends JMenuBar
         if (!clockFrame.getStopwatchPanel().getDisplayTimePanel().isShowAnaloguePanel())
         {
             getShowAnalogueTimePanel().setText(SHOW+SPACE+ANALOGUE+SPACE+"Time");
+            getShowAnalogueTimePanel().setName("Show the analogue clock panel. Shift + C.");
         }
         else
         {
             getShowAnalogueTimePanel().setText(SHOW+SPACE+DIGITAL+SPACE+"Time");
+            getShowAnalogueTimePanel().setName("Show the digital clock panel. Shift + C.");
         }
     }
 
