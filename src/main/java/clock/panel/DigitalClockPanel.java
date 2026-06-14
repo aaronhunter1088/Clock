@@ -19,7 +19,6 @@ import static java.lang.Thread.sleep;
  * in regular or military time, show different date views,
  * turn on/off Daylight Savings Time and change the time
  * zone.
- * // TODO: Add more timezones. Or allow for input somehow
  *
  * @author michael ball
  * @version since 1.0

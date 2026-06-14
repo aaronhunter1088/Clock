@@ -179,7 +179,9 @@ public class StopwatchPanel extends ClockPanel
         clockFrame.setTitle(STOPWATCH);
         startButton.setText(START);
         lapButton.setText(LAP);
-        displayTimePanel.setClockText(currentStopwatch != null ? currentStopwatch.elapsedFormatted(currentStopwatch.getAccumMilli(), STOPWATCH_READING_FORMAT) : startText);
+        displayTimePanel.setClockText(currentStopwatch != null
+                ? currentStopwatch.elapsedFormatted(currentStopwatch.getAccumMilli(), STOPWATCH_READING_FORMAT)
+                : startText);
     }
 
     /**

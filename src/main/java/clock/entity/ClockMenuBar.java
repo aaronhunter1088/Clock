@@ -40,7 +40,7 @@ public class ClockMenuBar extends JMenuBar
     private transient JMenu settingsMenu,
                   featuresMenu,
                   helpMenu,
-                  changeTimeZoneMenuSetting; // an option under Settings
+                  changeTimeZoneMenuSetting; // an sub menu option under Settings
     // Options for Settings
     private transient JMenuItem militaryTimeSetting,
                       fullTimeSetting,
@@ -185,9 +185,11 @@ public class ClockMenuBar extends JMenuBar
         getChangeTimeZoneMenu().add(userTimezone);
         getChangeTimeZoneMenu().setName(
                 """
-                Change the timezone to the selected choice and adjusts the clock.
-                The last option presents a list of standard abbreviated timezone IDs
-                to choose from (e.g. PST, CST, JST). Selecting one updates the clock.
+                Changes the timezone to the selected choice and updates the time.
+                You can choose from a predefined list of timezones, displayed using
+                the timezone's display name, or enter a timezone, like Africa/Cairo
+                or America/Chicago. If the value given is valid, the time will be
+                updated and a new timezone will be added to the list to choose from.
                 """
         );
         setCurrentTimeZone();

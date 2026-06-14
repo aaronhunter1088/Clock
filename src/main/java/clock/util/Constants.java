@@ -32,7 +32,6 @@ public class Constants {
     public static final String EIGHT = "8";
     public static final String ELEVEN = "11";
     public static final String EMPTY = "";
-    public static final String ENTER_ZONE_ID = "Enter Zone ID";
     public static final String SELECT_ZONE_ID = "Select Time Zone";
     public static final String TEXT_FIELD = "TextField";
     public static final String FIVE = "5";
@@ -51,8 +50,6 @@ public class Constants {
     public static final String NEWLINE = "\n";
     public static final String NINE = "9";
     public static final String NO = "No";
-    public static final String No_Alarms = "No Alarms";
-    public static final String No_Timers = "No Timers";
     public static final String of = "of";
     public static final String off = "off";
     public static final String on = "on";
@@ -99,7 +96,31 @@ public class Constants {
     public static final String PACIFIC_HONOLULU = "Pacific/Honolulu";
     public static final String AMERICA_DENVER = "America/Denver";
 
-    //String
+    // Alarm
+    public static final String ALARM = "Alarm";
+    public static final String ALARM_ERROR = "Alarm Error";
+    public static final String AMPM = "AM/PM";
+    public static final String DAYS = "Days";
+    public static final String M = "M";
+    public static final String T = "T";
+    public static final String W = "W";
+    public static final String TH = "Th";
+    public static final String F = "F";
+    public static final String S = "S";
+    public static final String SU = "Su";
+    public static final String EVERY_DAY = "Every Day";
+    public static final String No_Alarms = NO + SPACE + ALARM + S.toLowerCase();
+    public static final String SLEEPING = "Sleeping .zZ";
+    public static final String SNOOZE = "Snooze";
+    public static final String STOP = "Stop";
+    public static final String VIEW_ALARMS = "View Alarms";
+    public static final String WEEK = "WK";
+    public static final String WEEKDAYS = "Weekdays";
+    public static final String WEEKEND = "WKD";
+    public static final String WEEKENDS = "Weekends";
+    public static final String VIEW_DIGITAL_CLOCK = "View Digital Clock";
+    public static final String VIEW_ANALOGUE_CLOCK = "View Analogue Clock";
+    public static final List<DayOfWeek> WEEKDAYS_LIST = List.of(MONDAY, TUESDAY, WEDNESDAY, THURSDAY, FRIDAY);
 
     // Timer
     public static final String COUNTDOWN = "Countdown";
@@ -119,31 +140,7 @@ public class Constants {
     public static final String VIEW_STOPWATCHES = "View Stopwatches";
     public static final String VIEW_HELP = "View Help";
     public static final String ZERO = "0";
-
-    // Alarm
-    public static final String ALARM = "Alarm";
-    public static final String ALARM_ERROR = "Alarm Error";
-    public static final String AMPM = "AM/PM";
-    public static final String DAYS = "Days";
-    public static final String M = "M";
-    public static final String T = "T";
-    public static final String W = "W";
-    public static final String TH = "Th";
-    public static final String F = "F";
-    public static final String S = "S";
-    public static final String SU = "Su";
-    public static final String EVERY_DAY = "Every Day";
-    public static final String SLEEPING = "Sleeping .zZ";
-    public static final String SNOOZE = "Snooze";
-    public static final String STOP = "Stop";
-    public static final String VIEW_ALARMS = "View Alarms";
-    public static final String WEEK = "WK";
-    public static final String WEEKDAYS = "Weekdays";
-    public static final String WEEKEND = "WKD";
-    public static final String WEEKENDS = "Weekends";
-    public static final String VIEW_DIGITAL_CLOCK = "View Digital Clock";
-    public static final String VIEW_ANALOGUE_CLOCK = "View Analogue Clock";
-    public static final List<DayOfWeek> WEEKDAYS_LIST = List.of(MONDAY, TUESDAY, WEDNESDAY, THURSDAY, FRIDAY);
+    public static final String No_Timers = NO + SPACE + TIMER + S.toLowerCase();
 
     // Stopwatch
     public static final String ELAPSED = "Elapsed";

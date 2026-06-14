@@ -284,35 +284,18 @@ public class DisplayLapsPanel extends JPanel
         };
     }
 
-    public StopwatchPanel getStopwatchPanel()
-    {
-        return stopwatchPanel;
-    }
-
-    public JTable getLapsTable()
-    {
-        return lapsTable;
-    }
-
-    public JTable getStopwatchTable()
-    {
-        return stopwatchTable;
-    }
-
-    public String[] getLapTableColumnNames()
-    {
-        return lapTableColumnNames;
-    }
-
-    public String[] getStopwatchTableColumnNames()
-    {
-        return stopwatchTableColumnNames;
-    }
-
-    public boolean isLapsReversed()
-    {
-        return isLapsReversed;
-    }
+    /** Return the stopwatch panel */
+    public StopwatchPanel getStopwatchPanel() { return stopwatchPanel; }
+    /** Return the laps table */
+    public JTable getLapsTable() { return lapsTable; }
+    /** Return the stopwatch table */
+    public JTable getStopwatchTable() { return stopwatchTable; }
+    /** Return the lap table column names */
+    public String[] getLapTableColumnNames() { return lapTableColumnNames; }
+    /** Return the stopwatch table column names */
+    public String[] getStopwatchTableColumnNames() { return stopwatchTableColumnNames; }
+    /** Returns isLapsReverse */
+    public boolean isLapsReversed() { return isLapsReversed; }
 
     /**
      * Sets the grid bay layout manager
@@ -324,7 +307,6 @@ public class DisplayLapsPanel extends JPanel
      * @param constraints the GridBagConstraints to use
      */
     private void setGridBagConstraints(GridBagConstraints constraints) { this.constraints = constraints; logger.debug("constraints set"); }
-
     /**
      * Sets the laps table
      * @param lapsTable the JTable used to display lap data
@@ -333,7 +315,6 @@ public class DisplayLapsPanel extends JPanel
     {
         this.lapsTable = lapsTable;
     }
-
     /**
      * Sets the stopwatch table
      * @param stopwatchTable the JTable used to display stopwatch data
@@ -342,7 +323,6 @@ public class DisplayLapsPanel extends JPanel
     {
         this.stopwatchTable = stopwatchTable;
     }
-
     /**
      * Sets whether laps are displayed in reverse order
      * @param lapsReversed true to show laps in descending order

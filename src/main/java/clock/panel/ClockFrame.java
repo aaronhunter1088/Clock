@@ -38,11 +38,8 @@ public class ClockFrame extends JFrame
 
     public final static Dimension clockDefaultSize = new Dimension(700, 300);
     public final static Dimension analogueSize = new Dimension(350, 400);
-    public final static Dimension panelSize = new Dimension(400, 300);
     public final static Dimension alarmSize = new Dimension(200,100);
-    public final static Dimension timerSize = new Dimension(400, 300);
     public final static Font font60 = new Font("Courier New", Font.BOLD, 60);
-    public final static Font font50 = new Font("Courier New", Font.BOLD, 50);
     public final static Font font40 = new Font("Courier New", Font.BOLD, 40);
     public final static Font font20 = new Font("Courier New", Font.BOLD, 20);
     public final static Font font10 = new Font("Courier New", Font.BOLD, 10);

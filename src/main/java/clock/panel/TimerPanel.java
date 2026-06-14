@@ -22,22 +22,6 @@ import static clock.util.Constants.*;
 /**
  * Timer Panel
  * <p>
- * This panel will allow you to create multiple
- * timers, and see them displayed in a table
- * below the timer creation fields. Each timer
- * will have a name, hours, minutes, and seconds.
- * Once it reaches zero, it will sound an alarm
- * until the user turns it off. You can pause,
- * resume, restart, or remove the timer. There is
- * a settings that allows you to pause or resume
- * all existing timers at once.
- *
- * @author michael ball
- * @version since 2.9
- */
-/**
- * Timer Panel
- * <p>
  * Used to set and view timers. The timers are displayed
  * in a table below where they're created.
  * To set a timer, you must enter a name, an hour, minute,

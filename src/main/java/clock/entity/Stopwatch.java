@@ -29,9 +29,6 @@ import static clock.util.Constants.STOPWATCH_READING_FORMAT;
  * lap. The main count up time will continue to be visible will all times
  * shown together.
  * A lap is the time elapsed between one start and stop event.
- * TODO: Implement 'Reset (Stopwatch) Panel' menu setting: resets the entire panel
- * TODO: Implement 'Reset Laps' menu setting: resets laps for active stopwatch
- * TODO: Implement 'Reset All Laps' menu setting: resets all laps for all stopwatches
  *
  * @author michael ball
  * @version since 2.9

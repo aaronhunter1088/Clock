@@ -30,7 +30,7 @@ public class DisplayTimePanel extends JPanel implements Runnable
     private boolean showAnaloguePanel = false;
     public String clockText = "00:00.000";
     public static String startText = "00:00.000"; // default text
-    private StopwatchPanel stopwatchPanel;
+    private final StopwatchPanel stopwatchPanel;
 
     public DisplayTimePanel(StopwatchPanel stopwatchPanel)
     {
@@ -64,7 +64,7 @@ public class DisplayTimePanel extends JPanel implements Runnable
         logger.debug("stopping digital stopwatch panel");
         // TODO: Is this right? Is there a better way to do this?
         thread = null;
-        setClockText(DisplayTimePanel.startText);
+        setClockText(startText);
         if (stopwatchPanel.getCurrentStopwatch() != null)
         {
             stopwatchPanel.getCurrentStopwatch().pauseStopwatch();
@@ -250,4 +250,3 @@ public class DisplayTimePanel extends JPanel implements Runnable
      */
     public void setClockText(String clockText) { this.clockText = clockText; /* logger.debug("clockText set to {}", clockText); */ }
 }
-
