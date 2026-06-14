@@ -334,18 +334,25 @@ class TimerPanelTest
     @Test
     void testClickedOffHourFieldValidNumberInputFocusLost() throws InterruptedException, InvocationTargetException
     {
-        timerPanel.getHoursTextField().setText("1"); // start a 1 hour timer
-        // user opens timer panel, enters number and clicks off hour field
-        timerPanel.getHoursTextField().setFocusable(true);
-        FocusEvent focusEvent = new FocusEvent(
-                timerPanel.getHoursTextField(),
-                FocusEvent.FOCUS_LOST,
-                false,
-                timerPanel
-        );
+        // Perform all setup and dispatch on the EDT to ensure the FocusListener
+        // runs on the EDT thread. Calling dispatchEvent from a non-EDT thread is
+        // unsafe — in a test suite the EDT may be busy, causing the listener's
+        // invokeLater (which enables the button) to be queued *after* the
+        // assertion invokeAndWait, making isEnabled() return false intermittently.
+        EventQueue.invokeAndWait(() -> {
+            timerPanel.getHoursTextField().setText("1"); // start a 1 hour timer
+            timerPanel.getHoursTextField().setFocusable(true);
+            FocusEvent focusEvent = new FocusEvent(
+                    timerPanel.getHoursTextField(),
+                    FocusEvent.FOCUS_LOST,
+                    false,
+                    timerPanel
+            );
+            timerPanel.getHoursTextField().dispatchEvent(focusEvent);
+        });
 
-        timerPanel.getHoursTextField().dispatchEvent(focusEvent);
-
+        // Second invokeAndWait drains any invokeLater callbacks triggered by the
+        // FocusListener (e.g. setEnabled) before the assertions run.
         EventQueue.invokeAndWait(() -> {
             assertEquals("1", timerPanel.getHoursTextField().getText(), "Expected field to be 1");
             assertEquals(SET, timerPanel.getSetTimerButton().getText(), "Expected set timer button text to be "+SET);
@@ -356,17 +363,17 @@ class TimerPanelTest
     @Test
     void testClickedOffHourFieldInvalidNumberInputFocusLost() throws InterruptedException, InvocationTargetException
     {
-        timerPanel.getHoursTextField().setText("-1"); // start a -1 hour timer
-        // user opens timer panel, enters invalid number and clicks off hour field
-        timerPanel.getHoursTextField().setFocusable(true);
-        FocusEvent focusEvent = new FocusEvent(
-                timerPanel.getHoursTextField(),
-                FocusEvent.FOCUS_LOST,
-                false,
-                timerPanel
-        );
-
-        timerPanel.getHoursTextField().dispatchEvent(focusEvent);
+        EventQueue.invokeAndWait(() -> {
+            timerPanel.getHoursTextField().setText("-1"); // start a -1 hour timer
+            timerPanel.getHoursTextField().setFocusable(true);
+            FocusEvent focusEvent = new FocusEvent(
+                    timerPanel.getHoursTextField(),
+                    FocusEvent.FOCUS_LOST,
+                    false,
+                    timerPanel
+            );
+            timerPanel.getHoursTextField().dispatchEvent(focusEvent);
+        });
 
         EventQueue.invokeAndWait(() -> {
             assertEquals("-1", timerPanel.getHoursTextField().getText(), "Expected field to be -1");
@@ -397,21 +404,21 @@ class TimerPanelTest
     @Test
     void testClickedOffHourFieldValidNumberInputFocusLostMinutesIsInvalid() throws InterruptedException, InvocationTargetException
     {
-        timerPanel.getHoursTextField().setText("1"); // start a 1 hour timer
-        timerPanel.getMinutesTextField().setText("M"); // invalid minute
-        timerPanel.getMinutesTextField().setFocusable(true);
-        FocusEvent focusEvent = new FocusEvent(
-                timerPanel.getMinutesTextField(),
-                FocusEvent.FOCUS_LOST,
-                false,
-                timerPanel
-        );
-
-        timerPanel.getMinutesTextField().dispatchEvent(focusEvent);
+        EventQueue.invokeAndWait(() -> {
+            timerPanel.getHoursTextField().setText("1"); // start a 1 hour timer
+            timerPanel.getMinutesTextField().setText("M"); // invalid minute
+            timerPanel.getMinutesTextField().setFocusable(true);
+            FocusEvent focusEvent = new FocusEvent(
+                    timerPanel.getMinutesTextField(),
+                    FocusEvent.FOCUS_LOST,
+                    false,
+                    timerPanel
+            );
+            timerPanel.getMinutesTextField().dispatchEvent(focusEvent);
+        });
 
         EventQueue.invokeAndWait(() -> {
             assertEquals("1", timerPanel.getHoursTextField().getText(), "Expected field to be 1");
-            //assertEquals(Color.RED, ((javax.swing.border.LineBorder) timerPanel.getMinutesTextField().getBorder()).getLineColor(), "Expected minutes field border to be red indicating invalid input");
             assertEquals(SET, timerPanel.getSetTimerButton().getText(), "Expected set timer button text to be "+SET);
         });
     }
@@ -443,18 +450,19 @@ class TimerPanelTest
     @Test
     void testClickedOffSecondsFieldValidNumberInputFocusLostSecondsIsInvalid() throws InterruptedException, InvocationTargetException
     {
-        timerPanel.getHoursTextField().setText("1"); // start a 1 hour timer
-        timerPanel.getMinutesTextField().setText("2"); // with 2 minutes...
-        timerPanel.getSecondsTextField().setText("S"); // invalid second
-        timerPanel.getSecondsTextField().setFocusable(true);
-        FocusEvent focusEvent = new FocusEvent(
-                timerPanel.getMinutesTextField(),
-                FocusEvent.FOCUS_LOST,
-                false,
-                timerPanel
-        );
-
-        timerPanel.getMinutesTextField().dispatchEvent(focusEvent);
+        EventQueue.invokeAndWait(() -> {
+            timerPanel.getHoursTextField().setText("1"); // start a 1 hour timer
+            timerPanel.getMinutesTextField().setText("2"); // with 2 minutes...
+            timerPanel.getSecondsTextField().setText("S"); // invalid second
+            timerPanel.getSecondsTextField().setFocusable(true);
+            FocusEvent focusEvent = new FocusEvent(
+                    timerPanel.getMinutesTextField(),
+                    FocusEvent.FOCUS_LOST,
+                    false,
+                    timerPanel
+            );
+            timerPanel.getMinutesTextField().dispatchEvent(focusEvent);
+        });
 
         EventQueue.invokeAndWait(() -> {
             assertEquals("1", timerPanel.getHoursTextField().getText(), "Expected field to be 1");
