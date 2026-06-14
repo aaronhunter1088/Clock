@@ -89,7 +89,7 @@ public class ClockMenuBar extends JMenuBar
         if (clock.isShowMilitaryTime())
         {
             setMilitaryTimeSetting(new JMenuItem(SHOW+SPACE+STANDARD_TIME_SETTING));
-            getMilitaryTimeSetting().setName("Displays the Time in Standard Time CTRL + M. Ex: 08:50:00 AM");
+            getMilitaryTimeSetting().setName("Displays the Time in Standard Time. CTRL + M. Ex: 08:50:00 AM");
         }
         else
         {
@@ -481,12 +481,12 @@ public class ClockMenuBar extends JMenuBar
         if (clock.isShowMilitaryTime())
         {
             getMilitaryTimeSetting().setText(SHOW+SPACE+STANDARD_TIME_SETTING);
-            getMilitaryTimeSetting().setName("Displays the Time in Standard Time. Ex: 08:50:00 AM");
+            getMilitaryTimeSetting().setName("Displays the Time in Standard Time. CTRL + M. Ex: 08:50:00 AM");
         }
         else
         {
             getMilitaryTimeSetting().setText(SHOW+SPACE+MILITARY_TIME_SETTING);
-            getMilitaryTimeSetting().setName("Displays the Time in Military Time. Ex: 0850 hours 30");
+            getMilitaryTimeSetting().setName("Displays the Time in Military Time. CTRL + M. Ex: 0850 hours 30");
 
         }
         SwingUtilities.updateComponentTreeUI(this);
