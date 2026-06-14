@@ -19,6 +19,7 @@ public class Constants {
     // General
     public static final String ALL = "All";
     public static final String AM = "AM";
+    public static final String AND = "AND";
     public static final String ANALOGUE = "Analogue";
     public static final String are = "are";
     public static final String BUTTON = "Button";
@@ -26,6 +27,7 @@ public class Constants {
     public static final String COLON = ":";
     public static final String COMMA = ",";
     public static final String CLOCK = "Clock";
+    public static final String DATE = "Date";
     public static final String DIGITAL = "Digital";
     public static final String DIGITAL_TIME = "digital time";
     public static final String DST_SETTING = "daylight savings time";

@@ -2,7 +2,7 @@
 
 This is a Java Swing GUI application which displays the date and time to the user in
 both digital and analogue modes. It also has the capability to set multiple alarms,
-timers and stopwatches. You can also start the clock specifying a panel or a specific
+timers and stopwatches. You can also start the clock by specifying a panel or a specific
 date and time. The following is the default java command to run the clock:
 
 ### Running the JAR
@@ -16,6 +16,9 @@ java -jar dist/{version}/clock-{version}-jar-with-dependencies.jar panel_alarm
 
 # Start with specific date/time
 java -jar dist/{version}/clock-{version}-jar-with-dependencies.jar august 6 2025 10 30 0 pm
+
+# Start with specific date/time in military time
+java -jar dist/{version}/clock-{version}-jar-with-dependencies.jar august 6 2025 10 30 0 pm true
 ```
 
 The clock defaults on the Digital Clock panel, displaying the current date like
@@ -79,6 +82,13 @@ digital or analogue mode. The default is digital mode.
 On the Stopwatches panel, you can change the following settings:
 * (Ctrl + T) Show Analogue/Digital Time: This will toggle the stopwatch time between analogue and digital modes.
 * (Ctrl + R) Reverse Laps Order: This toggle will reverse the order of the laps for all stopwatches.
+* Reset Laps: This will reset the laps for the current stopwatch, removing all laps and resetting the list.
+* Reset All Laps: This will reset the laps for all stopwatches, removing all laps and resetting the lists.
+* Rest Panel: This will reset the stopwatches panel, removing all stopwatches and resetting the list.
+
+The Help Menu displays instructions on how to use the application and its features. It builds the text based on the value
+set on the menu item's setName method. When you change the panel or a setting, the help menu will adjust according to what
+is currently visible to the user.
 
 Running The Tests:<br>
 The application is tested using JUnit 5 and Mockito. Some tests have popups that requires you to close them.
@@ -90,7 +100,21 @@ Without the tests will 'pause' until that popup is closed.
 v3.1.0:
 Updated all objects to utilize the ScheduledExecutorService defined in the ClockFrame class.
 Now, the Clock, Alarm, Timer and Stopwatch classes have been updated to use this scheduling service.
-
+Added an option to allow 'true' to be added to enforce military time on a clock instead of the hour.
+Added the ability to edit a Timer. Now, if you Pause a running Timer, you can click a new Edit button
+which will update the text fields with this Timer's values and you can update the values accordingly, 
+and then click Set. This will start that Timer with those new/selected values. You can also 'toss out' 
+that Timer by not clicking Set, effectively deleting it without clicking Remove.
+Added the date to the Analogue clock panel. It is displayed above the time, similar to the digital
+clock panel. There is currently only one supported view, like JUNE 13, 2026. The setting, 'Show/Hide
+Digital Time' is still supported and will support show/hiding the date as well. The setting has been
+renamed to 'Show/Hide Date and Time'.
+Added some new menu options to the Stopwatch panel to reset the current stopwatch's laps, reset all stopwatches' laps,
+and reset the panel which removes all stopwatches.
+Added a new Help menu that displays instructions on what each setting or feature does. This has been set up
+such that as long as the existing pattern for adding a new setting or feature is followed, the help text generated will
+automatically update to include the new setting or feature.
+Removed code that is not used minus getters and setters. Also added more javadocs to these methods.
 
 v3.0.4:
 Added github instructions for better utilization of Copilot and other new AI tools. 

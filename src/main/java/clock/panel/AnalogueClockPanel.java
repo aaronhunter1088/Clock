@@ -69,7 +69,6 @@ public class AnalogueClockPanel extends ClockPanel implements Runnable
         clockFrame.getClockMenuBar().getSettingsMenu().add(clockFrame.getClockMenuBar().getShowDigitalTimeOnAnalogueClockSetting());
         clockFrame.getClockMenuBar().getSettingsMenu().add(clockFrame.getClockMenuBar().getToggleDSTSetting());
         clockFrame.getClockMenuBar().getSettingsMenu().add(clockFrame.getClockMenuBar().getChangeTimeZoneMenu());
-        clockFrame.getClockMenuBar().getShowDigitalTimeOnAnalogueClockSetting().setText(HIDE+SPACE+DIGITAL_TIME);
         setShowDigitalTimeOnAnalogueClock(true);
     }
 
