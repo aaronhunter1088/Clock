@@ -200,11 +200,12 @@ public class DisplayTimePanel extends JPanel implements Runnable
 
         g.setColor(Color.BLACK);
 
-        // Derive milliseconds from seconds (assuming getStopwatch().getSeconds() returns total seconds with millisecond precision)
-        String time = stopwatchPanel.getCurrentStopwatch() == null ? startText : clockText;
+        // Use the parse format ("MM:SS:mmm") as the fallback — startText uses dot format
+        // and would only produce 2 parts when split by COLON, causing an index-out-of-bounds.
+        String time = stopwatchPanel.getCurrentStopwatch() == null ? "00:00:000" : clockText;
         String[] parts = time.split(COLON);
 
-        double milliseconds = Double.parseDouble(parts[2]);
+        double milliseconds = Double.parseDouble(parts[2] != null ? parts[2] : String.valueOf(Double.parseDouble("0")));
         long minutes = Long.parseLong(parts[0]);
         int seconds = Integer.parseInt(parts[1]);
 
