@@ -53,8 +53,8 @@ public class AnalogueClockPanelTest
     void beforeEach()
     {
         clock = new Clock(11, 30, 0, JANUARY, WEDNESDAY, 1, 2025, AM); // 11:30 AM
-        clockFrame = new ClockFrame(clock);
-        analogueClockPanel = new AnalogueClockPanel(clockFrame);
+        clockFrame = ClockFrame.createAndShowGUI(clock);
+        analogueClockPanel = clockFrame.getAnalogueClockPanel();
         clockFrame.changePanels(PANEL_ANALOGUE_CLOCK);
     }
 

@@ -52,11 +52,11 @@ class TimerPanelTest
     @BeforeEach
     void beforeEach()
     {
-        clockFrame = new ClockFrame(new Clock());
+        clockFrame = ClockFrame.createAndShowGUI();
         clock = clockFrame.getClock();
-        timerPanel = new TimerPanel(clockFrame);
+        timerPanel = clockFrame.getTimerPanel();
+        timerPanel.setClock(clock);
         clockFrame.changePanels(PANEL_TIMER);
-        clockFrame.start();
     }
 
     @AfterEach

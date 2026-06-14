@@ -41,7 +41,7 @@ public class ClockPanelTest
     void beforeEach()
     {
         clock = new Clock(11, 30, 0, JANUARY, WEDNESDAY, 1, 2025, AM); // 11:30 AM
-        clockFrame = new ClockFrame(clock);
+        clockFrame = ClockFrame.createAndShowGUI(clock);
         alarmPanel = new AlarmPanel(clockFrame);
     }
 

@@ -200,9 +200,13 @@ public class DisplayTimePanel extends JPanel implements Runnable
 
         g.setColor(Color.BLACK);
 
-        // Use the parse format ("MM:SS:mmm") as the fallback — startText uses dot format
-        // and would only produce 2 parts when split by COLON, causing an index-out-of-bounds.
-        String time = stopwatchPanel.getCurrentStopwatch() == null ? "00:00:000" : clockText;
+        // Derive time directly from the stopwatch using the colon-delimited parse format so
+        // the split always yields 3 parts regardless of what clockText currently holds.
+        // Using clockText here caused a race with the repaint thread, which continuously
+        // overwrites clockText with the dot-delimited reading format.
+        final Stopwatch currentStopwatch = stopwatchPanel.getCurrentStopwatch();
+        String time = currentStopwatch == null ? "00:00:000" :
+                currentStopwatch.elapsedFormatted(currentStopwatch.getAccumMilli(), STOPWATCH_PARSE_FORMAT);
         String[] parts = time.split(COLON);
 
         double milliseconds = Double.parseDouble(parts[2]);

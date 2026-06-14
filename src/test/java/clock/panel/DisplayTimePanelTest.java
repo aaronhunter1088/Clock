@@ -51,10 +51,10 @@ class DisplayTimePanelTest
     @BeforeEach
     void beforeEach()
     {
-        clockFrame = new ClockFrame(new Clock());
+        clockFrame = ClockFrame.createAndShowGUI();
         clock = clockFrame.getClock();
         Stopwatch.stopwatchCounter = 0L;
-        stopwatchPanel = new StopwatchPanel(new ClockFrame(clock));
+        stopwatchPanel = clockFrame.getStopwatchPanel();
         clockFrame.changePanels(PANEL_STOPWATCH);
         displayTimePanel = stopwatchPanel.getDisplayTimePanel();
     }
@@ -264,6 +264,8 @@ class DisplayTimePanelTest
     void testPaintDigitalModeDoesNotThrow()
     {
         displayTimePanel.setShowAnaloguePanel(false);
+        // super.paint(g) internally calls g.create() — stub it to prevent NPE from null.dispose()
+        when(g.create()).thenReturn(g);
         when(g.getFontMetrics(any())).thenReturn(fontMetrics);
         when(fontMetrics.stringWidth(any())).thenReturn(100);
         assertDoesNotThrow(() -> displayTimePanel.paint(g),
@@ -278,7 +280,8 @@ class DisplayTimePanelTest
         clock.getListOfStopwatches().add(sw);
         stopwatchPanel.setCurrentStopwatch(sw);
         displayTimePanel.setShowAnaloguePanel(true);
-
+        // super.paint(g) internally calls g.create() — stub it to prevent NPE from null.dispose()
+        when(g.create()).thenReturn(g);
         when(g.getFontMetrics()).thenReturn(fontMetrics);
         when(fontMetrics.stringWidth(any())).thenReturn(50);
         assertDoesNotThrow(() -> displayTimePanel.paint(g),

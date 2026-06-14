@@ -51,9 +51,9 @@ public class DigitalClockPanelTest
     @BeforeEach
     void beforeEach()
     {
-        clockFrame = new ClockFrame(new Clock());
+        clockFrame = ClockFrame.createAndShowGUI();
         clock = clockFrame.getClock();
-        digitalClockPanel = new DigitalClockPanel(clockFrame);
+        digitalClockPanel = clockFrame.getDigitalClockPanel();
         clockFrame.changePanels(PANEL_DIGITAL_CLOCK);
     }
 

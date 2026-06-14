@@ -50,8 +50,8 @@ class AlarmPanelTest
     void beforeEach()
     {
         clock = new Clock(11, 30, 0, JANUARY, WEDNESDAY, 1, 2025, AM); // 11:30 AM
-        clockFrame = new ClockFrame(clock);
-        alarmPanel = new AlarmPanel(clockFrame);
+        clockFrame = ClockFrame.createAndShowGUI(clock);
+        alarmPanel = clockFrame.getAlarmPanel();
         clockFrame.changePanels(PANEL_ALARM);
     }
 

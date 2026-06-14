@@ -44,10 +44,10 @@ class DisplayLapsPanelTest
     @BeforeEach
     void beforeEach()
     {
-        clockFrame = new ClockFrame(new Clock());
+        clockFrame = ClockFrame.createAndShowGUI();
         clock = clockFrame.getClock();
         Stopwatch.stopwatchCounter = 0L;
-        stopwatchPanel = new StopwatchPanel(new ClockFrame(clock));
+        stopwatchPanel = clockFrame.getStopwatchPanel();
         clockFrame.changePanels(PANEL_STOPWATCH);
         displayLapsPanel = stopwatchPanel.getDisplayLapsPanel();
     }
