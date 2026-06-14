@@ -22,10 +22,11 @@ import static java.lang.Thread.sleep;
  */
 public class AnalogueClockPanel extends ClockPanel implements Runnable
 {
+    /** The logger */
     private static final Logger logger = LogManager.getLogger(AnalogueClockPanel.class);
     /** The layout of the analogue clock panel */
     private GridBagLayout layout;
-    //private GridBagConstraints constraints;
+    private GridBagConstraints constraints;
     /** The panel thread */
     private Thread thread = null;
     /** Drawing variables */
@@ -71,7 +72,7 @@ public class AnalogueClockPanel extends ClockPanel implements Runnable
         setTimeText(clock.getTimeAsStr());
         setGridBagLayout(new GridBagLayout()); // sets layout
         setLayout(layout);
-        //setGridBagConstraints(new GridBagConstraints());
+        setGridBagConstraints(new GridBagConstraints());
         setupDefaultValues();
     }
 
@@ -243,6 +244,16 @@ public class AnalogueClockPanel extends ClockPanel implements Runnable
      */
     public ClockFrame getClockFrame() { return this.clockFrame; }
     /**
+     * Returns the layout manager
+     * @return the GridBagLayout used by this panel
+     */
+    public GridBagLayout getGridBagLayout() { return this.layout; }
+    /**
+     * Returns the constraints
+     * @return the GridBagConstraints used by this panel
+     */
+    public GridBagConstraints getGridBagConstraints() { return this.constraints; }
+    /**
      * Returns the clock
      * @return the clock.
      */
@@ -282,7 +293,7 @@ public class AnalogueClockPanel extends ClockPanel implements Runnable
      * Sets the grid bag constraints
      * @param constraints the GridBagConstraints to use
      */
-    //private void setGridBagConstraints(GridBagConstraints constraints) { this.constraints = constraints; logger.debug("GridBagConstraints set"); }
+    private void setGridBagConstraints(GridBagConstraints constraints) { this.constraints = constraints; logger.debug("GridBagConstraints set"); }
     /**
      * Sets the clock date text
      * @param dateText the date string to display

@@ -48,6 +48,7 @@ import static java.time.DayOfWeek.*;
  */
 public class AlarmPanel extends ClockPanel implements Runnable
 {
+    /** The logger */
     private static final Logger logger = LogManager.getLogger(AlarmPanel.class);
     /** The panel thread */
     private Thread thread;

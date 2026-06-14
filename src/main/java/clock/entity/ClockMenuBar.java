@@ -34,6 +34,7 @@ public class ClockMenuBar extends JMenuBar implements Serializable
 {
     @Serial
     private static final long serialVersionUID = 1L;
+    /** The logger */
     private static final Logger logger = LogManager.getLogger(ClockMenuBar.class);
     /** Reference to the clock frame */
     private transient ClockFrame clockFrame;

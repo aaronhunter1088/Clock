@@ -32,6 +32,7 @@ public class Timer implements Serializable, Comparable<Timer>
 {
     @Serial
     private static final long serialVersionUID = 2L;
+    /** The logger */
     private static final Logger logger = LogManager.getLogger(Timer.class);
     /** Running count of total Timer instances created; resets at 100. */
     public static long timersCounter = 0L;

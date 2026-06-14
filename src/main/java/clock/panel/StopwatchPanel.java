@@ -39,6 +39,7 @@ import static clock.util.Constants.*;
  */
 public class StopwatchPanel extends ClockPanel
 {
+    /** The logger */
     private static final Logger logger = LogManager.getLogger(StopwatchPanel.class);
     /** The stopwatch layout */
     private GridBagLayout layout;

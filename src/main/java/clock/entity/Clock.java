@@ -32,8 +32,8 @@ public class Clock implements Serializable, Comparable<Clock>
 {
     @Serial
     private static final long serialVersionUID = 2L;
+    /** The logger */
     private static final Logger logger = LogManager.getLogger(Clock.class);
-
     /** The current date. */
     private LocalDate date;
     /** The current day of the week. */

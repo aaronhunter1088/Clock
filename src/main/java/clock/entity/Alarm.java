@@ -37,8 +37,11 @@ public class Alarm implements Serializable, Comparable<Alarm>
 {
     @Serial
     private static final long serialVersionUID = 2L;
+    /** The snooze time */
     private static final long SNOOZE_TIME = Duration.ofMinutes(7).toMillis(); // 7 minutes in milliseconds
+    /** The auto-snooze time */
     private static final long AUTO_SNOOZE_TIME = Duration.ofMinutes(1).toMillis(); // 1 minute in milliseconds
+    /** The logger */
     private static final Logger logger = LogManager.getLogger(Alarm.class);
     /** Running count of total Alarm instances created; resets at 100. */
     public static long alarmsCounter = 0L;

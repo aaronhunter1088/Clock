@@ -26,9 +26,8 @@ import static java.lang.Thread.sleep;
  */
 public class DigitalClockPanel extends ClockPanel implements Runnable
 {
+    /** The logger */
     private static final Logger logger = LogManager.getLogger(DigitalClockPanel.class);
-    //private GridBagLayout layout;
-    //private GridBagConstraints constraints;
     /** The panel thread */
     private Thread thread = null;
     /** Reference to the clock */
@@ -237,16 +236,6 @@ public class DigitalClockPanel extends ClockPanel implements Runnable
      * @return the clock frame reference
      */
     public ClockFrame getClockFrame() { return this.clockFrame; }
-//    /**
-//     * Returns the layout manager
-//     * @return the GridBagLayout used by this panel
-//     */
-//    public GridBagLayout getGridBagLayout() { return this.layout; }
-//    /**
-//     * Returns the grid bag constraints
-//     * @return the GridBagConstraints used by this panel
-//     */
-//    public GridBagConstraints getGridBagConstraints() { return this.constraints; }
     /**
      * Returns the clock
      * @return the clock reference
@@ -258,16 +247,6 @@ public class DigitalClockPanel extends ClockPanel implements Runnable
      * @param clockFrame the clock frame reference
      */
     private void setClockFrame(ClockFrame clockFrame) { this.clockFrame = clockFrame; logger.debug("clockFrame set"); }
-//    /**
-//     * Sets the layout manager
-//     * @param layout the GridBagLayout to use
-//     */
-//    protected void setGridBagLayout(GridBagLayout layout) { this.layout = layout; }
-//    /**
-//     * Sets the grid bag constraints
-//     * @param constraints the GridBagConstraints to use
-//     */
-//    protected void setGridBagConstraints(GridBagConstraints constraints) { this.constraints = constraints; }
     /**
      * Sets the clock
      * @param clock the clock reference

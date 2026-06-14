@@ -28,11 +28,11 @@ import static clock.util.Constants.EMPTY;
  * @author michael ball
  * @version since 2.9
  */
-public class ButtonColumn extends AbstractCellEditor
-        implements TableCellRenderer, TableCellEditor, ActionListener
+public class ButtonColumn extends AbstractCellEditor implements TableCellRenderer, TableCellEditor, ActionListener
 {
     @Serial
     private static final long serialVersionUID = 1L;
+    /** The logger */
     private static final Logger logger = LogManager.getLogger(ButtonColumn.class);
     /** The reference to the table */
     private final JTable table;

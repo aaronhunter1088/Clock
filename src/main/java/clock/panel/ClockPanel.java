@@ -15,6 +15,7 @@ import java.awt.*;
  */
 public abstract class ClockPanel extends JPanel implements IClockPanel
 {
+    /** The logger */
     private static final Logger logger = LogManager.getLogger(ClockPanel.class);
 
     /** Default constructor. */

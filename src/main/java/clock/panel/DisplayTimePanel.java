@@ -25,6 +25,7 @@ import static java.lang.Thread.sleep;
  */
 public class DisplayTimePanel extends JPanel implements Runnable
 {
+    /** The logger */
     private static final Logger logger = LogManager.getLogger(DisplayTimePanel.class);
     /** The panel thread */
     public Thread thread;
@@ -71,7 +72,6 @@ public class DisplayTimePanel extends JPanel implements Runnable
     public void stop()
     {
         logger.debug("stopping digital time stopwatch panel");
-        // TODO: Is this right? Is there a better way to do this?
         thread = null;
         setClockText(startText);
         if (stopwatchPanel.getCurrentStopwatch() != null)

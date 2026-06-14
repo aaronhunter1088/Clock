@@ -34,8 +34,8 @@ public class ClockFrame extends JFrame
 {
     @Serial
     private static final long serialVersionUID = 2L;
+    /** The logger */
     private static final Logger logger = LogManager.getLogger(ClockFrame.class);
-
     /** Default window size for the digital clock panel. */
     public final static Dimension clockDefaultSize = new Dimension(700, 300);
     /** Window size for the analogue clock panel. */

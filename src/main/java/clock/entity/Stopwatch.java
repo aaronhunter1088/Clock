@@ -37,6 +37,7 @@ public class Stopwatch implements Serializable, Comparable<Stopwatch>
 {
     @Serial
     private static final long serialVersionUID = 1L;
+    /** The logger */
     private static final Logger logger = LogManager.getLogger(Stopwatch.class);
     /** Running count of total Stopwatch instances created; resets at 100. */
     public static long stopwatchCounter = 0L;

@@ -23,6 +23,7 @@ public class Lap implements Serializable, Comparable<Lap>, Cloneable
 {
     @Serial
     private static final long serialVersionUID = 1L;
+    /** The logger */
     private static final Logger logger = LogManager.getLogger(Lap.class);
     /** The lap number */
     private int lapNumber;

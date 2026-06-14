@@ -26,9 +26,13 @@ import static clock.util.Constants.*;
  */
 public class DisplayLapsPanel extends JPanel
 {
+    /** The logger */
     private static final Logger logger = LogManager.getLogger(DisplayLapsPanel.class);
+    /** The display laps layout */
     private GridBagLayout layout;
+    /** The display laps layout constraints */
     private GridBagConstraints constraints;
+    /** Reference to the stopwatch panel */
     private final StopwatchPanel stopwatchPanel;
     /** The panel thread */
     public Thread thread;
