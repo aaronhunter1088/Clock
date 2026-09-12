@@ -87,7 +87,7 @@ On the Stopwatches panel, you can change the following settings:
 * (Ctrl + F) Reverse Laps Order: This toggle will reverse the order of the laps for all stopwatches.
 * (Ctrl + L) Reset Laps: This will reset the laps for the current stopwatch, removing all laps and resetting the list.
 * (Shift + L) Reset All Laps: This will reset the laps for all stopwatches, removing all laps and resetting the lists.
-* (Ctrl + R) Rest Panel: This will reset the stopwatches panel, removing all stopwatches and resetting the list.
+* (Ctrl + R) Reset Panel: This will reset the stopwatches panel, removing all stopwatches and resetting the list.
 
 The Help Menu displays instructions on how to use the application and its features. It builds the text based on the value
 set on the menu item's setName method. When you change the panel or a setting, the help menu will adjust according to what
