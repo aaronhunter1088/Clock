@@ -1,5 +1,7 @@
 # Clock v: 3.1.0
 
+[![Dependabot Updates](https://github.com/aaronhunter1088/Clock/actions/workflows/dependabot/dependabot-updates/badge.svg)](https://github.com/aaronhunter1088/Clock/actions/workflows/dependabot/dependabot-updates)
+
 This is a Java Swing GUI application which displays the date and time to the user in
 both digital and analogue modes. It also has the capability to set multiple alarms,
 timers and stopwatches. You can also start the clock by specifying a panel or a specific
