@@ -34,7 +34,7 @@
         <dependency>
             <groupId>com.google.code.gson</groupId>
             <artifactId>gson</artifactId>
-            <version>2.14.0</version>
+            <version>2.15.0</version>
         </dependency>
         <!-- log4j2-core --><!--
              Managed in Parent Dependency Management section -->
@@ -127,17 +127,6 @@
                     <excludes>
                         <exclude>clock/examples/**</exclude>
                     </excludes>
-                </configuration>
-            </plugin>
-
-            <!-- springdoc-openapi --><!--
-                 This plugin is disabled for this project -->
-            <plugin>
-                <groupId>org.springdoc</groupId>
-                <artifactId>springdoc-openapi-maven-plugin</artifactId>
-                <version>${springdoc.openapi.version}</version>
-                <configuration>
-                    <skip>true</skip>
                 </configuration>
             </plugin>
         </plugins>
