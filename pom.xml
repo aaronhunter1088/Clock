@@ -19,22 +19,24 @@
         <outputDirectory>${basedir}/dist/${project.version}</outputDirectory>
         <finalName>${project.artifactId}-${project.version}</finalName>
         <main.class>clock.Main</main.class>
+        <gson.version>2.15.0</gson.version>
+        <java.zoom.version>1.0.1</java.zoom.version>
     </properties>
 
     <dependencies>
-        <!-- javazoom.jlayer --><!--
-             https://mvnrepository.com/artifact/javazoom/jlayer -->
-        <dependency>
-            <groupId>javazoom</groupId>
-            <artifactId>jlayer</artifactId>
-            <version>1.0.1</version>
-        </dependency>
         <!-- google.gson --><!--
              https://mvnrepository.com/artifact/com.google.code.gson/gson -->
         <dependency>
             <groupId>com.google.code.gson</groupId>
             <artifactId>gson</artifactId>
-            <version>2.15.0</version>
+            <version>${gson.version}</version>
+        </dependency>
+        <!-- javazoom.jlayer --><!--
+             https://mvnrepository.com/artifact/javazoom/jlayer -->
+        <dependency>
+            <groupId>javazoom</groupId>
+            <artifactId>jlayer</artifactId>
+            <version>${java.zoom.version}</version>
         </dependency>
         <!-- log4j2-core --><!--
              Managed in Parent Dependency Management section -->
@@ -65,12 +67,8 @@
             <scope>test</scope>
         </dependency>
         <!-- jupiter junit-engine --><!--
-             Managed in Parent Test Dependency Management section -->
-        <dependency>
-            <groupId>org.junit.jupiter</groupId>
-            <artifactId>junit-jupiter-engine</artifactId>
-            <scope>test</scope>
-        </dependency>
+             Managed in Parent Test Dependency Management section,
+             Comes from Springboot dependencies, junit-bom -->
         <!-- jupiter junit-params --><!--
              Managed in Parent Test Dependency Management section -->
         <dependency>

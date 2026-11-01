@@ -334,6 +334,7 @@ class TimerPanelTest
     @Test
     void testClickedOffHourFieldValidNumberInputFocusLost() throws InterruptedException, InvocationTargetException
     {
+        assertNotNull(timerPanel.getClock(), "Expected clock to be not null");
         // Perform all setup and dispatch on the EDT to ensure the FocusListener
         // runs on the EDT thread. Calling dispatchEvent from a non-EDT thread is
         // unsafe — in a test suite the EDT may be busy, causing the listener's
