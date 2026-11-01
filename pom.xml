@@ -129,17 +129,6 @@
                     </excludes>
                 </configuration>
             </plugin>
-
-            <!-- springdoc-openapi --><!--
-                 This plugin is disabled for this project -->
-            <plugin>
-                <groupId>org.springdoc</groupId>
-                <artifactId>springdoc-openapi-maven-plugin</artifactId>
-                <version>${springdoc.openapi.version}</version>
-                <configuration>
-                    <skip>true</skip>
-                </configuration>
-            </plugin>
         </plugins>
     </build>
 </project>

@@ -53,8 +53,9 @@ class ClockTest
     @BeforeEach
     void beforeEach()
     {
-        clockFrame = new ClockFrame(new Clock());
-        clock = clockFrame.getClock();
+        clock = new Clock(8, 30, 0, JANUARY, WEDNESDAY, 1, 2025, AM);
+        clockFrame = new ClockFrame(clock);
+        //clock = clockFrame.getClock();
         clockWEDJAN12025_103000AM.setScheduledExecutorService(clockFrame.getScheduler());
         clockWEDJAN12025_103000PM.setScheduledExecutorService(clockFrame.getScheduler());
     }
@@ -239,6 +240,8 @@ class ClockTest
     void testLocalDatesAreCompared()
     {
         LocalDate today = LocalDate.now();
+        clock = new Clock();
+        clockFrame = new ClockFrame(clock);
         assertEquals(clock.getDate(), today, "Dates should be equal");
 
         LocalDate anotherDay = LocalDate.of(2022, 8, 29);
@@ -543,6 +546,8 @@ class ClockTest
     @MethodSource("provideClocksForComparison")
     void testCompareDefaultClock(Clock input)
     {
+        clock = new Clock();
+        clockFrame = new ClockFrame(clock);
         int comparison = clock.compareTo(input);
         assertTrue(comparison >= 0, "Comparison result should match expected value");
     }
@@ -559,6 +564,8 @@ class ClockTest
     @DisplayName("Test compareTo between two clocks with similar time")
     void testCompareToSimilarClocks(Clock input, boolean expected)
     {
+        clock = new Clock();
+        clockFrame = new ClockFrame(clock);
         assertEquals(expected, clock.equals(input), "Clocks should not be equal");
     }
     public static Stream<Arguments> provideClocksForEquality() {
